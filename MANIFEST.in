@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include ganapathy_pavers *.css
+recursive-include ganapathy_pavers *.csv
+recursive-include ganapathy_pavers *.html
+recursive-include ganapathy_pavers *.ico
+recursive-include ganapathy_pavers *.js
+recursive-include ganapathy_pavers *.json
+recursive-include ganapathy_pavers *.md
+recursive-include ganapathy_pavers *.png
+recursive-include ganapathy_pavers *.py
+recursive-include ganapathy_pavers *.svg
+recursive-include ganapathy_pavers *.txt
+recursive-exclude ganapathy_pavers *.pyc
