@@ -1,0 +1,32 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Vehicle",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2022-03-14 11:28:46.916176",
+   "default_value": null,
+   "doc_type": "Vehicle",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "location",
+   "idx": 0,
+   "modified": "2022-03-14 11:28:46.916176",
+   "modified_by": "Administrator",
+   "name": "Vehicle-location-hidden",
+   "owner": "Administrator",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "hidden",
+   "property_type": "Check",
+   "row_name": null,
+   "value": "1"
+  }
+ ],
+ "sync_on_migrate": 1
+}
