@@ -89,6 +89,7 @@ app_license = "MIT"
 # ---------------
 # Hook on document methods and events
 
+<<<<<<< Updated upstream
 # doc_events = {
 # 	"*": {
 # 		"on_update": "method",
@@ -96,6 +97,19 @@ app_license = "MIT"
 # 		"on_trash": "method"
 #	}
 # }
+=======
+doc_events = {
+	"Item": {
+		# "on_update": "method",
+		# "on_cancel": "method",
+		# "on_trash": "method",
+		"after_insert": "ganapathy_pavers.ganapathy_pavers.custom.item.multiply"
+	},
+	"Delivery Trip": {
+		"before_save": "ganapathy_pavers.ganapathy_pavers.custom.delivery_trip.kilometer"
+	}
+}
+>>>>>>> Stashed changes
 
 # Scheduled Tasks
 # ---------------
