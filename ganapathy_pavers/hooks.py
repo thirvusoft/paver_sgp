@@ -95,6 +95,9 @@ doc_events = {
 		# "on_cancel": "method",
 		# "on_trash": "method",
 		"after_insert": "ganapathy_pavers.ganapathy_pavers.custom.item.multiply"
+	},
+	"Delivery Trip": {
+		"before_save": "ganapathy_pavers.ganapathy_pavers.custom.delivery_trip.kilometer"
 	}
 }
 
