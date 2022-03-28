@@ -32,6 +32,7 @@ app_license = "MIT"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {"Item" : "ganapathy_pavers/custom/item.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -89,18 +90,13 @@ app_license = "MIT"
 # ---------------
 # Hook on document methods and events
 
-
-doc_events = {
-	"Item": {
-		# "on_update": "method",
-		# "on_cancel": "method",
-		# "on_trash": "method",
-		"after_insert": "ganapathy_pavers.ganapathy_pavers.custom.item.multiply"
-	},
-	"Delivery Trip": {
-		"before_save": "ganapathy_pavers.ganapathy_pavers.custom.delivery_trip.kilometer"
-	}
-}
+# doc_events = {
+# 	"*": {
+# 		"on_update": "method",
+# 		"on_cancel": "method",
+# 		"on_trash": "method"
+#	}
+# }
 
 # Scheduled Tasks
 # ---------------
@@ -177,4 +173,3 @@ user_data_fields = [
 # auth_hooks = [
 # 	"ganapathy_pavers.auth.validate"
 # ]
-
