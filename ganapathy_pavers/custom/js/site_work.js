@@ -23,13 +23,11 @@ frappe.ui.form.on("Project",{
 	}
 })
 
-//
 var item_price
 var area_bundle
 var data
 var no_of_bundle
 var allocated_paver
-var ttt
 var tot_amount
 frappe.ui.form.on("Item Details Pavers", {
 
