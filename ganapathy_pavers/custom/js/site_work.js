@@ -61,8 +61,6 @@ frappe.ui.form.on("Item Detail Pavers", {
 			let data = locals[cdt][cdn]
 			let allocated_paver = data.number_of_bundle * data.area_per_bundle
 			frappe.model.set_value(cdt,cdn,"allocated_paver_area",allocated_paver?allocated_paver:0)
-			
-		
 	},
 	allocated_paver_area :function(frm,cdt,cdn) {
 			let data = locals[cdt][cdn]
@@ -83,71 +81,63 @@ frappe.ui.form.on("Item Detail Pavers", {
 
 //compound wall
 
-frappe.ui.form.on("Item Detail Compound Wall", {
-	item : function(frm,cdt,cdn) {      
-		let data = locals[cdt][cdn]
-		let item_code = data.item
-		if(item_code){
-			frappe.call({
-				method:"ganapathy_pavers.custom.py.site_work.item_details_fetching_compoundwall",
-				args:{item_code},
-				callback(r)
-				{
-					frappe.model.set_value(cdt,cdn,"area_per_bundle",r['message'][0]?parseFloat(r["message"][0]):0)
-					frappe.model.set_value(cdt,cdn,"rate",r["message"][1]?parseFloat(r["message"][1]):0)
-				}
-			})
-		}
-	},
-	running_sqft : function(frm,cdt,cdn) {
-		for(var i=0;i<main_data.item_details_compound_wall.length;i++){
-			var rft = data.running_sqft
-			var bundle = rft / cw_area_bundle
-			no_of_bundle = Math.round((bundle+0.5))
-			if(rft==main_data.item_details_compound_wall[i].running_sqft){
-				frappe.model.set_value(main_data.item_details_compound_wall[i].doctype,main_data.item_details_compound_wall[i].name,"allocated_ft",no_of_bundle)
-			}
-		}
-	},
-	allocated_ft : function(frm,cdt,cdn) {
-		for(var i=0;i<main_data.item_details_compound_wall.length;i++){
-			var aft = data.allocated_ft
-			cwtot_amount = item_price * no_of_bundle
-			if(aft==main_data.item_details_compound_wall[i].allocated_ft){
-				frappe.model.set_value(main_data.item_details_compound_wall[i].doctype,main_data.item_details_compound_wall[i].name,"rate",item_price)
-				frappe.model.set_value(main_data.item_details_compound_wall[i].doctype,main_data.item_details_compound_wall[i].name,"amount",cwtot_amount)
-			}
-		}
-	},
-	rate : function(frm,cdt,cdn) {
-		for(var i=0;i<main_data.item_details_compound_wall.length;i++){
-			var rate = data.rate
-			cwtot_amount = rate * no_of_bundle
-			if(rate==main_data.item_details_compound_wall[i].rate){
-				frappe.model.set_value(main_data.item_details_compound_wall[i].doctype,main_data.item_details_compound_wall[i].name,"amount",cwtot_amount)
-			}
-		}
-	}
-})
+// frappe.ui.form.on("Item Detail Compound Wall", {
+// 	item : function(frm,cdt,cdn) {      
+// 		let data = locals[cdt][cdn]
+// 		let item_code = data.item
+// 		if(item_code){
+// 			frappe.call({
+// 				method:"ganapathy_pavers.custom.py.site_work.item_details_fetching_compoundwall",
+// 				args:{item_code},
+// 				callback(r)
+// 				{
+// 					frappe.model.set_value(cdt,cdn,"area_per_bundle",r['message'][0]?parseFloat(r["message"][0]):0)
+// 					frappe.model.set_value(cdt,cdn,"rate",r["message"][1]?parseFloat(r["message"][1]):0)
+// 				}
+// 			})
+// 		}
+// 	},
+// 	running_sqft : function(frm,cdt,cdn) {
+// 			let data = locals[cdt][cdn]
+// 			let rft = data.running_sqft
+// 			let bundle = rft / cw_area_bundle
+// 			let no_of_bundle = Math.ceil(bundle)
+// 			frappe.model.set_value(cdt, cdn, "allocated_ft",no_of_bundle)
+		
+// 	},
+// 	allocated_ft : function(frm,cdt,cdn) {
+// 			let data = locals[cdt][cdn]
+// 			let aft = data.allocated_ft
+// 			cwtot_amount = item_price * no_of_bundle
+// 			frappe.model.set_value(cdt, cdn,"rate",item_price)
+// 			frappe.model.set_value(cdt, cdn,"amount",cwtot_amount)
+	
+// 	},
+// 	rate : function(frm,cdt,cdn) {
+// 			let data = locals[cdt][cdn]
+// 			let cwtot_amount = data.rate * data.number_of_bundle
+// 			frappe.model.set_value(cdt, cdn,"amount",cwtot_amount)
+// 	}
+// })
 
 
-frappe.ui.form.on('Project',{
-	validate: function(frm,cdt,cdn){
-		let arg;
-		if(cur_frm.doc.project_type == "Pavers"){
-			arg = cur_frm.doc.item_details
-		}
-		if(cur_frm.doc.project_type == "Compound Walls"){
-			arg = cur_frm.doc.item_details_compound_wall
-		}
-		if(arg){
-			frappe.call({
-				method:"ganapathy_pavers.custom.py.site_work.add_total_amount",
-				args:{items: arg},
-				callback: function(res){
-					cur_frm.set_value('estimated_costing',res.message)
-				}
-			})
-	}
-	}
-})
+// frappe.ui.form.on('Project',{
+// 	validate: function(frm,cdt,cdn){
+// 		let arg;
+// 		if(cur_frm.doc.project_type == "Pavers"){
+// 			arg = cur_frm.doc.item_details
+// 		}
+// 		if(cur_frm.doc.project_type == "Compound Walls"){
+// 			arg = cur_frm.doc.item_details_compound_wall
+// 		}
+// 		if(arg){
+// 			frappe.call({
+// 				method:"ganapathy_pavers.custom.py.site_work.add_total_amount",
+// 				args:{items: arg},
+// 				callback: function(res){
+// 					cur_frm.set_value('estimated_costing',res.message)
+// 				}
+// 			})
+// 	}
+// 	}
+// })

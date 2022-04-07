@@ -32,9 +32,15 @@ app_license = "MIT"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
-doctype_js = {"Item" : "/custom/js/item.js",
-			"Payment Entry" : "/custom/js/payment_entry.js",
-			"Project": "/custom/js/site_work.js"}
+doctype_js = {
+				"Item" : "/custom/js/item.js",
+				"Payment Entry" : "/custom/js/payment_entry.js",
+				"Project": "/custom/js/site_work.js",
+				"Sales Order": [
+								"/custom/js/site_work.js",
+								"/custom/js/sales_order.js"
+								]
+			 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -92,13 +98,11 @@ doctype_js = {"Item" : "/custom/js/item.js",
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Sales Order": {
+		"validate": "ganapathy_pavers.custom.py.sales_order.update_item"
+		}
+}
 
 # Scheduled Tasks
 # ---------------
