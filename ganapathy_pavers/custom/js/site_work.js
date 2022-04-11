@@ -29,6 +29,14 @@ frappe.ui.form.on("Project",{
     },
     onload:function(frm,cdt,cdn){
         setquery(frm,cdt,cdn)
+        frm.set_query('job__work',function(frm){
+            return{
+                filters:
+					{
+						'designation': 'Job Worker'
+					}
+			}
+        })
     }
 })
 
