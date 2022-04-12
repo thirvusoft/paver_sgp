@@ -31,7 +31,6 @@ app_license = "MIT"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -82,9 +81,10 @@ app_license = "MIT"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	# "ToDo": "custom_app.overrides.CustomToDo"
+	"Salary Slip":"ganapathy_pavers.utils.py.salary_slip.CustomSalary"
+}
 
 # Document Events
 # ---------------
@@ -93,6 +93,9 @@ app_license = "MIT"
 after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
+	"Timesheet":{
+		"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
+	}
 
 }
 
@@ -103,7 +106,8 @@ doctype_js = {
 				"Sales Order": [
 								"/custom/js/site_work.js",
 								"/custom/js/sales_order.js",
-								]
+								],
+				"Timesheet":"utils/js/timesheet.js"
 			 }
 # Scheduled Tasks
 # ---------------
