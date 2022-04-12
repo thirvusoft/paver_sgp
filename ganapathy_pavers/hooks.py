@@ -34,7 +34,6 @@ app_license = "MIT"
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
-
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -94,9 +93,7 @@ app_license = "MIT"
 after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
-	# "Sales Order": {
-	# 		"on_submit": "ganapathy_pavers.custom.py.sales_order.create_site"
-	# 	}
+
 }
 
 doctype_js = {

@@ -61,8 +61,7 @@ frappe.ui.form.on('Sales Order',{
                 self: cur_frm.doc
             },
             callback: function(r){
-                console.log(1,r.message['doc'])
-                frappe.set_route('project', 'new-project-1',r.message['doc'])
+                //frappe.set_route('project', 'new-project-1',r.message['doc'])
             }
         })
     }

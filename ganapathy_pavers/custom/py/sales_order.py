@@ -13,17 +13,7 @@ def get_item_value(doctype):
 @frappe.whitelist()
 def create_site(self):
     return
-    frappe.errprint(self)
-    self=json.loads(self)
-    doc=dict(
-        doctype='Project',
-        project_type=self['type'],
-        project_name=self['site_work'],
-        # item_details=self['pavers'],
-        # sales_order=self['name']
-    )
-    frappe.errprint(doc)
-    return doc
+    
     
     
     
