@@ -1,0 +1,80 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-03-30 12:19:20.944135",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "compound_wall_type",
+  "height",
+  "pcs",
+  "double_post",
+  "running_sqft",
+  "allocated_ft",
+  "rate",
+  "amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "compound_wall_type",
+   "fieldtype": "Select",
+   "label": "Compound Wall Type",
+   "options": "\nSlab\nPost"
+  },
+  {
+   "fieldname": "height",
+   "fieldtype": "Float",
+   "label": "Height"
+  },
+  {
+   "fieldname": "pcs",
+   "fieldtype": "Int",
+   "label": "Pcs"
+  },
+  {
+   "fieldname": "double_post",
+   "fieldtype": "Int",
+   "label": "Double Post"
+  },
+  {
+   "fieldname": "running_sqft",
+   "fieldtype": "Float",
+   "label": "Running Sqft"
+  },
+  {
+   "fieldname": "allocated_ft",
+   "fieldtype": "Float",
+   "label": "Allocated ft"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Currency",
+   "label": "Rate"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-04-12 10:55:06.269718",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Item Detail Compound Wall",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
