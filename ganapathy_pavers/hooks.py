@@ -31,7 +31,6 @@ app_license = "MIT"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Timesheet" : "utils/js/timesheet.js"}
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -104,7 +103,8 @@ doctype_js = {
 				"Sales Order": [
 								"/custom/js/site_work.js",
 								"/custom/js/sales_order.js",
-								]
+								],
+				"Timesheet":"utils/js/timesheet.js"
 			 }
 # Scheduled Tasks
 # ---------------
