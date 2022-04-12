@@ -93,6 +93,9 @@ override_doctype_class = {
 after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
+	"Timesheet":{
+		"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
+	}
 
 }
 
