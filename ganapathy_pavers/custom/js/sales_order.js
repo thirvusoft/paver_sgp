@@ -12,14 +12,27 @@ function setquery(frm){
 
 
 frappe.ui.form.on('Sales Order',{
-    
     onload:function(frm){
         setquery(frm)
         if(cur_frm.is_new()==1){
             frm.clear_table('items')
         }
         cur_frm.set_df_property('items','reqd',0);
-        cur_frm.set_df_property('items','hidden',1)
+        cur_frm.set_df_property('items','hidden',1);
+        frm.set_query('supervisor', function(frm){
+            return {
+                filters:{
+                    'designation': 'Supervisor'
+                }
+            }
+        });
+        frm.set_query('item','raw_materials',function(frm){
+            return {
+                filters:{
+                   // 'item_group':'Raw Materials'
+                }
+            }
+        })
     },
     type:function(frm){
         setquery(frm)
@@ -54,16 +67,37 @@ frappe.ui.form.on('Sales Order',{
         refresh_field("items");
     },
     
-    on_submit:function(frm){
-        frappe.call({
-            method:"ganapathy_pavers.custom.py.sales_order.create_site",
-            args:{
-                self: cur_frm.doc
-            },
-            callback: function(r){
-                //frappe.set_route('project', 'new-project-1',r.message['doc'])
-            }
-        })
+    // on_submit:function(frm){
+    //     frappe.model.open_mapped_doc({
+    //         method:"ganapathy_pavers.custom.py.sales_order.create_site",
+    //         frm: frm
+    //     })
+    // }
+})
+
+
+frappe.ui.form.on('TS Raw Materials',{
+    item: function(frm,cdt,cdn){
+        let row=locals[cdt][cdn]
+        if(row.item){
+            frappe.db.get_doc('Item',row.item).then((item)=>{
+                console.log(item,row.item)
+                console.log(item.standard_rate,item['standard_rate'])
+                frappe.model.set_value(cdt,cdn,'rate', item.standard_rate);
+                frappe.model.set_value(cdt,cdn,'uom', item.stock_uom);
+            })
+        }
+    },
+    rate: function(frm,cdt,cdn){
+        amount_rawmet(frm,cdt,cdn)
+    },
+    qty: function(frm,cdt,cdn){
+        amount_rawmet(frm,cdt,cdn)
     }
 })
 
+
+function amount_rawmet(frm,cdt,cdn){
+    let row=locals[cdt][cdn]
+    frappe.model.set_value(cdt,cdn,'amount', (row.rate?row.rate:0)*(row.qty?row.qty:0))
+}
