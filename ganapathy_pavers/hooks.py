@@ -31,7 +31,7 @@ app_license = "MIT"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {"Timesheet" : "utils/js/timesheet.js"}
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -82,9 +82,10 @@ app_license = "MIT"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	# "ToDo": "custom_app.overrides.CustomToDo"
+	"Salary Slip":"hrapp.utils.py.salary_slip.CustomSalary"
+}
 
 # Document Events
 # ---------------
