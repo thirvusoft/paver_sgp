@@ -93,9 +93,9 @@ app_license = "MIT"
 after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
-	"Sales Order": {
-			"on_submit": "ganapathy_pavers.custom.py.sales_order.create_site"
-		}
+	# "Sales Order": {
+	# 		"on_submit": "ganapathy_pavers.custom.py.sales_order.create_site"
+	# 	}
 }
 
 doctype_js = {
