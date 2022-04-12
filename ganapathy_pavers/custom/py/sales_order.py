@@ -1,5 +1,5 @@
 import frappe
-
+import json
 
 @frappe.whitelist()
 def get_item_value(doctype):
@@ -11,8 +11,9 @@ def get_item_value(doctype):
     return res
     
 @frappe.whitelist()
-def create_site(self,action):
+def create_site(self):
     return
-    doc=frappe.new_doc('Project')
+    
+    
     
     
