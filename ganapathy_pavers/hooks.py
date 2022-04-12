@@ -84,7 +84,7 @@ doctype_js = {"Timesheet" : "utils/js/timesheet.js"}
 
 override_doctype_class = {
 	# "ToDo": "custom_app.overrides.CustomToDo"
-	"Salary Slip":"hrapp.utils.py.salary_slip.CustomSalary"
+	"Salary Slip":"ganapathy_pavers.utils.py.salary_slip.CustomSalary"
 }
 
 # Document Events
@@ -94,6 +94,9 @@ override_doctype_class = {
 after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
+	"Timesheet":{
+		"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
+	}
 
 }
 

@@ -1,7 +1,7 @@
 import frappe
 
 @frappe.whitelist()
-def create_designation(self, event):
+def create_designation():
     doc=frappe.new_doc('Designation')
     doc.update({
         'doctype': 'Designation',
