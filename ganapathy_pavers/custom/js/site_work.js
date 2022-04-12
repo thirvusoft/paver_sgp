@@ -131,8 +131,6 @@ frappe.ui.form.on('TS Raw Materials',{
         let row=locals[cdt][cdn]
         if(row.item){
             frappe.db.get_doc('Item',row.item).then((item)=>{
-                console.log(item,row.item)
-                console.log(item.standard_rate,item['standard_rate'])
                 frappe.model.set_value(cdt,cdn,'rate', item.standard_rate);
                 frappe.model.set_value(cdt,cdn,'uom', item.stock_uom);
             })
