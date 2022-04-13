@@ -68,7 +68,7 @@ frappe.ui.form.on('Sales Order',{
     },
     
     // on_submit:function(frm){
-<<<<<<< HEAD
+
     //     frappe.call({
     //         method:"ganapathy_pavers.custom.py.sales_order.create_site",
     //         args:{
@@ -79,7 +79,7 @@ frappe.ui.form.on('Sales Order',{
     //         }
     //     })
     // }
-=======
+
     //     frappe.model.open_mapped_doc({
     //         method:"ganapathy_pavers.custom.py.sales_order.create_site",
     //         frm: frm
@@ -106,7 +106,7 @@ frappe.ui.form.on('TS Raw Materials',{
     qty: function(frm,cdt,cdn){
         amount_rawmet(frm,cdt,cdn)
     }
->>>>>>> 9a104b9dbe79dc5a53782aea583c3f36a538c647
+
 })
 
 

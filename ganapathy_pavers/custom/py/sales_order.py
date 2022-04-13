@@ -13,19 +13,10 @@ def get_item_value(doctype):
     return res
     
 # @frappe.whitelist()
-# def create_site(source_name):
-#     target_doc = get_mapped_doc("Sales Order", source_name, {
-# 		"Sales Order": {
-# 			"doctype": "Project",
-			
-# 		},
-# 		"Item Detail Pavers": {
-# 			"doctype": "Item Detail Pavers",
-			
-			
-# 		}
-# 	})
-#     return doclist
+# def create_site(self):
+#     return
+    
+
     
     
     
