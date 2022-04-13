@@ -17,6 +17,7 @@ frappe.ui.form.on('Sales Order',{
         if(cur_frm.is_new()==1){
             frm.clear_table('items')
         }
+        cur_frm.set_df_property('items','allow_on_submit',1);
         cur_frm.set_df_property('items','reqd',0);
         cur_frm.set_df_property('items','hidden',1);
         frm.set_query('supervisor', function(frm){
@@ -29,10 +30,11 @@ frappe.ui.form.on('Sales Order',{
         frm.set_query('item','raw_materials',function(frm){
             return {
                 filters:{
-                   // 'item_group':'Raw Materials'
+                    'item_group':'Raw Material'
                 }
             }
         })
+        
     },
     type:function(frm){
         setquery(frm)
@@ -66,26 +68,34 @@ frappe.ui.form.on('Sales Order',{
         }   
         refresh_field("items");
     },
-    
-    // on_submit:function(frm){
+    on_submit:function(frm){
+        frappe.call({
+            method:"ganapathy_pavers.custom.py.sales_order.create_site",
+            args:{
+                doc: cur_frm.doc
+            },
+            callback: function(r){
+                let doc=r.message
+                frappe.run_serially([ 
+                    () => frappe.set_route('project', 'new-project-1'), 
+                    () => cur_frm.set_value('project_name',doc.project_name),
+                    () => cur_frm.set_value('customer',doc.customer),
+                    () => cur_frm.set_value('supervisor',doc.supervisor),
+                    () => cur_frm.set_value('sales_order',doc.sales_order),
+                    () => cur_frm.set_value('item_details', doc.pavers),
+                    () => cur_frm.set_value('raw_material', doc.raw_material),
+                    () => cur_frm.set_value('project_type',doc.type),
+                ]);
+            }
+        })
+    }
 
-    //     frappe.call({
-    //         method:"ganapathy_pavers.custom.py.sales_order.create_site",
-    //         args:{
-    //             self: cur_frm.doc
-    //         },
-    //         callback: function(r){
-    //             //frappe.set_route('project', 'new-project-1',r.message['doc'])
-    //         }
-    //     })
-    // }
-
-    //     frappe.model.open_mapped_doc({
-    //         method:"ganapathy_pavers.custom.py.sales_order.create_site",
-    //         frm: frm
-    //     })
-    // }
 })
+
+
+
+
+
 
 
 frappe.ui.form.on('TS Raw Materials',{
@@ -93,8 +103,6 @@ frappe.ui.form.on('TS Raw Materials',{
         let row=locals[cdt][cdn]
         if(row.item){
             frappe.db.get_doc('Item',row.item).then((item)=>{
-                console.log(item,row.item)
-                console.log(item.standard_rate,item['standard_rate'])
                 frappe.model.set_value(cdt,cdn,'rate', item.standard_rate);
                 frappe.model.set_value(cdt,cdn,'uom', item.stock_uom);
             })
