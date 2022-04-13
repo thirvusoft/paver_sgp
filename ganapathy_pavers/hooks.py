@@ -31,6 +31,7 @@ app_license = "MIT"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
+
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -82,7 +83,7 @@ app_license = "MIT"
 
 override_doctype_class = {
 	# "ToDo": "custom_app.overrides.CustomToDo"
-	"Salary Slip":"hrapp.utils.py.salary_slip.CustomSalary"
+	"Salary Slip":"ganapathy_pavers.utils.py.salary_slip.CustomSalary"
 }
 
 # Document Events
@@ -94,6 +95,8 @@ after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 doc_events = {
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
+	"Timesheet":{
+		"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
 	}
 
 }

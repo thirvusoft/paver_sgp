@@ -29,7 +29,7 @@ frappe.ui.form.on("Project",{
     },
     onload:function(frm,cdt,cdn){
         setquery(frm,cdt,cdn)
-        frm.set_query('job__work',function(frm){
+        frm.set_query('name1','job_worker',function(frm){
             return{
                 filters:
 					{
@@ -37,6 +37,8 @@ frappe.ui.form.on("Project",{
 					}
 			}
         })
+        
+        
     }
 })
 
@@ -86,6 +88,69 @@ frappe.ui.form.on("Item Detail Pavers", {
 
 
 
+frappe.ui.form.on('TS Job Worker Details',{
+	rate: function(frm, cdt, cdn){
+		amount(frm, cdt, cdn)
+	},
+	sqft_allocated: function(frm, cdt, cdn){
+		amount(frm, cdt, cdn)
+	},
+	amount: function(frm, cdt, cdn){
+		balance_amount(frm, cdt, cdn)
+	},
+	paid_amount: function(frm, cdt, cdn){
+		balance_amount(frm, cdt, cdn)
+	}
+})
+
+
+function amount(frm,cdt,cdn){
+	let row=locals[cdt][cdn]
+	if(row.rate && row.sqft_allocated){
+		frappe.model.set_value(cdt, cdn, 'amount', row.rate*row.sqft_allocated)
+	}
+	else{
+		frappe.model.set_value(cdt, cdn, 'amount', 0)
+	}
+}
+
+
+function balance_amount(frm,cdt,cdn){
+	let row=locals[cdt][cdn]
+	if(row.amount){
+		frappe.model.set_value(cdt, cdn, 'balance_amount', row.amount- (row.paid_amount?row.paid_amount:0))
+	}
+	else{
+		frappe.model.set_value(cdt, cdn, 'balance_amount', 0)
+	}
+}
+
+
+frappe.ui.form.on('TS Raw Materials',{
+    item: function(frm,cdt,cdn){
+        let row=locals[cdt][cdn]
+        if(row.item){
+            frappe.db.get_doc('Item',row.item).then((item)=>{
+                console.log(item,row.item)
+                console.log(item.standard_rate,item['standard_rate'])
+                frappe.model.set_value(cdt,cdn,'rate', item.standard_rate);
+                frappe.model.set_value(cdt,cdn,'uom', item.stock_uom);
+            })
+        }
+    },
+    rate: function(frm,cdt,cdn){
+        amount_rawmet(frm,cdt,cdn)
+    },
+    qty: function(frm,cdt,cdn){
+        amount_rawmet(frm,cdt,cdn)
+    }
+})
+
+
+function amount_rawmet(frm,cdt,cdn){
+    let row=locals[cdt][cdn]
+    frappe.model.set_value(cdt,cdn,'amount', (row.rate?row.rate:0)*(row.qty?row.qty:0))
+}
 
 //compound wall
 

@@ -1,7 +1,7 @@
 import frappe
 
 @frappe.whitelist()
-def create_designation(self, event):
+def create_designation():
     doc=frappe.new_doc('Designation')
     doc.update({
         'doctype': 'Designation',
@@ -16,3 +16,10 @@ def create_designation(self, event):
     })
     doc.save()
     frappe.db.commit
+    doc=frappe.new_doc('Designation')
+    doc.update({
+        'doctype': 'Designation',
+        'designation_name': 'Supervisor'
+    })
+    doc.save()
+    frappe.db.commit()
