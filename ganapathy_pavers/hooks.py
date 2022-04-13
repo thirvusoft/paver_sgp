@@ -31,8 +31,6 @@ app_license = "MIT"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Timesheet" : "utils/js/timesheet.js"}
-
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -94,6 +92,9 @@ override_doctype_class = {
 after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
+	"Driver":{
+		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
+	}
 
 }
 
@@ -104,7 +105,9 @@ doctype_js = {
 				"Sales Order": [
 								"/custom/js/site_work.js",
 								"/custom/js/sales_order.js",
-								]
+								],
+				"Vehicle":"/custom/js/vehicle.js",
+				"Timesheet" : "utils/js/timesheet.js"
 			 }
 # Scheduled Tasks
 # ---------------

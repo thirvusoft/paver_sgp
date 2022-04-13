@@ -54,16 +54,16 @@ frappe.ui.form.on('Sales Order',{
         refresh_field("items");
     },
     
-    on_submit:function(frm){
-        frappe.call({
-            method:"ganapathy_pavers.custom.py.sales_order.create_site",
-            args:{
-                self: cur_frm.doc
-            },
-            callback: function(r){
-                //frappe.set_route('project', 'new-project-1',r.message['doc'])
-            }
-        })
-    }
+    // on_submit:function(frm){
+    //     frappe.call({
+    //         method:"ganapathy_pavers.custom.py.sales_order.create_site",
+    //         args:{
+    //             self: cur_frm.doc
+    //         },
+    //         callback: function(r){
+    //             //frappe.set_route('project', 'new-project-1',r.message['doc'])
+    //         }
+    //     })
+    // }
 })
 

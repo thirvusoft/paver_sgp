@@ -10,9 +10,9 @@ def get_item_value(doctype):
     }
     return res
     
-@frappe.whitelist()
-def create_site(self):
-    return
+# @frappe.whitelist()
+# def create_site(self):
+#     return
     
     
     
