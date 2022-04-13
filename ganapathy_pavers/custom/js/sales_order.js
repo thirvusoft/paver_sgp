@@ -89,6 +89,7 @@ frappe.ui.form.on('Sales Order',{
             }
         })
     }
+
 })
 
 
@@ -113,6 +114,7 @@ frappe.ui.form.on('TS Raw Materials',{
     qty: function(frm,cdt,cdn){
         amount_rawmet(frm,cdt,cdn)
     }
+
 })
 
 
