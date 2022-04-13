@@ -37,7 +37,13 @@ frappe.ui.form.on("Project",{
 					}
 			}
         })
-        
+        frm.set_query('supervisor', function(frm){
+            return {
+                filters:{
+                    'designation': 'Supervisor'
+                }
+            }
+        });
         
     }
 })
