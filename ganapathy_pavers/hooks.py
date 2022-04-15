@@ -96,6 +96,7 @@ doc_events = {
 
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
+	},
 	"Timesheet":{
 		"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
 	}
