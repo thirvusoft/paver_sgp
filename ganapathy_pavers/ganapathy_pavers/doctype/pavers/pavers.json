@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-03-30 12:16:19.293964",
+ "creation": "2022-04-15 13:29:33.628974",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -13,10 +13,12 @@
   "number_of_bundle",
   "allocated_paver_area",
   "rate",
-  "amount"
+  "amount",
+  "sales_order"
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "item",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -25,6 +27,7 @@
    "reqd": 1
   },
   {
+   "columns": 1,
    "fieldname": "required_area",
    "fieldtype": "Int",
    "in_list_view": 1,
@@ -32,39 +35,56 @@
    "reqd": 1
   },
   {
+   "columns": 1,
    "fieldname": "area_per_bundle",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Area Per Bundle",
    "read_only": 1
   },
   {
+   "columns": 1,
    "fieldname": "number_of_bundle",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Number of Bundle",
    "read_only": 1
   },
   {
+   "columns": 1,
    "fieldname": "allocated_paver_area",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Allocated Paver Area",
    "read_only": 1
   },
   {
+   "columns": 1,
    "fieldname": "rate",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "Rate ",
    "read_only": 1
   },
   {
+   "columns": 1,
    "fieldname": "amount",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "Amount",
    "read_only": 1
   },
   {
+   "columns": 2,
+   "fieldname": "sales_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sales Order",
+   "options": "Sales Order"
+  },
+  {
    "fieldname": "work",
    "fieldtype": "Select",
-   "in_list_view": 1,
    "label": "Work",
    "options": "\nSupply\nLaying\nSupply & Laying",
    "reqd": 1
@@ -73,10 +93,10 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-04-15 14:31:53.312771",
+ "modified": "2022-04-15 14:31:40.666094",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "Item Detail Pavers",
+ "name": "Pavers",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",

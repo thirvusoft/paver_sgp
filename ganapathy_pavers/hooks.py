@@ -100,8 +100,6 @@ doc_events = {
 	"Timesheet":{
 		"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
 	}
-
-
 }
 
 doctype_js = {
