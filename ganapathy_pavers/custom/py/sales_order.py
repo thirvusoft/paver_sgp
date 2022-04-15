@@ -36,7 +36,7 @@ def create_site(doc):
             'amount':row['amount'],
             'sales_order':doc['name']
             } for row in doc['raw_materials']]
-    site_work=frappe.get_doc('Project','PROJ-0009')
+    site_work=frappe.get_doc('Project',doc['site_work'])
     site_work.update({
         'supervisor': supervisor,
         'item_details': (site_work.get('item_details') or []) +pavers,
