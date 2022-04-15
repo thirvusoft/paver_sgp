@@ -17,7 +17,6 @@ frappe.ui.form.on('Sales Order',{
         if(cur_frm.is_new()==1){
             frm.clear_table('items')
         }
-        cur_frm.set_df_property('items','allow_on_submit',1);
         cur_frm.set_df_property('items','reqd',0);
         cur_frm.set_df_property('items','hidden',1);
         frm.set_query('supervisor', function(frm){
@@ -34,7 +33,26 @@ frappe.ui.form.on('Sales Order',{
                 }
             }
         })
-        
+        if(cur_frm.doc.docstatus==0){
+            cur_frm.fields_dict.site_work.$input.on("click", function() {
+                if(!cur_frm.doc.customer){
+                    frappe.throw('Please Select Customer')
+                }
+            });
+        }
+    },
+    customer:function(frm){
+        frm.set_query('site_work',function(frm){
+            return {
+                filters:{
+                    'customer': cur_frm.doc.customer,
+                    'status': 'Open'
+                }
+            }
+        })
+    },
+    site_work:function(frm){
+        cur_frm.set_value('project',cur_frm.doc.site_work)
     },
     type:function(frm){
         setquery(frm)
@@ -64,6 +82,7 @@ frappe.ui.form.on('Sales Order',{
                 new_row.conversion_factor=1
                 new_row.warehouse=cur_frm.doc.set_warehouse
                 new_row.delivery_date=cur_frm.doc.delivery_date
+                new_row.work=cur_frm.doc.pavers[row].work
             }
         }   
         refresh_field("items");
@@ -75,21 +94,11 @@ frappe.ui.form.on('Sales Order',{
                 doc: cur_frm.doc
             },
             callback: function(r){
-                let doc=r.message
-                frappe.run_serially([ 
-                    () => frappe.set_route('project', 'new-project-1'), 
-                    () => cur_frm.set_value('project_name',doc.project_name),
-                    () => cur_frm.set_value('customer',doc.customer),
-                    () => cur_frm.set_value('supervisor',doc.supervisor),
-                    () => cur_frm.set_value('sales_order',doc.sales_order),
-                    () => cur_frm.set_value('item_details', doc.pavers),
-                    () => cur_frm.set_value('raw_material', doc.raw_material),
-                    () => cur_frm.set_value('project_type',doc.type),
-                ]);
-            }
+                frappe.set_route('project', cur_frm.doc.site_work)
+                cur_frm.reload_doc()
+                }
         })
     }
-
 })
 
 

@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-03-30 12:19:20.944135",
+ "creation": "2022-04-15 13:28:35.864934",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -15,64 +15,95 @@
   "running_sqft",
   "allocated_ft",
   "rate",
-  "amount"
+  "amount",
+  "sales_order"
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "item",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Item",
    "options": "Item",
-   "reqd": 1
+   "reqd": 1,
+   "width": "2"
   },
   {
+   "columns": 1,
    "fieldname": "compound_wall_type",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Compound Wall Type",
    "options": "\nSlab\nPost",
-   "reqd": 1
+   "reqd": 1,
+   "width": "1"
   },
   {
+   "fieldname": "sales_order",
+   "fieldtype": "Link",
+   "label": "Sales Order",
+   "options": "Sales Order"
+  },
+  {
+   "columns": 1,
    "fieldname": "height",
    "fieldtype": "Float",
-   "label": "Height"
+   "in_list_view": 1,
+   "label": "Height",
+   "width": "1"
   },
   {
+   "columns": 1,
    "fieldname": "pcs",
    "fieldtype": "Int",
-   "label": "Pcs"
+   "in_list_view": 1,
+   "label": "Pcs",
+   "width": "1"
   },
   {
+   "columns": 1,
    "fieldname": "double_post",
    "fieldtype": "Int",
-   "label": "Double Post"
+   "in_list_view": 1,
+   "label": "Double Post",
+   "width": "1"
   },
   {
+   "columns": 1,
    "fieldname": "running_sqft",
    "fieldtype": "Float",
-   "label": "Running Sqft"
+   "in_list_view": 1,
+   "label": "Running Sqft",
+   "width": "1"
   },
   {
+   "columns": 1,
    "fieldname": "allocated_ft",
    "fieldtype": "Float",
-   "label": "Allocated ft"
+   "in_list_view": 1,
+   "label": "Allocated ft",
+   "width": "1"
   },
   {
+   "columns": 1,
    "fieldname": "rate",
    "fieldtype": "Currency",
-   "label": "Rate"
+   "in_list_view": 1,
+   "label": "Rate",
+   "width": "1"
   },
   {
+   "columns": 1,
    "fieldname": "amount",
    "fieldtype": "Currency",
-   "label": "Amount"
+   "in_list_view": 1,
+   "label": "Amount",
+   "width": "1"
   },
   {
    "fieldname": "work",
    "fieldtype": "Select",
-   "in_list_view": 1,
    "label": "Work",
    "options": "\nSupply\nLaying\nSupply & Laying",
    "reqd": 1
@@ -81,10 +112,10 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-04-15 14:32:14.212866",
+ "modified": "2022-04-15 14:32:05.133335",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "Item Detail Compound Wall",
+ "name": "Compound Wall",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
