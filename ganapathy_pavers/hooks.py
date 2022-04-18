@@ -93,7 +93,9 @@ override_doctype_class = {
 after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
-
+	'Payment Entry':{
+        'on_submit':'ganapathy_pavers.utils.py.payment_entry.create_additional_salary'
+    },
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
 	},
