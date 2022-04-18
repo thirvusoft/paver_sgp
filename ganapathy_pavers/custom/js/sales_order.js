@@ -84,7 +84,34 @@ frappe.ui.form.on('Sales Order',{
                 new_row.delivery_date=cur_frm.doc.delivery_date
                 new_row.work=cur_frm.doc.pavers[row].work
             }
-        }   
+        }
+        for(let row=0;row<cur_frm.doc.raw_materials.length;row++){
+            var message;
+            var new_row = frm.add_child("items");
+            new_row.item_code=cur_frm.doc.raw_materials[row].item
+            new_row.qty=cur_frm.doc.raw_materials[row].qty
+            new_row.uom=cur_frm.doc.raw_materials[row].uom
+            new_row.rate=cur_frm.doc.raw_materials[row].rate
+            new_row.amount=cur_frm.doc.raw_materials[row].amount
+            await frappe.call({
+                method:'ganapathy_pavers.custom.py.sales_order.get_item_value',
+                args:{
+                    'doctype':cur_frm.doc.raw_materials[row].item,
+                },
+                callback: function(r){
+                    message=r.message;
+                    new_row.item_name=message['item_name']
+                    new_row.description=message['description']
+                }
+            })
+            new_row.conversion_factor=1
+            new_row.warehouse=cur_frm.doc.set_warehouse
+            new_row.delivery_date=cur_frm.doc.delivery_date
+            
+        }
+       
+            
+           
         refresh_field("items");
     },
     on_submit:function(frm){
