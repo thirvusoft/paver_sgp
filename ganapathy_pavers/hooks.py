@@ -1,3 +1,4 @@
+from razorpay import Payment
 from . import __version__ as app_version
 
 app_name = "ganapathy_pavers"
@@ -93,7 +94,13 @@ override_doctype_class = {
 after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
-
+	'Payment Entry':{
+		'on_submit':'ganapathy_pavers.utils.py.payment_entry.create_additional_salary'
+	},
+	'Salary Slip':
+	{
+		'validate':'ganapathy_pavers.utils.py.salary_slip.salary_structure_update'
+	}
 }
 
 doctype_js = {
@@ -104,7 +111,8 @@ doctype_js = {
 								"/custom/js/site_work.js",
 								"/custom/js/sales_order.js",
 								],
-				"Timesheet":"utils/js/timesheet.js"
+				"Timesheet":"utils/js/timesheet.js",
+				"Salary Slip":"utils/js/salary_slip.js"
 			 }
 # Scheduled Tasks
 # ---------------
