@@ -16,7 +16,7 @@ def get_item_value(doctype):
 @frappe.whitelist()
 def create_site(doc):
     doc=json.loads(doc)
-    supervisor=doc.get('supervisor') if('supervisor' in doc) else '',
+    supervisor=doc.get('supervisor') if('supervisor' in doc) else ''
     pavers=[{
             'item':row['item'],
             'required_area':row['required_area'],
