@@ -16,7 +16,7 @@ def get_item_value(doctype):
 @frappe.whitelist()
 def create_site(doc):
     doc=json.loads(doc)
-    supervisor=doc.get('supervisor') if('supervisor' in doc) else ''
+    supervisor=doc.get('supervisor_name') if('supervisor_name' in doc) else ''
     pavers=[{
             'item':row['item'],
             'required_area':row['required_area'],
@@ -38,7 +38,7 @@ def create_site(doc):
             } for row in doc['raw_materials']]
     site_work=frappe.get_doc('Project',doc['site_work'])
     site_work.update({
-        'supervisor': supervisor,
+        'supervisor_name': supervisor,
         'item_details': (site_work.get('item_details') or []) +pavers,
         'raw_material': (site_work.get('raw_material') or []) + raw_material
     })
