@@ -113,7 +113,8 @@ doctype_js = {
 								"/custom/js/sales_order.js",
 								],
 				"Vehicle":"/custom/js/vehicle.js",
-				"Timesheet" : "utils/js/timesheet.js"
+				"Timesheet" : "utils/js/timesheet.js",
+				"Salary Slip":"utils/js/salary_slip.js"
 			 }
 # Scheduled Tasks
 # ---------------
