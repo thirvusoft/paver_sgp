@@ -60,7 +60,8 @@ frappe.ui.form.on('Sales Order',{
     before_save:async function(frm){
         frm.clear_table("items");
         if(cur_frm.doc.type=='Pavers'){
-            for(let row=0;row<cur_frm.doc.pavers.length;row++){
+            let rm= cur_frm.doc.pavers?cur_frm.doc.pavers:[]
+            for(let row=0;row<rm.length;row++){
                 var message;
                 var new_row = frm.add_child("items");
                 new_row.item_code=cur_frm.doc.pavers[row].item
@@ -85,7 +86,8 @@ frappe.ui.form.on('Sales Order',{
                 new_row.work=cur_frm.doc.pavers[row].work
             }
         }
-        for(let row=0;row<cur_frm.doc.raw_materials.length;row++){
+        let rm= cur_frm.doc.raw_materials?cur_frm.doc.raw_materials:[]
+        for(let row=0;row<rm.length;row++){
             var message;
             var new_row = frm.add_child("items");
             new_row.item_code=cur_frm.doc.raw_materials[row].item
