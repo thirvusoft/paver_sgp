@@ -1,6 +1,10 @@
+var salary_balance;
 frappe.ui.form.on('Salary Slip',{
     employee:function(frm,cdt,cdn){
         if(frm.doc.designation=='Job Worker'){
+            frappe.db.get_doc('Employee', frm.doc.employee).then((doc) => {
+                salary_balance=doc.salary_balance
+            });
             frappe.call({
                 method:"ganapathy_pavers.utils.py.salary_slip.site_work_details",
                 args:{
@@ -22,13 +26,26 @@ frappe.ui.form.on('Salary Slip',{
                     cur_frm.refresh_field("site_work_details")
                     cur_frm.set_value("total_paid_amount",paid_amount);
                     cur_frm.set_value("total_amount",total_amount);
-                    cur_frm.set_value("total_unpaid_amount",total_unpaid_amount);
+                    cur_frm.set_value("total_unpaid_amount",(frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance);
                 }
         })
         }     
     },
+    pay_the_balance:function(frm){
+        if(frm.doc.pay_the_balance==1){
+            frm.set_value('total_paid_amount',frm.doc.total_paid_amount+frm.doc.salary_balance)
+            frm.set_value('total_amount',frm.doc.total_amount+frm.doc.salary_balance)
+            frm.set_value('salary_balance',0)
+        }
+        else{
+                frm.set_value('salary_balance',salary_balance)
+                frm.set_value('total_paid_amount',frm.doc.total_paid_amount-frm.doc.salary_balance)
+                frm.set_value('total_amount',frm.doc.total_amount-frm.doc.salary_balance)
+        }
+
+    },
     total_paid_amount:function(frm){
-        frm.set_value('total_unpaid_amount',frm.doc.total_amount-frm.doc.total_paid_amount) 
+        frm.set_value('total_unpaid_amount',(frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance) 
         let earnings = frm.doc.earnings
         for (let data in earnings){
             if(earnings[data].salary_component=='Basic'){
@@ -38,19 +55,7 @@ frappe.ui.form.on('Salary Slip',{
         }      
     }
 })
-var set_totals = function(frm) {
-	if (frm.doc.docstatus === 0 && frm.doc.doctype === "Salary Slip") {
-		if (frm.doc.earnings || frm.doc.deductions) {
-			frappe.call({
-				method: "set_totals",
-				doc: frm.doc,
-				callback: function() {
-					frm.refresh_fields();
-				}
-			});
-		}
-	}
-};
+
 
 frappe.ui.form.on('Site work Details',{
     paid_amount:function(frm,cdt,cdn){
@@ -60,8 +65,14 @@ frappe.ui.form.on('Site work Details',{
         for (let value in paid_data){
             amount_to_pay+=paid_data[value].paid_amount
         }
-        frappe.model.set_value(row.doctype,row.name, "balance_amount",row.amount - row.paid_amount )   
-        frm.set_value('total_paid_amount',amount_to_pay)
+        frappe.model.set_value(row.doctype,row.name, "balance_amount",row.amount - row.paid_amount)
+        if(frm.doc.pay_the_balance){
+
+            frm.set_value('total_paid_amount',salary_balance+amount_to_pay)
+        }  
+        else{
+            frm.set_value('total_paid_amount',amount_to_pay)
+        } 
         
 }
 })

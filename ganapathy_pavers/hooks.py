@@ -96,6 +96,10 @@ doc_events = {
 	'Payment Entry':{
         'on_submit':'ganapathy_pavers.utils.py.payment_entry.create_additional_salary'
     },
+	'Salary Slip':
+    {
+        'on_submit':'ganapathy_pavers.utils.py.salary_slip.employee_update'
+    },
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
 	},
