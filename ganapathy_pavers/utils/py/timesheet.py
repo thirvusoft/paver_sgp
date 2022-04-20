@@ -10,7 +10,9 @@ def stock_entry(doc,method=None):
         batch.batch_id=a.strftime('%m/%d/%y')
         batch.item=data.item
         batch.insert()
+        company = frappe.get_doc('Company',doc.company)
+        abbr=company.abbr
         make_stock_entry(item_code=data.item,
         qty=data.total_production_pavers,
-        to_warehouse="Finished Goods - TS",
+        to_warehouse="Finished Goods - "+abbr,
         batch_no =a.strftime('%m/%d/%y'))
