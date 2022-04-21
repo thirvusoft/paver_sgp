@@ -106,7 +106,7 @@ doc_events = {
 	},
 	"Timesheet":{
 		"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
-	}
+	},
 }
 
 doctype_js = {
@@ -119,7 +119,8 @@ doctype_js = {
 								],
 				"Vehicle":"/custom/js/vehicle.js",
 				"Timesheet" : "utils/js/timesheet.js",
-				"Salary Slip":"utils/js/salary_slip.js"
+				"Salary Slip":"utils/js/salary_slip.js",
+				"Purchase Receipt":"/custom/js/purchase_receipt.js"
 			 }
 # Scheduled Tasks
 # ---------------

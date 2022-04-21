@@ -48,8 +48,22 @@ frappe.ui.form.on("Project",{
             cur_frm.set_df_property('project_name','read_only',1)
             cur_frm.set_df_property('customer','read_only',1)
         }
+        
+	sqft_allocated: function(frm, cdt, cdn){
+		percent_completed(frm, cdt, cdn)
+	},
+	allocated_paver_area :function(frm,cdt,cdn) {
+		percent_completed(frm,cdt,cdn)
+	}
+
+function percent_completed(frm,cdt,cdn){ 
+	for(let row=0;row<rm.length;sqft_allocated++){
+
+        }
+
     }
 })
+
 
 
 frappe.ui.form.on("Item Detail Pavers", {
@@ -149,6 +163,7 @@ frappe.ui.form.on('TS Job Worker Details',{
 	},
 	sqft_allocated: function(frm, cdt, cdn){
 		amount(frm, cdt, cdn)
+		percent_completed(frm, cdt, cdn)
 	}
 })
 
