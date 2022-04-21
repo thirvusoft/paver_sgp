@@ -83,7 +83,8 @@ app_license = "MIT"
 
 override_doctype_class = {
 	# "ToDo": "custom_app.overrides.CustomToDo"
-	"Salary Slip":"ganapathy_pavers.utils.py.salary_slip.CustomSalary"
+	"Salary Slip":"ganapathy_pavers.utils.py.salary_slip.CustomSalary",
+	"Payroll Entry":"ganapathy_pavers.utils.py.payroll_entry.MessExpense",
 }
 
 # Document Events
