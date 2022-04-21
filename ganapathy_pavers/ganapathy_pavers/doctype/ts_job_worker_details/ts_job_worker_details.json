@@ -61,20 +61,18 @@
    "fieldname": "sqft_allocated",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Sqft Allocated"
+   "label": "Completed Sqft"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-04-18 14:46:48.383098",
+ "modified": "2022-04-20 10:08:51.445425",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Job Worker Details",
- "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_order": "DESC"
 }
