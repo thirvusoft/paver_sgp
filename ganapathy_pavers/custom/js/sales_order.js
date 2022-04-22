@@ -125,6 +125,7 @@ frappe.ui.form.on('Sales Order',{
             callback: function(r){
                 frappe.set_route('project', cur_frm.doc.site_work)
                 cur_frm.reload_doc()
+               
                 }
         })
     }
