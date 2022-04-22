@@ -123,31 +123,6 @@
  ],
  "custom_perms": [],
  "doctype": "Timesheet Detail",
- "property_setters": [
-  {
-   "_assign": null,
-   "_comments": null,
-   "_liked_by": null,
-   "_user_tags": null,
-   "creation": "2022-04-20 11:13:12.238366",
-   "default_value": null,
-   "doc_type": "Timesheet Detail",
-   "docstatus": 0,
-   "doctype_or_field": "DocField",
-   "field_name": "activity_type",
-   "idx": 0,
-   "modified": "2022-04-20 11:13:12.238366",
-   "modified_by": "Administrator",
-   "name": "Timesheet Detail-activity_type-hidden",
-   "owner": "Administrator",
-   "parent": null,
-   "parentfield": null,
-   "parenttype": null,
-   "property": "hidden",
-   "property_type": "Check",
-   "row_name": null,
-   "value": "1"
-  }
- ],
+ "property_setters": [],
  "sync_on_migrate": 1
 }
