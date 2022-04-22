@@ -27,7 +27,9 @@ frappe.ui.form.on("Project",{
     project_type:function(frm,cdt,cdn){
         setquery(frm,cdt,cdn)
     },
+    
     onload:function(frm,cdt,cdn){
+        percent_complete(frm,cdt,cdn)
         setquery(frm,cdt,cdn)
         frm.set_query('name1','job_worker',function(frm){
             return{
@@ -48,8 +50,28 @@ frappe.ui.form.on("Project",{
             cur_frm.set_df_property('project_name','read_only',1)
             cur_frm.set_df_property('customer','read_only',1)
         }
+        
+	
+        	
+		
+
     }
 })
+
+function percent_complete(frm,cdt,cdn){ 
+	let total_area=0;
+	let paver= cur_frm.doc.item_details?cur_frm.doc.item_details:[]
+	for(let row=0;row<paver.length;row++){
+		total_area+= cur_frm.doc.item_details[row].required_area
+	        }
+	let completed_area=0;
+	let work= cur_frm.doc.job_worker?cur_frm.doc.job_worker:[]
+	for(let row=0;row<work.length;row++){
+		completed_area+= cur_frm.doc.job_worker[row].sqft_allocated
+	}
+	let percent=(completed_area/total_area)*100
+	frm.set_value('completed',percent)
+}
 
 
 frappe.ui.form.on("Item Detail Pavers", {
@@ -69,6 +91,9 @@ frappe.ui.form.on("Item Detail Pavers", {
 		}
 	},
 	required_area : function(frm,cdt,cdn) {
+			if(cur_frm.doc.type=="Project"){
+			percent_complete(frm, cdt, cdn)
+			}
 			let data = locals[cdt][cdn]
 			let bundle = data.area_per_bundle?data.required_area / data.area_per_bundle :0
 			let no_of_bundle = Math.ceil(bundle)
@@ -82,10 +107,12 @@ frappe.ui.form.on("Item Detail Pavers", {
 			frappe.model.set_value(cdt,cdn,"allocated_paver_area",allocated_paver?allocated_paver:0)
 	},
 	allocated_paver_area :function(frm,cdt,cdn) {
+			
 			let data = locals[cdt][cdn]
 			let allocated_paver = data.allocated_paver_area
 			let tot_amount = data.rate * allocated_paver
 			frappe.model.set_value(cdt,cdn,"amount",tot_amount?tot_amount:0)
+			
 	},
 	rate : function(frm,cdt,cdn) {
 			let data = locals[cdt][cdn]
@@ -148,7 +175,9 @@ frappe.ui.form.on('TS Job Worker Details',{
 		amount(frm, cdt, cdn)
 	},
 	sqft_allocated: function(frm, cdt, cdn){
+		percent_complete(frm, cdt, cdn)
 		amount(frm, cdt, cdn)
+		
 	}
 })
 
