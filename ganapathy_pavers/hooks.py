@@ -95,16 +95,21 @@ override_doctype_class = {
 after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
-	'Payment Entry':{
-        'on_submit':'ganapathy_pavers.utils.py.payment_entry.create_additional_salary'
-    },
-	'Salary Slip':
-    {
-        'on_submit':'ganapathy_pavers.utils.py.salary_slip.employee_update'
-    },
+	"Payment Entry":{
+                      "on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary"
+          },
+	"Salary Slip":{
+        		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update"
+          },
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
 	},
+	"Timesheet":{
+		"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
+	},
+	"Project":{
+		"validate":"ganapathy_pavers.custom.py.site_work.validate"
+	}
 	# "Timesheet":{
 	# 	"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
 	# }
