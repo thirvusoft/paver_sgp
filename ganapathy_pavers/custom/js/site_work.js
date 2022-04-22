@@ -59,7 +59,6 @@ frappe.ui.form.on("Project",{
 })
 
 function percent_complete(frm,cdt,cdn){ 
-	console.log("set")
 	let total_area=0;
 	let paver= cur_frm.doc.item_details?cur_frm.doc.item_details:[]
 	for(let row=0;row<paver.length;row++){
