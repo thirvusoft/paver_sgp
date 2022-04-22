@@ -84,6 +84,7 @@ app_license = "MIT"
 override_doctype_class = {
 	# "ToDo": "custom_app.overrides.CustomToDo"
 	"Salary Slip":"ganapathy_pavers.utils.py.salary_slip.CustomSalary",
+	"Payroll Entry":"ganapathy_pavers.utils.py.payroll_entry.MessExpense",
 	"Opening Invoice Creation Tool":"ganapathy_pavers.custom.py.opening_invoice.OpeningInvoice"
 }
 
@@ -106,7 +107,7 @@ doc_events = {
 	},
 	"Timesheet":{
 		"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
-	}
+	},
 }
 
 doctype_js = {
@@ -119,7 +120,8 @@ doctype_js = {
 								],
 				"Vehicle":"/custom/js/vehicle.js",
 				"Timesheet" : "utils/js/timesheet.js",
-				"Salary Slip":"utils/js/salary_slip.js"
+				"Salary Slip":"utils/js/salary_slip.js",
+				"Purchase Receipt":"/custom/js/purchase_receipt.js"
 			 }
 # Scheduled Tasks
 # ---------------
