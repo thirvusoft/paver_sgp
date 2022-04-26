@@ -6,7 +6,7 @@ def create_additional_salary(doc,action):
             if advance_doc.repay_unclaimed_amount_from_salary == 1:
                 add_doc=frappe.new_doc('Additional Salary')
                 add_doc.employee = doc.party
-                add_doc.salary_component = 'Additional Salary'
+                add_doc.salary_component = 'Advance Amount'
                 add_doc.payroll_date=doc.posting_date
                 add_doc.amount=i.allocated_amount
                 add_doc.ref_doctype='Employee Advance'

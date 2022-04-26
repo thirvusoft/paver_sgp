@@ -44,15 +44,34 @@ frappe.ui.form.on('Salary Slip',{
         }
 
     },
+    total_time_of_food_taken:function(frm){
+        var emp = frm.doc.employee
+        cur_frm.set_value('employee','')
+        cur_frm.set_value('employee',emp)
+    },
     total_paid_amount:function(frm){
         frm.set_value('total_unpaid_amount',(frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance) 
         let earnings = frm.doc.earnings
+        var exit=0
         for (let data in earnings){
             if(earnings[data].salary_component=='Basic'){
                 frappe.model.set_value(earnings[data].doctype,earnings[data].name,'amount',frm.doc.total_paid_amount)
+                exit=1
             }
             cur_frm.refresh_field("earnings")
-        }      
+        }   
+        if(exit==0){
+            var child = cur_frm.add_child("earnings");
+            frappe.model.set_value(child.doctype, child.name, "salary_component",'Basic') 
+            setTimeout(() => {    
+                frappe.model.set_value(child.doctype, child.name, "amount",frm.doc.total_paid_amount)
+                cur_frm.refresh_field("earnings")            }, 100);
+        }   
+    },
+    employee:function(frm){
+        var date = frm.doc.end_date;
+        var arr = date.split('-');
+        frm.set_value('days',arr[2])
     }
 })
 
