@@ -1,4 +1,4 @@
- import frappe
+import frappe
 def create_payment_entry(doc,action):
         add_doc=frappe.new_doc('Payment Entry')
         add_doc.payment_type='Pay'
