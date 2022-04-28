@@ -49,6 +49,7 @@ frappe.ui.form.on('Sales Order',{
         }
     },
     customer:function(frm){
+        cur_frm.set_value('site_work','')
         frm.set_query('site_work',function(frm){
             return {
                 filters:{
@@ -149,13 +150,19 @@ frappe.ui.form.on('Sales Order',{
                 doc: cur_frm.doc
             },
             callback: function(r){
-                frappe.set_route('project', cur_frm.doc.site_work)
-                cur_frm.reload_doc()
-               
+                frappe.run_serially([
+                    () =>{
+                        frappe.set_route('project', cur_frm.doc.site_work)
+                    },
+                    () => {
+                        window.location.reload()
+                    }
+                ])
                 }
         })
     },
     is_multi_customer: function(frm){
+        cur_frm.set_value('site_work','')
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_df_property('customer','reqd',0);
             cur_frm.set_value('customer','');

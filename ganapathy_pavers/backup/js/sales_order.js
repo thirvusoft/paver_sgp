@@ -46,7 +46,7 @@ make_delivery_note(delivery_dates) {
         }
     })
 }
-}
+},
 
  make_sales_invoice() {
     var me = this
@@ -89,4 +89,4 @@ make_delivery_note(delivery_dates) {
         }
     })
 }
-}
+},
