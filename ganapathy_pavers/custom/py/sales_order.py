@@ -1,4 +1,5 @@
 from codecs import ignore_errors
+import site
 import frappe
 import json
 from frappe.model.mapper import get_mapped_doc
@@ -38,12 +39,54 @@ def create_site(doc):
             } for row in doc['raw_materials']]
     site_work=frappe.get_doc('Project',doc['site_work'])
     site_work.update({
+        'customer': doc['customer'] or '',
         'supervisor_name': supervisor,
         'item_details': (site_work.get('item_details') or []) +pavers,
         'raw_material': (site_work.get('raw_material') or []) + raw_material
     })
+    if(doc['is_multi_customer']):
+        sw_cust=[cus.customer for cus in (site_work.get('customer_name') or [] )]
+        customer=[]
+        for cust in doc['customers_name']:
+            if(cust['customer'] not in sw_cust):
+                customer.append({'customer':cust['customer']})
+        site_work.update({
+            'customer_name': (site_work.get('customer_name') or [] ) + customer
+        })
     site_work.save()
     frappe.db.commit()
     return
 
+
+@frappe.whitelist()
+def create_property():
+    doc=frappe.new_doc('Property Setter')
+    doc.update({
+        "doctype_or_field": "DocField",
+        "doc_type":"Sales Order",
+        "field_name":"customer",
+        "property":"reqd",
+        "value":0
+    })
+    doc.save()
+    frappe.db.commit()
+    return doc.name
+   
+   
+@frappe.whitelist()
+def remove_property(prop_name):
+    frappe.delete_doc('Property Setter',prop_name)
+    frappe.db.commit()
+
+
+@frappe.whitelist()
+def update_temporary_customer(customer, sales_order):
+    doc=frappe.get_doc('Sales Order',sales_order)
+    frappe.db.set(doc, "customer", customer)
+
+@frappe.whitelist()
+def get_customer_list(sales_order):
+    doc=frappe.get_doc('Sales Order', sales_order)
+    customer=[cust.customer for cust in doc.customers_name]
+    return '\n'.join(customer)
     
