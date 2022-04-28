@@ -44,13 +44,16 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
             if(employee.designation=='Job Worker'):
                 job_worker = frappe.db.get_all('TS Job Worker Details',fields=['name1','parent','amount','start_date','end_date'])
                 site_work=[]
+                total_amount=0
                 start_date=getdate(start_date)
                 end_date=getdate(end_date)
                 for data in job_worker:
                     site_row = frappe._dict({})
                     if data.name1 == emp and data.start_date >= start_date and data.start_date <= end_date and data.end_date >= start_date and data.end_date <= end_date:
+                        total_amount+=data.amount
                         site_row.update({'site_work_name':data.parent,'amount':data.amount})
                     site_work.append(site_row)
+                args.update({"doctype": "Salary Slip", "total_amount": total_amount})
                 args.update({"doctype": "Salary Slip", "site_work_details": site_work})
             ss = frappe.get_doc(args)
             ss.insert()
