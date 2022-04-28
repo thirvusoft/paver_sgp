@@ -17,8 +17,13 @@ frappe.ui.form.on('Timesheet Detail',{
             var qty_table=frm.doc.item_produced_quantity
             for (let data in qty_table){
                 if(row.item==qty_table[data].item){
-                    let existing_qty=qty_table[data].quantity_produced
-                    frappe.model.set_value(qty_table[data].doctype,qty_table[data].name,'quantity_produced',existing_qty+row.total_production_pavers)
+                    let existing_quantity=0
+                    for (let val in frm.doc.time_logs){
+                        if(frm.doc.time_logs[val].item==row.item){
+                            existing_quantity+=frm.doc.time_logs[val].total_production_pavers
+                        }
+                    }
+                    frappe.model.set_value(qty_table[data].doctype,qty_table[data].name,'quantity_produced',existing_quantity)
                     cur_frm.refresh_field("item_produced_quantity")
                 }
             }

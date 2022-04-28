@@ -25,4 +25,4 @@ def add_total_amount(items):
 def validate(doc, action):
     completed = doc.completed or 0
     if completed>100:
-        frappe.throw(frappe._("Area completed by Job Worker is greater than required area.Please Check").format(completed)) 
+        frappe.throw(frappe._("Area completed by Job Worker is greater than required area.Please Check")) 
