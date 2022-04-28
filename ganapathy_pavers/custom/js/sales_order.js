@@ -10,10 +10,17 @@ function setquery(frm){
     })
 }
 
-
+var prop_name;
 frappe.ui.form.on('Sales Order',{
     onload:function(frm){
+        if(cur_frm.doc.is_multi_customer){
+            cur_frm.set_df_property('customer','reqd',0);
+        }
+        else{
+            cur_frm.set_df_property('customer','reqd',1);
+        }
         setquery(frm)
+        
         if(cur_frm.is_new()==1){
             frm.clear_table('items')
         }
@@ -35,7 +42,7 @@ frappe.ui.form.on('Sales Order',{
         })
         if(cur_frm.doc.docstatus==0){
             cur_frm.fields_dict.site_work.$input.on("click", function() {
-                if(!cur_frm.doc.customer){
+                if(!cur_frm.doc.customer && cur_frm.doc.is_multi_customer==0){
                     frappe.throw('Please Select Customer')
                 }
             });
@@ -46,7 +53,8 @@ frappe.ui.form.on('Sales Order',{
             return {
                 filters:{
                     'customer': cur_frm.doc.customer,
-                    'status': 'Open'
+                    'status': 'Open',
+                    'is_multi_customer':cur_frm.doc.is_multi_customer
                 }
             }
         })
@@ -58,6 +66,14 @@ frappe.ui.form.on('Sales Order',{
         setquery(frm)
     },
     before_save:async function(frm){
+        if(cur_frm.doc.is_multi_customer){
+            await frappe.call({
+                "method":"ganapathy_pavers.custom.py.sales_order.create_property",
+                "callback":function(r){
+                    prop_name=r.message;
+                }
+            })
+        }
         frm.clear_table("items");
         if(cur_frm.doc.type=='Pavers'){
             let rm= cur_frm.doc.pavers?cur_frm.doc.pavers:[]
@@ -116,6 +132,16 @@ frappe.ui.form.on('Sales Order',{
            
         refresh_field("items");
     },
+    after_save:function(frm){
+        if(cur_frm.doc.is_multi_customer){
+            frappe.call({
+                "method":"ganapathy_pavers.custom.py.sales_order.remove_property",
+                "args":{
+                    'prop_name':prop_name
+                }
+            })
+        }
+    },
     on_submit:function(frm){
         frappe.call({
             method:"ganapathy_pavers.custom.py.sales_order.create_site",
@@ -128,6 +154,15 @@ frappe.ui.form.on('Sales Order',{
                
                 }
         })
+    },
+    is_multi_customer: function(frm){
+        if(cur_frm.doc.is_multi_customer){
+            cur_frm.set_df_property('customer','reqd',0);
+            cur_frm.set_value('customer','');
+        }
+        else{
+            cur_frm.set_df_property('customer','reqd',1);
+        }
     }
 })
 
