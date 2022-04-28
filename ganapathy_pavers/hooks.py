@@ -126,7 +126,8 @@ doctype_js = {
 				"Vehicle":"/custom/js/vehicle.js",
 				"Timesheet" : "utils/js/timesheet.js",
 				"Salary Slip":"utils/js/salary_slip.js",
-				"Purchase Receipt":"/custom/js/purchase_receipt.js"
+				"Purchase Receipt":"/custom/js/purchase_receipt.js",
+				"Workstation":"custom/js/workstation.js"
 			 }
 # Scheduled Tasks
 # ---------------

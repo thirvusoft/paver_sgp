@@ -15,8 +15,8 @@ def create_payment_entry(doc,action):
         add_doc.paid_to=doc.advance_account
         add_doc.paid_from=doc.advance_account
         add_doc.append(
-                "references",
-                {
+		"references",
+		{
                         "reference_doctype": 'Employee Advance',
                         "reference_name": doc.name,
                         "total_amount": doc.advance_amount,
@@ -24,6 +24,7 @@ def create_payment_entry(doc,action):
                         "allocated_amount": doc.advance_amount,
                 },
         )
+
         add_doc.insert()
-        add_doc.submit()
+        add_doc.submit()        
         frappe.db.commit()
