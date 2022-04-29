@@ -45,7 +45,7 @@ def create_site(doc):
     for item in pavers:
         total_area+=item['required_area']
     for item in (site_work.get('job_worker') or []):
-        total_area+=item.sqft_allocated
+        completed_area+=item.sqft_allocated
     
     site_work.update({
         'customer': doc['customer'] or '',
