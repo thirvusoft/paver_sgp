@@ -114,6 +114,9 @@ doc_events = {
 	# "Timesheet":{
 	# 	"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
 	# }
+	"Sales Order":{
+		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
+	}
 }
 
 doctype_js = {
