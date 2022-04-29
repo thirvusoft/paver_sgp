@@ -110,7 +110,7 @@ doc_events = {
 	"Project":{
 		"validate":"ganapathy_pavers.custom.py.site_work.validate",
 		"autoname":"ganapathy_pavers.custom.py.site_work.autoname"
-	}
+	},
 	# "Timesheet":{
 	# 	"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
 	# }
