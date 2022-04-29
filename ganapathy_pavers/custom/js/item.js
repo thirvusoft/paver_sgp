@@ -21,7 +21,7 @@ frappe.ui.form.on("Item", {
         bundle(frm,cdt,cdn)
     },
     item_group:function(frm,cdt,cdn){
-            if(cur_frm.doc.item_group=="Pavers"||cur_frm.doc.item_group=="Compound Walls")
+            if(cur_frm.doc.item_group=="Pavers"||cur_frm.doc.item_group=="Compound Wall")
                 frm.set_value("has_batch_no",1)
             else
                 frm.set_value("has_batch_no",0)
