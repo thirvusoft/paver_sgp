@@ -29,7 +29,10 @@ frappe.ui.form.on("Project",{
     },
     
     refresh:function(frm,cdt,cdn){
-        percent_complete(frm,cdt,cdn)
+        //percent_complete(frm,cdt,cdn)
+		cur_frm.remove_custom_button('Duplicate Project with Tasks')
+		cur_frm.remove_custom_button('Kanban Board')
+		cur_frm.remove_custom_button('Gantt Chart')
         setquery(frm,cdt,cdn)
         frm.set_query('name1','job_worker',function(frm){
             return{
@@ -93,6 +96,8 @@ function percent_complete(frm,cdt,cdn){
 		completed_area+= cur_frm.doc.job_worker[row].sqft_allocated
 	}
 	let percent=(completed_area/total_area)*100
+	frm.set_value('total_required_area',total_area)
+	frm.set_value('total_completed_area',completed_area)
 	frm.set_value('completed',percent)
 }
 

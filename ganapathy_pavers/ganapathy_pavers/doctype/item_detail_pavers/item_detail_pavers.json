@@ -51,9 +51,10 @@
   {
    "columns": 1,
    "fieldname": "allocated_paver_area",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Allocated Paver Area",
+   "precision": "2",
    "read_only": 1
   },
   {
@@ -75,13 +76,12 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-04-23 12:30:33.054911",
+ "modified": "2022-04-29 08:49:53.417123",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Item Detail Pavers",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_order": "DESC"
 }

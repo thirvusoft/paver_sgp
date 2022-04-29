@@ -38,11 +38,23 @@ def create_site(doc):
             'sales_order':doc['name']
             } for row in doc['raw_materials']]
     site_work=frappe.get_doc('Project',doc['site_work'])
+    total_area=0
+    completed_area=0
+    for item in (site_work.get('item_details') or []):
+        total_area+=item.required_area
+    for item in pavers:
+        total_area+=item['required_area']
+    for item in (site_work.get('job_worker') or []):
+        total_area+=item.sqft_allocated
+    
     site_work.update({
         'customer': doc['customer'] or '',
         'supervisor_name': supervisor,
         'item_details': (site_work.get('item_details') or []) +pavers,
-        'raw_material': (site_work.get('raw_material') or []) + raw_material
+        'raw_material': (site_work.get('raw_material') or []) + raw_material,
+        'total_required_area': total_area,
+        'total_completed_area': completed_area,
+        'completed': (completed_area/total_area)*100
     })
     if(doc['is_multi_customer']):
         sw_cust=[cus.customer for cus in (site_work.get('customer_name') or [] )]

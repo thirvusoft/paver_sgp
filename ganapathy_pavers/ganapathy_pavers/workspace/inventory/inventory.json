@@ -1,9 +1,15 @@
 {
  "category": "Modules",
- "charts": [],
+ "charts": [
+  {
+   "chart_name": "Stock Summary",
+   "label": "Stock Summary"
+  }
+ ],
+ "charts_label": "Inventory",
  "creation": "2022-04-21 16:45:14.321794",
  "developer_mode_only": 0,
- "disable_user_customization": 0,
+ "disable_user_customization": 1,
  "docstatus": 0,
  "doctype": "Workspace",
  "extends_another_page": 0,
@@ -27,7 +33,7 @@
    "label": "Stock Summary",
    "link_to": "Total Stock Summary",
    "link_type": "Report",
-   "onboard": 0,
+   "onboard": 1,
    "type": "Link"
   },
   {
@@ -49,13 +55,14 @@
    "type": "Link"
   }
  ],
- "modified": "2022-04-21 17:07:46.884096",
+ "modified": "2022-04-29 07:28:11.975143",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "INVENTORY",
+ "onboarding": "",
  "owner": "Administrator",
  "pin_to_bottom": 0,
- "pin_to_top": 0,
+ "pin_to_top": 1,
  "shortcuts": [
   {
    "doc_view": "List",
