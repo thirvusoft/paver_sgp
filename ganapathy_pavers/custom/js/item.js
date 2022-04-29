@@ -19,7 +19,14 @@ frappe.ui.form.on("Item", {
     },
     pavers_per_sqft:function(frm,cdt,cdn){
         bundle(frm,cdt,cdn)
-    }
+    },
+    item_group:function(frm,cdt,cdn){
+            if(cur_frm.doc.item_group=="Pavers"||cur_frm.doc.item_group=="Compound Walls")
+                frm.set_value("has_batch_no",1)
+            else
+                frm.set_value("has_batch_no",0)
+    
+     }
 })
 
 
