@@ -48,7 +48,7 @@ class JobCard(Document):
 		self.validate_work_order()
 
 	def set_sub_operations(self):
-		if not self.sub_operations and self.operation:
+		if self.operation:
 			self.sub_operations = []
 			for row in frappe.get_all('Sub Operation',
 				filters = {'parent': self.operation}, fields=['operation', 'idx'], order_by='idx'):
@@ -62,7 +62,7 @@ class JobCard(Document):
 
 		if self.get('time_logs'):
 			for d in self.get('time_logs'):
-				if d.to_time and get_datetime(d.from_time) > get_datetime(d.to_time):
+				if get_datetime(d.from_time) > get_datetime(d.to_time):
 					frappe.throw(_("Row {0}: From time must be less than to time").format(d.idx))
 
 				data = self.get_overlap_for(d)
@@ -355,8 +355,8 @@ class JobCard(Document):
 			total_completed_qty = bold(_("Total Completed Qty"))
 			qty_to_manufacture = bold(_("Qty to Manufacture"))
 
-			# frappe.throw(_("The {0} ({1}) must be equal to {2} ({3})")
-			# 	.format(total_completed_qty, bold(self.total_completed_qty), qty_to_manufacture,bold(self.for_quantity)))
+			frappe.throw(_("The {0} ({1}) must be equal to {2} ({3})")
+				.format(total_completed_qty, bold(self.total_completed_qty), qty_to_manufacture,bold(self.for_quantity)))
 
 	def update_work_order(self):
 		if not self.work_order:
@@ -500,15 +500,16 @@ class JobCard(Document):
 			2: "Cancelled"
 		}[self.docstatus or 0]
 
-		if self.for_quantity <= self.transferred_qty:
-			self.status = 'Material Transferred'
-
 		if self.time_logs:
 			self.status = 'Work In Progress'
 
 		if (self.docstatus == 1 and
 			(self.for_quantity <= self.total_completed_qty or not self.items)):
 			self.status = 'Completed'
+
+		if self.status != 'Completed':
+			if self.for_quantity <= self.transferred_qty:
+				self.status = 'Material Transferred'
 
 		if update_status:
 			self.db_set('status', self.status)
