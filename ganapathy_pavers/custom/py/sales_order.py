@@ -120,18 +120,21 @@ def remove_project_fields(self,event):
                 
         total_area=0
         completed_area=0
-        for item in (new_paver or 0):
+        for item in (new_paver or []):
             total_area+=(item.get('required_area') or 0)
         for item in (doc.get('job_worker') or []):
             completed_area+=(item.get('sqft_allocated') or 0)
-            
-            
+        
+        if(total_area):
+            percent=(completed_area/total_area)*100
+        else:
+            percent=0
         doc.update({
             'item_details':new_paver,
             'raw_material':new_rm,
             'total_required_area': total_area,
             'total_completed_area': completed_area,
-            'completed': (completed_area/total_area)*100
+            'completed': percent
         })
         doc.save()
         frappe.db.commit()
