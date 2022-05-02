@@ -62,7 +62,7 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
                         total_amount+=data.amount
                         site_row.update({'site_work_name':data.parent,'amount':data.amount})
                     site_work.append(site_row)
-                args.update({"doctype": "Salary Slip", "total_amount": total_amount})
+                args.update({"doctype": "Salary Slip", "total_amount": total_amount})    
                 args.update({"doctype": "Salary Slip", "site_work_details": site_work})
             ss = frappe.get_doc(args)
             ss.insert()
@@ -86,45 +86,12 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
             title=_("Message"),
             indicator="orange",
         )
+
 def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progress=False):
-    salary_slip=[frappe.get_doc("Salary Slip",i) for i in frappe.get_all("Salary Slip",filters={'payroll_entry':payroll_entry.name})]
-    print(salary_slip)
-    single_slip=[{
-    'Employee':i.employee,
-    'Salary':i.net_pay
-    }  for i in salary_slip]
-    return html_history(single_slip,payroll_entry,salary_slips, publish_progress=False)
-def html_history(single_slip,payroll_entry,salary_slips, publish_progress):
-    head='<head><center><h4>Service History</h4></center></head>'
-    style='''<style>
-    table{
-  font-family: Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-td,th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color:#728FCE;
-  color: white;
-}
-</style>'''
-    html='<tr>'+''.join([ f'<th><center>{i}</center></th>' for i in ['S.No','Employee','Salary Issued'] ])+'</tr>'
-    td=[
-        f'<tr><h1>'+f'<td>{i+1}</td>'+f'<td>{single_slip[i]["Employee"]}</td>'+f'<td>{single_slip[i]["Salary"]}</td>'+'</tr></h1>'
-        for i in range(len(single_slip))
-        ]
-    value =head+style+'<table style="width:100%;">'+html+''.join(td)+'</table>'
-    print(value.message)
-    frappe.set_value(payroll_entry.doctype, payroll_entry.name, "employee_salary_",value)
     submitted_ss = []
     not_submitted_ss = []
     frappe.flags.via_payroll_entry = True
+
     count = 0
     for ss in salary_slips:
         ss_obj = frappe.get_doc("Salary Slip", ss[0])
@@ -144,6 +111,30 @@ th {
         frappe.msgprint(
             _("Salary Slip submitted for period from {0} to {1}").format(ss_obj.start_date, ss_obj.end_date)
         )
+
         payroll_entry.email_salary_slip(submitted_ss)
+
         payroll_entry.db_set("salary_slips_submitted", 1)
         payroll_entry.notify_update()
+
+    salary_slip=[frappe.get_doc("Salary Slip",i) for i in frappe.get_all("Salary Slip",filters={'payroll_entry':payroll_entry.name})]
+    single_slip=[{
+    'Employee':i.employee,
+    'Salary':i.net_pay
+    }  for i in salary_slip]
+
+    return html_history(single_slip,payroll_entry)
+
+
+def html_history(single_slip,payroll_entry):
+    html='<tr style="border: 1px solid #ddd; height:20px !important;">'+''.join([ 
+        f'<th style="border-right: 1px solid #ddd;"><center>{i}</center></th>'for i in ['S.No','Employee','Salary Issued'] ])+'</tr>'
+    td=[
+        f'<tr style="text-align:center;border: 1px solid #ddd; height:20px !important;"><h1>'+
+        f'<td style="border-right: 1px solid #ddd;">{i+1}</td>'+
+        f'<td style="border-right: 1px solid #ddd;">{single_slip[i]["Employee"]}</td>'+
+        f'<td style="border-right: 1px solid #ddd;">{single_slip[i]["Salary"]}</td>'+'</tr></h1>'
+        for i in range(len(single_slip))
+        ]
+    value ='<table style="width:100%;border: 1px solid #ddd;border-collapse: collapse; ">'+html+''.join(td)+'</table>'
+    frappe.set_value(payroll_entry.doctype, payroll_entry.name, "employee_salary_",value)
