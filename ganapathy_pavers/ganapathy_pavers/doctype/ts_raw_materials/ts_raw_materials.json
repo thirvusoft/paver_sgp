@@ -35,9 +35,10 @@
    "columns": 2,
    "fetch_if_empty": 1,
    "fieldname": "uom",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "UOM"
+   "label": "UOM",
+   "options": "UOM"
   },
   {
    "allow_on_submit": 1,
@@ -59,14 +60,12 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-04-18 14:47:06.437002",
+ "modified": "2022-04-29 10:20:16.809917",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Raw Materials",
- "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_order": "DESC"
 }

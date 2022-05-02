@@ -127,6 +127,7 @@ frappe.ui.form.on("Work Order", {
 	},
 
 	refresh: function(frm) {
+			
 		erpnext.toggle_naming_series();
 		erpnext.work_order.set_custom_buttons(frm);
 		frm.set_intro("");
@@ -649,27 +650,41 @@ erpnext.work_order = {
 
 	show_prompt_for_qty_input: function(frm, purpose) {
 		let max = this.get_max_transferable_qty(frm, purpose);
+		let data={};
 		return new Promise((resolve, reject) => {
-			frappe.prompt({
-				fieldtype: 'Float',
-				label: __('Qty for {0}', [purpose]),
-				fieldname: 'qty',
-				description: __('Max: {0}', [max]),
-				default: max
-			}, data => {
-				max += (frm.doc.qty * (frm.doc.__onload.overproduction_percentage || 0.0)) / 100;
+			data.purpose = purpose;
+			frappe.call({
+				method: "ganapathy_pavers.custom.py.work_order.get_linked_jobcard",
+				args:{
+					name:frm.doc.name
+				},
+				callback(r){
+					data.qty = r.message
+					alert(r.message)
+				}
+			})
+			resolve(data);
+			// frappe.prompt({
+			// 	fieldtype: 'Float',
+			// 	label: __('Qty for {0}', [purpose]),
+			// 	fieldname: 'qty',
+			// 	// description: __('Max: {0}', [max]),
+			// 	default: max
+			// }, data => {
+			// 	max += (frm.doc.qty * (frm.doc.__onload.overproduction_percentage || 0.0)) / 100;
 
-				// if (data.qty > max) {
-				// 	frappe.msgprint(__('Quantity must not be more than {0}', [max]));
-				// 	reject();
-				// }
-				data.purpose = purpose;
-				resolve(data);
-			}, __('Select Quantity'), __('Create'));
+			// 	// if (data.qty > max) {
+			// 	// 	frappe.msgprint(__('Quantity must not be more than {0}', [max]));
+			// 	// 	reject();
+			// 	// }
+			// 	data.purpose = purpose;
+			// 	console.log(data)
+			// 	resolve(data);
+			// }, __('Select Quantity'), __('Create'));
 		});
 	},
 
-	make_se: function(frm, purpose) {
+		make_se: function(frm, purpose) {
 		this.show_prompt_for_qty_input(frm, purpose)
 			.then(data => {
 				return frappe.xcall('erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry', {

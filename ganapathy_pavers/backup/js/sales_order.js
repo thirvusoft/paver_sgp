@@ -1,7 +1,3 @@
-//above line 500 in sales_order.js  erpnext
-
-
-
 make_delivery_note(delivery_dates) {
     var me = this
     if(this.frm.doc.is_multi_customer){
@@ -46,6 +42,15 @@ make_delivery_note(delivery_dates) {
         }
     })
 }
+else{
+    frappe.model.open_mapped_doc({
+        method: "erpnext.selling.doctype.sales_order.sales_order.make_delivery_note",
+        frm: this.frm,
+        args: {
+            delivery_dates
+        }
+    })
+}
 },
 
  make_sales_invoice() {
@@ -87,6 +92,12 @@ make_delivery_note(delivery_dates) {
             });
             dialog.show();
         }
+    })
+}
+else{
+    frappe.model.open_mapped_doc({
+        method: "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice",
+        frm: this.frm
     })
 }
 },

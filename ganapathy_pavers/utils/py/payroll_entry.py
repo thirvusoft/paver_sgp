@@ -10,25 +10,25 @@ class MessExpense(PayrollEntry):
         food_count= [emp.total_time_of_food_taken for emp in self.employees]
         if employees:
             args = frappe._dict(
-				{
-					"salary_slip_based_on_timesheet": self.salary_slip_based_on_timesheet,
-					"payroll_frequency": self.payroll_frequency,
-					"start_date": self.start_date,
-					"end_date": self.end_date,
-					"company": self.company,
-					"posting_date": self.posting_date,
-					"deduct_tax_for_unclaimed_employee_benefits": self.deduct_tax_for_unclaimed_employee_benefits,
-					"deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
-					"payroll_entry": self.name,
-					"exchange_rate": self.exchange_rate,
-					"currency": self.currency,
-				}
-			)
+                {
+                    "salary_slip_based_on_timesheet": self.salary_slip_based_on_timesheet,
+                    "payroll_frequency": self.payroll_frequency,
+                    "start_date": self.start_date,
+                    "end_date": self.end_date,
+                    "company": self.company,
+                    "posting_date": self.posting_date,
+                    "deduct_tax_for_unclaimed_employee_benefits": self.deduct_tax_for_unclaimed_employee_benefits,
+                    "deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
+                    "payroll_entry": self.name,
+                    "exchange_rate": self.exchange_rate,
+                    "currency": self.currency,
+                }
+            )
             if len(employees) > 30:
                 frappe.enqueue(create_salary_slips_for_employees, timeout=600, employees=employees,args=args,food_count=food_count)
             else:
                 create_salary_slips_for_employees(self.start_date,self.end_date,employees, args,food_count, publish_progress=False)
-				# since this method is called via frm.call this doc needs to be updated manually
+                # since this method is called via frm.call this doc needs to be updated manually
                 self.reload()
     @frappe.whitelist()
     def submit_salary_slips(self):
@@ -40,7 +40,6 @@ class MessExpense(PayrollEntry):
             )
         else:
             submit_salary_slips_for_employees(self, ss_list, publish_progress=False)
-
 def create_salary_slips_for_employees(start_date,end_date,employees, args,food_count, publish_progress=True):
     salary_slips_exists_for = get_existing_salary_slips(employees, args)
     count = 0
@@ -73,15 +72,12 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
                     count * 100 / len(set(employees) - set(salary_slips_exists_for)),
                     title=_("Creating Salary Slips..."),
                 )
-
         else:
             salary_slips_not_created.append(emp)
         index+=1
-
     payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
     payroll_entry.db_set("salary_slips_created", 1)
     payroll_entry.notify_update()
-
     if salary_slips_not_created:
         frappe.msgprint(
             _(
@@ -107,7 +103,6 @@ def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progr
                 submitted_ss.append(ss_obj)
             except frappe.ValidationError:
                 not_submitted_ss.append(ss[0])
-
         count += 1
         if publish_progress:
             frappe.publish_progress(count * 100 / len(salary_slips), title=_("Submitting Salary Slips..."))

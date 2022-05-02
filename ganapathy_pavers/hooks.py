@@ -108,11 +108,15 @@ doc_events = {
 		"on_submit":"ganapathy_pavers.utils.py.employee_advance.create_payment_entry"
 	},
 	"Project":{
-		"validate":"ganapathy_pavers.custom.py.site_work.validate"
-	}
+		"validate":"ganapathy_pavers.custom.py.site_work.validate",
+		"autoname":"ganapathy_pavers.custom.py.site_work.autoname"
+	},
 	# "Timesheet":{
 	# 	"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
 	# }
+	"Sales Order":{
+		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
+	}
 }
 
 doctype_js = {
@@ -127,7 +131,8 @@ doctype_js = {
 				"Timesheet" : "utils/js/timesheet.js",
 				"Salary Slip":"utils/js/salary_slip.js",
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
-				"Workstation":"custom/js/workstation.js"
+				"Workstation":"/custom/js/workstation.js",
+				"Work Order": "/custom/js/work_order.js"
 			 }
 # Scheduled Tasks
 # ---------------
