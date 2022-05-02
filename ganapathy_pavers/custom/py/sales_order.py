@@ -7,10 +7,18 @@ from frappe.model.mapper import get_mapped_doc
 
 @frappe.whitelist()
 def get_item_value(doctype):
+    uom=frappe.get_doc('Item',doctype)
+    conv=0
+    for row in uom.uoms:
+        if(row.uom=='Square Foot'):
+            conv=row.conversion_factor
+    if(not conv):
+        frappe.throw(f'Please enter UOM conversion for Square foot in item:{doctype}')
     res={
         'item_name':frappe.get_value('Item',doctype,'item_name'),
         'description':frappe.get_value('Item',doctype,'description'),
-        'uom':frappe.get_value('Item',doctype,'sales_uom')
+        'uom':frappe.get_value('Item',doctype,'sales_uom'),
+        'uom_conversion':conv
     }
     return res
     
@@ -26,7 +34,7 @@ def create_site(doc):
             'allocated_paver_area':row['allocated_paver_area'],
             'rate':row['rate'],
             'amount':row['amount'],
-            'work': doc['work'],
+            'work': row['work'],
             'sales_order':doc['name']
             } for row in doc['pavers']]
     raw_material=[{

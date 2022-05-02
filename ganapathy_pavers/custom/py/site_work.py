@@ -22,13 +22,9 @@ def add_total_amount(items):
     if items:
         return sum([i['amount'] for i in json.loads(items)])
 
-def validate(doc, action):
-    completed = doc.completed or 0
-    if completed>100:
-        frappe.throw(frappe._("Area completed by Job Worker is greater than required area.Please Check")) 
 
 def autoname(self, event):
-    name= (self.project_name or '') + (self.customer or '')
+    name= (self.project_name or '') + '-' + (self.customer or '')
     if(name):
         self.name=name
     else:

@@ -88,6 +88,8 @@ frappe.ui.form.on('Sales Order',{
                 var new_row = frm.add_child("items");
                 new_row.item_code=cur_frm.doc.pavers[row].item
                 new_row.qty=cur_frm.doc.pavers[row].allocated_paver_area
+                new_row.ts_qty=cur_frm.doc.pavers[row].number_of_bundle
+                new_row.area_per_bundle=cur_frm.doc.pavers[row].area_per_bundle
                 new_row.rate=cur_frm.doc.pavers[row].rate
                 new_row.amount=cur_frm.doc.pavers[row].amount
                 await frappe.call({
@@ -100,9 +102,9 @@ frappe.ui.form.on('Sales Order',{
                         new_row.item_name=message['item_name']
                         new_row.uom=message['uom']
                         new_row.description=message['description']
+                        new_row.conversion_factor=message['uom_conversion']
                     }
                 })
-                new_row.conversion_factor=1
                 new_row.warehouse=cur_frm.doc.set_warehouse
                 new_row.delivery_date=cur_frm.doc.delivery_date
                 new_row.work=cur_frm.doc.pavers[row].work
