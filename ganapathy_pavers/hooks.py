@@ -112,6 +112,9 @@ doc_events = {
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
+	},
+	"Delivery Note":{
+		"validate":"ganapathy_pavers.custom.py.delivery_note.set_qty"
 	}
 }
 
@@ -128,7 +131,8 @@ doctype_js = {
 				"Salary Slip":"utils/js/salary_slip.js",
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
 				"Workstation":"/custom/js/workstation.js",
-				"Work Order": "/custom/js/work_order.js"
+				"Work Order": "/custom/js/work_order.js",
+				"Delivery Note": "/custom/js/delivery_note.js"
 			 }
 # Scheduled Tasks
 # ---------------

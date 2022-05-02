@@ -84,14 +84,13 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Work",
-   "options": "\nSupply Only\nLaying Only\nSupply and Laying",
-   "reqd": 1
+   "options": "\nSupply Only\nLaying Only\nSupply and Laying"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-02 09:57:46.570022",
+ "modified": "2022-05-02 11:09:30.410217",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Pavers",

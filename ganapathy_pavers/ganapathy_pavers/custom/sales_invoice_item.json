@@ -359,7 +359,7 @@
    "name": "Sales Invoice Item-work",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "\nSupply Only\nLaying Only\nSupply & Laying",
+   "options": "\nSupply Only\nLaying Only\nSupply and Laying",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,

@@ -23,3 +23,13 @@ def create_designation():
     })
     doc.save()
     frappe.db.commit()
+    doc=frappe.new_doc('Property Setter')
+    doc.update({
+        "doctype_or_field": "DocField",
+        "doc_type":"Project",
+        "field_name":"status",
+        "property":"options",
+        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site"
+    })
+    doc.save()
+    frappe.db.commit()
