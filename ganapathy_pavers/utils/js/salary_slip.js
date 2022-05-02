@@ -29,7 +29,10 @@ frappe.ui.form.on('Salary Slip',{
                     cur_frm.set_value("total_unpaid_amount",(frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance);
                 }
         })
-        }     
+        }
+        var date = frm.doc.end_date;
+        var arr = date.split('-');
+        frm.set_value('days',arr[2])     
     },
     pay_the_balance:function(frm){
         if(frm.doc.pay_the_balance==1){
@@ -67,11 +70,6 @@ frappe.ui.form.on('Salary Slip',{
                 frappe.model.set_value(child.doctype, child.name, "amount",frm.doc.total_paid_amount)
                 cur_frm.refresh_field("earnings")            }, 100);
         }   
-    },
-    employee:function(frm){
-        var date = frm.doc.end_date;
-        var arr = date.split('-');
-        frm.set_value('days',arr[2])
     }
 })
 
