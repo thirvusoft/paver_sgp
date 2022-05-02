@@ -26,7 +26,7 @@ def create_site(doc):
             'allocated_paver_area':row['allocated_paver_area'],
             'rate':row['rate'],
             'amount':row['amount'],
-            'work': doc['work'],
+            'work': row['work'],
             'sales_order':doc['name']
             } for row in doc['pavers']]
     raw_material=[{

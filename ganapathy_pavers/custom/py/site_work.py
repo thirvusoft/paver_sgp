@@ -24,7 +24,7 @@ def add_total_amount(items):
 
 
 def autoname(self, event):
-    name= (self.project_name or '') + (self.customer or '')
+    name= (self.project_name or '') + '-' + (self.customer or '')
     if(name):
         self.name=name
     else:
