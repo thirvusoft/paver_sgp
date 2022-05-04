@@ -22,15 +22,37 @@ function stock_uom(frm,cdt,cdn){
 
 frappe.ui.form.on('Delivery Note',{
     onload:async function(frm){
-        for(let row=0;row<frm.doc.items.length;row++){
-            let ts_doc=locals[frm.doc.items[row].doctype][frm.doc.items[row].name]
-            let uom = ts_doc.uom
-            await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'uom', '')
-            await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'uom', uom)
-            let qty = ts_doc.qty
-            await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'qty', qty)
-            await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'ts_qty', (ts_doc.qty?ts_doc.qty:0)/(ts_doc.conversion_factor?ts_doc.conversion_factor:0))
-            await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name,'stock_qty',ts_doc.ts_qty?ts_doc.ts_qty:0)
-        }
+        if(cur_frm.is_new()){
+            if(cur_frm.doc.is_return){
+                cur_frm.add_custom_button("Change UOM",async()=>{
+                    let base_rate = []
+                    for(let row=0;row<frm.doc.items.length;row++){
+                        base_rate.push(frm.doc.items[row].rate)
+                        let ts_doc=locals[frm.doc.items[row].doctype][frm.doc.items[row].name]
+                        let uom = ts_doc.uom
+                        await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'uom', '')
+                        await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'uom', 'Nos')
+                        let qty = ts_doc.qty
+                        await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'qty', qty)
+                        await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'ts_qty', (ts_doc.qty?ts_doc.qty:0)/(ts_doc.conversion_factor?ts_doc.conversion_factor:0))
+                        await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name,'stock_qty',ts_doc.ts_qty?ts_doc.ts_qty:0)
+                }
+                for(let row=0;row<frm.doc.items.length;row++){
+                    await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'rate',base_rate[row])
+                }
+                })
+                
+            }
+            else{
+            for(let row=0;row<frm.doc.items.length;row++){
+                let ts_doc=locals[frm.doc.items[row].doctype][frm.doc.items[row].name]
+                let uom = ts_doc.uom
+                await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'uom', '')
+                await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'uom', uom)
+                let qty = ts_doc.qty
+                await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'qty', qty)
+                await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'ts_qty', (ts_doc.qty?ts_doc.qty:0)/(ts_doc.conversion_factor?ts_doc.conversion_factor:0))
+                await frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name,'stock_qty',ts_doc.ts_qty?ts_doc.ts_qty:0)
+        }}}
     }
 })
