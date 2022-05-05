@@ -30,6 +30,9 @@ frappe.ui.form.on('Salary Slip',{
                 }
         })
         }
+        else if(frm.doc.designation=='Contractor'){
+            frm.trigger('employee_count');    
+        }
         var date = frm.doc.end_date;
         var arr = date.split('-');
         frm.set_value('days',arr[2]) 
@@ -41,6 +44,39 @@ frappe.ui.form.on('Salary Slip',{
             let remainder = (frm.doc.total_working_hours%value);
             var value = quotient.toString()+' Days '+remainder.toString()+' Hours'
             cur_frm.set_value('days_worked',value) })
+    },
+    employee_count:function(frm){
+        frappe.db.get_list("Salary Slip", {
+            filters: { 'status': 'Submitted','designation':'Labour Worker'},
+            fields: ["name",'end_date','start_date','total_working_hours']
+        }).then((data) => {
+            let total_hours=0
+            for(let val=0;val<=data.length;val++){
+                if(data[val].start_date>=frm.doc.start_date && data[val].start_date<=frm.doc.end_date && data[val].end_date>=frm.doc.start_date && data[val].end_date<=frm.doc.end_date){
+                    console.log(val,data[val].start_date)
+                    total_hours+=data[val].total_working_hours
+                }
+                let exit=0;
+                let earnings = frm.doc.earnings
+                for (let data in earnings){
+                    if(earnings[data].salary_component=='Basic'){
+                        frappe.model.set_value(earnings[data].doctype,earnings[data].name,'amount',total_hours*3)
+                        exit=1
+                    }
+                    cur_frm.refresh_field("earnings")
+                }   
+                if(exit==0){
+                    var child = cur_frm.add_child("earnings");
+                    frappe.model.set_value(child.doctype, child.name, "salary_component",'Basic') 
+                    setTimeout(() => {    
+                        frappe.model.set_value(child.doctype, child.name, "amount",total_hours*3)   
+                        cur_frm.refresh_field("earnings")         
+                    }, 1000);
+
+                }   
+            }
+            console.log(total_hours)           
+        }); 
     },
     pay_the_balance:function(frm){
         if(frm.doc.pay_the_balance==1){
