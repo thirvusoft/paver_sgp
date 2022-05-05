@@ -381,7 +381,6 @@
  ],
  "custom_perms": [],
  "doctype": "Sales Order Item",
- "links": [],
  "property_setters": [
   {
    "_assign": null,

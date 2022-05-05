@@ -2,7 +2,6 @@
  "custom_fields": [],
  "custom_perms": [],
  "doctype": "Packed Item",
- "links": [],
  "property_setters": [
   {
    "_assign": null,
