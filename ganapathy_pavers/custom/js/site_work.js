@@ -213,11 +213,13 @@ frappe.ui.form.on('TS Job Worker Details',{
 		let bundle = data.completed_bundle
 		var item_bundle_per_sqft
 		let allocated_sqft
-		frappe.db.get_doc('Item',data.item).then(value => {
+		var item = data.item
+		if(bundle && item){
+		frappe.db.get_doc('Item',item).then(value => {
 			item_bundle_per_sqft = value.bundle_per_sqr_ft
 			allocated_sqft = bundle * item_bundle_per_sqft
 			frappe.model.set_value(cdt,cdn,"sqft_allocated",allocated_sqft?allocated_sqft:0)
-		})
+		})}
 	},
 	sqft_allocated: function(frm, cdt, cdn){
 		percent_complete(frm, cdt, cdn)
