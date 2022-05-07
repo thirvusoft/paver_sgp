@@ -86,18 +86,24 @@ frappe.ui.form.on("Project",{
 
 function percent_complete(frm,cdt,cdn){ 
 	let total_area=0;
+	let total_bundle = 0;
 	let paver= cur_frm.doc.item_details?cur_frm.doc.item_details:[]
 	for(let row=0;row<paver.length;row++){
 		total_area+= cur_frm.doc.item_details[row].required_area
+		total_bundle += cur_frm.doc.item_details[row].number_of_bundle
 	        }
 	let completed_area=0;
+	let total_comp_bundle = 0;
 	let work= cur_frm.doc.job_worker?cur_frm.doc.job_worker:[]
 	for(let row=0;row<work.length;row++){
 		completed_area+= cur_frm.doc.job_worker[row].sqft_allocated
+		total_comp_bundle += cur_frm.doc.job_worker[row].completed_bundle
 	}
 	let percent=(completed_area/total_area)*100
 	frm.set_value('total_required_area',total_area)
 	frm.set_value('total_completed_area',completed_area)
+	frm.set_value('total_required_bundle',total_bundle)
+	frm.set_value('total_completed_bundle',total_comp_bundle)
 	frm.set_value('completed',percent)
 }
 
@@ -202,11 +208,46 @@ frappe.ui.form.on('TS Job Worker Details',{
 	rate: function(frm, cdt, cdn){
 		amount(frm, cdt, cdn)
 	},
+	completed_bundle: function(frm,cdt,cdn){
+		let data = locals[cdt][cdn]
+		let bundle = data.completed_bundle
+		var item_bundle_per_sqft
+		let allocated_sqft
+		var item = data.item
+		if(bundle && item){
+		frappe.db.get_doc('Item',item).then(value => {
+			item_bundle_per_sqft = value.bundle_per_sqr_ft
+			allocated_sqft = bundle * item_bundle_per_sqft
+			frappe.model.set_value(cdt,cdn,"sqft_allocated",allocated_sqft?allocated_sqft:0)
+		})}
+	},
 	sqft_allocated: function(frm, cdt, cdn){
 		percent_complete(frm, cdt, cdn)
 		amount(frm, cdt, cdn)
 		
-	}
+	},
+	job_worker_add: function(frm, cdt, cdn){
+		let work= cur_frm.doc.job_worker?cur_frm.doc.job_worker:[]
+		var name
+		var start_date
+		let rate
+		var date
+		for(let row=0;row<work.length;row++){
+			if(row){
+				name = cur_frm.doc.job_worker[row-1].name1
+				start_date = cur_frm.doc.job_worker[row-1].start_date
+				rate = cur_frm.doc.job_worker[row-1].rate
+				date = frappe.datetime.add_days(start_date,1)
+			}
+			else{
+				date = start_date
+			}
+		}
+		frappe.model.set_value(cdt,cdn,"name1",name)
+		frappe.model.set_value(cdt,cdn,"start_date",date)
+		frappe.model.set_value(cdt,cdn,"end_date",date)
+		frappe.model.set_value(cdt,cdn,"rate",rate)
+	},
 })
 
 
