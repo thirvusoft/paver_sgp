@@ -1,4 +1,4 @@
-var salary_balance;
+var salary_balance,standard_hrs=0;
 frappe.ui.form.on('Salary Slip',{
     employee:function(frm,cdt,cdn){
         if(frm.doc.designation=='Job Worker'){
@@ -29,7 +29,18 @@ frappe.ui.form.on('Salary Slip',{
                     cur_frm.set_value("total_unpaid_amount",(frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance);
                 }
         })
-        }     
+        }
+        var date = frm.doc.end_date;
+        var arr = date.split('-');
+        frm.set_value('days',arr[2]) 
+        frm.trigger('total_working_hours');    
+    },
+    total_working_hours:function(frm){
+        frappe.db.get_single_value('HR Settings', 'standard_working_hours').then(value => { 
+            let quotient = Math.floor(frm.doc.total_working_hours/value);
+            let remainder = (frm.doc.total_working_hours%value);
+            var value = quotient.toString()+' Days '+remainder.toString()+' Hours'
+            cur_frm.set_value('days_worked',value) })
     },
     pay_the_balance:function(frm){
         if(frm.doc.pay_the_balance==1){
@@ -67,11 +78,6 @@ frappe.ui.form.on('Salary Slip',{
                 frappe.model.set_value(child.doctype, child.name, "amount",frm.doc.total_paid_amount)
                 cur_frm.refresh_field("earnings")            }, 100);
         }   
-    },
-    employee:function(frm){
-        var date = frm.doc.end_date;
-        var arr = date.split('-');
-        frm.set_value('days',arr[2])
     }
 })
 
