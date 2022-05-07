@@ -117,7 +117,7 @@ doc_events = {
 		"validate":"ganapathy_pavers.custom.py.delivery_note.set_qty"
 	}
 }
-
+after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]
 doctype_js = {
 				"Item" : "/custom/js/item.js",
 				"Payment Entry" : "/custom/js/payment_entry.js",

@@ -29,3 +29,17 @@ def autoname(self, event):
         self.name=name
     else:
         pass
+        
+def create_status():
+    print('Creating Property Setter for Site Work Status')
+    doc=frappe.new_doc('Property Setter')
+    doc.update({
+        "doctype_or_field": "DocField",
+        "doc_type":"Project",
+        "field_name":"status",
+        "property":"options",
+        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site"
+    })
+    doc.save()
+    frappe.db.commit()
+    
