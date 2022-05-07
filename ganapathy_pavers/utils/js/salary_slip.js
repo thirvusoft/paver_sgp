@@ -1,7 +1,7 @@
 var salary_balance;
 frappe.ui.form.on('Salary Slip',{
     employee:function(frm,cdt,cdn){
-        if(frm.doc.designation=='Job Worker'){
+        if(frm.doc.designation=='Jobb Worker'){
             frappe.db.get_doc('Employee', frm.doc.employee).then((doc) => {
                 salary_balance=doc.salary_balance
             });
