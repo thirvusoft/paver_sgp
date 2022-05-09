@@ -74,12 +74,11 @@ def create_site(doc):
             if(cust['customer'] not in sw_cust):
                 customer.append({'customer':cust['customer']})
         site_work.update({
-            'is_multi_customer': doc['is_multi_customer'],
             'customer_name': (site_work.get('customer_name') or [] ) + customer
         })
     site_work.save()
     frappe.db.commit()
-    return 1
+    return
 
 
 @frappe.whitelist()

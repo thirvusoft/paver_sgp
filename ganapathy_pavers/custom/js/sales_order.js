@@ -8,29 +8,6 @@ function setquery(frm){
             }
         }
     })
-    if(cur_frm.doc.is_multi_customer){
-        cur_frm.set_df_property('customer','reqd',0);
-        frm.set_query('site_work',function(frm){
-            return {
-                filters:{
-                    'status': 'Open',
-                    'is_multi_customer':cur_frm.doc.is_multi_customer
-                }
-            }
-        })
-    }
-    else{
-        cur_frm.set_df_property('customer','reqd',1);
-        frm.set_query('site_work',function(frm){
-            return {
-                filters:{
-                    'customer': cur_frm.doc.customer,
-                    'status': 'Open',
-                    'is_multi_customer':cur_frm.doc.is_multi_customer
-                }
-            }
-        })
-    }
 }
 
 var prop_name;
@@ -180,12 +157,14 @@ frappe.ui.form.on('Sales Order',{
                 doc: cur_frm.doc
             },
             callback: function(r){
-                if(r.message==1){ 
-                    frappe.show_alert({message: __("Site Work Updated Successfully"),indicator: 'green'});
-                  }
-                  else{
-                    frappe.show_alert({message: __("Couldn't Update Site Work"),indicator: 'red'});
-                  }
+                frappe.run_serially([
+                    () =>{
+                        frappe.set_route('project', cur_frm.doc.site_work)
+                    },
+                    () => {
+                        window.location.reload()
+                    }
+                ])
                 }
         })
     },

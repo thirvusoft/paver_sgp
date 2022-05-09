@@ -57,11 +57,13 @@ frappe.ui.form.on("Project",{
         }
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_df_property('customer','reqd',0)
+            cur_frm.set_df_property('customer_name','reqd',1)
             cur_frm.set_df_property('customer','hidden',1)
             cur_frm.set_df_property('customer_name','hidden',0)
         }
         else{
             cur_frm.set_df_property('customer','reqd',1)
+            cur_frm.set_df_property('customer_name','reqd',0)
             cur_frm.set_df_property('customer','hidden',0)
             cur_frm.set_df_property('customer_name','hidden',1)
         }	
@@ -69,11 +71,13 @@ frappe.ui.form.on("Project",{
     is_multi_customer:function(frm){
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_df_property('customer','reqd',0)
+            cur_frm.set_df_property('customer_name','reqd',1)
             cur_frm.set_df_property('customer','hidden',1)
             cur_frm.set_df_property('customer_name','hidden',0)
         }
         else{
             cur_frm.set_df_property('customer','reqd',1)
+            cur_frm.set_df_property('customer_name','reqd',0)
             cur_frm.set_df_property('customer','hidden',0)
             cur_frm.set_df_property('customer_name','hidden',1)
         }	
