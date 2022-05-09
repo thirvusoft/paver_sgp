@@ -1,0 +1,32 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Employee Advance Details",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2022-05-09 17:18:39.102234",
+   "default_value": null,
+   "doc_type": "Employee Advance Details",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "outstanding_amount",
+   "idx": 0,
+   "modified": "2022-05-09 17:18:39.102234",
+   "modified_by": "Administrator",
+   "name": "Employee Advance Details-outstanding_amount-in_list_view",
+   "owner": "Administrator",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "in_list_view",
+   "property_type": "Check",
+   "row_name": null,
+   "value": "0"
+  }
+ ],
+ "sync_on_migrate": 1
+}
