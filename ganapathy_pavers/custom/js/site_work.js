@@ -239,7 +239,6 @@ frappe.ui.form.on('TS Job Worker Details',{
 				date = start_date
 			}
 		}
-		alert(name)
 		frappe.model.set_value(cdt,cdn,"name1",name)
 		frappe.model.set_value(cdt,cdn,"start_date",date)
 		frappe.model.set_value(cdt,cdn,"end_date",date)
