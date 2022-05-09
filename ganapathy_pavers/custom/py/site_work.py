@@ -32,9 +32,9 @@ def autoname(self, event):
         frappe.throw("Please Enter Customer's Name")
     elif(not self.is_multi_customer):
         name+= '-' + self.customer
+        self.project_name+='-'+self.customer
     if(name):
         self.name=name
-        frappe.errprint(self.name)
     else:
         pass
         

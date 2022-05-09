@@ -9,7 +9,7 @@ from frappe.model.mapper import get_mapped_doc
 def get_item_value(doctype):
     uom=frappe.get_doc('Item',doctype)
     conv=0
-    if(uom.item_group=='Raw Materials'):
+    if(uom.item_group=='Raw Material'):
         conv=1
     else:
         for row in uom.uoms:
