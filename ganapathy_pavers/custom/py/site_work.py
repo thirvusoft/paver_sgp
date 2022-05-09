@@ -24,8 +24,16 @@ def add_total_amount(items):
 
 
 def autoname(self, event):
-    name= (self.project_name or '') + '-' + (self.customer or '')
+    if(not self.project_name):
+        frappe.throw('Please Enter Site Work Name')
+    else:
+        name= self.project_name
+    if(not self.is_multi_customer and not self.customer):
+        frappe.throw("Please Enter Customer's Name")
+    elif(not self.is_multi_customer):
+        name+= '-' + self.customer
     if(name):
         self.name=name
+        frappe.errprint(self.name)
     else:
         pass

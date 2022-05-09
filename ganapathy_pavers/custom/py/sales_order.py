@@ -9,11 +9,14 @@ from frappe.model.mapper import get_mapped_doc
 def get_item_value(doctype):
     uom=frappe.get_doc('Item',doctype)
     conv=0
-    for row in uom.uoms:
-        if(row.uom=='Square Foot'):
-            conv=row.conversion_factor
-    if(not conv):
-        frappe.throw(f'Please enter UOM conversion for Square foot in item:{doctype}')
+    if(uom.item_group=='Raw Materials'):
+        conv=1
+    else:
+        for row in uom.uoms:
+            if(row.uom=='Square Foot'):
+                conv=row.conversion_factor
+        if(not conv):
+            frappe.throw(f'Please enter UOM conversion for Square foot in item:{doctype}')
     res={
         'item_name':frappe.get_value('Item',doctype,'item_name'),
         'description':frappe.get_value('Item',doctype,'description'),
@@ -71,11 +74,12 @@ def create_site(doc):
             if(cust['customer'] not in sw_cust):
                 customer.append({'customer':cust['customer']})
         site_work.update({
+            'is_multi_customer': doc['is_multi_customer'],
             'customer_name': (site_work.get('customer_name') or [] ) + customer
         })
     site_work.save()
     frappe.db.commit()
-    return
+    return 1
 
 
 @frappe.whitelist()
