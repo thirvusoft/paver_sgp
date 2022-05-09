@@ -24,8 +24,30 @@ def add_total_amount(items):
 
 
 def autoname(self, event):
-    name= (self.project_name or '') + '-' + (self.customer or '')
+    if(not self.project_name):
+        frappe.throw('Please Enter Site Work Name')
+    else:
+        name= self.project_name
+    if(not self.is_multi_customer and not self.customer):
+        frappe.throw("Please Enter Customer's Name")
+    elif(not self.is_multi_customer):
+        name+= '-' + self.customer
     if(name):
         self.name=name
+        frappe.errprint(self.name)
     else:
         pass
+        
+def create_status():
+    print('Creating Property Setter for Site Work Status')
+    doc=frappe.new_doc('Property Setter')
+    doc.update({
+        "doctype_or_field": "DocField",
+        "doc_type":"Project",
+        "field_name":"status",
+        "property":"options",
+        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site"
+    })
+    doc.save()
+    frappe.db.commit()
+    
