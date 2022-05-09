@@ -658,12 +658,13 @@ erpnext.work_order = {
 				args:{
 					name:frm.doc.name
 				},
+				async: false,
 				callback(r){
 					data.qty = r.message
-					alert(r.message)
+					resolve(data);
 				}
 			})
-			resolve(data);
+			
 			// frappe.prompt({
 			// 	fieldtype: 'Float',
 			// 	label: __('Qty for {0}', [purpose]),

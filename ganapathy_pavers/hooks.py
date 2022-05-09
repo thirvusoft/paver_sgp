@@ -115,6 +115,9 @@ doc_events = {
 	},
 	"Delivery Note":{
 		"validate":"ganapathy_pavers.custom.py.delivery_note.set_qty"
+	},
+	"Job Card":{
+		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
 	}
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]

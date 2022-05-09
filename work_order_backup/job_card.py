@@ -59,6 +59,9 @@ class JobCard(Document):
 	def validate_time_logs(self):
 		self.total_time_in_mins = 0.0
 		self.total_completed_qty = 0.0
+		shift_id_time_in_mins = []
+		completed_qty = []
+		shift_id_in_time_logs = []
 
 		if self.get('time_logs'):
 			for d in self.get('time_logs'):
@@ -72,10 +75,19 @@ class JobCard(Document):
 
 				if d.from_time and d.to_time:
 					d.time_in_mins = time_diff_in_hours(d.to_time, d.from_time) * 60
-					self.total_time_in_mins += d.time_in_mins
+					if(d.shift_id not in shift_id_time_in_mins):
+						shift_id_time_in_mins.append(d.shift_id)
+						self.total_time_in_mins += d.time_in_mins
+					# self.total_time_in_mins += d.time_in_mins
 
 				if d.completed_qty and not self.sub_operations:
-					self.total_completed_qty += d.completed_qty
+
+					#code start
+					if(d.shift_id not in shift_id_in_time_logs):
+						shift_id_in_time_logs.append(d.shift_id)
+						self.total_completed_qty += d.completed_qty
+					#code end
+					# self.total_completed_qty += d.completed_qty
 
 			self.total_completed_qty = flt(self.total_completed_qty, self.precision("total_completed_qty"))
 
@@ -210,10 +222,15 @@ class JobCard(Document):
 						"completed_qty": args.get("completed_qty") or 0.0
 					})
 		elif args.get("start_time"):
+			if(len(self.time_logs) ==0):
+				shift_id=0
+			else:
+				shift_id = max([int(i.shift_id) for i in self.time_logs])+1
 			new_args = frappe._dict({
 				"from_time": get_datetime(args.get("start_time")),
 				"operation": args.get("sub_operation"),
-				"completed_qty": 0.0
+				"completed_qty": 0.0,
+				"shift_id" : shift_id
 			})
 
 			if employees:
@@ -355,8 +372,8 @@ class JobCard(Document):
 			total_completed_qty = bold(_("Total Completed Qty"))
 			qty_to_manufacture = bold(_("Qty to Manufacture"))
 
-			frappe.throw(_("The {0} ({1}) must be equal to {2} ({3})")
-				.format(total_completed_qty, bold(self.total_completed_qty), qty_to_manufacture,bold(self.for_quantity)))
+			# frappe.throw(_("The {0} ({1}) must be equal to {2} ({3})")
+			# 	.format(total_completed_qty, bold(self.total_completed_qty), qty_to_manufacture,bold(self.for_quantity)))
 
 	def update_work_order(self):
 		if not self.work_order:
