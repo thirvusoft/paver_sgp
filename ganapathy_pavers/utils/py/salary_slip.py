@@ -31,3 +31,16 @@ def employee_update(doc,action):
     employee_doc = frappe.get_doc('Employee',doc.employee)
     employee_doc.salary_balance=doc.total_unpaid_amount
     employee_doc.save()
+
+def round_off(doc,action):
+        net_pay=(round(doc.net_pay))%10
+        if(net_pay<=2):
+            frappe.db.set_value('Salary Slip',doc.name,'rounded_total',round(doc.net_pay)-net_pay)
+            frappe.db.set_value('Salary Slip',doc.name,'net_pay',round(doc.net_pay)-net_pay)
+        
+        elif(net_pay>2):
+            value = 10- net_pay
+            print(round(doc.net_pay)+value)
+            frappe.db.set_value('Salary Slip',doc.name,'rounded_total',round(doc.net_pay)+value)
+            frappe.db.set_value('Salary Slip',doc.name,'net_pay',round(doc.net_pay)+value)
+

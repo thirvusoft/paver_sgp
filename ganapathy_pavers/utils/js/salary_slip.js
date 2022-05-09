@@ -30,6 +30,9 @@ frappe.ui.form.on('Salary Slip',{
                 }
         })
         }
+        else if(frm.doc.designation=='Contractor'){
+            frm.trigger('employee_count');    
+        }
         var date = frm.doc.end_date;
         var arr = date.split('-');
         frm.set_value('days',arr[2]) 
@@ -42,6 +45,40 @@ frappe.ui.form.on('Salary Slip',{
             var value = quotient.toString()+' Days '+remainder.toString()+' Hours'
             cur_frm.set_value('days_worked',value) })
     },
+    employee_count:function(frm){
+        frappe.db.get_list("Salary Slip", {
+            filters: { 'status': 'Submitted','designation':'Labour Worker'},
+            fields: ["name",'end_date','start_date','total_working_hours']
+        }).then((data) => {
+            let total_hours=0
+            for(let val=0;val<=data.length;val++){
+                if(data[val].start_date>=frm.doc.start_date && data[val].start_date<=frm.doc.end_date && data[val].end_date>=frm.doc.start_date && data[val].end_date<=frm.doc.end_date){
+                    total_hours+=data[val].total_working_hours
+                }
+                let exit=0;
+                let earnings = frm.doc.earnings
+                for (let data in earnings){
+                    if(earnings[data].salary_component=='Basic'){
+                        frappe.db.get_value("Company", {"name": frm.doc.company}, "contractor_welfare_commission", (r) => {
+                            frappe.model.set_value(earnings[data].doctype,earnings[data].name,'amount',total_hours*r.contractor_welfare_commission)
+                        });
+                        exit=1
+                    }
+                    cur_frm.refresh_field("earnings")
+                }   
+                if(exit==0){
+                    var child = cur_frm.add_child("earnings");
+                    frappe.model.set_value(child.doctype, child.name, "salary_component",'Basic') 
+                    frappe.db.get_value("Company", {"name": frm.doc.company}, "contractor_welfare_commission", (r) => {
+                        frappe.model.set_value(earnings[data].doctype,earnings[data].name,'amount',total_hours*r.contractor_welfare_commission)
+                    });
+                    cur_frm.refresh_field("earnings")
+                        cur_frm.refresh_field("earnings")         
+                    cur_frm.refresh_field("earnings")
+                }   
+            }         
+        });
+    },
     pay_the_balance:function(frm){
         if(frm.doc.pay_the_balance==1){
             frm.set_value('total_paid_amount',frm.doc.total_paid_amount+frm.doc.salary_balance)
@@ -49,6 +86,9 @@ frappe.ui.form.on('Salary Slip',{
             frm.set_value('salary_balance',0)
         }
         else{
+                frappe.db.get_value("Employee", {"name": frm.doc.employee}, "salary_balance", (r) => {
+                    salary_balance=r.salary_balance                    
+                });
                 frm.set_value('salary_balance',salary_balance)
                 frm.set_value('total_paid_amount',frm.doc.total_paid_amount-frm.doc.salary_balance)
                 frm.set_value('total_amount',frm.doc.total_amount-frm.doc.salary_balance)
@@ -59,6 +99,19 @@ frappe.ui.form.on('Salary Slip',{
         var emp = frm.doc.employee
         cur_frm.set_value('employee','')
         cur_frm.set_value('employee',emp)
+    // },
+    // before_save:function(frm){
+    //     let net_pay=(Math.round(frm.doc.net_pay))%10
+    //     if(net_pay<=2){
+    //         cur_frm.set_value('rounded_total',Math.round(frm.doc.net_pay)-net_pay)
+    //         cur_frm.set_value('net_pay',Math.round(frm.doc.net_pay)-net_pay)
+    //     }
+    //     else if(net_pay>2){
+    //         let value = 10- net_pay
+    //         cur_frm.set_value('rounded_total',Math.round(frm.doc.net_pay)+value)
+    //         cur_frm.set_value('net_pay',Math.round(frm.doc.net_pay)+value)
+    //     }
+
     },
     total_paid_amount:function(frm){
         frm.set_value('total_unpaid_amount',(frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance) 
