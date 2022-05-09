@@ -33,6 +33,7 @@ frappe.ui.form.on('Job Card', {
 					args:{
 						name:work_order_frm.name
 					},
+					async: false,
 					callback(r){
 						data.qty = r.message
 					}

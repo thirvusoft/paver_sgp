@@ -176,7 +176,7 @@ class StockEntry(StockController):
 		self.set_transfer_qty()
 		self.validate_uom_is_integer("uom", "qty")
 		self.validate_uom_is_integer("stock_uom", "transfer_qty")
-		self.validate_warehouse()
+		# self.validate_warehouse()
 		self.validate_work_order()
 		self.validate_bom()
 
@@ -397,9 +397,9 @@ class StockEntry(StockController):
 
 		for item_code, qty_list in iteritems(item_wise_qty):
 			total = flt(sum(qty_list), frappe.get_precision("Stock Entry Detail", "qty"))
-			if self.fg_completed_qty != total:
-				frappe.throw(_("The finished product {0} quantity {1} and For Quantity {2} cannot be different")
-					.format(frappe.bold(item_code), frappe.bold(total), frappe.bold(self.fg_completed_qty)))
+			# if self.fg_completed_qty != total:
+			# 	frappe.throw(_("The finished product {0} quantity {1} and For Quantity {2} cannot be different")
+			# 		.format(frappe.bold(item_code), frappe.bold(total), frappe.bold(self.fg_completed_qty)))
 
 	def validate_difference_account(self):
 		if not cint(erpnext.is_perpetual_inventory_enabled(self.company)):
@@ -415,7 +415,6 @@ class StockEntry(StockController):
 
 	def validate_warehouse(self):
 		"""perform various (sometimes conditional) validations on warehouse"""
-
 		source_mandatory = ["Material Issue", "Material Transfer", "Send to Subcontractor", "Material Transfer for Manufacture",
 			"Material Consumption for Manufacture"]
 
@@ -619,6 +618,11 @@ class StockEntry(StockController):
 					rate = get_incoming_rate(args, raise_error_if_no_rate)
 					if rate > 0:
 						d.basic_rate = rate
+					if(self.get('bom_no')):
+						rate_based_on = frappe.get_value("BOM", self.get("bom_no"),'rm_cost_as_per')
+						if(rate_based_on == 'Price List'):
+							price_list = frappe.get_value("BOM",self.get("bom_no"),'buying_price_list')
+							d.basic_rate = frappe.get_all("Item Price",filters={'item_code':d.item_code,'price_list':price_list}, pluck='price_list_rate')[0]
 
 				d.basic_amount = flt(flt(d.transfer_qty) * flt(d.basic_rate), d.precision("basic_amount"))
 				if not d.t_warehouse:
@@ -885,12 +889,12 @@ class StockEntry(StockController):
 			)
 			allowed_qty = wo_qty + ((allowance_percentage/100) * wo_qty)
 
-			# No work order could mean independent Manufacture entry, if so skip validation
-			if self.work_order and self.fg_completed_qty > allowed_qty:
-				frappe.throw(
-					_("For quantity {0} should not be greater than work order quantity {1}")
-					.format(flt(self.fg_completed_qty), wo_qty)
-				)
+			# # No work order could mean independent Manufacture entry, if so skip validation
+			# if self.work_order and self.fg_completed_qty > allowed_qty:
+			# 	frappe.throw(
+			# 		_("For quantity {0} should not be greater than work order quantity {1}")
+			# 		.format(flt(self.fg_completed_qty), wo_qty)
+			# 	)
 
 	def update_stock_ledger(self):
 		sl_entries = []
