@@ -12,6 +12,8 @@ def get_item_value(doctype):
     if(uom.item_group=='Raw Material'):
         conv=1
     else:
+        if(not uom.sales_uom):
+                frappe.throw("Please Enter Sales Uom for an item:"+doctype)
         for row in uom.uoms:
             if(row.uom==uom.sales_uom):
                 conv=row.conversion_factor
