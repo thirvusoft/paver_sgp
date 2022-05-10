@@ -115,7 +115,8 @@ doc_events = {
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
 	},
 	"Delivery Note":{
-		"validate":"ganapathy_pavers.custom.py.delivery_note.set_qty"
+		"on_submit":"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
+		"on_cancel":"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework"
 	},
 	"Job Card":{
 		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"

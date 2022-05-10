@@ -130,7 +130,7 @@ frappe.ui.form.on('Sales Order',{
                     new_row.description=message['description']
                 }
             })
-            new_row.conversion_factor=1
+            
             new_row.warehouse=cur_frm.doc.set_warehouse
             new_row.delivery_date=cur_frm.doc.delivery_date
             
@@ -157,14 +157,13 @@ frappe.ui.form.on('Sales Order',{
                 doc: cur_frm.doc
             },
             callback: function(r){
-                frappe.run_serially([
-                    () =>{
-                        frappe.set_route('project', cur_frm.doc.site_work)
-                    },
-                    () => {
-                        window.location.reload()
+                if(r.message){ 
+                        frappe.show_alert({message: __("Site Work Updated Successfully"),indicator: 'green'});
+                      }
+                else{
+                    frappe.show_alert({message: __("Couldn't Update Site Work"),indicator: 'red'});
                     }
-                ])
+                
                 }
         })
     },

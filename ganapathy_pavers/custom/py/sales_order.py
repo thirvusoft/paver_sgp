@@ -13,7 +13,7 @@ def get_item_value(doctype):
         conv=1
     else:
         for row in uom.uoms:
-            if(row.uom=='Square Foot'):
+            if(row.uom==uom.sales_uom):
                 conv=row.conversion_factor
         if(not conv):
             frappe.throw(f'Please enter UOM conversion for Square foot in item:{doctype}')
@@ -78,7 +78,7 @@ def create_site(doc):
         })
     site_work.save()
     frappe.db.commit()
-    return
+    return 1
 
 
 @frappe.whitelist()
