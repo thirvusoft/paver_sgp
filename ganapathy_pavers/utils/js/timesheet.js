@@ -1,5 +1,5 @@
 frappe.ui.form.on('Timesheet', {
-    on_submit: function(frm) {
+    before_submit: function(frm) {
             frappe.db.get_value('Workstation', {'name':cur_frm.doc.workstation}, '_assign', function(r) {
                 cur_frm.assign_to.add();
                 cur_frm.assign_to.assign_to.dialog.set_values({assign_to:r._assign});
@@ -7,6 +7,15 @@ frappe.ui.form.on('Timesheet', {
                     frm.assign_to.assign_to.dialog.primary_action();
                 }, 100);
 			});
+            frappe.db.get_single_value('HR Settings', 'standard_working_hours').then(value => { 
+                if((frm.doc.total_hours-value)>0){
+                    frm.set_value('overtime_hours',(frm.doc.total_hours-value))
+                }
+                else{
+                    frm.set_value('overtime_hours',(frm.doc.total_hours))
+                }
+                }
+                )   
         },
 });
 var exists=[];
