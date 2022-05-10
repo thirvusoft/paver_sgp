@@ -22,6 +22,7 @@ frappe.ui.form.on("Employee Advance Tool",{
 		})
 
 	},
+	
 	on_submit:function(frm,cdt,cdn){
 		var advance=locals[cdt][cdn]
 		console.log(advance.employee_advance_details.length)
@@ -34,5 +35,15 @@ frappe.ui.form.on("Employee Advance Tool",{
 					payment_type:advance.employee_advance_details[i].payment_method},
 			})
 		}
-	}
+	},
+	on_submit:function(frm, cdt, cdn) {
+
+		var table = frm.doc.employee_advance_details;
+		var total = 0;
+		for(var i in table) {
+			total = total + table[i].current_advance;
+		 }
+		 frm.set_value("total_advance_amount",total);
+		}
+	
 })
