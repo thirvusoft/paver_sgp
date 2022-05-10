@@ -4,7 +4,6 @@ from frappe.model.document import Document
 
 class EmployeeAdvanceTool(Document):
 	pass
-
 @frappe.whitelist()
 def employee_finder(advance1):
 	employee_names=[]
