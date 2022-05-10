@@ -528,6 +528,7 @@ class WorkOrder(Document):
 			bom_traversal = reversed(bom_tree.level_order_traversal())
 
 			for node in bom_traversal:
+				frappe.errprint(node)
 				if node.is_bom:
 					operations.extend(_get_operations(node.name, qty=node.exploded_qty))
 

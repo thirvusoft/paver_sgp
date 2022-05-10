@@ -9,11 +9,16 @@ from frappe.model.mapper import get_mapped_doc
 def get_item_value(doctype):
     uom=frappe.get_doc('Item',doctype)
     conv=0
-    for row in uom.uoms:
-        if(row.uom=='Square Foot'):
-            conv=row.conversion_factor
-    if(not conv):
-        frappe.throw(f'Please enter UOM conversion for Square foot in item:{doctype}')
+    if(uom.item_group=='Raw Material'):
+        conv=1
+    else:
+        if(not uom.sales_uom):
+                frappe.throw("Please Enter Sales Uom for an item:"+doctype)
+        for row in uom.uoms:
+            if(row.uom==uom.sales_uom):
+                conv=row.conversion_factor
+        if(not conv):
+            frappe.throw(f'Please enter UOM conversion for Square foot in item:{doctype}')
     res={
         'item_name':frappe.get_value('Item',doctype,'item_name'),
         'description':frappe.get_value('Item',doctype,'description'),

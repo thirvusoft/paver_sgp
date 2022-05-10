@@ -99,7 +99,8 @@ doc_events = {
                       "on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary"
           },
 	"Salary Slip":{
-        		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update"
+        		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update",
+				"validate":"ganapathy_pavers.utils.py.salary_slip.round_off"
           },
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
@@ -115,9 +116,12 @@ doc_events = {
 	},
 	"Delivery Note":{
 		"validate":"ganapathy_pavers.custom.py.delivery_note.set_qty"
+	},
+	"Job Card":{
+		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
 	}
 }
-
+after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]
 doctype_js = {
 				"Item" : "/custom/js/item.js",
 				"Payment Entry" : "/custom/js/payment_entry.js",
@@ -132,7 +136,7 @@ doctype_js = {
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
 				"Workstation":"/custom/js/workstation.js",
 				"Work Order": "/custom/js/work_order.js",
-				"Delivery Note": "/custom/js/delivery_note.js"
+				"Delivery Note": "/custom/js/delivery_note.js",
 			 }
 # Scheduled Tasks
 # ---------------
