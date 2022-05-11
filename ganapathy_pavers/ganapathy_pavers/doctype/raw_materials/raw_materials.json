@@ -8,6 +8,7 @@
  "field_order": [
   "item",
   "qty",
+  "delivered_quantity",
   "uom",
   "rate",
   "amount",
@@ -63,12 +64,18 @@
    "in_list_view": 1,
    "label": "Sales Order",
    "read_only": 1
+  },
+  {
+   "fieldname": "delivered_quantity",
+   "fieldtype": "Float",
+   "label": "Delivered Quantity",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-10 11:56:25.413489",
+ "modified": "2022-05-11 16:00:14.475142",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Raw Materials",

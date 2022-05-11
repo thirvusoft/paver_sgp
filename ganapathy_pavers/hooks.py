@@ -115,11 +115,15 @@ doc_events = {
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
 	},
 	"Delivery Note":{
+		"before_validate":"ganapathy_pavers.custom.py.delivery_note.update_customer",
 		"on_submit":"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
 		"on_cancel":"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework"
 	},
 	"Job Card":{
 		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
+	},
+	"Sales Invoice":{
+		"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer"
 	}
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]

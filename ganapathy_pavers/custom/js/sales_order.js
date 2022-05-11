@@ -87,8 +87,8 @@ frappe.ui.form.on('Sales Order',{
                 var message;
                 var new_row = frm.add_child("items");
                 new_row.item_code=cur_frm.doc.pavers[row].item
-                //new_row.ts_qty=cur_frm.doc.pavers[row].allocated_paver_area
-                new_row.qty=cur_frm.doc.pavers[row].number_of_bundle
+                new_row.qty=cur_frm.doc.pavers[row].allocated_paver_area
+                new_row.ts_qty=cur_frm.doc.pavers[row].number_of_bundle
                 new_row.area_per_bundle=cur_frm.doc.pavers[row].area_per_bundle
                 new_row.rate=cur_frm.doc.pavers[row].rate
                 new_row.amount=cur_frm.doc.pavers[row].amount
