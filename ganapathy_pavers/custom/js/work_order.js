@@ -1,5 +1,5 @@
 frappe.ui.form.on("Work Order",{
-    on_submit: function(frm,cdt,cdn){
+    on_submit: function(frm){
         frappe.call({
             method: "ganapathy_pavers.custom.py.work_order.get_link",
             args:{doc:frm.doc.name},
@@ -7,5 +7,22 @@ frappe.ui.form.on("Work Order",{
                 window.location.assign(r.message)
             }
         })
+    },
+    onload: function(frm){
+        if(frm.doc.__unsaved || frm.doc.parent_work_order){
+            frm.set_df_property("linked_work_order",'hidden',1)
+        }
+        else{
+            frappe.call({
+                method: "ganapathy_pavers.custom.py.work_order.get_child_work_order_status",
+                args: {parent: frm.doc.name},
+                callback(r){
+                    cur_frm.set_value("linked_work_order", r.message)
+                    cur_frm.refresh()
+                    cur_frm.save()
+                }
+            })
+
+        }
     }
 })
