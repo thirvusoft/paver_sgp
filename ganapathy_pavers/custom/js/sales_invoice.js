@@ -1,4 +1,4 @@
-frappe.ui.form.on('Delivery Note Item', {
+frappe.ui.form.on('Sales Invoice Item', {
     ts_qty: function(frm,cdt,cdn){
         bundle_calc(frm, cdt, cdn)
     },
@@ -37,9 +37,10 @@ async function bundle_calc(frm, cdt, cdn){
 
 
 
-frappe.ui.form.on('Delivery Note', {
+frappe.ui.form.on('Sales Invoice', {
     onload:async function(frm){
-        if(cur_frm.is_new() ){
+        console.clear()
+        if(cur_frm.is_new()){
             for(let ind=0;cur_frm.doc.items.length;ind++){
                 let cdt=cur_frm.doc.items[ind].doctype
                 let cdn=cur_frm.doc.items[ind].name
@@ -62,19 +63,17 @@ frappe.ui.form.on('Delivery Note', {
                     conv=bundle_conv/other_conv
                 })
             
-                
-                
-                frappe.db.get_doc('Item',row.item_code).then((doc)=>{
-                    if(doc.item_group=='Pavers'){
-                        frappe.model.set_value(cdt, cdn, 'ts_qty', row.qty/conv)
-                        let rate=row.rate
-                        frappe.model.set_value(cdt, cdn, 'rate', 0)
-                        frappe.model.set_value(cdt, cdn, 'rate', rate)
-                    }    
-                    })
-                }
-            }
             
+            frappe.db.get_doc('Item',row.item_code).then((doc)=>{
+                if(doc.item_group=='Pavers'){
+                    frappe.model.set_value(cdt, cdn, 'ts_qty', row.qty/conv)
+                    let rate=row.rate
+                    frappe.model.set_value(cdt, cdn, 'rate', 0)
+                    frappe.model.set_value(cdt, cdn, 'rate', rate)
+                }    
+                })
+            }
+        }
             }
         }
 })
