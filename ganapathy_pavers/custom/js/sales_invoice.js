@@ -1,4 +1,4 @@
-frappe.ui.form.on('Delivery Note Item', {
+frappe.ui.form.on('Sales Invoice Item', {
     ts_qty: function(frm,cdt,cdn){
         bundle_calc(frm, cdt, cdn)
     },
@@ -37,10 +37,9 @@ async function bundle_calc(frm, cdt, cdn){
 
 
 
-frappe.ui.form.on('Delivery Note', {
+frappe.ui.form.on('Sales Invoice', {
     onload:async function(frm){
         console.clear()
-        let child_items=[]
         if(cur_frm.is_new()){
             for(let ind=0;cur_frm.doc.items.length;ind++){
                 let cdt=cur_frm.doc.items[ind].doctype
@@ -48,8 +47,6 @@ frappe.ui.form.on('Delivery Note', {
                 let row=locals[cdt][cdn]
                 let uom=row.uom
                 let conv
-                if(row.item_code)
-                {
                 await frappe.db.get_doc('Item', row.item_code).then((doc) => {
                     let bundle_conv=1;
                     let other_conv=1;
@@ -64,28 +61,17 @@ frappe.ui.form.on('Delivery Note', {
                     conv=bundle_conv/other_conv
                 })
             
-                
-                
-                frappe.db.get_doc('Item',row.item_code).then((doc)=>{
-                    if(doc.item_group=='Pavers'){
-                        frappe.model.set_value(cdt, cdn, 'ts_qty', row.qty/conv)
-                        let rate=row.rate
-                        frappe.model.set_value(cdt, cdn, 'rate', 0)
-                        frappe.model.set_value(cdt, cdn, 'rate', rate)
-                    }    
-                    })
-                
-                if(row.qty){
-                    child_items.push(cur_frm.doc.items[ind])
-                    console.log(child_items)
-                    console.log(cur_frm.doc.items[ind])
-                }
-                }
-            }
-            console.log(child_items)
-            cur_frm.set_value('items', child_items)
-            refresh_field('items    ')
+            console.log(conv)
             
+            frappe.db.get_doc('Item',row.item_code).then((doc)=>{
+                if(doc.item_group=='Pavers'){
+                    frappe.model.set_value(cdt, cdn, 'ts_qty', row.qty/conv)
+                    let rate=row.rate
+                    frappe.model.set_value(cdt, cdn, 'rate', 0)
+                    frappe.model.set_value(cdt, cdn, 'rate', rate)
+                }    
+                })
+            }
             }
         }
 })
