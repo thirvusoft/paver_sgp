@@ -6,7 +6,7 @@ def execute(filters=None):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 	employee = filters.get("employee")
-	site_name = filters.get("status")
+	site_name = filters.get("site_name")
 	conditions = ""
 	if from_date or to_date or employee or site_name:
 		conditions = " where 1 = 1"
@@ -30,27 +30,28 @@ def execute(filters=None):
 
 	data = [list(i) for i in report_data]
 	final_data = []
-	start = 0
-	for i in range(len(data)-1):
-		if (data[i][1] != data[i+1][1]):
-			final_data.append(data[i])
-			total = [" " for i in range(9)]
-			total[5] = "<b style=color:orange;>""Total""</b>"
-			total[6] = sum(data[i][6] for i in range(start,i+1))
-			total[7] = ("NaN" for i in range(start,i+1))
-			total[8] = sum(data[i][8] for i in range(start,i+1))
-			final_data.append(total)
-			start = i+1	
-		else:
-			final_data.append(data[i])
-			
-	final_data.append(data[-1])
-	total = [" " for i in range(9)]
-	total[5] = "<b style=color:orange;>""Total""</b>"
-	total[6] = sum(data[i][6] for i in range(start,len(data)))
-	total[7] = ("NaN" for i in range(start,i+1))
-	total[8] = sum(data[i][8] for i in range(start,len(data)))
-	final_data.append(total)
+	if(len(data)):
+		start = 0
+		for i in range(len(data)-1):
+			if (data[i][1] != data[i+1][1]):
+				final_data.append(data[i])
+				total = [" " for i in range(9)]
+				total[5] = "<b style=color:orange;>""Total""</b>"
+				total[6] = sum(data[i][6] for i in range(start,i+1))
+				total[7] = ("NaN","NaN")
+				total[8] = sum(data[i][8] for i in range(start,i+1))
+				final_data.append(total)
+				start = i+1	
+			else:
+				final_data.append(data[i])
+				
+		final_data.append(data[-1])
+		total = [" " for i in range(9)]
+		total[5] = "<b style=color:orange;>""Total""</b>"
+		total[6] = sum(data[i][6] for i in range(start,len(data)))
+		total[7] = ("NaN","NaN")
+		total[8] = sum(data[i][8] for i in range(start,len(data)))
+		final_data.append(total)
 	columns = get_columns()
 	return columns, final_data
 
