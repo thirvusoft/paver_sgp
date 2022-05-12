@@ -19,7 +19,7 @@ async function bundle_calc(frm, cdt, cdn){
             if(doc.uoms[doc_row].uom==uom){
                 other_conv=doc.uoms[doc_row].conversion_factor
             }
-            if(doc.uoms[doc_row].uom=='Bundle'){
+            if(doc.uoms[doc_row].uom=='bundle'){
                 bundle_conv=doc.uoms[doc_row].conversion_factor
             }
         }
@@ -39,7 +39,7 @@ async function bundle_calc(frm, cdt, cdn){
 
 frappe.ui.form.on('Delivery Note', {
     onload:async function(frm){
-        if(cur_frm.is_new()){
+        if(cur_frm.is_new() ){
             for(let ind=0;cur_frm.doc.items.length;ind++){
                 let cdt=cur_frm.doc.items[ind].doctype
                 let cdn=cur_frm.doc.items[ind].name
@@ -55,7 +55,7 @@ frappe.ui.form.on('Delivery Note', {
                         if(doc.uoms[doc_row].uom==uom){
                             other_conv=doc.uoms[doc_row].conversion_factor
                         }
-                        if(doc.uoms[doc_row].uom=='Bundle'){
+                        if(doc.uoms[doc_row].uom=='bundle'){
                             bundle_conv=doc.uoms[doc_row].conversion_factor
                         }
                     }
