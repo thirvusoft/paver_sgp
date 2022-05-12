@@ -36,7 +36,7 @@ frappe.ui.form.on("Employee Advance Tool",{
 			})
 		}
 	},
-	on_submit:function(frm, cdt, cdn) {
+	before_save:function(frm, cdt, cdn) {
 
 		var table = frm.doc.employee_advance_details;
 		var total = 0;
