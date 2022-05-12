@@ -47,6 +47,8 @@ frappe.ui.form.on('Sales Invoice', {
                 let row=locals[cdt][cdn]
                 let uom=row.uom
                 let conv
+                if(row.item_code)
+                {
                 await frappe.db.get_doc('Item', row.item_code).then((doc) => {
                     let bundle_conv=1;
                     let other_conv=1;
@@ -61,7 +63,6 @@ frappe.ui.form.on('Sales Invoice', {
                     conv=bundle_conv/other_conv
                 })
             
-            console.log(conv)
             
             frappe.db.get_doc('Item',row.item_code).then((doc)=>{
                 if(doc.item_group=='Pavers'){
@@ -72,6 +73,7 @@ frappe.ui.form.on('Sales Invoice', {
                 }    
                 })
             }
+        }
             }
         }
 })

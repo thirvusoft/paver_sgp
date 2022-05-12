@@ -10,12 +10,16 @@ def update_qty_sitework(self,event):
                 if(sw):
                     doc=frappe.get_doc('Project', sw)
                     item_details=doc.item_details
+                    raw_material=doc.raw_material
                     for item in range(len(item_details)):
                         if(item_details[item].item==row.item_code and item_details[item].sales_order==so):
                             item_details[item].delivered_qty=float(item_details[item].delivered_qty)+row.ts_qty
-
+                    for item in range(len(raw_material)):
+                        if(raw_material[item].item==row.item_code and raw_material[item].sales_order==so):
+                            raw_material[item].delivered_quantity=float(raw_material[item].delivered_quantity)+row.qty
                     doc.update({
-                        'item_details': item_details
+                        'item_details': item_details,
+                        'raw_material': raw_material
                     })
                     doc.save()
         frappe.db.commit()
@@ -31,12 +35,17 @@ def reduce_qty_sitework(self,event):
                 if(sw):
                     doc=frappe.get_doc('Project', sw)
                     item_details=doc.item_details
+                    raw_material=doc.raw_material
                     for item in range(len(item_details)):
                         if(item_details[item].item==row.item_code and item_details[item].sales_order==so):
                             item_details[item].delivered_qty=float(item_details[item].delivered_qty)-row.ts_qty
-
+                    for item in range(len(raw_material)):
+                        if(raw_material[item].item==row.item_code and raw_material[item].sales_order==so):
+                            raw_material[item].delivered_quantity=float(raw_material[item].delivered_quantity)-row.qty
+                            
                     doc.update({
-                        'item_details': item_details
+                        'item_details': item_details,
+                        'raw_material': raw_material
                     })
                     doc.save()
         frappe.db.commit()

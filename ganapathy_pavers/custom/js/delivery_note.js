@@ -39,8 +39,6 @@ async function bundle_calc(frm, cdt, cdn){
 
 frappe.ui.form.on('Delivery Note', {
     onload:async function(frm){
-        console.clear()
-        let child_items=[]
         if(cur_frm.is_new()){
             for(let ind=0;cur_frm.doc.items.length;ind++){
                 let cdt=cur_frm.doc.items[ind].doctype
@@ -74,17 +72,8 @@ frappe.ui.form.on('Delivery Note', {
                         frappe.model.set_value(cdt, cdn, 'rate', rate)
                     }    
                     })
-                
-                if(row.qty){
-                    child_items.push(cur_frm.doc.items[ind])
-                    console.log(child_items)
-                    console.log(cur_frm.doc.items[ind])
-                }
                 }
             }
-            console.log(child_items)
-            cur_frm.set_value('items', child_items)
-            refresh_field('items    ')
             
             }
         }
