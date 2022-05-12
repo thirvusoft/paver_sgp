@@ -80,7 +80,7 @@ def create_site(doc):
         })
     site_work.save()
     frappe.db.commit()
-    return
+    return 1
 
 
 @frappe.whitelist()
