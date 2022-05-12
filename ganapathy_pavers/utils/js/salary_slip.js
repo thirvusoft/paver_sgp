@@ -36,14 +36,6 @@ frappe.ui.form.on('Salary Slip',{
         var date = frm.doc.end_date;
         var arr = date.split('-');
         frm.set_value('days',arr[2]) 
-        frm.trigger('total_working_hours');    
-    },
-    total_working_hours:function(frm){
-        frappe.db.get_single_value('HR Settings', 'standard_working_hours').then(value => { 
-            let quotient = Math.floor(frm.doc.total_working_hours/value);
-            let remainder = (frm.doc.total_working_hours%value);
-            var value = quotient.toString()+' Days '+remainder.toString()+' Hours'
-            cur_frm.set_value('days_worked',value) })
     },
     employee_count:function(frm){
         frappe.db.get_list("Salary Slip", {
@@ -69,12 +61,11 @@ frappe.ui.form.on('Salary Slip',{
                 if(exit==0){
                     var child = cur_frm.add_child("earnings");
                     frappe.model.set_value(child.doctype, child.name, "salary_component",'Basic') 
-                    frappe.db.get_value("Company", {"name": frm.doc.company}, "contractor_welfare_commission", (r) => {
-                        frappe.model.set_value(earnings[data].doctype,earnings[data].name,'amount',total_hours*r.contractor_welfare_commission)
-                    });
-                    cur_frm.refresh_field("earnings")
-                        cur_frm.refresh_field("earnings")         
-                    cur_frm.refresh_field("earnings")
+                    setTimeout(() => {    
+                        frappe.db.get_value("Company", {"name": frm.doc.company}, "contractor_welfare_commission", (r) => {
+                            frappe.model.set_value(child.doctype,child.name,'amount',total_hours*r.contractor_welfare_commission)
+                        });
+                        cur_frm.refresh_field("earnings")}, 100);
                 }   
             }         
         });
@@ -99,19 +90,6 @@ frappe.ui.form.on('Salary Slip',{
         var emp = frm.doc.employee
         cur_frm.set_value('employee','')
         cur_frm.set_value('employee',emp)
-    // },
-    // before_save:function(frm){
-    //     let net_pay=(Math.round(frm.doc.net_pay))%10
-    //     if(net_pay<=2){
-    //         cur_frm.set_value('rounded_total',Math.round(frm.doc.net_pay)-net_pay)
-    //         cur_frm.set_value('net_pay',Math.round(frm.doc.net_pay)-net_pay)
-    //     }
-    //     else if(net_pay>2){
-    //         let value = 10- net_pay
-    //         cur_frm.set_value('rounded_total',Math.round(frm.doc.net_pay)+value)
-    //         cur_frm.set_value('net_pay',Math.round(frm.doc.net_pay)+value)
-    //     }
-
     },
     total_paid_amount:function(frm){
         frm.set_value('total_unpaid_amount',(frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance) 
