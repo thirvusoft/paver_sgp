@@ -18,24 +18,23 @@ def item_details_fetching_compoundwall(item_code):
         return area_bundle,item_price
 
 def before_save(doc, action):
-    total1= 0
-    total2 = 0
-    total3 = 0
-    total4 = 0
+    additionalcost_total= 0
+    item_details_total = 0
+    job_worker_total = 0
+    raw_material_total = 0
     for i in doc.additional_cost:
-        total1 = total1+i.amount
-    print(total1)
-    doc.total = total1
+        additionalcost_total = additionalcost_total+i.amount
+    doc.total = additionalcost_total
     for i in doc.item_details:
-        total2 = total2+i.amount
-    doc.total_amount=total2
+        item_details_total = item_details_total+i.amount
+    doc.total_amount=item_details_total
     for i in doc.job_worker:
-        total3 = total3+i.amount
-    doc.total_job_worker_cost=total3
+        job_worker_total = job_worker_total+i.amount
+    doc.total_job_worker_cost=job_worker_total
     for i in doc.raw_material:
-        total4 = total4+i.amount   
-    doc.total_amount_of_raw_material=total4   
-    total_costing=total1+total2+total3+total4
+        raw_material_total = raw_material_total+i.amount   
+    doc.total_amount_of_raw_material=raw_material_total   
+    total_costing=additionalcost_total+item_details_total+job_worker_total+raw_material_total
     doc.total_expense_amount=total_costing
 		
 
