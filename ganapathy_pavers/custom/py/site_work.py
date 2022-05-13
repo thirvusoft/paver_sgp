@@ -17,6 +17,28 @@ def item_details_fetching_compoundwall(item_code):
         area_bundle= doc.bundle_per_sqr_ft
         return area_bundle,item_price
 
+def before_save(doc, action):
+    total1= 0
+    total2 = 0
+    total3 = 0
+    total4 = 0
+    for i in doc.additional_cost:
+        total1 = total1+i.amount
+    print(total1)
+    doc.total = total1
+    for i in doc.item_details:
+        total2 = total2+i.amount
+    doc.total_amount=total2
+    for i in doc.job_worker:
+        total3 = total3+i.amount
+    doc.total_job_worker_cost=total3
+    for i in doc.raw_material:
+        total4 = total4+i.amount   
+    doc.total_amount_of_raw_material=total4   
+    total_costing=total1+total2+total3+total4
+    doc.total_expense_amount=total_costing
+		
+
 @frappe.whitelist()
 def add_total_amount(items):
     if items:

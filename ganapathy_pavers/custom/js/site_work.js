@@ -27,42 +27,6 @@ frappe.ui.form.on("Project",{
     project_type:function(frm,cdt,cdn){
         setquery(frm,cdt,cdn)
     },
-    	before_save:function(frm, cdt, cdn) {
-		
-		let total1= 0;
-		
-		var table1= frm.doc.additional_cost;
-		for(let i in table1){
-			total1 = total1+table1[i].amount;
-
-		}
-		frm.set_value("total",total1);
-		var table2 = frm.doc.item_details;
-		let total2 = 0;
-		for(let i in table2){
-			total2 = total2+table2[i].amount;
-	
-		}
-		frm.set_value("total_amount",total2);
-		var table3 = frm.doc.job_worker;
-		let total3 = 0;
-		for(let i in table3){
-			total3 = total3+table3[i].amount;
-	
-		}
-		frm.set_value("total_job_worker_cost",total3);
-		var table4 = frm.doc.raw_material;
-		let total4 = 0;
-		for(let i in table3){
-			total4 = total4+table4[i].amount;
-	
-		}
-		frm.set_value("total_amount_of_raw_material",total4);
-		let total_costing=total1+total2+total3+total4;
-		frm.set_value("total_expense_amount",total_costing)
-		},
-	
-
     
     refresh:function(frm,cdt,cdn){
         //percent_complete(frm,cdt,cdn)
@@ -333,10 +297,6 @@ function amount_rawmet(frm,cdt,cdn){
     let row=locals[cdt][cdn]
     frappe.model.set_value(cdt,cdn,'amount', (row.rate?row.rate:0)*(row.qty?row.qty:0))
 }
-
-
-	
-		
 
 //compound wall
 
