@@ -110,18 +110,27 @@ doc_events = {
 		"on_submit":"ganapathy_pavers.utils.py.employee_advance.create_payment_entry"
 	},
 	"Project":{
-		"autoname":"ganapathy_pavers.custom.py.site_work.autoname",
-		"before_save":"ganapathy_pavers.custom.py.site_work.before_save"
-		
+		"autoname":"ganapathy_pavers.custom.py.site_work.autoname"
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
 	},
 	"Delivery Note":{
-		"validate":"ganapathy_pavers.custom.py.delivery_note.set_qty"
+		"before_validate":"ganapathy_pavers.custom.py.delivery_note.update_customer",
+		"on_submit":[
+					"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
+					"ganapathy_pavers.custom.py.delivery_note.update_return_qty_sitework"
+					],
+		"on_cancel":[
+					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
+					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
+					 ],
 	},
 	"Job Card":{
 		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
+	},
+	"Sales Invoice":{
+		"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer"
 	}
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]
@@ -140,6 +149,7 @@ doctype_js = {
 				"Workstation":"/custom/js/workstation.js",
 				"Work Order": "/custom/js/work_order.js",
 				"Delivery Note": "/custom/js/delivery_note.js",
+				"Sales Invoice": "/custom/js/sales_invoice.js",
 				"Vehicle Log":"/custom/js/vehicle_log.js"
 			 }
 # Scheduled Tasks

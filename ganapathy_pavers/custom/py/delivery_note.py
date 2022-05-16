@@ -9,18 +9,28 @@ def update_qty_sitework(self,event):
             if(so):
                 sw=frappe.get_value('Sales Order', so, 'site_work')
                 if(sw):
+                    item_group=frappe.get_value('Item', row.item_code, 'item_group')
                     doc=frappe.get_doc('Project', sw)
-                    item_details=doc.item_details
+                    delivery_detail=doc.delivery_detail
+                    create=1
+                    for item in range(len(delivery_detail)):
+                        if(row.item_code==delivery_detail[item].item and item_group!='Raw Material'):
+                            create=0
+                            delivery_detail[item].delivered_bundle+=row.ts_qty
+                            delivery_detail[item].delivered_pieces+=row.pieces
                     raw_material=doc.raw_material
-                    for item in range(len(item_details)):
-                        if(item_details[item].item==row.item_code and item_details[item].sales_order==so):
-                            item_details[item].delivered_qty=float(item_details[item].delivered_qty)+row.ts_qty
                     for item in range(len(raw_material)):
-                        if(raw_material[item].item==row.item_code and raw_material[item].sales_order==so):
-                            raw_material[item].delivered_quantity=float(raw_material[item].delivered_quantity)+row.qty
+                        if(row.item_code==raw_material[item].item and item_group=='Raw Material'):
+                            raw_material[item].delivered_quantity+=row.qty
+                    if(create and item_group!='Raw Material'):
+                        delivery_detail.append({
+                            'item':row.item_code,
+                            'delivered_bundle':row.ts_qty,
+                            'delivered_pieces':row.pieces
+                        })
                     doc.update({
-                        'item_details': item_details,
-                        'raw_material': raw_material
+                        'raw_material': raw_material,
+                        'delivery_detail': delivery_detail
                     })
                     doc.save()
         frappe.db.commit()
@@ -34,22 +44,104 @@ def reduce_qty_sitework(self,event):
             if(so):
                 sw=frappe.get_value('Sales Order', so, 'site_work')
                 if(sw):
+                    item_group=frappe.get_value('Item', row.item_code, 'item_group')
                     doc=frappe.get_doc('Project', sw)
-                    item_details=doc.item_details
+                    delivery_detail=doc.delivery_detail
+                    create=1
+                    for item in range(len(delivery_detail)):
+                        if(row.item_code==delivery_detail[item].item and item_group!='Raw Material'):
+                            create=0
+                            delivery_detail[item].delivered_bundle-=row.ts_qty
+                            delivery_detail[item].delivered_pieces-=row.pieces
                     raw_material=doc.raw_material
-                    for item in range(len(item_details)):
-                        if(item_details[item].item==row.item_code and item_details[item].sales_order==so):
-                            item_details[item].delivered_qty=float(item_details[item].delivered_qty)-row.ts_qty
                     for item in range(len(raw_material)):
-                        if(raw_material[item].item==row.item_code and raw_material[item].sales_order==so):
-                            raw_material[item].delivered_quantity=float(raw_material[item].delivered_quantity)-row.qty
-                            
+                        if(row.item_code==raw_material[item].item and item_group=='Raw Material'):
+                            raw_material[item].delivered_quantity-=row.qty
+                    if(create and item_group!='Raw Material'):
+                        delivery_detail.append({
+                            'item':row.item_code,
+                            'delivered_bundle':row.ts_qty,
+                            'delivered_pieces':row.pieces
+                        })
                     doc.update({
-                        'item_details': item_details,
-                        'raw_material': raw_material
+                        'raw_material': raw_material,
+                        'delivery_detail': delivery_detail
                     })
                     doc.save()
         frappe.db.commit()
+
+
+
+
+def update_return_qty_sitework(self,event):
+    if(self.is_return):
+        for row in self.items:
+            so=row.against_sales_order
+            if(so):
+                sw=frappe.get_value('Sales Order', so, 'site_work')
+                if(sw):
+                    item_group=frappe.get_value('Item', row.item_code, 'item_group')
+                    doc=frappe.get_doc('Project', sw)
+                    delivery_detail=doc.delivery_detail
+                    create=1
+                    for item in range(len(delivery_detail)):
+                        if(row.item_code==delivery_detail[item].item and item_group!='Raw Material'):
+                            create=0
+                            delivery_detail[item].returned_bundle+=row.ts_qty
+                            delivery_detail[item].returned_pieces+=row.pieces
+                    raw_material=doc.raw_material
+                    for item in range(len(raw_material)):
+                        if(row.item_code==raw_material[item].item and item_group=='Raw Material'):
+                            raw_material[item].returned_quantity+=row.qty
+                    if(create and item_group!='Raw Material'):
+                        delivery_detail.append({
+                            'item':row.item_code,
+                            'returned_bundle':row.ts_qty,
+                            'returned_pieces':row.pieces
+                        })
+                    doc.update({
+                        'raw_material': raw_material,
+                        'delivery_detail': delivery_detail
+                    })
+                    doc.save()
+        frappe.db.commit()
+
+
+
+
+def reduce_return_qty_sitework(self,event):
+    if(self.is_return):
+        for row in self.items:
+            so=row.against_sales_order
+            if(so):
+                sw=frappe.get_value('Sales Order', so, 'site_work')
+                if(sw):
+                    item_group=frappe.get_value('Item', row.item_code, 'item_group')
+                    doc=frappe.get_doc('Project', sw)
+                    delivery_detail=doc.delivery_detail
+                    create=1
+                    for item in range(len(delivery_detail)):
+                        if(row.item_code==delivery_detail[item].item and item_group!='Raw Material'):
+                            create=0
+                            delivery_detail[item].returned_bundle-=row.ts_qty
+                            delivery_detail[item].returned_pieces-=row.pieces
+                    raw_material=doc.raw_material
+                    for item in range(len(raw_material)):
+                        if(row.item_code==raw_material[item].item and item_group=='Raw Material'):
+                            raw_material[item].returned_quantity-=row.qty
+                    if(create and item_group!='Raw Material'):
+                        delivery_detail.append({
+                            'item':row.item_code,
+                            'returned_bundle':row.ts_qty,
+                            'returned_pieces':row.pieces
+                        })
+                    doc.update({
+                        'raw_material': raw_material,
+                        'delivery_detail': delivery_detail
+                    })
+                    doc.save()
+        frappe.db.commit()
+
 
 
 def update_customer(self,event):
