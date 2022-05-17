@@ -56,7 +56,7 @@ app_license = "MIT"
 # Installation
 # ------------
 
-# before_install = "ganapathy_pavers.install.before_install"
+before_install = "ganapathy_pavers.custom.py.warehouse.create_scrap_warehouse"
 # after_install = "ganapathy_pavers.install.after_install"
 
 # Desk Notifications
@@ -135,7 +135,8 @@ doctype_js = {
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
 				"Workstation":"/custom/js/workstation.js",
 				"Work Order": "/custom/js/work_order.js",
-				"Delivery Note": "/custom/js/delivery_note.js"
+				"Delivery Note": "/custom/js/delivery_note.js",
+				"BOM": "/custom/js/bom.js"
 			 }
 # Scheduled Tasks
 # ---------------
