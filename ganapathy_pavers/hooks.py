@@ -110,7 +110,8 @@ doc_events = {
 		"on_submit":"ganapathy_pavers.utils.py.employee_advance.create_payment_entry"
 	},
 	"Project":{
-		"autoname":"ganapathy_pavers.custom.py.site_work.autoname"
+		"autoname":"ganapathy_pavers.custom.py.site_work.autoname",
+		"before_save":"ganapathy_pavers.custom.py.site_work.before_save"
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
