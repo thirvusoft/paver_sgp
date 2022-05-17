@@ -17,22 +17,16 @@ async function bundle_calc(frm, cdt, cdn){
     let conv1
     let conv2
     await frappe.db.get_doc('Item', row.item_code).then((doc) => {
-        let bundle_conv=1;
-        let pieces_conv=1;
+        let bundle_conv=doc.bundle_per_sqr_ft?doc.bundle_per_sqr_ft:1;
         let other_conv=1;
+        let nos_conv=doc.pavers_per_sqft?1/doc.pavers_per_sqft:1;
         for(let doc_row=0; doc_row<doc.uoms.length; doc_row++){
             if(doc.uoms[doc_row].uom==uom){
                 other_conv=doc.uoms[doc_row].conversion_factor
             }
-            if(doc.uoms[doc_row].uom=='bundle'){
-                bundle_conv=doc.uoms[doc_row].conversion_factor
-            }
-            if(doc.uoms[doc_row].uom=='Nos'){
-                pieces_conv=doc.uoms[doc_row].conversion_factor
-            }
         }
         conv1=bundle_conv/other_conv
-        conv2=pieces_conv/other_conv
+        conv2=nos_conv/other_conv
     })
 
     if(row.item_group=='Pavers'){
@@ -59,18 +53,12 @@ frappe.ui.form.on('Sales Invoice', {
                 if(row.item_code)
                 {
                 await frappe.db.get_doc('Item', row.item_code).then((doc) => {
-                    let bundle_conv=1;
+                    let bundle_conv=doc.bundle_per_sqr_ft?doc.bundle_per_sqr_ft:1;
                     let other_conv=1;
-                    let nos_conv=1;
+                    let nos_conv=doc.pavers_per_sqft?1/doc.pavers_per_sqft:1;
                     for(let doc_row=0; doc_row<doc.uoms.length; doc_row++){
                         if(doc.uoms[doc_row].uom==uom){
                             other_conv=doc.uoms[doc_row].conversion_factor
-                        }
-                        if(doc.uoms[doc_row].uom=='bundle'){
-                            bundle_conv=doc.uoms[doc_row].conversion_factor
-                        }
-                        if(doc.uoms[doc_row].uom=='Nos'){
-                            nos_conv=doc.uoms[doc_row].conversion_factor
                         }
                     }
                     conv1=bundle_conv/other_conv
