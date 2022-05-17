@@ -8,10 +8,11 @@
  "field_order": [
   "item",
   "qty",
-  "delivered_quantity",
   "uom",
   "rate",
   "amount",
+  "delivered_quantity",
+  "returned_quantity",
   "sales_order"
  ],
  "fields": [
@@ -26,7 +27,7 @@
   },
   {
    "allow_on_submit": 1,
-   "columns": 2,
+   "columns": 1,
    "fieldname": "qty",
    "fieldtype": "Float",
    "in_list_view": 1,
@@ -51,31 +52,41 @@
   },
   {
    "allow_on_submit": 1,
-   "columns": 2,
+   "columns": 1,
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount"
   },
   {
-   "columns": 2,
    "fieldname": "sales_order",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Sales Order",
    "read_only": 1
   },
   {
+   "columns": 1,
+   "default": "0",
    "fieldname": "delivered_quantity",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Delivered Quantity",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "default": "0",
+   "fieldname": "returned_quantity",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Returned Quantity",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-11 16:00:14.475142",
+ "modified": "2022-05-16 14:32:51.820667",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Raw Materials",

@@ -4,6 +4,9 @@ frappe.ui.form.on('Sales Invoice Item', {
     },
     conversion_factor: function(frm,cdt,cdn){
         bundle_calc(frm, cdt, cdn)
+    },
+    pieces: function(frm,cdt,cdn){
+        bundle_calc(frm, cdt, cdn)
     }
 })
 
@@ -11,9 +14,11 @@ frappe.ui.form.on('Sales Invoice Item', {
 async function bundle_calc(frm, cdt, cdn){
     let row = locals[cdt][cdn]
     let uom=row.uom
-    let conv
+    let conv1
+    let conv2
     await frappe.db.get_doc('Item', row.item_code).then((doc) => {
         let bundle_conv=1;
+        let pieces_conv=1;
         let other_conv=1;
         for(let doc_row=0; doc_row<doc.uoms.length; doc_row++){
             if(doc.uoms[doc_row].uom==uom){
@@ -22,36 +27,41 @@ async function bundle_calc(frm, cdt, cdn){
             if(doc.uoms[doc_row].uom=='bundle'){
                 bundle_conv=doc.uoms[doc_row].conversion_factor
             }
+            if(doc.uoms[doc_row].uom=='Nos'){
+                pieces_conv=doc.uoms[doc_row].conversion_factor
+            }
         }
-        conv=bundle_conv/other_conv
+        conv1=bundle_conv/other_conv
+        conv2=pieces_conv/other_conv
     })
-    frappe.db.get_doc('Item',row.item_code).then((doc)=>{
-        if(doc.item_group=='Pavers'){
-            frappe.model.set_value(cdt, cdn, 'qty', row.ts_qty*conv)
-            let rate=row.rate
-            frappe.model.set_value(cdt, cdn, 'rate', 0)
-            frappe.model.set_value(cdt, cdn, 'rate', rate)
-       }
-    })
+
+    if(row.item_group=='Pavers'){
+        frappe.model.set_value(cdt, cdn, 'qty', row.ts_qty*conv1 + row.pieces*conv2)
+        let rate=row.rate
+        frappe.model.set_value(cdt, cdn, 'rate', 0)
+        frappe.model.set_value(cdt, cdn, 'rate', rate)
+    }
+    
 }
 
 
 
 frappe.ui.form.on('Sales Invoice', {
     onload:async function(frm){
-        console.clear()
-        if(cur_frm.is_new()){
-            for(let ind=0;cur_frm.doc.items.length;ind++){
+        if(cur_frm.is_new() ){
+            for(let ind=0;ind<cur_frm.doc.items.length;ind++){
                 let cdt=cur_frm.doc.items[ind].doctype
                 let cdn=cur_frm.doc.items[ind].name
                 let row=locals[cdt][cdn]
                 let uom=row.uom
-                let conv
+                let conv1
+                let conv2
                 if(row.item_code)
                 {
                 await frappe.db.get_doc('Item', row.item_code).then((doc) => {
                     let bundle_conv=1;
                     let other_conv=1;
+                    let nos_conv=1;
                     for(let doc_row=0; doc_row<doc.uoms.length; doc_row++){
                         if(doc.uoms[doc_row].uom==uom){
                             other_conv=doc.uoms[doc_row].conversion_factor
@@ -59,21 +69,42 @@ frappe.ui.form.on('Sales Invoice', {
                         if(doc.uoms[doc_row].uom=='bundle'){
                             bundle_conv=doc.uoms[doc_row].conversion_factor
                         }
+                        if(doc.uoms[doc_row].uom=='Nos'){
+                            nos_conv=doc.uoms[doc_row].conversion_factor
+                        }
                     }
-                    conv=bundle_conv/other_conv
+                    conv1=bundle_conv/other_conv
+                    conv2=nos_conv/other_conv
                 })
             
-            
-            frappe.db.get_doc('Item',row.item_code).then((doc)=>{
-                if(doc.item_group=='Pavers'){
-                    frappe.model.set_value(cdt, cdn, 'ts_qty', row.qty/conv)
+                
+               
+                if(row.item_group=='Pavers'){
+                    let total_qty=row.qty
+                    await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(row.qty/conv1))
+                    await frappe.model.set_value(cdt, cdn, 'pieces', 0)
+                    let bundle_qty=row.qty
+                    let pieces_qty=total_qty-bundle_qty
+                    await frappe.model.set_value(cdt, cdn, 'pieces', pieces_qty/conv2)
                     let rate=row.rate
                     frappe.model.set_value(cdt, cdn, 'rate', 0)
                     frappe.model.set_value(cdt, cdn, 'rate', rate)
                 }    
-                })
+                }
             }
-        }
+            let items = cur_frm.doc.items || [];
+            let len = items.length;
+            while (len--)
+            {
+                if(items[len].qty == 0)
+                {
+                    await cur_frm.get_field("items").grid.grid_rows[len].remove();
+                }
             }
+            cur_frm.refresh();
+            
+            
+            }
+            
         }
 })
