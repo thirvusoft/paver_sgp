@@ -1,0 +1,52 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-05-11 16:17:19.496734",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "description",
+  "amount",
+  "area",
+  "no_of_labours"
+ ],
+ "fields": [
+  {
+   "fieldname": "description",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Description",
+   "options": "\nMaterial Supply\nWork Completed\nCutting Piece\nDust Swing\nDust Finishing With Rammer\nDust Sweeping\nAny Food Exp in Site\nOther Labour Work\nSite Advance"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "fieldname": "area",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Area"
+  },
+  {
+   "fieldname": "no_of_labours",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "No of Labours"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-05-12 09:34:15.532614",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Additional Costs",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

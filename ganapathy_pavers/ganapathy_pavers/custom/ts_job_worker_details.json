@@ -46,9 +46,6 @@
    "non_negative": 0,
    "options": "Item",
    "owner": "Administrator",
-   "parent": null,
-   "parentfield": null,
-   "parenttype": null,
    "permlevel": 0,
    "precision": "",
    "print_hide": 0,
@@ -109,9 +106,6 @@
    "non_negative": 0,
    "options": null,
    "owner": "Administrator",
-   "parent": null,
-   "parentfield": null,
-   "parenttype": null,
    "permlevel": 0,
    "precision": "",
    "print_hide": 0,
@@ -129,6 +123,7 @@
  ],
  "custom_perms": [],
  "doctype": "TS Job Worker Details",
+ "links": [],
  "property_setters": [],
  "sync_on_migrate": 1
 }

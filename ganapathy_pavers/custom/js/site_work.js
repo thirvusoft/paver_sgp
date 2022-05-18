@@ -57,11 +57,13 @@ frappe.ui.form.on("Project",{
         }
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_df_property('customer','reqd',0)
+            cur_frm.set_df_property('customer_name','reqd',1)
             cur_frm.set_df_property('customer','hidden',1)
             cur_frm.set_df_property('customer_name','hidden',0)
         }
         else{
             cur_frm.set_df_property('customer','reqd',1)
+            cur_frm.set_df_property('customer_name','reqd',0)
             cur_frm.set_df_property('customer','hidden',0)
             cur_frm.set_df_property('customer_name','hidden',1)
         }	
@@ -69,11 +71,13 @@ frappe.ui.form.on("Project",{
     is_multi_customer:function(frm){
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_df_property('customer','reqd',0)
+            cur_frm.set_df_property('customer_name','reqd',1)
             cur_frm.set_df_property('customer','hidden',1)
             cur_frm.set_df_property('customer_name','hidden',0)
         }
         else{
             cur_frm.set_df_property('customer','reqd',1)
+            cur_frm.set_df_property('customer_name','reqd',0)
             cur_frm.set_df_property('customer','hidden',0)
             cur_frm.set_df_property('customer_name','hidden',1)
         }	
@@ -95,7 +99,7 @@ function percent_complete(frm,cdt,cdn){
 		completed_area+= cur_frm.doc.job_worker[row].sqft_allocated
 		total_comp_bundle += cur_frm.doc.job_worker[row].completed_bundle
 	}
-	let percent=(completed_area/total_area)*100
+	let percent=(total_comp_bundle/total_bundle)*100
 	frm.set_value('total_required_area',total_area)
 	frm.set_value('total_completed_area',completed_area)
 	frm.set_value('total_required_bundle',total_bundle)
@@ -200,27 +204,38 @@ frappe.ui.form.on("Pavers", {
 
 
 
+
+function completed_bundle_calc(frm,cdt,cdn){
+	let data = locals[cdt][cdn]
+	let bundle = data.completed_bundle
+	var item_bundle_per_sqft
+	let allocated_sqft
+	var item = data.item
+	if(bundle && item){
+		frappe.db.get_doc('Item',item).then(value => {
+			item_bundle_per_sqft = value.bundle_per_sqr_ft
+			allocated_sqft = bundle * item_bundle_per_sqft
+			frappe.model.set_value(cdt,cdn,"sqft_allocated",allocated_sqft?allocated_sqft:0)
+		})
+	}
+}
+
+
+
 frappe.ui.form.on('TS Job Worker Details',{
 	rate: function(frm, cdt, cdn){
 		amount(frm, cdt, cdn)
 	},
 	completed_bundle: function(frm,cdt,cdn){
-		let data = locals[cdt][cdn]
-		let bundle = data.completed_bundle
-		var item_bundle_per_sqft
-		let allocated_sqft
-		var item = data.item
-		if(bundle && item){
-		frappe.db.get_doc('Item',item).then(value => {
-			item_bundle_per_sqft = value.bundle_per_sqr_ft
-			allocated_sqft = bundle * item_bundle_per_sqft
-			frappe.model.set_value(cdt,cdn,"sqft_allocated",allocated_sqft?allocated_sqft:0)
-		})}
+		completed_bundle_calc(frm,cdt,cdn)
+	},
+	item:function(frm,cdt,cdn){
+		completed_bundle_calc(frm,cdt,cdn)
 	},
 	sqft_allocated: function(frm, cdt, cdn){
 		percent_complete(frm, cdt, cdn)
 		amount(frm, cdt, cdn)
-		
+
 	},
 	job_worker_add: function(frm, cdt, cdn){
 		let work= cur_frm.doc.job_worker?cur_frm.doc.job_worker:[]
@@ -231,7 +246,7 @@ frappe.ui.form.on('TS Job Worker Details',{
 		for(let row=0;row<work.length;row++){
 			if(row){
 				name = cur_frm.doc.job_worker[row-1].name1
-				start_date = cur_frm.doc.job_worker[row-1].start_date
+				start_date = cur_frm.doc.job_worker[row-1].end_date?cur_frm.doc.job_worker[row-1].end_date:cur_frm.doc.job_worker[row-1].start_date
 				rate = cur_frm.doc.job_worker[row-1].rate
 				date = frappe.datetime.add_days(start_date,1)
 			}

@@ -11,10 +11,19 @@ class CustomSalary(SalarySlip):
                 [["start_date", ">=", self.start_date],
                 ["end_date", "<=", self.end_date],
                 ['status','=','Submitted']],
-                fields=["name","_assign",'total_hours']);
+                fields=["name","_assign",'total_hours','overtime_hours']);
                 for data in timesheets:
                     if email in data._assign:
-                        self.append("timesheets", {"time_sheet": data.name, "working_hours": data.total_hours})
+                        self.append("timesheets", {"time_sheet": data.name, "working_hours": data.total_hours,"overtime_hours":data.overtime_hours})
+                total_days=0
+                ot_hours=0.0
+                for data in self.timesheets:
+                    value = frappe.db.get_single_value('HR Settings', 'standard_working_hours')
+                    if (data.working_hours)>=float(value):
+                            total_days+=1
+                    ot_hours+=data.overtime_hours
+                self.total_overtime_hours=ot_hours
+                self.days_worked=total_days
 
 @frappe.whitelist(allow_guest=True)
 def site_work_details(employee,start_date,end_date):
@@ -31,3 +40,15 @@ def employee_update(doc,action):
     employee_doc = frappe.get_doc('Employee',doc.employee)
     employee_doc.salary_balance=doc.total_unpaid_amount
     employee_doc.save()
+
+def round_off(doc,action):
+        net_pay=(round(doc.net_pay))%10
+        if(net_pay<=2):
+            frappe.db.set_value('Salary Slip',doc.name,'rounded_total',round(doc.net_pay)-net_pay)
+            frappe.db.set_value('Salary Slip',doc.name,'net_pay',round(doc.net_pay)-net_pay)
+        
+        elif(net_pay>2):
+            value = 10- net_pay
+            frappe.db.set_value('Salary Slip',doc.name,'rounded_total',round(doc.net_pay)+value)
+            frappe.db.set_value('Salary Slip',doc.name,'net_pay',round(doc.net_pay)+value)
+

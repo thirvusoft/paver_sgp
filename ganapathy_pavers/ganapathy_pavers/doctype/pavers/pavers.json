@@ -76,27 +76,27 @@
   {
    "fieldname": "sales_order",
    "fieldtype": "Data",
-   "label": "Sales Order"
+   "label": "Sales Order",
+   "read_only": 1
   },
   {
-   "allow_on_submit": 1,
    "fieldname": "work",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Work",
-   "options": "\nSupply Only\nLaying Only\nSupply and Laying\nSupply & Laying\nSupply\nLaying",
-   "reqd": 1
+   "options": "\nSupply Only\nLaying Only\nSupply and Laying"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-07 16:33:48.727354",
+ "modified": "2022-05-16 12:27:36.747560",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Pavers",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
- "sort_order": "DESC"
+ "sort_order": "DESC",
+ "states": []
 }
