@@ -136,7 +136,8 @@ doctype_js = {
 				"Workstation":"/custom/js/workstation.js",
 				"Work Order": "/custom/js/work_order.js",
 				"Delivery Note": "/custom/js/delivery_note.js",
-				"BOM": "/custom/js/bom.js"
+				"BOM": "/custom/js/bom.js",
+				"Job Card": "/custom/js/job_card.js"
 			 }
 # Scheduled Tasks
 # ---------------
