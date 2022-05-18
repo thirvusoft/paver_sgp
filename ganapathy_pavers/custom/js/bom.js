@@ -1,5 +1,6 @@
 frappe.ui.form.on("BOM",{
     onload: function(frm){
+        if(cur_frm.doc.doctype == "BOM"){
         if(frm.doc.__unsaved){
             frm.set_df_property("linked_work_orders",'hidden',1)
         }
@@ -14,8 +15,10 @@ frappe.ui.form.on("BOM",{
                     cur_frm.refresh()
                     cur_frm.save('Update')
                     }
+                    
                 }
             }) 
         }
+    }
     }
 })

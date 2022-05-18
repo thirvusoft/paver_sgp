@@ -5,14 +5,22 @@ def get_parent_work_order_status(bom):
     link = frappe.db.sql(f''' 
             SELECT name as work_order, status
             FROM `tabWork Order`
-            WHERE status not in  ('Completed', 'Cancelled') and bom_no = "{bom}" and parent_work_order = "" or parent_work_order is NULL
+            WHERE bom_no = "{bom}" and parent_work_order = "" or parent_work_order is NULL
     ''', as_dict=1)
-    child_data = frappe.db.sql(f''' 
-        SELECT work_order, status
-        FROM `tabWork Order Status`
-        WHERE parent = "{bom}"
-    ''', as_dict=1)
-    if(len(child_data) and link != child_data):
-        return link, child_data
-    elif(not len(child_data)):
-        return link
+    final_wo = []
+    status = ['Completed', 'Closed', 'Cancelled']
+    for i in link:
+        child_wo = frappe.db.sql(f''' 
+            SELECT  name as work_order, status
+            FROM `tabWork Order`
+            WHERE parent_work_order = "{i['work_order']}"
+        ''', as_list=1)
+        child_wo1 = frappe.db.sql(f''' 
+            SELECT  name as work_order, status
+            FROM `tabWork Order`
+            WHERE parent_work_order = "{child_wo[0][0]}"
+        ''', as_list=1)
+        if(child_wo[0][1] not in status and child_wo1[0][1] not in status):
+                final_wo.append(i)
+
+    return final_wo[::-1]
