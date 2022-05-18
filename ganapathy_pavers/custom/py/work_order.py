@@ -29,6 +29,26 @@ def get_child_work_order_status(parent):
             child_status.append(child_docs[0])
         else:
             break
-    frappe.errprint(child_status)
     return child_status
+
+def change_status(wo, action=None):
+    jc_completed_qty = sum(frappe.get_all("Job Card", filters={'work_order':wo}, pluck='total_completed_qty'))
+    from frappe.utils import flt
+    work_order = frappe.get_doc("Work Order", wo)
+    status = work_order.status
+    if work_order.docstatus==0:
+        status = 'Draft'
+    elif work_order.docstatus==1:
+        if status != 'Stopped':
+            stock_entries = True
+            status = "Not Started"
+            if stock_entries:
+                status = "In Process"
+                # produced_qty = stock_entries.get("Manufacture")
+                if flt(jc_completed_qty) >= flt(work_order.qty):
+                    status = "Completed"
+    else:
+        status = 'Cancelled'
+    work_order.status = status
+    work_order.save('Update')
 
