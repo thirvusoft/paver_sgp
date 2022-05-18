@@ -19,7 +19,7 @@ frappe.ui.form.on("Work Order",{
                 callback(r){
                     cur_frm.set_value("linked_work_order", r.message)
                     cur_frm.refresh()
-                    cur_frm.save()
+                    cur_frm.save('Update')
                 }
             })
 
