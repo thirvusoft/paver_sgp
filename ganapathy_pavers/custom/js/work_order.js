@@ -17,9 +17,15 @@ frappe.ui.form.on("Work Order",{
                 method: "ganapathy_pavers.custom.py.work_order.get_child_work_order_status",
                 args: {parent: frm.doc.name},
                 callback(r){
+                    var docstatus= cur_frm.doc.docstatus
                     cur_frm.set_value("linked_work_order", r.message)
                     cur_frm.refresh()
+                    if(docstatus == 1){
                     cur_frm.save('Update')
+                    }
+                    else{
+                        cur_frm.save()
+                    }
                 }
             })
 
