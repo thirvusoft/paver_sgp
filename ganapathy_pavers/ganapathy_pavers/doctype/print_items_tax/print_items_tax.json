@@ -1,0 +1,57 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-05-18 11:17:35.042319",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "taxable_amount",
+  "output_tax_sgst",
+  "output_tax__cgst",
+  "igst"
+ ],
+ "fields": [
+  {
+   "fieldname": "item",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item"
+  },
+  {
+   "fieldname": "taxable_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Taxable Amount"
+  },
+  {
+   "fieldname": "output_tax_sgst",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Output Tax SGST"
+  },
+  {
+   "fieldname": "output_tax__cgst",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Output Tax  CGST"
+  },
+  {
+   "fieldname": "igst",
+   "fieldtype": "Float",
+   "label": "IGST"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-05-18 13:13:23.919870",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Print Items Tax",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
