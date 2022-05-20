@@ -108,3 +108,21 @@ frappe.ui.form.on('Sales Invoice', {
             
         }
 })
+
+function amount(frm,cdt,cdn){
+    let row=locals[cdt][cdn];
+    console.log(row.rate)
+    if(row.qty>=0 && row.rate>=0){
+        frappe.model.set_value(cdt,cdn,'amount',Math.round(row.qty*row.rate));
+    }
+ }
+ frappe.ui.form.on('Sales Invoice Print Items', {
+     qty:function(frm,cdt,cdn){
+         amount(frm,cdt,cdn);
+        },
+     rate:function(frm,cdt,cdn){
+         amount(frm,cdt,cdn);
+        },
+    })
+
+    
