@@ -1,31 +1,31 @@
 {
  "custom_fields": [],
  "custom_perms": [],
- "doctype": "Additional Costs",
+ "doctype": "BOM Item",
  "property_setters": [
   {
    "_assign": null,
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-   "creation": "2022-05-11 18:38:20.566688",
+   "creation": "2022-05-28 11:16:13.716850",
    "default_value": null,
-   "doc_type": "Additional Costs",
+   "doc_type": "BOM Item",
    "docstatus": 0,
    "doctype_or_field": "DocField",
-   "field_name": "no_of_labours",
+   "field_name": "qty",
    "idx": 0,
-   "modified": "2022-05-11 18:38:20.566688",
+   "modified": "2022-05-28 11:16:13.716850",
    "modified_by": "Administrator",
-   "name": "Additional Costs-no_of_labours-label",
+   "name": "BOM Item-qty-precision",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
    "parenttype": null,
-   "property": "label",
-   "property_type": "Data",
+   "property": "precision",
+   "property_type": "Select",
    "row_name": null,
-   "value": "Number of Labours"
+   "value": "4"
   }
  ],
  "sync_on_migrate": 1
