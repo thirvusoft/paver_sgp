@@ -126,6 +126,7 @@ doc_events = {
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
 					 ],
+		"validate":["ganapathy_pavers.custom.py.delivery_note.validate"]
 	},
 	"Job Card":{
 		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
