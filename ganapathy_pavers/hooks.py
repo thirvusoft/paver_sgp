@@ -101,7 +101,7 @@ doc_events = {
           },
 	"Salary Slip":{
         		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update",
-				"validate":"ganapathy_pavers.utils.py.salary_slip.round_off"
+				'validate':"ganapathy_pavers.utils.py.salary_slip.set_net_pay"
           },
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
@@ -126,6 +126,7 @@ doc_events = {
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
 					 ],
+		"validate":["ganapathy_pavers.custom.py.delivery_note.validate"]
 	},
 	"Job Card":{
 		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"

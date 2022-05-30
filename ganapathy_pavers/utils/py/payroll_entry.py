@@ -1,4 +1,5 @@
 from erpnext.payroll.doctype.payroll_entry.payroll_entry import ( PayrollEntry,get_existing_salary_slips)
+from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip
 import frappe
 from frappe.utils import getdate
 from frappe import _
@@ -25,9 +26,9 @@ class MessExpense(PayrollEntry):
                 }
             )
             if len(employees) > 30:
-                frappe.enqueue(create_salary_slips_for_employees, timeout=600, employees=employees,args=args,food_count=food_count)
+                frappe.enqueue(create_salary_slips_for_employees, timeout=600, posting_date=self.posting_date,employees=employees,args=args,food_count=food_count)
             else:
-                create_salary_slips_for_employees(self.start_date,self.end_date,employees, args,food_count, publish_progress=False)
+                create_salary_slips_for_employees(self.posting_date,self.start_date,self.end_date,employees, args,food_count, publish_progress=False)
                 # since this method is called via frm.call this doc needs to be updated manually
                 self.reload()
     @frappe.whitelist()
@@ -40,7 +41,8 @@ class MessExpense(PayrollEntry):
             )
         else:
             submit_salary_slips_for_employees(self, ss_list, publish_progress=False)
-def create_salary_slips_for_employees(start_date,end_date,employees, args,food_count, publish_progress=True):
+
+def create_salary_slips_for_employees(posting_date,start_date,end_date,employees, args,food_count, publish_progress=True):
     salary_slips_exists_for = get_existing_salary_slips(employees, args)
     count = 0
     salary_slips_not_created = []
@@ -64,6 +66,64 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
                         site_work.append(site_row)
                 args.update({"doctype": "Salary Slip", "total_amount": total_amount})    
                 args.update({"doctype": "Salary Slip", "site_work_details": site_work})
+                
+            elif(employee.designation=='Contractor'):
+                contractor=[]
+                total_hours=0
+                start_date=getdate(start_date)
+                end_date=getdate(end_date)
+                for data in frappe.db.get_list("Salary Slip", filters={'status': 'Submitted','designation':'Labour Worker'},fields=["name",'end_date','start_date','total_working_hours']):
+                    contractor_row = frappe._dict({})
+                    if data.start_date>=start_date and data.start_date<= end_date and data.end_date>=start_date and data.end_date<=end_date:
+                        total_hours+=data.total_working_hours
+                        welfare_amount = frappe.db.get_value("Company", employee.company,"contractor_welfare_commission")
+                        contractor_row.update({'salary_component':'Contractor Welfare','amount':total_hours*welfare_amount})
+                        contractor.append(contractor_row)
+
+                #Salary structure Updation
+                salary_structure=None
+                for structure in frappe.get_all("Salary Structure Assignment",fields=["name","from_date",'salary_structure'],
+                        filters={"employee": emp,'docstatus':1}, order_by="from_date",):
+                    if(getdate(posting_date)>=structure['from_date']):
+                        salary_structure=structure
+                args.update({'doctype':'Salary Slip','salary_structure':salary_structure['salary_structure']})
+               
+                #Timesheet Updation
+                timesheets = frappe.db.sql(
+                    """ select * from `tabTimesheet` where employee = %(employee)s and start_date BETWEEN %(start_date)s AND %(end_date)s and (status = 'Submitted' or
+                    status = 'Billed')""",
+                    {"employee": emp, "start_date": start_date, "end_date": end_date},
+                    as_dict=1,
+                )
+                hour_rate=frappe.db.get_value("Salary Structure", salary_structure['salary_structure'], "hour_rate")
+                total_time_hours=0
+                timesheet=[]
+                for data in timesheets:
+                    timesheets_row=frappe._dict({})
+                    timesheets_row.update({"time_sheet": data.name, "working_hours": data.total_hours,"overtime_hours":data.overtime_hours})
+                    total_time_hours+=data.total_hours
+                    timesheet.append(timesheets_row)
+                    
+                args.update({"doctype": "Salary Slip", "timesheets": timesheet})
+                
+                total_days=0
+                ot_hours=0.0
+                for data in args.timesheets:
+                    value = frappe.db.get_single_value('HR Settings', 'standard_working_hours')
+                    if (data.working_hours)>=float(value):
+                            total_days+=1
+                    ot_hours+=data.overtime_hours
+                
+                args.update({"doctype": "Salary Slip", "total_overtime_hours": ot_hours})
+                args.update({"doctype": "Salary Slip", "days_worked": total_days})
+                args.update({"doctype": "Salary Slip", "hour_rate": hour_rate})
+                args.update({"doctype": "Salary Slip", "total_working_hours": total_time_hours})
+
+                contractor_row = frappe._dict({})
+                contractor_row.update({'salary_component':frappe.db.get_value("Salary Structure", salary_structure['salary_structure'], "salary_component"),'amount':total_time_hours*hour_rate})
+                contractor.append(contractor_row)
+                args.update({"doctype": "Salary Slip", "earnings": contractor})
+
             ss = frappe.get_doc(args)
             ss.insert()
             count += 1
@@ -75,6 +135,7 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
         else:
             salary_slips_not_created.append(emp)
         index+=1
+
     payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
     payroll_entry.db_set("salary_slips_created", 1)
     payroll_entry.notify_update()
