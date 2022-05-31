@@ -33,18 +33,68 @@ frappe.ui.form.on("Vehicle" ,{
 
 function vehicle(frm,cdt,cdn){
 	let row=locals[cdt][cdn];
-	if(row.from_date != ""){
-        console.log(today().toLocaleDateString("en-US", options));}
-       // console.log(toLocaleDateString(row.from_date));}
+	if( row.frequency !=""){
+            if(!row.from_date){}
+            else
+                    frappe.call({
+                        method:"ganapathy_pavers.custom.py.vehicle.todate",
+                        args:{
+                            'diff':row.frequency, 
+                            'fdate':row.from_date,
+                        },
+                        callback: function(r){
+                            frappe.model.set_value(cdt,cdn,'to_date',r.message);
+                        }
+                    })
+    }
     else
-       console.log("&&&&&&&&&&&&&&")
-	  //frappe.model.set_value(cdt,cdn,'no_of_sheets',Math.round(row.qty/row.label_count_per_paper));
+       {}
 
 }
+
+function notification(frm,cdt,cdn){
+	let row=locals[cdt][cdn]; 
+               frappe.call({
+                        method:"ganapathy_pavers.custom.py.vehicle.notify",
+                        args:{
+                            'day':row.day_before ? row.day_before:'', 
+                            'month':row.month_before ? row.month_before:'',
+                            'week':row.week_before ? row.week_before:'',
+                            'todate':to_date ? row.to_date:'',
+                        },
+                        callback: function(r){
+                           console.log("hhhh")
+                        }
+                    })
+    
+}
+
+
+
+
+
 frappe.ui.form.on('Maintenance Details', {
- from_date:function(frm,cdt,cdn){
-   vehicle(frm,cdt,cdn);
+    frequency:function(frm,cdt,cdn){
+        vehicle(frm,cdt,cdn);
+ 
 },
+   from_date:function(frm,cdt,cdn){
+        vehicle(frm,cdt,cdn);
+ 
+},
+   month_before:function(frm,cdt,cdn){
+      notification(frm,cdt,cdn);
+
+},
+   week_before:function(frm,cdt,cdn){
+    notification(frm,cdt,cdn);
+},
+   day_before:function(frm,cdt,cdn){
+    notification(frm,cdt,cdn);
+},
+   to_date:function(frm,cdt,cdn){
+     notification(frm,cdt,cdn);
+}
 
 })
 
