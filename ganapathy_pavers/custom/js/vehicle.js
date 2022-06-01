@@ -32,42 +32,67 @@ frappe.ui.form.on("Vehicle" ,{
 })
 
 function vehicle(frm,cdt,cdn){
+    let license=cur_frm.doc.license_plate
 	let row=locals[cdt][cdn];
 	if( row.frequency !=""){
             if(!row.from_date){}
-            else
+            if(row.day_before==1){
+                  let day=1
                     frappe.call({
                         method:"ganapathy_pavers.custom.py.vehicle.todate",
                         args:{
                             'diff':row.frequency, 
                             'fdate':row.from_date,
+                            'duaration':day ? day:'', 
+                            'lic':license,
+                            'main':row.maintenance,
                         },
                         callback: function(r){
                             frappe.model.set_value(cdt,cdn,'to_date',r.message);
                         }
                     })
+                }
+            if(row.week_before===1){
+                    console.log('test');
+                    let day=7
+                      frappe.call({
+                          method:"ganapathy_pavers.custom.py.vehicle.todate",
+                          args:{
+                              'diff':row.frequency, 
+                              'fdate':row.from_date,
+                              'duaration':day ? day:'',
+                              'lic':license,
+                              'main':row.maintenance,
+                          },
+                          callback: function(r){
+                              frappe.model.set_value(cdt,cdn,'to_date',r.message);
+                          }
+                      })
+                  }
+                  if(row.month_before===1){
+                    console.log('test1');
+                    let day=30
+                      frappe.call({
+                          method:"ganapathy_pavers.custom.py.vehicle.todate",
+                          args:{
+                              'diff':row.frequency, 
+                              'fdate':row.from_date,
+                              'duaration':day ? day:'', 
+                              'lic':license,
+                              'main':row.maintenance,
+                          },
+                          callback: function(r){
+                              frappe.model.set_value(cdt,cdn,'to_date',r.message);
+                          }
+                      })
+                  }
     }
     else
        {}
 
 }
 
-function notification(frm,cdt,cdn){
-	let row=locals[cdt][cdn]; 
-               frappe.call({
-                        method:"ganapathy_pavers.custom.py.vehicle.notify",
-                        args:{
-                            'day':row.day_before ? row.day_before:'', 
-                            'month':row.month_before ? row.month_before:'',
-                            'week':row.week_before ? row.week_before:'',
-                            'todate':to_date ? row.to_date:'',
-                        },
-                        callback: function(r){
-                           console.log("hhhh")
-                        }
-                    })
-    
-}
+
 
 
 
@@ -83,18 +108,17 @@ frappe.ui.form.on('Maintenance Details', {
  
 },
    month_before:function(frm,cdt,cdn){
-      notification(frm,cdt,cdn);
-
+     vehicle(frm,cdt,cdn);
 },
    week_before:function(frm,cdt,cdn){
-    notification(frm,cdt,cdn);
-},
+     vehicle(frm,cdt,cdn);
+}, 
    day_before:function(frm,cdt,cdn){
-    notification(frm,cdt,cdn);
+     vehicle(frm,cdt,cdn);
 },
-   to_date:function(frm,cdt,cdn){
-     notification(frm,cdt,cdn);
-}
+  maintenance:function(frm,cdt,cdn){
+     vehicle(frm,cdt,cdn);
 
+   },
 })
 
