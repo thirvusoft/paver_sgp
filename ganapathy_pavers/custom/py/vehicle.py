@@ -143,8 +143,6 @@ def notify(end_date, duaration, lic, main):
             doc.insert(ignore_permissions=True)
             row(lic)
             return end_date
-
-
     
 def row(lic):
     doc=frappe.get_doc("Notification",lic)
