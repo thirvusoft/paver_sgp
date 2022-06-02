@@ -24,9 +24,6 @@ frappe.ui.form.on("Vehicle" ,{
                          }
                                   refresh_field("maintanence_details_");
 
-                              
-                                
-                    
     }
 
 })
@@ -91,11 +88,6 @@ function vehicle(frm,cdt,cdn){
        {}
 
 }
-
-
-
-
-
 
 
 frappe.ui.form.on('Maintenance Details', {
