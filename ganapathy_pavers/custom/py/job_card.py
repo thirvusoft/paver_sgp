@@ -17,7 +17,7 @@ def create_timesheet(doc,action):
                 'activity_type': "Production",
                 'from_time' : k.from_time,
                 'to_time' : k.to_time,
-                'hours' :  k.time_in_mins,
+                'hours' :  k.time_in_mins/60,
                 'total_production_pavers' : k.completed_qty
             })
         timesheet.update({
