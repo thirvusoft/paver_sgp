@@ -6,7 +6,7 @@ def create_scrap_warehouse():
     if(not frappe.db.exists('Warehouse', f'Scrap Warehouse - {abbr}')):
         warehouse = frappe.new_doc("Warehouse")
         parent = ''
-        if frappe.db.exists("Warehouse", 'All Warehouses - GP'):
+        if frappe.db.exists("Warehouse", f'All Warehouses - {abbr}'):
             parent = 'All Warehouses - GP'
         warehouse.update({
             'warehouse_name' : 'Scrap Warehouse',
