@@ -38,6 +38,9 @@ frappe.ui.form.on("Project",{
 		for(let item=0;item<frm.doc.item_details.length;item++){
 			sw_items.push(frm.doc.item_details[item].item)
 		}
+		for(let item=0;item<frm.doc.item_details_compound_wall.length;item++){
+			sw_items.push(frm.doc.item_details_compound_wall[item].item)
+		}
 		frm.set_query('item','job_worker', function(frm){
 			return {
 				filters:[
