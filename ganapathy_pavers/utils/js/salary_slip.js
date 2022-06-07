@@ -50,7 +50,7 @@ frappe.ui.form.on('Salary Slip',{
                 let exit=0;
                 let earnings = frm.doc.earnings
                 for (let data in earnings){
-                    if(earnings[data].salary_component=='Basic'){
+                    if(earnings[data].salary_component=='Contractor Welfare'){
                         frappe.db.get_value("Company", {"name": frm.doc.company}, "contractor_welfare_commission", (r) => {
                             frappe.model.set_value(earnings[data].doctype,earnings[data].name,'amount',total_hours*r.contractor_welfare_commission)
                         });
@@ -60,7 +60,7 @@ frappe.ui.form.on('Salary Slip',{
                 }   
                 if(exit==0){
                     var child = cur_frm.add_child("earnings");
-                    frappe.model.set_value(child.doctype, child.name, "salary_component",'Basic') 
+                    frappe.model.set_value(child.doctype, child.name, "salary_component",'Contractor Welfare') 
                     setTimeout(() => {    
                         frappe.db.get_value("Company", {"name": frm.doc.company}, "contractor_welfare_commission", (r) => {
                             frappe.model.set_value(child.doctype,child.name,'amount',total_hours*r.contractor_welfare_commission)

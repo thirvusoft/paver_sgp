@@ -24,36 +24,16 @@ frappe.ui.form.on('Job Card', {
 	},
 
 	on_submit: function(frm){
-		function show_prompt_for_qty_input(work_order_frm, purpose) {
-			let data={};
-			return new Promise((resolve, reject) => {
-				data.purpose = purpose;
-				frappe.call({
-					method: "ganapathy_pavers.custom.py.work_order.get_linked_jobcard",
-					args:{
-						name:work_order_frm.name
-					},
-					async: false,
-					callback(r){
-						data.qty = r.message
-					}
-				})
-				resolve(data);
-			});
-		}
-
-
 		let work_order_frm={};
 		frappe.db.get_doc("Work Order", frm.doc.work_order).then(function(data){
 			work_order_frm = data
-			let purpose = "Manufacture"
-			show_prompt_for_qty_input(work_order_frm, purpose)
-			.then(data => {
-				return frappe.xcall('erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry', {
-					'work_order_id': work_order_frm.name,
-					'purpose': purpose,
-					'qty': data.qty
-				});
+			let purpose = frm.doc.stock_entry_type
+			return frappe.xcall('erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry', {
+				'work_order_id': work_order_frm.name,
+				'purpose': frm.doc.stock_entry_type,
+				'qty': frm.doc.total_completed_qty,
+				'sw' : frm.doc.source_warehouse,
+				'tw' : frm.doc.target_warehouse
 			}).then(stock_entry => {
 				frappe.model.sync(stock_entry);
 				frappe.set_route('Form', stock_entry.doctype, stock_entry.name);

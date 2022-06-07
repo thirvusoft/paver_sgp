@@ -57,7 +57,7 @@ app_license = "MIT"
 # Installation
 # ------------
 
-# before_install = "ganapathy_pavers.install.before_install"
+before_install = "ganapathy_pavers.custom.py.warehouse.create_scrap_warehouse"
 # after_install = "ganapathy_pavers.install.after_install"
 
 # Desk Notifications
@@ -101,7 +101,7 @@ doc_events = {
           },
 	"Salary Slip":{
         		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update",
-				"validate":"ganapathy_pavers.utils.py.salary_slip.round_off"
+				'validate':"ganapathy_pavers.utils.py.salary_slip.set_net_pay"
           },
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
@@ -126,6 +126,7 @@ doc_events = {
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
 					 ],
+		"validate":["ganapathy_pavers.custom.py.delivery_note.validate"]
 	},
 	"Job Card":{
 		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
@@ -152,7 +153,9 @@ doctype_js = {
 				"Work Order": "/custom/js/work_order.js",
 				"Delivery Note": "/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
-				"Vehicle Log":"/custom/js/vehicle_log.js"
+				"Vehicle Log":"/custom/js/vehicle_log.js",
+				"BOM": "/custom/js/bom.js",
+				"Job Card": "/custom/js/job_card.js"
 			 }
 # Scheduled Tasks
 # ---------------

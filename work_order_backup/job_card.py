@@ -46,6 +46,7 @@ class JobCard(Document):
 		self.set_sub_operations()
 		self.update_sub_operation_status()
 		self.validate_work_order()
+		self.total_time_in_hrs = self.total_time_in_mins / 60
 
 	def set_sub_operations(self):
 		if self.operation:
@@ -75,6 +76,7 @@ class JobCard(Document):
 
 				if d.from_time and d.to_time:
 					d.time_in_mins = time_diff_in_hours(d.to_time, d.from_time) * 60
+					d.time_in_hrs  = time_diff_in_hours(d.to_time, d.from_time)
 					if(d.shift_id not in shift_id_time_in_mins):
 						shift_id_time_in_mins.append(d.shift_id)
 						self.total_time_in_mins += d.time_in_mins
@@ -89,6 +91,7 @@ class JobCard(Document):
 					#code end
 					# self.total_completed_qty += d.completed_qty
 
+			self.total_time_in_hrs = self.total_time_in_mins / 60
 			self.total_completed_qty = flt(self.total_completed_qty, self.precision("total_completed_qty"))
 
 		for row in self.sub_operations:
@@ -343,6 +346,14 @@ class JobCard(Document):
 					"rate": d.rate,
 					"amount": d.amount
 				})
+
+	def before_submit(self):
+		work_order = frappe.get_doc("Work Order", self.work_order)
+		work_order.update({
+			'qty' : self.total_completed_qty,
+			'produced_qty' : self.total_completed_qty
+		})
+		work_order.save('Update')
 
 	def on_submit(self):
 		self.validate_transfer_qty()
