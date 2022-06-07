@@ -139,6 +139,11 @@ frappe.ui.form.on('Sales Order',{
             
            
         refresh_field("items");
+        
+        let tax_category=frm.doc.tax_category
+        await cur_frm.set_value('tax_category', '')
+        await cur_frm.set_value('tax_category', tax_category)
+
     },
     after_save:function(frm){
         if(cur_frm.doc.is_multi_customer){
