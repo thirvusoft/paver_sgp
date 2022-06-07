@@ -29,11 +29,26 @@ frappe.ui.form.on("Project",{
     },
     
     refresh:function(frm,cdt,cdn){
-        //percent_complete(frm,cdt,cdn)
 		cur_frm.remove_custom_button('Duplicate Project with Tasks')
 		cur_frm.remove_custom_button('Kanban Board')
 		cur_frm.remove_custom_button('Gantt Chart')
         setquery(frm,cdt,cdn)
+
+		let sw_items=[];
+		for(let item=0;item<frm.doc.item_details.length;item++){
+			sw_items.push(frm.doc.item_details[item].item)
+		}
+		for(let item=0;item<frm.doc.item_details_compound_wall.length;item++){
+			sw_items.push(frm.doc.item_details_compound_wall[item].item)
+		}
+		frm.set_query('item','job_worker', function(frm){
+			return {
+				filters:[
+					['item_code' ,'in', sw_items]
+				]
+			}
+		})
+
         frm.set_query('name1','job_worker',function(frm){
             return{
                 filters:
