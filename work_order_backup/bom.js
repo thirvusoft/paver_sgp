@@ -331,9 +331,9 @@ frappe.ui.form.on("BOM", {
 			});
 		});
 
-		if (has_template_rm) {
-			dialog.fields_dict.items.grid.refresh();
-		}
+		// if (has_template_rm) {
+		// 	dialog.fields_dict.items.grid.refresh();
+		// }
 	},
 
 	make_quality_inspection: function(frm) {

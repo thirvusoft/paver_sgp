@@ -152,3 +152,10 @@ def update_customer(self,event):
             doc=frappe.get_doc('Sales Order', so)
             if(cus!=doc.customer):
                 frappe.db.set(doc, "customer", cus)
+
+def validate(doc,action):
+    for d in doc.items:
+        if d.pieces:
+            doc.value_in_pieces = True
+        if d.ts_qty:
+            doc.value_in_bundle = True

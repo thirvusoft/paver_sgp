@@ -688,10 +688,15 @@ erpnext.work_order = {
 		make_se: function(frm, purpose) {
 		this.show_prompt_for_qty_input(frm, purpose)
 			.then(data => {
+				if(frm.doc.operations[0].stock_entry_type){
+					purpose = frm.doc.operations[0].stock_entry_type 
+				}
 				return frappe.xcall('erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry', {
 					'work_order_id': frm.doc.name,
 					'purpose': purpose,
-					'qty': data.qty
+					'qty': data.qty,
+					'sw': frm.doc.operations[0].source_warehouse,
+					'tw': frm.doc.operations[0].target_warehouse,
 				});
 			}).then(stock_entry => {
 				frappe.model.sync(stock_entry);
