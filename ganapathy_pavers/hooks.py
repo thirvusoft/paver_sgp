@@ -135,17 +135,7 @@ doc_events = {
 
 		"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer"
 	},
-<<<<<<< HEAD
 	
-=======
-	"Vehicle":{
-        "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
-    }
-		"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer",
-		# "validate":"ganapathy_pavers.custom.py.sales_invoice.tax_finder"
-	
-}
->>>>>>> 606cc93e031cb21e694fedd64b805348328fb232
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]
 doctype_js = {
