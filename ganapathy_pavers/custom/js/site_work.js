@@ -29,11 +29,26 @@ frappe.ui.form.on("Project",{
     },
     
     refresh:function(frm,cdt,cdn){
-        //percent_complete(frm,cdt,cdn)
 		cur_frm.remove_custom_button('Duplicate Project with Tasks')
 		cur_frm.remove_custom_button('Kanban Board')
 		cur_frm.remove_custom_button('Gantt Chart')
         setquery(frm,cdt,cdn)
+
+		let sw_items=[];
+		for(let item=0;item<frm.doc.item_details.length;item++){
+			sw_items.push(frm.doc.item_details[item].item)
+		}
+		for(let item=0;item<frm.doc.item_details_compound_wall.length;item++){
+			sw_items.push(frm.doc.item_details_compound_wall[item].item)
+		}
+		frm.set_query('item','job_worker', function(frm){
+			return {
+				filters:[
+					['item_code' ,'in', sw_items]
+				]
+			}
+		})
+
         frm.set_query('name1','job_worker',function(frm){
             return{
                 filters:
@@ -81,7 +96,34 @@ frappe.ui.form.on("Project",{
             cur_frm.set_df_property('customer','hidden',0)
             cur_frm.set_df_property('customer_name','hidden',1)
         }	
-    }
+    },
+    onload:function(frm){
+	 if(cur_frm.doc.additional_cost.length==0){
+	
+		let add_on_cost=["Material Supply","Work Completed","Cutting Piece","Dust Swing","Dust Finishing With Rammer",
+			"Dust Sweeping","Any Food Exp in Site","Other Labour Work","Site Advance"]
+			for(let row=0;row<add_on_cost.length;row++){
+			
+			var new_row = frm.add_child("additional_cost");
+			new_row.description=add_on_cost[row]
+			}
+				refresh_field("additional_cost");
+		}
+		cur_frm.set_df_property("total_amount","read_only",1)
+		if(cur_frm.doc.total_amount==0)
+			cur_frm.set_df_property("total_amount","hidden",1)
+		else
+			cur_frm.set_df_property("total_amount","hidden",0)
+		
+		cur_frm.set_df_property("total_amount_of_raw_material","read_only",1)
+		if(cur_frm.doc.total_amount_of_raw_material==0)
+			cur_frm.set_df_property("total_amount_of_raw_material","hidden",1)
+		else
+			cur_frm.set_df_property("total_amount_of_raw_material","hidden",0)
+
+		
+
+}
 })
 
 function percent_complete(frm,cdt,cdn){ 
@@ -297,6 +339,9 @@ function amount_rawmet(frm,cdt,cdn){
     let row=locals[cdt][cdn]
     frappe.model.set_value(cdt,cdn,'amount', (row.rate?row.rate:0)*(row.qty?row.qty:0))
 }
+
+
+
 
 //compound wall
 

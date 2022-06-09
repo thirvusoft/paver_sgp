@@ -2,7 +2,6 @@
  "custom_fields": [],
  "custom_perms": [],
  "doctype": "Packed Item",
- "links": [],
  "property_setters": [
   {
    "_assign": null,
@@ -16,12 +15,13 @@
    "doctype_or_field": "DocField",
    "field_name": "rate",
    "idx": 0,
-   "is_system_generated": 0,
    "modified": "2021-12-16 12:50:43.780376",
    "modified_by": "Administrator",
-   "module": null,
    "name": "Packed Item-rate-read_only",
    "owner": "Administrator",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
    "property": "read_only",
    "property_type": "Check",
    "row_name": null,
