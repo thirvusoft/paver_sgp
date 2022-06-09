@@ -75,7 +75,7 @@ def note_alert():
     notes.content = content
     notes.public = 1
     notes.notify_on_login = 1
-    notes.notify_on_every_login = 1
-    notes.expire_notification_on = add_days(final_date,7)
+    # notes.notify_on_every_login = 1
+    notes.expire_notification_on = final_date
     notes.save(ignore_permissions=True)
     frappe.db.commit()
