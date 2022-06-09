@@ -131,10 +131,6 @@ doc_events = {
 	"Job Card":{
 		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
 	},
-	"Sales Invoice":{
-
-		"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer"
-	},
 	
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]
@@ -161,15 +157,15 @@ doctype_js = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
+    "all": [
+		"ganapathy_pavers.custom.py.note.note_alert"
+	],
 # 	"all": [
 # 		"ganapathy_pavers.tasks.all"
-# 	],
 # 	"daily": [
 # 		"ganapathy_pavers.tasks.daily"
 # 	],
-	
-
 # 	"hourly": [
 # 		"ganapathy_pavers.tasks.hourly"
 # 	],
@@ -179,7 +175,7 @@ doctype_js = {
 # 	"monthly": [
 # 		"ganapathy_pavers.tasks.monthly"
 # 	]
-# }
+}
 
 # Testing
 # -------

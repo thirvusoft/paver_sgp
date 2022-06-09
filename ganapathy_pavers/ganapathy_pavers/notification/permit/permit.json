@@ -1,0 +1,32 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "condition": "",
+ "creation": "2022-06-07 11:29:49.019571",
+ "date_changed": "fc_details_expired_data",
+ "days_in_advance": 1,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Vehicle Log",
+ "enabled": 1,
+ "event": "Days Before",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "Add your message here",
+ "modified": "2022-06-08 14:02:50.347838",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Permit",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "condition": "",
+   "receiver_by_role": "All"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "sender": "Navin",
+ "sender_email": "navinthirvu@gmail.com",
+ "subject": "{{doc.license_plate}}"
+}
