@@ -134,9 +134,7 @@ doc_events = {
 	"Sales Invoice":{
 		"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer"
 	},
-	"Vehicle":{
-        "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
-    }
+	
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]
 doctype_js = {
@@ -162,14 +160,14 @@ doctype_js = {
 # Scheduled Tasks
 # ---------------
 
-scheduler_events = {
+# scheduler_events = {
 # 	"all": [
 # 		"ganapathy_pavers.tasks.all"
 # 	],
 # 	"daily": [
 # 		"ganapathy_pavers.tasks.daily"
 # 	],
-	"daily":"ganapathy_pavers.custom.py.note.note_alert"
+	
 
 # 	"hourly": [
 # 		"ganapathy_pavers.tasks.hourly"
@@ -180,7 +178,7 @@ scheduler_events = {
 # 	"monthly": [
 # 		"ganapathy_pavers.tasks.monthly"
 # 	]
-}
+# }
 
 # Testing
 # -------
