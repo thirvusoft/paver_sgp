@@ -23,16 +23,16 @@ def before_save(doc, action):
     job_worker_total = 0
     raw_material_total = 0
     for i in doc.additional_cost:
-        additionalcost_total = additionalcost_total+i.amount
+        additionalcost_total = additionalcost_total+ (i.amount or 0)
     doc.total = additionalcost_total
     for i in doc.item_details:
-        item_details_total = item_details_total+i.amount
+        item_details_total = item_details_total+(i.amount or 0)
     doc.total_amount=item_details_total
     for i in doc.job_worker:
-        job_worker_total = job_worker_total+i.amount
+        job_worker_total = job_worker_total+(i.amount or 0)
     doc.total_job_worker_cost=job_worker_total
     for i in doc.raw_material:
-        raw_material_total = raw_material_total+i.amount   
+        raw_material_total = raw_material_total+(i.amount or 0)
     doc.total_amount_of_raw_material=raw_material_total   
     total_costing=additionalcost_total+item_details_total+job_worker_total+raw_material_total
     doc.total_expense_amount=total_costing

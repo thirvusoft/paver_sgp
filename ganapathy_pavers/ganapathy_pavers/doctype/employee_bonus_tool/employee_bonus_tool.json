@@ -1,40 +1,50 @@
 {
  "actions": [],
- "autoname": "format:{designation}-{DD}-{MM}-{YYYY}",
- "creation": "2022-05-09 09:32:30.330568",
+ "autoname": "format:{designation}-{date}",
+ "creation": "2022-06-07 10:14:55.031643",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "date",
   "designation",
-  "employee_advance_details",
+  "employee_bonus_details",
+  "total_bonus_amount",
   "amended_from"
  ],
  "fields": [
   {
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "Date"
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
   },
   {
    "fieldname": "designation",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Designation",
-   "options": "Designation"
+   "options": "Designation",
+   "reqd": 1
   },
   {
-   "fieldname": "employee_advance_details",
+   "fieldname": "employee_bonus_details",
    "fieldtype": "Table",
-   "label": "Employee Advance Details",
-   "options": "Employee Advance Details"
+   "label": "Employee Bonus Details",
+   "options": "Employee Bonus Details"
+  },
+  {
+   "fieldname": "total_bonus_amount",
+   "fieldtype": "Currency",
+   "label": "Total Bonus Amount"
   },
   {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "Employee Advance Tool",
+   "options": "Employee Bonus Tool",
    "print_hide": 1,
    "read_only": 1
   }
@@ -42,10 +52,10 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-06-07 11:20:20.267762",
+ "modified": "2022-06-07 13:26:40.131224",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "Employee Advance Tool",
+ "name": "Employee Bonus Tool",
  "owner": "Administrator",
  "permissions": [
   {
