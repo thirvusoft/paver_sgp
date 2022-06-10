@@ -28,11 +28,10 @@ frappe.ui.form.on("Employee Bonus Tool",{
 		var advance=locals[cdt][cdn]
 		for(var i=0;i<advance.employee_bonus_details.length;i++){
 			frappe.call({
-				method:"ganapathy_pavers.ganapathy_pavers.doctype.employee_bonus_tool.employee_bonus_tool.create_bonus",
+				method:"ganapathy_pavers.ganapathy_pavers.doctype.employee_bonus_tool.employee_bonus_tool.create_retention_bonus",
 				args:{amount:advance.employee_bonus_details[i].current_bonus,
 					name:advance.employee_bonus_details[i].employee,
-					date:frm.doc.date,
-					doc:frm.doc.name},
+					date:frm.doc.date},
 			})
 		}
 	},
