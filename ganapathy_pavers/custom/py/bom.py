@@ -5,7 +5,7 @@ def get_parent_work_order_status(bom):
     link = frappe.db.sql(f''' 
             SELECT name as work_order, status
             FROM `tabWork Order`
-            WHERE bom_no = "{bom}" and parent_work_order = "" or parent_work_order is NULL
+            WHERE bom_no = "{bom}" and (parent_work_order = "" or parent_work_order is NULL)
     ''', as_dict=1)
     final_wo = []
     status = ['Completed', 'Closed', 'Cancelled']

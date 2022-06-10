@@ -131,7 +131,15 @@ doc_events = {
 	"Job Card":{
 		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
 	},
-	
+	"Sales Invoice":{
+		"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer"
+	},
+	"Work Order":{
+		'before_submit': "ganapathy_pavers.custom.py.work_order.before_submit"
+	},
+	"Workstation":{
+		"validate": "ganapathy_pavers.custom.py.workstation.validate"
+	}
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]
 doctype_js = {
