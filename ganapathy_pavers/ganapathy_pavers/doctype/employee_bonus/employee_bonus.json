@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "HR-EB-.YYYY.-.#####",
  "creation": "2022-06-09 09:38:33.116259",
  "doctype": "DocType",
@@ -28,14 +27,18 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Employee",
-   "options": "Employee"
+   "options": "Employee",
+   "reqd": 1
   },
   {
    "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
-   "label": "Employee Name"
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "reqd": 1
   },
   {
    "fieldname": "amended_from",
@@ -53,12 +56,16 @@
   {
    "fieldname": "bonus_amount",
    "fieldtype": "Currency",
-   "label": "Bonus Amount"
+   "in_list_view": 1,
+   "label": "Bonus Amount",
+   "reqd": 1
   },
   {
    "fieldname": "bonus_payment_date",
    "fieldtype": "Date",
-   "label": "Bonus Payment Date"
+   "in_list_view": 1,
+   "label": "Bonus Payment Date",
+   "reqd": 1
   },
   {
    "fieldname": "reference",
@@ -82,7 +89,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-06-09 11:37:26.454348",
+ "modified": "2022-06-10 11:27:54.596993",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Employee Bonus",
