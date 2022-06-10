@@ -14,3 +14,14 @@ def create_scrap_warehouse():
                 'company' : i
             })
             warehouse.save(ignore_permissions=True)
+        if(not frappe.db.exists('Warehouse', f'Remaining Pavers - {abbr}')):
+            warehouse = frappe.new_doc("Warehouse")
+            parent = ''
+            if frappe.db.exists("Warehouse", f'All Warehouses - {abbr}'):
+                parent = f'All Warehouses - {abbr}'
+            warehouse.update({
+                'warehouse_name' : 'Remaining Pavers',
+                'parent_warehouse' : parent,
+                'company' : i
+            })
+            warehouse.save(ignore_permissions=True)
