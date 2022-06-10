@@ -23,6 +23,7 @@ def get_child_work_order_status(parent):
             FROM `tabWork Order`
             WHERE parent_work_order = "{child_name[-1]}"
         ''', as_dict=1)
+        frappe.errprint(child_docs)
         if(len(child_docs)):
             for i in child_docs:
                 child_name.append(i['work_order'])
@@ -51,4 +52,13 @@ def change_status(wo, action=None):
         status = 'Cancelled'
     work_order.status = status
     work_order.save('Update')
+    print(work_order.status,"444444444444444444444444444444444444")
 
+
+
+def before_submit(doc,action):
+    from frappe.utils import get_link_to_form
+    if(doc.parent_work_order):
+        parent=doc.parent_work_order
+        if(frappe.db.get_value("Work Order",parent,'status') in ['Draft','Not Started','Cancelled']):
+            frappe.throw(f"Work Order "+frappe.bold(get_link_to_form("Work Order",parent))+" is not Completed. Complete that workorder to submit this workorder.")

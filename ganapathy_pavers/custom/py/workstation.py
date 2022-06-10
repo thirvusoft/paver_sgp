@@ -1,4 +1,3 @@
-from dataclasses import fields
 import frappe
 @frappe.whitelist()
 def hour_salary_finder(ts_employee):

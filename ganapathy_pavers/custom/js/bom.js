@@ -22,3 +22,19 @@ frappe.ui.form.on("BOM",{
     }
     }
 })
+
+frappe.ui.form.on('BOM',{
+    setup: function(frm){
+        frm.set_query('source_warehouse','operations', function(){
+            return {
+                filters:{"is_group":0}
+            }
+        })
+
+        frm.set_query('target_warehouse','operations', function(){
+            return {
+                filters:{"is_group":0}
+            }
+        })
+    }
+})
