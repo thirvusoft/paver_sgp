@@ -517,6 +517,7 @@ frappe.ui.form.on("Work Order Operation", {
 
 erpnext.work_order = {
 	set_custom_buttons: function(frm) {
+
 		var doc = frm.doc;
 		if (doc.docstatus === 1 && doc.status != "Closed") {
 			frm.add_custom_button(__('Close'), function() {
@@ -590,12 +591,12 @@ erpnext.work_order = {
 					}
 				}
 			} else {
-				if ((flt(doc.produced_qty) < flt(doc.qty)) && frm.doc.status != 'Stopped') {
+				// if ((flt(doc.produced_qty) < flt(doc.qty)) && frm.doc.status != 'Stopped') {
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
 						erpnext.work_order.make_se(frm, 'Manufacture');
 					});
 					finish_btn.addClass('btn-primary');
-				}
+				// }
 			}
 		}
 
