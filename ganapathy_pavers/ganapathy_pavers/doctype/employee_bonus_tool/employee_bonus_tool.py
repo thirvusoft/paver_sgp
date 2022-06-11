@@ -15,13 +15,13 @@ def employee_finder(advance1):
 	return employee_names
 
 @frappe.whitelist()
-def create_bonus(name,amount,date,doc):
+def create_retention_bonus(name,amount,date):
 	amount=json.loads(amount)
-	bonus_doc=frappe.new_doc('Employee Bonus')
+	bonus_doc=frappe.new_doc('Retention Bonus')
 	bonus_doc.employee = name
 	bonus_doc.bonus_payment_date= date
 	bonus_doc.bonus_amount = amount
-	bonus_doc.reference=doc
+	bonus_doc.salary_component='Bonus'
 	bonus_doc.insert()
 	bonus_doc.save()
 	bonus_doc.submit()

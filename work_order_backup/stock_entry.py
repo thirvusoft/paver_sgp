@@ -6,6 +6,7 @@ from collections import defaultdict
 
 import frappe
 from frappe import _
+from frappe.core.doctype import error_log
 from frappe.model.mapper import get_mapped_doc
 from frappe.query_builder.functions import Sum
 from frappe.utils import cint, comma_or, cstr, flt, format_time, formatdate, getdate, nowdate
@@ -398,6 +399,7 @@ class StockEntry(StockController):
 		for d in prod_order.get("operations"):
 			total_completed_qty = flt(self.fg_completed_qty) + flt(prod_order.produced_qty)
 			completed_qty = d.completed_qty + (allowance_percentage/100 * d.completed_qty)
+			print(total_completed_qty, completed_qty)
 			if total_completed_qty > flt(completed_qty):
 				job_card = frappe.db.get_value('Job Card', {'operation_id': d.name}, 'name')
 				if not job_card:
@@ -532,7 +534,7 @@ class StockEntry(StockController):
 						if(rate_based_on == 'Price List'):
 							price_list = frappe.get_value("BOM",self.get("bom_no"),'buying_price_list')
 							d.basic_rate = frappe.get_all("Item Price",filters={'item_code':d.item_code,'price_list':price_list}, pluck='price_list_rate')[0]
-
+							frappe.errprint(d.basic_rate)
 				d.basic_amount = flt(flt(d.transfer_qty) * flt(d.basic_rate), d.precision("basic_amount"))
 				if not d.t_warehouse:
 					outgoing_items_cost += flt(d.basic_amount)
@@ -1300,10 +1302,14 @@ class StockEntry(StockController):
 				& (job_card.docstatus == 1))
 			.groupby(job_card_scrap_item.item_code)
 		).run(as_dict=1)
-
+		frappe.errprint(scrap_items, "Scrap Items")
+		frappe.errprint(self.pro_doc.produced_qty, "Produced qty")
+		frappe.errprint(self.get_completed_job_card_qty(), "Completed jobcard qty")
+		
 		pending_qty = flt(self.get_completed_job_card_qty()) - flt(self.pro_doc.produced_qty)
 
 		used_scrap_items = self.get_used_scrap_items()
+	
 		for row in scrap_items:
 			row.stock_qty -= flt(used_scrap_items.get(row.item_code))
 			row.stock_qty = (row.stock_qty) * flt(self.fg_completed_qty) / flt(pending_qty)

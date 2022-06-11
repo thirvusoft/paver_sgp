@@ -33,7 +33,10 @@ frappe.ui.form.on('Job Card', {
 				'purpose': frm.doc.stock_entry_type,
 				'qty': frm.doc.total_completed_qty,
 				'sw' : frm.doc.source_warehouse,
-				'tw' : frm.doc.target_warehouse
+				'tw' : frm.doc.target_warehouse,
+				'manufacturing_uom': frm.doc.manufacturing_uom,
+				'repack_uom': frm.doc.repack_uom,
+				'batch': frm.doc.remaining_item_batch_qty
 			}).then(stock_entry => {
 				frappe.model.sync(stock_entry);
 				frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
@@ -41,8 +44,220 @@ frappe.ui.form.on('Job Card', {
 		})
 		
 	},
-
+	
 	refresh: function(frm) {
+		if(cur_frm.doc.status != 'Completed'){
+		cur_frm.add_custom_button(__("Show Bundle Info"), function() {
+			if(cur_frm.doc.production_item){
+				let scrap_qty=0
+				if(cur_frm.doc.scrap_items.length){
+					cur_frm.doc.scrap_items.forEach( (i)=>{
+						scrap_qty+=i.stock_qty
+					})
+				}
+				frappe.db.get_value("Item",cur_frm.doc.production_item,'stock_uom').then( (uom)=>{
+					var uom = uom.message.stock_uom
+					frappe.db.get_list("Item",{
+						filters:{'name':cur_frm.doc.production_item},
+						fields:['pavers_per_sqft','bundle_per_sqr_ft']
+					}).then( (uoms)=>{
+						console.log(uoms);
+						var message = ''
+						if(cur_frm.doc.work_order){
+							frappe.db.get_value("Work Order", cur_frm.doc.work_order, 'parent_work_order').then( (parent_wo)=>{
+								let parent = parent_wo.message.parent_work_order
+								console.log(parent)
+								if(!parent){
+									frappe.msgprint("Couldn't able to show information.")
+								}
+								else{
+									frappe.db.get_list("Job Card",{
+										filters:{'work_order':parent},
+										fields:['total_completed_qty','stock_entry_type','manufacturing_uom','repack_uom']
+								}).then( (qty=>{
+									var stock_uom_qty = 0
+									var conv_uom = ''
+									var current_uom_bundle = ''
+									var current_uom_bund = 0
+									var current_conv_pcs = 0
+									if(cur_frm.doc.total_completed_qty >0){
+									frappe.db.get_list('UOM Conversion Detail',{filters:{'uom':['in', ['Pavers','Bundle']], 'parent':cur_frm.doc.production_item},fields:['uom','conversion_factor']}).then( (conv_fct)=>{
+										// current_conv_pcs = conv_fct[0].
+										conv_fct.forEach((data)=>{
+											if(data['uom']=='Bundle'){current_uom_bund = data['conversion_factor']}
+											if(data['uom'] == 'Pavers'){current_conv_pcs = data['conversion_factor']}
+										})
+										console.log(conv_fct,"00000")
+									})}
+									if(qty[0].stock_entry_type == "Manufacture"){
+										conv_uom = qty[0].manufacturing_uom
+										current_uom_bundle = cur_frm.doc.repack_uom
+									}
+									else{if(qty[0].stock_entry_type == "Repack"){
+										conv_uom = qty[0].repack_uom
+										
+									}}
+									var current_conv = 1
+									frappe.db.get_list('UOM Conversion Detail', {filters:{'uom':current_uom_bundle,'parent':cur_frm.doc.production_item}, fields:['conversion_factor']}).then( (current_conv)=>{
+										current_conv = current_conv[0].conversion_factor
+									
+										console.log(current_uom_bund/current_conv_pcs, "121548484541")
+									// if(qty[0].stock_entry_type == 'Material Transfer' || qty[0].stock_entry_type == 'Repack'){
+										frappe.db.get_list('UOM Conversion Detail', {filters:{'uom':conv_uom,'parent':cur_frm.doc.production_item}, fields:['conversion_factor']}).then( (conv)=>{
+											stock_uom_qty = qty[0].total_completed_qty *conv[0].conversion_factor
+											console.log(stock_uom_qty)
+											console.log(stock_uom_qty,cur_frm.doc.total_completed_qty,scrap_qty,conv[0].conversion_factor)
+											message += "<p><b>"+ "Square Foot" + "</b>: "+(stock_uom_qty-cur_frm.doc.total_completed_qty-scrap_qty)+"</p>"
+											message += "<p><b>"+ "Pavers or PCS" + "</b>: "+(stock_uom_qty-(cur_frm.doc.total_completed_qty * (current_uom_bund/current_conv_pcs))-scrap_qty)*uoms[0]['pavers_per_sqft']+"</p>"
+											message += "<p><b>"+"Bundle"+"</b>: "+((stock_uom_qty-(cur_frm.doc.total_completed_qty*current_conv)-scrap_qty)/uoms[0]['bundle_per_sqr_ft']).toFixed(2)+"</p>"
+											frappe.msgprint({'title':"UOM Conversions for Remaining Stocksa",'message':message})
+									
+										}) 
+									})
+									// }
+									// else{
+									// 	stock_uom_qty = qty[0].total_completed_qty
+									// 	message += "<p><b>"+ "Square Foot" + "</b>: "+(stock_uom_qty-cur_frm.doc.total_completed_qty-scrap_qty)+"</p>"
+									// 	message += "<p><b>"+ "Pavers or PCS" + "</b>: "+(stock_uom_qty-cur_frm.doc.total_completed_qty-scrap_qty)*uoms[0]['pavers_per_sqft']+"</p>"
+									// 	message += "<p><b>"+"Bundle"+"</b>: "+((stock_uom_qty-cur_frm.doc.total_completed_qty-scrap_qty)/uoms[0]['bundle_per_sqr_ft']).toFixed(2)+"</p>"
+									// 	frappe.msgprint({'title':"UOM Conversions for Remaining Stocks",'message':message})
+									
+									// }
+
+									
+								}))
+								}
+							})
+						}
+			})		
+			})
+		}
+		}); 
+
+
+		cur_frm.add_custom_button(__("Add Remaining Pavers"), function(){
+			var item = cur_frm.doc.production_item
+			var bom = cur_frm.doc.bom_no
+			var operation = cur_frm.doc.operation 
+			var work_order = cur_frm.doc.work_order
+			let jc_scrap_qty=0
+				if(cur_frm.doc.scrap_items.length){
+					cur_frm.doc.scrap_items.forEach( (i)=>{
+						jc_scrap_qty+=i.jc_scrap_qty
+					})
+				}
+			if(item && bom && operation && work_order){
+			let added_qty=[]
+			let added_jc=[]
+			let remaining_qty=[]
+			frappe.call({
+				method: "erpnext.manufacturing.doctype.job_card.job_card.get_remaining_pavers",
+				args: {
+					work_order: work_order,
+					item: item,
+					operation: operation,
+					cur_jc_qty: (cur_frm.doc.total_completed_qty + jc_scrap_qty)
+				},
+				callback(r){
+						var d=new frappe.ui.Dialog({
+							title: "Add Remaining Pavers",
+							fields: r.message[0],
+							primary_action: function(data){
+								console.log(data)
+								for(var i=1;i<=r.message[1];i++){
+									if(data['jc_add_qty'+i.toString()] > 0) {
+									if(data['jc_add_qty'+i.toString()]<=data['jc_qty'+i.toString()]){
+										added_qty.push(
+											data['jc_add_qty'+i.toString()]
+										)
+										added_jc.push(
+											data['jc_name'+i.toString()]
+										)
+										remaining_qty.push(
+											data['jc_qty'+i.toString()]
+										)
+									}
+									else{
+										frappe.throw("'Added qty' must be less than 'remaining qty'")
+									}
+								}
+								}
+								console.log(added_qty,added_jc,remaining_qty)
+								if(added_jc.length){
+									var d1 = new frappe.ui.Dialog({
+										title:"Choose Start and End Time",
+										fields:[
+											{'fieldname':'start_time','label':"Start Time",'fieldtype':'Datetime','reqd':1},
+											{"fieldtype":'Column Break'},
+											{'fieldname':'end_time','label':"End Time",'fieldtype':'Datetime','reqd':1}
+										],
+										primary_action: function(times){
+											frappe.call({
+												method:"erpnext.manufacturing.doctype.job_card.job_card.update_jc_remaining_pavers",
+												args:{qtys:added_qty,jcs:added_jc,max_qty:remaining_qty,times:times, wo:cur_frm.doc.work_order},
+												callback: function(r){
+													let hrs = r.message[1]
+													let mins = r.message[1] * 60
+													console.log(r.message)
+													function add_time_log(employee){
+														var shift_id=0;
+														if(cur_frm.doc.time_logs.length){
+														shift_id=cur_frm.doc.time_logs.at(-1).shift_id + 1
+														}
+														r.message[2].forEach( (i)=>{
+															let batch_child = cur_frm.add_child("remaining_item_batch_qty")
+															batch_child.batch_no = i[0]
+															batch_child.qty = i[1]
+															cur_frm.refresh()
+														})
+														
+														employee.forEach( (i)=>{
+															let child = cur_frm.add_child("time_logs")
+															child.employee = i['employee']
+															child.from_time = times['start_time']
+															child.to_time = times['end_time']
+															child.completed_qty = r.message[0]
+															child.shift_id = shift_id
+															child.time_in_mins = mins
+															child.time_in_hrs = hrs
+															cur_frm.refresh()
+														})
+														cur_frm.save()
+													}
+													if(cur_frm.doc.employee.length){
+														add_time_log(cur_frm.doc.employee)
+													}
+													else{
+														var employee_list=[]
+														frappe.db.get_doc("Workstation",frm.doc.workstation).then(ts_workstation_details=>{
+															for(var i=0;i<ts_workstation_details.ts_labor.length;i++){
+																employee_list.push({employee:ts_workstation_details.ts_labor[i].ts_labour})
+															}
+															frm.events.start_job(frm, "Work In Progress", employee_list);
+														})
+
+													}
+												}
+											})
+											d1.hide()
+											d.hide()
+										}
+									})
+									d1.show()
+								
+							}
+							else{
+								d.hide()
+							}
+								
+							}
+						})
+						d.show()
+				}
+			})
+		}
+		})
+	}
 		if(frm.doc.doc_onload == 0){
 			frm.set_value('time_logs',[])
 			frm.set_value('doc_onload',1)
@@ -276,6 +491,7 @@ frappe.ui.form.on('Job Card', {
 	},
 
 	start_job: function(frm, status, employee) {
+		if(!employee.length){frappe.throw({title:"Not Found",message:"Employee not found in workstation <b>"+frm.doc.workstation+"</b>"})}
 		const args = {
 			job_card_id: frm.doc.name,
 			start_time: frappe.datetime.now_datetime(),

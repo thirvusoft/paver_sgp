@@ -926,88 +926,240 @@ def set_work_order_ops(name):
 	po.set_work_order_operations()
 	po.save()
 
-@frappe.whitelist()
-def make_stock_entry(work_order_id, purpose, qty=None, sw=None, tw=None):
+
+def make_repack_sgp(stock_entry, work_order_id, purpose, qty=0, sw=None, tw=None, manufacturing_uom=None,repack_uom="bundle",batch=None):
+	from ganapathy_pavers.custom.py.warehouse import create_scrap_warehouse
+	create_scrap_warehouse()
+
 	work_order = frappe.get_doc("Work Order", work_order_id)
-	if not frappe.db.get_value("Warehouse", work_order.wip_warehouse, "is_group"):
-		wip_warehouse = work_order.wip_warehouse
-	else:
-		wip_warehouse = None
-
-	stock_entry = frappe.new_doc("Stock Entry")
-	stock_entry.purpose = purpose
-	stock_entry.company = work_order.company
+	item_code = frappe.get_value("Work Order",work_order_id,'production_item')
+	item = frappe.get_doc("Item",item_code)
+	abbr = frappe.get_value("Company",stock_entry.company, 'abbr')
+	conv=1
+	uom=item.stock_uom
+	repack_uom="bundle"
+	if(repack_uom.lower()=="bundle"):
+		conv = flt(item.bundle_per_sqr_ft)
+		uom='bundle'
+	print(batch)
+	se_items=[]
+	if(batch):
+		batch = json.loads(batch)
+		for i in batch:
+			if(i):
+				items={
+					'item_code': item.item_code,
+					"item_group": item.item_group, 
+					"item_name":item.item_name, 
+					"qty": i['qty'] , 
+					"uom":uom, 
+					"conversion_factor": conv,
+					'batch_no': i['batch_no'],
+					's_warehouse': f'Remaining Pavers - {abbr}'
+				}
+				se_items.append(items)
 	
-	if(purpose != "Material Transfer"):
-		stock_entry.bom_no = work_order.bom_no
-		stock_entry.work_order = work_order_id
-		stock_entry.from_bom = 1
-		stock_entry.use_multi_level_bom = work_order.use_multi_level_bom
-		stock_entry.fg_completed_qty = qty or (flt(work_order.qty) - flt(work_order.produced_qty))
-		if work_order.bom_no:
-			stock_entry.inspection_required = frappe.db.get_value('BOM',
-			work_order.bom_no, 'inspection_required')
-	else:
-		job_card = frappe.get_all("Job Card", filters={'work_order':work_order_id},pluck = 'name')[0]
-		jc_doc = frappe.get_doc("Job Card", job_card)
-		scrap_item = jc_doc.scrap_items
-		se_item = frappe.get_doc("Item",work_order.production_item)
+	items={
+		'item_code': item.item_code,
+		"item_group": item.item_group, 
+		"item_name":item.item_name, 
+		"qty": qty , 
+		"uom":uom, 
+		"conversion_factor": conv,
+		's_warehouse': sw
+	}
+	se_items.append(items)
+	items={
+		'item_code': item.item_code,
+		"item_group": item.item_group, 
+		"item_name":item.item_name, 
+		"qty": qty , 
+		"uom":uom, 
+		"conversion_factor": conv,
+		't_warehouse': tw
+	}
+	se_items.append(items)
+	
+
+	## Move Remaining Items from Jobcard to Remaing Warehouse
+	job_card = frappe.get_all("Job Card", filters={'work_order':work_order_id},pluck = 'name')[0]
+	jc_doc = frappe.get_doc("Job Card", job_card)
+	scrap_item = jc_doc.scrap_items
+	parent_wo = frappe.get_value("Work Order", work_order_id, 'parent_work_order')
+	scrap_qty = sum([i.stock_qty for i in scrap_item])
+	if(scrap_qty == None):
+		scrap_qty=0
+	act_qty = frappe.get_value("Job Card",{'work_order':parent_wo},'total_completed_qty') - scrap_qty
+	uom = frappe.get_value("Job Card",{'work_order':parent_wo},'manufacturing_uom')
+	conv = 1
+
+	pending_qty_pcs = act_qty-(float(qty)*conv)
+	se_item = frappe.get_doc("Item",work_order.production_item)
+	if(uom):
+		conv = frappe.get_value('UOM Conversion Detail',{'uom':uom, 'parent':item.name},'conversion_factor')
+		bundle_conv = frappe.get_value('UOM Conversion Detail',{'uom':repack_uom, 'parent':item.name},'conversion_factor')
+		# pending_qty_pcs = act_qty-(float(qty)*bundle_conv)
+		frappe.errprint(bundle_conv,"ll")
+		# frappe.errprint(act_qty, (float(qty)*bundle_conv))
+		frappe.errprint(act_qty, qty)
+		frappe.errprint(flt(qty)*bundle_conv, act_qty*conv)
+		pending_qty_pcs = act_qty*conv - flt(qty)*bundle_conv
+	if(pending_qty_pcs>0):
 		items ={ 
-			"item_code":se_item.item_code,
-			"item_group": se_item.item_group, 
-			"item_name":se_item.item_name, 
-			"qty": qty , 
-			"uom":se_item.stock_uom, 
-			"conversion_factor": 1 }
-		stock_entry.append("items", items)
-		from ganapathy_pavers.custom.py.warehouse import create_scrap_warehouse
-		create_scrap_warehouse()
-		company = frappe.db.get_value("Company",frappe.db.get_single_value('Global Defaults', 'default_company'))
-		abbr = frappe.get_value("Company",company, 'abbr')
-		for i in scrap_item:
-			items ={ 
-			"item_code":i.item_code,
-			"item_group": frappe.get_value("Item", i.item_code, 'item_group'), 
-			"item_name":i.item_name, 
-			"qty": i.stock_qty , 
-			"uom":i.stock_uom, 
-			"conversion_factor": 1,
-			"is_scrap_item": 1,
-			"t_warehouse" : f'Scrap Warehouse - {abbr}'
-			}
-			stock_entry.append("items", items)
-		from erpnext.manufacturing.doctype.bom.bom import add_additional_cost
-		add_additional_cost(stock_entry, work_order)
-
-	if purpose=="Material Transfer for Manufacture":
-		stock_entry.to_warehouse = wip_warehouse
-		stock_entry.project = work_order.project
-	else:
-		# stock_entry.from_warehouse = wip_warehouse
-		stock_entry.from_warehouse = sw
-		# stock_entry.to_warehouse = work_order.fg_warehouse
-
-		stock_entry.to_warehouse = tw
-		stock_entry.project = work_order.project
-
-	stock_entry.set_stock_entry_type()
-	if(purpose != "Material Transfer"):
-		stock_entry.get_items()
-		stock_entry.set_serial_no_batch_for_finished_good()
-	if purpose=="Manufacture":
-		if(tw):
-			for i in range(len(stock_entry.items)):
-				stock_entry.items[i].update({
-					't_warehouse': tw
-				})
-		stock_entry.from_warehouse = sw
-
-		stock_entry.to_warehouse = tw
+		"item_code":se_item.item_code,
+		"item_group": se_item.item_group, 
+		"item_name":se_item.item_name, 
+		"qty": pending_qty_pcs , 
+		"uom":item.stock_uom, 
+		"conversion_factor": 1,
+		"t_warehouse" : f'Remaining Pavers - {abbr}'
+		}
+		print(pending_qty_pcs,"777777777777777777777")
+		se_items.append(items)
+	print(se_items)
+	stock_entry.update({
+		'items': se_items
+	})
+	from erpnext.manufacturing.doctype.bom.bom import add_additional_cost
+	add_additional_cost(stock_entry, work_order)
 	stock_entry.insert(ignore_mandatory=True)
 	stock_entry.submit()
 	from ganapathy_pavers.custom.py.work_order import change_status
 	change_status(work_order_id)
-	return stock_entry.as_dict()
+	return stock_entry.as_dict()	
+
+@frappe.whitelist()
+def make_stock_entry(work_order_id, purpose, qty=0, sw=None, tw=None, manufacturing_uom=None,repack_uom=None, batch=None):
+	work_order = frappe.get_doc("Work Order", work_order_id)
+	se_item = frappe.get_doc("Item",work_order.production_item)
+	company = frappe.db.get_value("Company",frappe.db.get_single_value('Global Defaults', 'default_company'))
+	abbr = frappe.get_value("Company",company, 'abbr')
+	print(purpose,"???")
+	if not frappe.db.get_value("Warehouse", work_order.wip_warehouse, "is_group"):
+		wip_warehouse = work_order.wip_warehouse
+	else:
+		wip_warehouse = None
+	scrap_item = ''
+	stock_entry = frappe.new_doc("Stock Entry")
+	stock_entry.ts_work_order = work_order_id
+	stock_entry.purpose = purpose
+	stock_entry.company = work_order.company
+	if(purpose == 'Repack'):
+		print(repack_uom,"0000000000000000000000000")
+		return make_repack_sgp(stock_entry,work_order_id, purpose, qty, sw, tw, manufacturing_uom,repack_uom,batch)
+	else:
+		if(purpose not in  ["Material Transfer",'Repack']):
+			stock_entry.bom_no = work_order.bom_no
+			stock_entry.work_order = work_order_id
+			stock_entry.from_bom = 1
+			stock_entry.use_multi_level_bom = work_order.use_multi_level_bom
+			stock_entry.fg_completed_qty = qty or (flt(work_order.qty) - flt(work_order.produced_qty))
+			if work_order.bom_no:
+				stock_entry.inspection_required = frappe.db.get_value('BOM',
+				work_order.bom_no, 'inspection_required')
+		else:
+			job_card = frappe.get_all("Job Card", filters={'work_order':work_order_id},pluck = 'name')[0]
+			jc_doc = frappe.get_doc("Job Card", job_card)
+			scrap_item = jc_doc.scrap_items
+			items ={ 
+				"item_code":se_item.item_code,
+				"item_group": se_item.item_group, 
+				"item_name":se_item.item_name, 
+				"qty": qty , 
+				"uom":se_item.stock_uom, 
+				"conversion_factor": 1 }
+			stock_entry.append("items", items)
+			from ganapathy_pavers.custom.py.warehouse import create_scrap_warehouse
+			create_scrap_warehouse()
+			for i in scrap_item:
+				items ={ 
+				"item_code":i.item_code,
+				"item_group": frappe.get_value("Item", i.item_code, 'item_group'), 
+				"item_name":i.item_name, 
+				"qty": i.stock_qty , 
+				"uom":i.stock_uom, 
+				"conversion_factor": 1,
+				"is_scrap_item": 1,
+				"t_warehouse" : f'Scrap Warehouse - {abbr}'
+				}
+				stock_entry.append("items", items)
+
+			
+
+
+			from erpnext.manufacturing.doctype.bom.bom import add_additional_cost
+			add_additional_cost(stock_entry, work_order)
+
+		if purpose=="Material Transfer for Manufacture":
+			stock_entry.to_warehouse = wip_warehouse
+			stock_entry.project = work_order.project
+		else:
+			# stock_entry.from_warehouse = wip_warehouse
+			stock_entry.from_warehouse = sw
+			# stock_entry.to_warehouse = work_order.fg_warehouse
+
+			stock_entry.to_warehouse = tw
+			stock_entry.project = work_order.project
+
+		stock_entry.set_stock_entry_type()
+		if(purpose != "Material Transfer"):
+			stock_entry.get_items()
+			stock_entry.set_serial_no_batch_for_finished_good()
+		frappe.errprint(stock_entry.items,"/./.")
+		if(purpose != "Manufacture"):
+			## Move Remaining Items from Jobcard to Remaing Warehouse
+			job_card = frappe.get_all("Job Card", filters={'work_order':work_order_id},pluck = 'name')[0]
+			jc_doc = frappe.get_doc("Job Card", job_card)
+			scrap_item = jc_doc.scrap_items
+			parent_wo = frappe.get_value("Work Order", work_order_id, 'parent_work_order')
+			scrap_qty = sum([i.stock_qty for i in scrap_item])
+			if(scrap_qty == None):
+				scrap_qty=0
+			act_qty = frappe.get_value("Job Card",{'work_order':parent_wo},'total_completed_qty') - scrap_qty
+			uom = frappe.get_value("Job Card",{'work_order':parent_wo},'manufacturing_uom')
+			pending_qty = act_qty-float(qty)
+			se_item = frappe.get_doc("Item",work_order.production_item)
+			if(uom):
+				conv = frappe.get_value('UOM Conversion Detail',{'uom':uom, 'parent':se_item.name},'conversion_factor')
+				pending_qty = (act_qty)/conv-float(qty)
+			if(pending_qty>0):
+				items ={ 
+				"item_code":se_item.item_code,
+				"item_group": se_item.item_group, 
+				"item_name":se_item.item_name, 
+				"qty": pending_qty , 
+				"uom":se_item.stock_uom, 
+				"conversion_factor": 1,
+				"t_warehouse" : f'Remaining Pavers - {abbr}'
+				}
+				stock_entry.append("items", items)
+
+
+		frappe.errprint(stock_entry.items[0].__dict__,stock_entry.items)
+		if purpose=="Manufacture":
+			if(tw):
+				for i in range(len(stock_entry.items)):
+					stock_entry.items[i].update({
+						't_warehouse': tw
+					})
+			if(manufacturing_uom):
+				print(">...........................")
+				for i in range(len(stock_entry.items)):
+					if(stock_entry.items[i].item_code == work_order.production_item):
+						print(stock_entry.items[i].item_code,stock_entry.items[i].t_warehouse,".....")
+						stock_entry.items[i].update({
+							'uom': manufacturing_uom,
+							'conversion_factor': frappe.get_value('UOM Conversion Detail',{'uom':manufacturing_uom, 'parent':se_item.name},'conversion_factor')
+						})
+				# stock_entry.fg_completed_qty = flt(qty)/frappe.get_value('UOM Conversion Detail',{'uom':manufacturing_uom, 'parent':se_item.name},'conversion_factor')
+			stock_entry.from_warehouse = sw
+
+			stock_entry.to_warehouse = tw
+		stock_entry.insert(ignore_mandatory=True)
+		stock_entry.submit()
+		from ganapathy_pavers.custom.py.work_order import change_status
+		change_status(work_order_id)
+		return stock_entry.as_dict()
 
 @frappe.whitelist()
 def get_default_warehouse():

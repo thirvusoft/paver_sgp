@@ -306,8 +306,7 @@ frappe.ui.form.on("BOM", {
 				},
 			});
 		}
-
-		let dialog = frappe.prompt(fields, data => {
+		if(fields.length){let dialog = frappe.prompt(fields, data => {
 			let item = data.item || frm.doc.item;
 			let variant_items = data.items || [];
 
@@ -320,6 +319,10 @@ frappe.ui.form.on("BOM", {
 			callback(frm, item, data, variant_items);
 
 		}, __(title), __("Create"));
+	}
+	else{
+		callback(frm, frm.doc.item, {}, []);
+	}
 
 		has_template_rm.forEach(d => {
 			dialog.fields_dict.items.df.data.push({

@@ -347,20 +347,19 @@ class JobCard(Document):
 					"amount": d.amount
 				})
 
-	def before_submit(self):
-		work_order = frappe.get_doc("Work Order", self.work_order)
-		work_order.update({
-			'qty' : self.total_completed_qty,
-			'produced_qty' : self.total_completed_qty
-		})
-		work_order.save('Update')
 
 	def on_submit(self):
 		self.validate_transfer_qty()
 		self.validate_job_card()
 		self.update_work_order()
 		self.set_transferred_qty()
-
+	def before_submit(self):
+		parent_wo = frappe.get_value("Work Order", self.work_order, 'parent_work_order')
+		if(parent_wo):
+			act_qty = frappe.get_value("Job Card",{'work_order':parent_wo},'total_completed_qty') - sum([i.stock_qty for i in self.scrap_items])
+			pending_qty = act_qty-float(self.total_completed_qty)
+			if(pending_qty>0):
+				self.remaining_pavers = pending_qty
 	def on_cancel(self):
 		self.update_work_order()
 		self.set_transferred_qty()
@@ -774,3 +773,51 @@ def make_corrective_job_card(source_name, operation=None, for_operation=None, ta
 	}, target_doc, set_missing_values)
 
 	return doclist
+
+@frappe.whitelist()
+def get_remaining_pavers(work_order, item, operation,cur_jc_qty=0):
+	jc_qty = frappe.get_all('Job Card', fields=['name', 'remaining_pavers'],
+			 filters={'production_item':item, 'operation':operation, 'docstatus':1,'remaining_pavers':['>',0]})
+	parent_wo = frappe.get_value("Work Order",work_order, 'parent_work_order')
+	total_qty_to_manufacture=0
+	if(parent_wo):
+		parent_wo_jc_qty = frappe.get_value("Job Card",{'work_order':parent_wo},'total_completed_qty')
+		total_qty_to_manufacture += parent_wo_jc_qty-float(cur_jc_qty)
+	message = []
+	count=0
+	for i in jc_qty:
+		count+=1
+		field = {"fieldname":f"jc_name{count}", "label":frappe.bold("Job Card"),"fieldtype":"Link",'default':i['name'], 'read_only':1}
+		message.append(field)
+		field = {"fieldtype":'Column Break'}
+		message.append(field)
+		field = {"fieldname":f"jc_qty{count}", "label":frappe.bold("Remaining Qty"),"fieldtype":"Data", "default":f"{i['remaining_pavers']}",'read_only':1}
+		message.append(field)
+		field = {"fieldtype":'Column Break'}
+		message.append(field)
+		field = {"fieldname":f"jc_add_qty{count}", "label":frappe.bold("Add QTY"),"fieldtype":"Float"}
+		message.append(field)
+		field = {"fieldtype":'Section Break'}
+		message.append(field)
+		
+	message.append({"fieldtype":'Data','label':'test','hidden':1})
+	message.append({"fieldtype":'Column Break'})
+	message.append({"fieldname":"total_qty_to_manufacture", "label":frappe.bold("Total Qty to Manufacture"),"fieldtype":"Data", "default":str(total_qty_to_manufacture),'read_only':1})
+	return message, count
+
+@frappe.whitelist()
+def update_jc_remaining_pavers(qtys, jcs, max_qty, times, wo):
+	qty = 0
+	qtys = json.loads(qtys)
+	jcs = json.loads(jcs)
+	max_qty = json.loads(max_qty)
+	times = json.loads(times)
+	batch = []
+	for i in range(len(qtys)):
+		frappe.db.set_value('Job Card', jcs[i], 'remaining_pavers', flt(max_qty[i])-flt(qtys[i]))
+		qty += qtys[i]
+		wo = frappe.get_value('Job Card', jcs[i], 'work_order')
+		se = frappe.get_value('Stock Entry',{'ts_work_order':wo},'name')
+		se_batch = frappe.get_value("Stock Entry Detail" ,{'parent':se}, 'batch_no')
+		batch.append([se_batch, qtys[i]])
+	return qty, time_diff_in_hours(times['end_time'], times['start_time']), batch
