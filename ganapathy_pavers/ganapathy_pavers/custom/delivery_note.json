@@ -321,7 +321,11 @@
    "fetch_if_empty": 0,
    "fieldname": "gst_transporter_id",
    "fieldtype": "Data",
+<<<<<<< HEAD
    "hidden": 1,
+=======
+   "hidden": 0,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
@@ -381,12 +385,19 @@
    "fetch_if_empty": 0,
    "fieldname": "mode_of_transport",
    "fieldtype": "Select",
+<<<<<<< HEAD
    "hidden": 1,
+=======
+   "hidden": 0,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
    "idx": 120,
+<<<<<<< HEAD
    "idx": 121,
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
@@ -442,12 +453,19 @@
    "fetch_if_empty": 0,
    "fieldname": "gst_vehicle_type",
    "fieldtype": "Select",
+<<<<<<< HEAD
    "hidden": 1,
+=======
+   "hidden": 0,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
    "idx": 123,
+<<<<<<< HEAD
    "idx": 124,
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
@@ -508,7 +526,10 @@
    "hide_days": 0,
    "hide_seconds": 0,
    "idx": 162,
+<<<<<<< HEAD
    "idx": 164,
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
@@ -569,7 +590,10 @@
    "hide_days": 0,
    "hide_seconds": 0,
    "idx": 163,
+<<<<<<< HEAD
    "idx": 165,
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
@@ -630,7 +654,10 @@
    "hide_days": 0,
    "hide_seconds": 0,
    "idx": 165,
+<<<<<<< HEAD
    "idx": 167,
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
@@ -691,7 +718,10 @@
    "hide_days": 0,
    "hide_seconds": 0,
    "idx": 164,
+<<<<<<< HEAD
    "idx": 166,
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
@@ -747,12 +777,19 @@
    "fetch_if_empty": 1,
    "fieldname": "gst_category",
    "fieldtype": "Select",
+<<<<<<< HEAD
    "hidden": 1,
+=======
+   "hidden": 0,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
    "idx": 124,
+<<<<<<< HEAD
    "idx": 125,
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
@@ -813,7 +850,10 @@
    "hide_days": 0,
    "hide_seconds": 0,
    "idx": 161,
+<<<<<<< HEAD
    "idx": 163,
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
@@ -1039,7 +1079,11 @@
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
+<<<<<<< HEAD
    "creation": "2022-04-19 11:29:00.151400",
+=======
+   "creation": "2022-04-13 14:27:09.851149",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default": null,
    "depends_on": null,
    "description": null,
@@ -1047,6 +1091,7 @@
    "dt": "Delivery Note",
    "fetch_from": null,
    "fetch_if_empty": 0,
+<<<<<<< HEAD
    "fieldname": "remarks",
    "fieldtype": "Data",
    "hidden": 0,
@@ -1055,12 +1100,22 @@
    "hide_seconds": 0,
    "idx": 125,
    "idx": 126,
+=======
+   "fieldname": "site_work",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "hide_border": 0,
+   "hide_days": 0,
+   "hide_seconds": 0,
+   "idx": 6,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
+<<<<<<< HEAD
    "insert_after": "gst_category",
    "label": "Remarks",
    "length": 0,
@@ -1068,6 +1123,15 @@
    "modified": "2022-04-19 11:29:00.151400",
    "modified_by": "Administrator",
    "name": "Delivery Note-remarks",
+=======
+   "insert_after": "supervisor_name",
+   "label": "Site Name",
+   "length": 0,
+   "mandatory_depends_on": null,
+   "modified": "2022-04-13 14:27:09.851149",
+   "modified_by": "Administrator",
+   "name": "Delivery Note-site_work",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "no_copy": 0,
    "non_negative": 0,
    "options": null,
@@ -1100,6 +1164,7 @@
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
+<<<<<<< HEAD
    "creation": "2022-04-19 11:50:27.665479",
    "default": null,
    "depends_on": "eval:doc.transporter==\"Own Transporter\"",
@@ -1110,17 +1175,34 @@
    "fetch_if_empty": 0,
    "fieldname": "operator_",
    "fieldtype": "Data",
+=======
+   "creation": "2022-04-19 10:25:44.881164",
+   "default": null,
+   "depends_on": null,
+   "description": null,
+   "docstatus": 0,
+   "dt": "Delivery Note",
+   "fetch_from": null,
+   "fetch_if_empty": 0,
+   "fieldname": "work",
+   "fieldtype": "Select",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
+<<<<<<< HEAD
    "idx": 111,
+=======
+   "idx": 16,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
+<<<<<<< HEAD
    "insert_after": "driver_name_2",
    "label": "Operator ",
    "length": 0,
@@ -1131,6 +1213,18 @@
    "no_copy": 0,
    "non_negative": 0,
    "options": null,
+=======
+   "insert_after": "posting_time",
+   "label": "Work",
+   "length": 0,
+   "mandatory_depends_on": null,
+   "modified": "2022-04-19 10:25:44.881164",
+   "modified_by": "Administrator",
+   "name": "Delivery Note-work",
+   "no_copy": 0,
+   "non_negative": 0,
+   "options": "\nSupply Only\nLaying Only\nSupply & Laying",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
@@ -1143,7 +1237,11 @@
    "read_only": 0,
    "read_only_depends_on": null,
    "report_hide": 0,
+<<<<<<< HEAD
    "reqd": 0,
+=======
+   "reqd": 1,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "search_index": 0,
    "translatable": 1,
    "unique": 0,
@@ -1160,7 +1258,11 @@
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
+<<<<<<< HEAD
    "creation": "2022-04-19 14:43:18.453385",
+=======
+   "creation": "2022-04-19 11:29:00.151400",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default": null,
    "depends_on": null,
    "description": null,
@@ -1168,19 +1270,28 @@
    "dt": "Delivery Note",
    "fetch_from": null,
    "fetch_if_empty": 0,
+<<<<<<< HEAD
    "fieldname": "supervisor_name",
+=======
+   "fieldname": "remarks",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "fieldtype": "Data",
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
+<<<<<<< HEAD
    "idx": 6,
+=======
+   "idx": 125,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
+<<<<<<< HEAD
    "insert_after": "customer",
    "label": "Supervisor ",
    "length": 0,
@@ -1188,6 +1299,15 @@
    "modified": "2022-04-19 14:43:18.453385",
    "modified_by": "Administrator",
    "name": "Delivery Note-supervisor_name",
+=======
+   "insert_after": "gst_category",
+   "label": "Remarks",
+   "length": 0,
+   "mandatory_depends_on": null,
+   "modified": "2022-04-19 11:29:00.151400",
+   "modified_by": "Administrator",
+   "name": "Delivery Note-remarks",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "no_copy": 0,
    "non_negative": 0,
    "options": null,
@@ -1220,6 +1340,7 @@
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
+<<<<<<< HEAD
    "creation": "2022-04-20 09:29:14.909973",
    "default": null,
    "depends_on": null,
@@ -1230,17 +1351,34 @@
    "fetch_if_empty": 0,
    "fieldname": "type",
    "fieldtype": "Select",
+=======
+   "creation": "2022-04-19 11:50:27.665479",
+   "default": null,
+   "depends_on": "eval:doc.transporter==\"Own Transporter\"",
+   "description": null,
+   "docstatus": 0,
+   "dt": "Delivery Note",
+   "fetch_from": "own_vehicle_no.operator",
+   "fetch_if_empty": 0,
+   "fieldname": "operator_",
+   "fieldtype": "Data",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
+<<<<<<< HEAD
    "idx": 8,
+=======
+   "idx": 111,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
+<<<<<<< HEAD
    "insert_after": "site_work",
    "label": "Sales Type",
    "length": 0,
@@ -1251,6 +1389,18 @@
    "no_copy": 0,
    "non_negative": 0,
    "options": "\nPavers\nCompound Wall",
+=======
+   "insert_after": "driver_name_2",
+   "label": "Operator ",
+   "length": 0,
+   "mandatory_depends_on": null,
+   "modified": "2022-04-19 11:50:27.665479",
+   "modified_by": "Administrator",
+   "name": "Delivery Note-operator_",
+   "no_copy": 0,
+   "non_negative": 0,
+   "options": null,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
@@ -1280,7 +1430,11 @@
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
+<<<<<<< HEAD
    "creation": "2022-04-28 20:37:00.852515",
+=======
+   "creation": "2022-04-19 14:43:18.453385",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default": null,
    "depends_on": null,
    "description": null,
@@ -1288,19 +1442,29 @@
    "dt": "Delivery Note",
    "fetch_from": null,
    "fetch_if_empty": 0,
+<<<<<<< HEAD
    "fieldname": "site_work",
    "fieldtype": "Link",
+=======
+   "fieldname": "supervisor_name",
+   "fieldtype": "Data",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
+<<<<<<< HEAD
    "idx": 7,
+=======
+   "idx": 6,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
+<<<<<<< HEAD
    "insert_after": "supervisor_name",
    "label": "Site Name",
    "length": 0,
@@ -1372,6 +1536,19 @@
    "non_negative": 0,
    "options": null,
    "owner": "admin@gmail.com",
+=======
+   "insert_after": "customer",
+   "label": "Supervisor ",
+   "length": 0,
+   "mandatory_depends_on": null,
+   "modified": "2022-04-19 14:43:18.453385",
+   "modified_by": "Administrator",
+   "name": "Delivery Note-supervisor_name",
+   "no_copy": 0,
+   "non_negative": 0,
+   "options": null,
+   "owner": "Administrator",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "parent": null,
    "parentfield": null,
    "parenttype": null,
@@ -1385,7 +1562,11 @@
    "report_hide": 0,
    "reqd": 0,
    "search_index": 0,
+<<<<<<< HEAD
    "translatable": 0,
+=======
+   "translatable": 1,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "unique": 0,
    "width": null
   },
@@ -1395,12 +1576,20 @@
    "_liked_by": null,
    "_user_tags": null,
    "allow_in_quick_entry": 0,
+<<<<<<< HEAD
    "allow_on_submit": 1,
+=======
+   "allow_on_submit": 0,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "bold": 0,
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
+<<<<<<< HEAD
    "creation": "2022-06-07 15:05:21.007798",
+=======
+   "creation": "2022-04-20 09:29:14.909973",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default": null,
    "depends_on": null,
    "description": null,
@@ -1408,19 +1597,29 @@
    "dt": "Delivery Note",
    "fetch_from": null,
    "fetch_if_empty": 0,
+<<<<<<< HEAD
    "fieldname": "return_odometer_value",
    "fieldtype": "Int",
+=======
+   "fieldname": "type",
+   "fieldtype": "Select",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
+<<<<<<< HEAD
    "idx": 117,
+=======
+   "idx": 8,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
+<<<<<<< HEAD
    "insert_after": "current_odometer_value",
    "label": "Return Odometer Value",
    "length": 0,
@@ -1432,6 +1631,19 @@
    "non_negative": 0,
    "options": null,
    "owner": "admin@gmail.com",
+=======
+   "insert_after": "project",
+   "label": "Sales Type",
+   "length": 0,
+   "mandatory_depends_on": null,
+   "modified": "2022-04-20 09:29:14.909973",
+   "modified_by": "Administrator",
+   "name": "Delivery Note-type",
+   "no_copy": 0,
+   "non_negative": 0,
+   "options": "\nPavers\nCompound Wall",
+   "owner": "Administrator",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "parent": null,
    "parentfield": null,
    "parenttype": null,
@@ -1445,6 +1657,7 @@
    "report_hide": 0,
    "reqd": 0,
    "search_index": 0,
+<<<<<<< HEAD
    "translatable": 0,
    "unique": 0,
    "width": null
@@ -1506,10 +1719,14 @@
    "reqd": 0,
    "search_index": 0,
    "translatable": 0,
+=======
+   "translatable": 1,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "unique": 0,
    "width": null
   }
  ],
+<<<<<<< HEAD
  "custom_perms": [
   {
    "_assign": null,
@@ -1716,6 +1933,9 @@
    "write": 1
   }
  ],
+=======
+ "custom_perms": [],
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
  "doctype": "Delivery Note",
  "property_setters": [
   {
@@ -1723,6 +1943,7 @@
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
+<<<<<<< HEAD
    "creation": "2022-06-07 10:57:43.589564",
    "default_value": null,
    "doc_type": "Delivery Note",
@@ -1819,6 +2040,8 @@
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "creation": "2022-04-19 14:56:52.938188",
    "default_value": null,
    "doc_type": "Delivery Note",

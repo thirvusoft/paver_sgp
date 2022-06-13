@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 var salary_balance,standard_hrs=0;
+=======
+var salary_balance;
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 frappe.ui.form.on('Salary Slip',{
     employee:function(frm,cdt,cdn){
         if(frm.doc.designation=='Job Worker'){
@@ -29,6 +33,7 @@ frappe.ui.form.on('Salary Slip',{
                     cur_frm.set_value("total_unpaid_amount",(frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance);
                 }
         })
+<<<<<<< HEAD
         }
         else if(frm.doc.designation=='Contractor'){
             frm.trigger('employee_count');    
@@ -69,6 +74,9 @@ frappe.ui.form.on('Salary Slip',{
                 }   
             }         
         });
+=======
+        }     
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
     },
     pay_the_balance:function(frm){
         if(frm.doc.pay_the_balance==1){
@@ -77,9 +85,12 @@ frappe.ui.form.on('Salary Slip',{
             frm.set_value('salary_balance',0)
         }
         else{
+<<<<<<< HEAD
                 frappe.db.get_value("Employee", {"name": frm.doc.employee}, "salary_balance", (r) => {
                     salary_balance=r.salary_balance                    
                 });
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
                 frm.set_value('salary_balance',salary_balance)
                 frm.set_value('total_paid_amount',frm.doc.total_paid_amount-frm.doc.salary_balance)
                 frm.set_value('total_amount',frm.doc.total_amount-frm.doc.salary_balance)
@@ -109,6 +120,14 @@ frappe.ui.form.on('Salary Slip',{
                 frappe.model.set_value(child.doctype, child.name, "amount",frm.doc.total_paid_amount)
                 cur_frm.refresh_field("earnings")            }, 100);
         }   
+<<<<<<< HEAD
+=======
+    },
+    employee:function(frm){
+        var date = frm.doc.end_date;
+        var arr = date.split('-');
+        frm.set_value('days',arr[2])
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
     }
 })
 

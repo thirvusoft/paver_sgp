@@ -127,7 +127,10 @@ frappe.ui.form.on("Work Order", {
 	},
 
 	refresh: function(frm) {
+<<<<<<< HEAD
 			
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 		erpnext.toggle_naming_series();
 		erpnext.work_order.set_custom_buttons(frm);
 		frm.set_intro("");
@@ -517,7 +520,10 @@ frappe.ui.form.on("Work Order Operation", {
 
 erpnext.work_order = {
 	set_custom_buttons: function(frm) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 		var doc = frm.doc;
 		if (doc.docstatus === 1 && doc.status != "Closed") {
 			frm.add_custom_button(__('Close'), function() {
@@ -591,12 +597,20 @@ erpnext.work_order = {
 					}
 				}
 			} else {
+<<<<<<< HEAD
 				// if ((flt(doc.produced_qty) < flt(doc.qty)) && frm.doc.status != 'Stopped') {
+=======
+				if ((flt(doc.produced_qty) < flt(doc.qty)) && frm.doc.status != 'Stopped') {
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
 						erpnext.work_order.make_se(frm, 'Manufacture');
 					});
 					finish_btn.addClass('btn-primary');
+<<<<<<< HEAD
 				// }
+=======
+				}
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 			}
 		}
 
@@ -651,6 +665,7 @@ erpnext.work_order = {
 
 	show_prompt_for_qty_input: function(frm, purpose) {
 		let max = this.get_max_transferable_qty(frm, purpose);
+<<<<<<< HEAD
 		let data={};
 		return new Promise((resolve, reject) => {
 			data.purpose = purpose;
@@ -698,6 +713,35 @@ erpnext.work_order = {
 					'qty': data.qty,
 					'sw': frm.doc.operations[0].source_warehouse,
 					'tw': frm.doc.operations[0].target_warehouse,
+=======
+		return new Promise((resolve, reject) => {
+			frappe.prompt({
+				fieldtype: 'Float',
+				label: __('Qty for {0}', [purpose]),
+				fieldname: 'qty',
+				description: __('Max: {0}', [max]),
+				default: max
+			}, data => {
+				max += (frm.doc.qty * (frm.doc.__onload.overproduction_percentage || 0.0)) / 100;
+
+				// if (data.qty > max) {
+				// 	frappe.msgprint(__('Quantity must not be more than {0}', [max]));
+				// 	reject();
+				// }
+				data.purpose = purpose;
+				resolve(data);
+			}, __('Select Quantity'), __('Create'));
+		});
+	},
+
+	make_se: function(frm, purpose) {
+		this.show_prompt_for_qty_input(frm, purpose)
+			.then(data => {
+				return frappe.xcall('erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry', {
+					'work_order_id': frm.doc.name,
+					'purpose': purpose,
+					'qty': data.qty
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 				});
 			}).then(stock_entry => {
 				frappe.model.sync(stock_entry);

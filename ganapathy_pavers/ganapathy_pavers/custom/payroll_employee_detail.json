@@ -33,7 +33,7 @@
    "in_preview": 0,
    "in_standard_filter": 0,
    "insert_after": "employee_name",
-   "label": "Number of Days Food Taken",
+   "label": "Total Time of Food Taken",
    "length": 0,
    "mandatory_depends_on": "",
    "modified": "2022-04-20 22:34:19.203308",

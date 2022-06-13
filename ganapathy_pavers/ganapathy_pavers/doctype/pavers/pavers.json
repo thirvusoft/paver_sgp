@@ -53,7 +53,11 @@
   {
    "columns": 2,
    "fieldname": "allocated_paver_area",
+<<<<<<< HEAD
    "fieldtype": "Float",
+=======
+   "fieldtype": "Int",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "in_list_view": 1,
    "label": "Allocated Paver Area",
    "read_only": 1
@@ -63,7 +67,12 @@
    "fieldname": "rate",
    "fieldtype": "Currency",
    "in_list_view": 1,
+<<<<<<< HEAD
    "label": "Rate "
+=======
+   "label": "Rate ",
+   "read_only": 1
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
   },
   {
    "columns": 1,
@@ -75,28 +84,47 @@
   },
   {
    "fieldname": "sales_order",
+<<<<<<< HEAD
    "fieldtype": "Data",
    "label": "Sales Order",
    "read_only": 1
+=======
+   "fieldtype": "Link",
+   "label": "Sales Order",
+   "options": "Sales Order"
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
   },
   {
    "fieldname": "work",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Work",
+<<<<<<< HEAD
    "options": "\nSupply Only\nLaying Only\nSupply and Laying"
+=======
+   "options": "\nSupply Only\nLaying Only\nSupply & Laying",
+   "reqd": 1
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
+<<<<<<< HEAD
  "modified": "2022-05-16 12:27:36.747560",
+=======
+ "modified": "2022-04-19 11:10:59.928148",
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Pavers",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
+<<<<<<< HEAD
  "sort_order": "DESC",
  "states": []
+=======
+ "sort_order": "DESC"
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 }

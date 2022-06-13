@@ -37,6 +37,7 @@ class JobCard(Document):
 		excess_transfer = frappe.db.get_single_value("Manufacturing Settings", "job_card_excess_transfer")
 		self.set_onload("job_card_excess_transfer", excess_transfer)
 		self.set_onload("work_order_stopped", self.is_work_order_stopped())
+<<<<<<< HEAD
 		parent_wo = frappe.get_value("Work Order", self.work_order, 'parent_work_order')
 		if(parent_wo):
 			act_qty, se_type = frappe.get_value("Job Card",{'work_order':parent_wo},['total_completed_qty',"stock_entry_type"]) 
@@ -67,6 +68,8 @@ class JobCard(Document):
 			self.remaining_pavers = pending_qty
 
 
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 
 	def validate(self):
 		self.validate_time_logs()
@@ -76,10 +79,16 @@ class JobCard(Document):
 		self.set_sub_operations()
 		self.update_sub_operation_status()
 		self.validate_work_order()
+<<<<<<< HEAD
 		self.total_time_in_hrs = self.total_time_in_mins / 60
 
 	def set_sub_operations(self):
 		if self.operation:
+=======
+
+	def set_sub_operations(self):
+		if not self.sub_operations and self.operation:
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 			self.sub_operations = []
 			for row in frappe.get_all('Sub Operation',
 				filters = {'parent': self.operation}, fields=['operation', 'idx'], order_by='idx'):
@@ -90,6 +99,7 @@ class JobCard(Document):
 	def validate_time_logs(self):
 		self.total_time_in_mins = 0.0
 		self.total_completed_qty = 0.0
+<<<<<<< HEAD
 		shift_id_time_in_mins = []
 		completed_qty = []
 		shift_id_in_time_logs = []
@@ -97,6 +107,12 @@ class JobCard(Document):
 		if self.get('time_logs'):
 			for d in self.get('time_logs'):
 				if get_datetime(d.from_time) > get_datetime(d.to_time):
+=======
+
+		if self.get('time_logs'):
+			for d in self.get('time_logs'):
+				if d.to_time and get_datetime(d.from_time) > get_datetime(d.to_time):
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 					frappe.throw(_("Row {0}: From time must be less than to time").format(d.idx))
 
 				data = self.get_overlap_for(d)
@@ -106,6 +122,7 @@ class JobCard(Document):
 
 				if d.from_time and d.to_time:
 					d.time_in_mins = time_diff_in_hours(d.to_time, d.from_time) * 60
+<<<<<<< HEAD
 					d.time_in_hrs  = time_diff_in_hours(d.to_time, d.from_time)
 					if(d.shift_id not in shift_id_time_in_mins):
 						shift_id_time_in_mins.append(d.shift_id)
@@ -122,6 +139,13 @@ class JobCard(Document):
 					# self.total_completed_qty += d.completed_qty
 
 			self.total_time_in_hrs = self.total_time_in_mins / 60
+=======
+					self.total_time_in_mins += d.time_in_mins
+
+				if d.completed_qty and not self.sub_operations:
+					self.total_completed_qty += d.completed_qty
+
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 			self.total_completed_qty = flt(self.total_completed_qty, self.precision("total_completed_qty"))
 
 		for row in self.sub_operations:
@@ -255,6 +279,7 @@ class JobCard(Document):
 						"completed_qty": args.get("completed_qty") or 0.0
 					})
 		elif args.get("start_time"):
+<<<<<<< HEAD
 			if(len(self.time_logs) ==0):
 				shift_id=0
 			else:
@@ -264,6 +289,12 @@ class JobCard(Document):
 				"operation": args.get("sub_operation"),
 				"completed_qty": 0.0,
 				"shift_id" : shift_id
+=======
+			new_args = frappe._dict({
+				"from_time": get_datetime(args.get("start_time")),
+				"operation": args.get("sub_operation"),
+				"completed_qty": 0.0
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 			})
 
 			if employees:
@@ -377,12 +408,16 @@ class JobCard(Document):
 					"amount": d.amount
 				})
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 	def on_submit(self):
 		self.validate_transfer_qty()
 		self.validate_job_card()
 		self.update_work_order()
 		self.set_transferred_qty()
+<<<<<<< HEAD
 	# def onload(self):
 	# 	parent_wo = frappe.get_value("Work Order", self.work_order, 'parent_work_order')
 	# 	if(parent_wo):
@@ -392,6 +427,9 @@ class JobCard(Document):
 	# 		pending_qty = act_qty-float(self.total_completed_qty)
 	# 		if(pending_qty>0):
 	# 			self.remaining_pavers = pending_qty
+=======
+
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 	def on_cancel(self):
 		self.update_work_order()
 		self.set_transferred_qty()
@@ -559,6 +597,12 @@ class JobCard(Document):
 			2: "Cancelled"
 		}[self.docstatus or 0]
 
+<<<<<<< HEAD
+=======
+		if self.for_quantity <= self.transferred_qty:
+			self.status = 'Material Transferred'
+
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 		if self.time_logs:
 			self.status = 'Work In Progress'
 
@@ -566,10 +610,13 @@ class JobCard(Document):
 			(self.for_quantity <= self.total_completed_qty or not self.items)):
 			self.status = 'Completed'
 
+<<<<<<< HEAD
 		if self.status != 'Completed':
 			if self.for_quantity <= self.transferred_qty:
 				self.status = 'Material Transferred'
 
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 		if update_status:
 			self.db_set('status', self.status)
 
@@ -805,6 +852,7 @@ def make_corrective_job_card(source_name, operation=None, for_operation=None, ta
 	}, target_doc, set_missing_values)
 
 	return doclist
+<<<<<<< HEAD
 
 @frappe.whitelist()
 def get_remaining_pavers(work_order, item, operation,se_type,scrap_qty,cur_jc_qty=0):
@@ -870,3 +918,5 @@ def update_jc_remaining_pavers(qtys, jcs, max_qty, times, wo):
 		batch.append([se_batch, qtys[i]])
 	return qty, time_diff_in_hours(times['end_time'], times['start_time']), batch
 
+=======
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd

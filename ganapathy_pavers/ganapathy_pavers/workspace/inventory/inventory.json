@@ -1,5 +1,6 @@
 {
  "category": "Modules",
+<<<<<<< HEAD
  "charts": [
   {
    "chart_name": "Stock Summary",
@@ -10,6 +11,12 @@
  "creation": "2022-04-21 16:45:14.321794",
  "developer_mode_only": 0,
  "disable_user_customization": 1,
+=======
+ "charts": [],
+ "creation": "2022-04-21 16:45:14.321794",
+ "developer_mode_only": 0,
+ "disable_user_customization": 0,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
  "docstatus": 0,
  "doctype": "Workspace",
  "extends_another_page": 0,
@@ -33,7 +40,11 @@
    "label": "Stock Summary",
    "link_to": "Total Stock Summary",
    "link_type": "Report",
+<<<<<<< HEAD
    "onboard": 1,
+=======
+   "onboard": 0,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "type": "Link"
   },
   {
@@ -55,6 +66,7 @@
    "type": "Link"
   }
  ],
+<<<<<<< HEAD
  "modified": "2022-04-29 07:28:11.975143",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
@@ -63,6 +75,15 @@
  "owner": "Administrator",
  "pin_to_bottom": 0,
  "pin_to_top": 1,
+=======
+ "modified": "2022-04-21 17:07:46.884096",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "INVENTORY",
+ "owner": "Administrator",
+ "pin_to_bottom": 0,
+ "pin_to_top": 0,
+>>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
  "shortcuts": [
   {
    "doc_view": "List",
