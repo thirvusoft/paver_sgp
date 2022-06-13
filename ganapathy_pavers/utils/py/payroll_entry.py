@@ -1,8 +1,5 @@
 from erpnext.payroll.doctype.payroll_entry.payroll_entry import ( PayrollEntry,get_existing_salary_slips)
-<<<<<<< HEAD
 from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip
-=======
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 import frappe
 from frappe.utils import getdate
 from frappe import _
@@ -14,7 +11,6 @@ class MessExpense(PayrollEntry):
         food_count= [emp.total_time_of_food_taken for emp in self.employees]
         if employees:
             args = frappe._dict(
-<<<<<<< HEAD
                 {
                     "salary_slip_based_on_timesheet": self.salary_slip_based_on_timesheet,
                     "payroll_frequency": self.payroll_frequency,
@@ -47,30 +43,6 @@ class MessExpense(PayrollEntry):
             submit_salary_slips_for_employees(self, ss_list, publish_progress=False)
 
 def create_salary_slips_for_employees(posting_date,start_date,end_date,employees, args,food_count, publish_progress=True):
-=======
-				{
-					"salary_slip_based_on_timesheet": self.salary_slip_based_on_timesheet,
-					"payroll_frequency": self.payroll_frequency,
-					"start_date": self.start_date,
-					"end_date": self.end_date,
-					"company": self.company,
-					"posting_date": self.posting_date,
-					"deduct_tax_for_unclaimed_employee_benefits": self.deduct_tax_for_unclaimed_employee_benefits,
-					"deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
-					"payroll_entry": self.name,
-					"exchange_rate": self.exchange_rate,
-					"currency": self.currency,
-				}
-			)
-            if len(employees) > 30:
-                frappe.enqueue(create_salary_slips_for_employees, timeout=600, employees=employees,args=args,food_count=food_count)
-            else:
-                create_salary_slips_for_employees(self.start_date,self.end_date,employees, args,food_count, publish_progress=False)
-				# since this method is called via frm.call this doc needs to be updated manually
-                self.reload()
-
-def create_salary_slips_for_employees(start_date,end_date,employees, args,food_count, publish_progress=True):
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
     salary_slips_exists_for = get_existing_salary_slips(employees, args)
     count = 0
     salary_slips_not_created = []
@@ -83,16 +55,12 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
             if(employee.designation=='Job Worker'):
                 job_worker = frappe.db.get_all('TS Job Worker Details',fields=['name1','parent','amount','start_date','end_date'])
                 site_work=[]
-<<<<<<< HEAD
                 total_amount=0
-=======
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
                 start_date=getdate(start_date)
                 end_date=getdate(end_date)
                 for data in job_worker:
                     site_row = frappe._dict({})
                     if data.name1 == emp and data.start_date >= start_date and data.start_date <= end_date and data.end_date >= start_date and data.end_date <= end_date:
-<<<<<<< HEAD
                         total_amount+=data.amount
                         site_row.update({'site_work_name':data.parent,'amount':data.amount})
                         site_work.append(site_row)
@@ -156,11 +124,6 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
                 contractor.append(contractor_row)
                 args.update({"doctype": "Salary Slip", "earnings": contractor})
 
-=======
-                        site_row.update({'site_work_name':data.parent,'amount':data.amount})
-                    site_work.append(site_row)
-                args.update({"doctype": "Salary Slip", "site_work_details": site_work})
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
             ss = frappe.get_doc(args)
             ss.insert()
             count += 1
@@ -169,10 +132,6 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
                     count * 100 / len(set(employees) - set(salary_slips_exists_for)),
                     title=_("Creating Salary Slips..."),
                 )
-<<<<<<< HEAD
-=======
-
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
         else:
             salary_slips_not_created.append(emp)
         index+=1
@@ -180,10 +139,6 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
     payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
     payroll_entry.db_set("salary_slips_created", 1)
     payroll_entry.notify_update()
-<<<<<<< HEAD
-=======
-
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
     if salary_slips_not_created:
         frappe.msgprint(
             _(
@@ -193,7 +148,6 @@ def create_salary_slips_for_employees(start_date,end_date,employees, args,food_c
             indicator="orange",
         )
 
-<<<<<<< HEAD
 def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progress=False):
     submitted_ss = []
     not_submitted_ss = []
@@ -245,5 +199,3 @@ def html_history(single_slip,payroll_entry):
         ]
     value ='<table style="width:100%;border: 1px solid #ddd;border-collapse: collapse; ">'+html+''.join(td)+'</table>'
     frappe.set_value(payroll_entry.doctype, payroll_entry.name, "employee_salary_",value)
-=======
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd

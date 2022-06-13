@@ -50,21 +50,14 @@ app_license = "MIT"
 # Generators
 # ----------
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 # automatically create page for each record of this doctype
 # website_generators = ["Web Page"]
 
 # Installation
 # ------------
 
-<<<<<<< HEAD
 before_install = "ganapathy_pavers.custom.py.warehouse.create_scrap_warehouse"
-=======
-# before_install = "ganapathy_pavers.install.before_install"
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 # after_install = "ganapathy_pavers.install.after_install"
 
 # Desk Notifications
@@ -107,12 +100,8 @@ doc_events = {
                       "on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary"
           },
 	"Salary Slip":{
-<<<<<<< HEAD
         		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update",
 				'validate':"ganapathy_pavers.utils.py.salary_slip.set_net_pay"
-=======
-        		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update"
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
           },
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
@@ -121,7 +110,6 @@ doc_events = {
 		"on_submit":"ganapathy_pavers.utils.py.employee_advance.create_payment_entry"
 	},
 	"Project":{
-<<<<<<< HEAD
 		"autoname":"ganapathy_pavers.custom.py.site_work.autoname",
 		"before_save":"ganapathy_pavers.custom.py.site_work.before_save"
 	},
@@ -158,15 +146,6 @@ doc_events = {
 
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]
-=======
-		"validate":"ganapathy_pavers.custom.py.site_work.validate"
-	}
-	# "Timesheet":{
-	# 	"on_submit":"ganapathy_pavers.utils.py.timesheet.stock_entry"
-	# }
-}
-
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 doctype_js = {
 				"Item" : "/custom/js/item.js",
 				"Payment Entry" : "/custom/js/payment_entry.js",
@@ -179,7 +158,6 @@ doctype_js = {
 				"Timesheet" : "utils/js/timesheet.js",
 				"Salary Slip":"utils/js/salary_slip.js",
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
-<<<<<<< HEAD
 				"Workstation":"/custom/js/workstation.js",
 				"Work Order": "/custom/js/work_order.js",
 				"Delivery Note": "/custom/js/delivery_note.js",
@@ -187,26 +165,16 @@ doctype_js = {
 				"Vehicle Log":"/custom/js/vehicle_log.js",
 				"BOM": "/custom/js/bom.js",
 				"Job Card": "/custom/js/job_card.js"
-=======
-				"Workstation":"custom/js/workstation.js"
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 			 }
 # Scheduled Tasks
 # ---------------
 
-<<<<<<< HEAD
 scheduler_events = {
     "all": [
 		"ganapathy_pavers.custom.py.note.note_alert"
 	],
 # 	"all": [
 # 		"ganapathy_pavers.tasks.all"
-=======
-# scheduler_events = {
-# 	"all": [
-# 		"ganapathy_pavers.tasks.all"
-# 	],
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 # 	"daily": [
 # 		"ganapathy_pavers.tasks.daily"
 # 	],
@@ -219,11 +187,7 @@ scheduler_events = {
 # 	"monthly": [
 # 		"ganapathy_pavers.tasks.monthly"
 # 	]
-<<<<<<< HEAD
 }
-=======
-# }
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 
 # Testing
 # -------

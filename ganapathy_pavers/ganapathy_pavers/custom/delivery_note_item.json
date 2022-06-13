@@ -6,52 +6,32 @@
    "_liked_by": null,
    "_user_tags": null,
    "allow_in_quick_entry": 0,
-<<<<<<< HEAD
    "allow_on_submit": 0,
-=======
-   "allow_on_submit": 1,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "bold": 0,
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
-<<<<<<< HEAD
    "creation": "2022-03-31 18:53:48.502895",
-=======
-   "creation": "2022-03-22 16:07:54.185541",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default": null,
    "depends_on": null,
    "description": null,
    "docstatus": 0,
    "dt": "Delivery Note Item",
-<<<<<<< HEAD
    "fetch_from": null,
    "fetch_if_empty": 0,
    "fieldname": "branch",
    "fieldtype": "Link",
-=======
-   "fetch_from": "item_code.gst_hsn_code",
-   "fetch_if_empty": 1,
-   "fieldname": "gst_hsn_code",
-   "fieldtype": "Data",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
-<<<<<<< HEAD
    "idx": 87,
-=======
-   "idx": 9,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
-<<<<<<< HEAD
    "insert_after": "accounting_dimensions_section",
    "label": "Branch",
    "length": 0,
@@ -122,29 +102,13 @@
    "no_copy": 0,
    "non_negative": 0,
    "options": "\nSupply Only\nLaying Only\nSupply and Laying",
-=======
-   "insert_after": "description",
-   "label": "HSN/SAC",
-   "length": 0,
-   "mandatory_depends_on": null,
-   "modified": "2022-03-22 16:07:54.185541",
-   "modified_by": "Administrator",
-   "name": "Delivery Note Item-gst_hsn_code",
-   "no_copy": 0,
-   "non_negative": 0,
-   "options": null,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
    "parenttype": null,
    "permlevel": 0,
    "precision": "",
-<<<<<<< HEAD
    "print_hide": 0,
-=======
-   "print_hide": 1,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "print_hide_if_no_value": 0,
    "print_width": null,
    "read_only": 0,
@@ -167,17 +131,12 @@
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
-<<<<<<< HEAD
    "creation": "2022-04-19 17:07:44.390113",
-=======
-   "creation": "2022-03-22 16:07:54.259252",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default": null,
    "depends_on": null,
    "description": null,
    "docstatus": 0,
    "dt": "Delivery Note Item",
-<<<<<<< HEAD
    "fetch_from": null,
    "fetch_if_empty": 0,
    "fieldname": "branch_",
@@ -242,28 +201,17 @@
    "fetch_if_empty": 0,
    "fieldname": "ts_qty",
    "fieldtype": "Float",
-=======
-   "fetch_from": "item_code.is_nil_exempt",
-   "fetch_if_empty": 0,
-   "fieldname": "is_nil_exempt",
-   "fieldtype": "Check",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
-<<<<<<< HEAD
    "idx": 19,
-=======
-   "idx": 10,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
-<<<<<<< HEAD
    "insert_after": "qty",
    "label": "Bundle",
    "length": 0,
@@ -271,15 +219,6 @@
    "modified": "2022-05-02 09:11:28.513883",
    "modified_by": "Administrator",
    "name": "Delivery Note Item-ts_qty",
-=======
-   "insert_after": "gst_hsn_code",
-   "label": "Is Nil Rated or Exempted",
-   "length": 0,
-   "mandatory_depends_on": null,
-   "modified": "2022-03-22 16:07:54.259252",
-   "modified_by": "Administrator",
-   "name": "Delivery Note Item-is_nil_exempt",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "no_copy": 0,
    "non_negative": 0,
    "options": null,
@@ -289,11 +228,7 @@
    "parenttype": null,
    "permlevel": 0,
    "precision": "",
-<<<<<<< HEAD
    "print_hide": 0,
-=======
-   "print_hide": 1,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "print_hide_if_no_value": 0,
    "print_width": null,
    "read_only": 0,
@@ -301,11 +236,7 @@
    "report_hide": 0,
    "reqd": 0,
    "search_index": 0,
-<<<<<<< HEAD
    "translatable": 0,
-=======
-   "translatable": 1,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "unique": 0,
    "width": null
   },
@@ -315,52 +246,32 @@
    "_liked_by": null,
    "_user_tags": null,
    "allow_in_quick_entry": 0,
-<<<<<<< HEAD
    "allow_on_submit": 1,
-=======
-   "allow_on_submit": 0,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "bold": 0,
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
-<<<<<<< HEAD
    "creation": "2022-03-22 16:07:54.185541",
-=======
-   "creation": "2022-03-22 16:07:54.334123",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default": null,
    "depends_on": null,
    "description": null,
    "docstatus": 0,
    "dt": "Delivery Note Item",
-<<<<<<< HEAD
    "fetch_from": "item_code.gst_hsn_code",
    "fetch_if_empty": 1,
    "fieldname": "gst_hsn_code",
    "fieldtype": "Data",
-=======
-   "fetch_from": "item_code.is_non_gst",
-   "fetch_if_empty": 0,
-   "fieldname": "is_non_gst",
-   "fieldtype": "Check",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
-<<<<<<< HEAD
    "idx": 9,
-=======
-   "idx": 11,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
-<<<<<<< HEAD
    "insert_after": "description",
    "label": "HSN/SAC",
    "length": 0,
@@ -368,15 +279,6 @@
    "modified": "2022-05-10 14:36:22.784452",
    "modified_by": "Administrator",
    "name": "Delivery Note Item-gst_hsn_code",
-=======
-   "insert_after": "is_nil_exempt",
-   "label": "Is Non GST",
-   "length": 0,
-   "mandatory_depends_on": null,
-   "modified": "2022-03-22 16:07:54.334123",
-   "modified_by": "Administrator",
-   "name": "Delivery Note Item-is_non_gst",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "no_copy": 0,
    "non_negative": 0,
    "options": null,
@@ -409,43 +311,27 @@
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
-<<<<<<< HEAD
    "creation": "2022-03-22 16:07:54.259252",
-=======
-   "creation": "2022-03-31 18:53:48.502895",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default": null,
    "depends_on": null,
    "description": null,
    "docstatus": 0,
    "dt": "Delivery Note Item",
-<<<<<<< HEAD
    "fetch_from": "item_code.is_nil_exempt",
    "fetch_if_empty": 0,
    "fieldname": "is_nil_exempt",
    "fieldtype": "Check",
-=======
-   "fetch_from": null,
-   "fetch_if_empty": 0,
-   "fieldname": "branch",
-   "fieldtype": "Link",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
-<<<<<<< HEAD
    "idx": 10,
-=======
-   "idx": 84,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
    "in_global_search": 0,
    "in_list_view": 0,
    "in_preview": 0,
    "in_standard_filter": 0,
-<<<<<<< HEAD
    "insert_after": "gst_hsn_code",
    "label": "Is Nil Rated or Exempted",
    "length": 0,
@@ -456,29 +342,13 @@
    "no_copy": 0,
    "non_negative": 0,
    "options": null,
-=======
-   "insert_after": "accounting_dimensions_section",
-   "label": "Branch",
-   "length": 0,
-   "mandatory_depends_on": null,
-   "modified": "2022-03-31 18:53:48.502895",
-   "modified_by": "Administrator",
-   "name": "Delivery Note Item-branch",
-   "no_copy": 0,
-   "non_negative": 0,
-   "options": "Branch",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
    "parenttype": null,
    "permlevel": 0,
    "precision": "",
-<<<<<<< HEAD
    "print_hide": 1,
-=======
-   "print_hide": 0,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "print_hide_if_no_value": 0,
    "print_width": null,
    "read_only": 0,
@@ -486,11 +356,7 @@
    "report_hide": 0,
    "reqd": 0,
    "search_index": 0,
-<<<<<<< HEAD
    "translatable": 1,
-=======
-   "translatable": 0,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "unique": 0,
    "width": null
   },
@@ -504,19 +370,13 @@
    "bold": 0,
    "collapsible": 0,
    "collapsible_depends_on": null,
-<<<<<<< HEAD
    "columns": 0,
    "creation": "2022-03-22 16:07:54.334123",
-=======
-   "columns": 1,
-   "creation": "2022-04-18 12:27:44.293929",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default": null,
    "depends_on": null,
    "description": null,
    "docstatus": 0,
    "dt": "Delivery Note Item",
-<<<<<<< HEAD
    "fetch_from": "item_code.is_non_gst",
    "fetch_if_empty": 0,
    "fieldname": "is_non_gst",
@@ -542,44 +402,13 @@
    "no_copy": 0,
    "non_negative": 0,
    "options": null,
-=======
-   "fetch_from": null,
-   "fetch_if_empty": 0,
-   "fieldname": "work",
-   "fieldtype": "Select",
-   "hidden": 1,
-   "hide_border": 0,
-   "hide_days": 0,
-   "hide_seconds": 0,
-   "idx": 3,
-   "ignore_user_permissions": 0,
-   "ignore_xss_filter": 0,
-   "in_global_search": 0,
-   "in_list_view": 1,
-   "in_preview": 0,
-   "in_standard_filter": 0,
-   "insert_after": "item_code",
-   "label": "Work",
-   "length": 0,
-   "mandatory_depends_on": null,
-   "modified": "2022-04-18 12:27:44.293929",
-   "modified_by": "Administrator",
-   "name": "Delivery Note Item-work",
-   "no_copy": 0,
-   "non_negative": 0,
-   "options": "\nSupply Only\nLaying Only\nSupply & Laying",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
    "parenttype": null,
    "permlevel": 0,
    "precision": "",
-<<<<<<< HEAD
    "print_hide": 1,
-=======
-   "print_hide": 0,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "print_hide_if_no_value": 0,
    "print_width": null,
    "read_only": 0,
@@ -602,31 +431,20 @@
    "collapsible": 0,
    "collapsible_depends_on": null,
    "columns": 0,
-<<<<<<< HEAD
    "creation": "2022-05-16 12:03:21.526603",
    "default": "0",
-=======
-   "creation": "2022-04-19 17:07:44.390113",
-   "default": null,
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "depends_on": null,
    "description": null,
    "docstatus": 0,
    "dt": "Delivery Note Item",
    "fetch_from": null,
    "fetch_if_empty": 0,
-<<<<<<< HEAD
    "fieldname": "pieces",
    "fieldtype": "Int",
-=======
-   "fieldname": "branch_",
-   "fieldtype": "Link",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,
-<<<<<<< HEAD
    "idx": 20,
    "ignore_user_permissions": 0,
    "ignore_xss_filter": 0,
@@ -644,25 +462,6 @@
    "no_copy": 0,
    "non_negative": 0,
    "options": null,
-=======
-   "idx": 84,
-   "ignore_user_permissions": 0,
-   "ignore_xss_filter": 0,
-   "in_global_search": 0,
-   "in_list_view": 0,
-   "in_preview": 0,
-   "in_standard_filter": 0,
-   "insert_after": "branch",
-   "label": "Branch ",
-   "length": 0,
-   "mandatory_depends_on": null,
-   "modified": "2022-04-19 17:07:44.390113",
-   "modified_by": "Administrator",
-   "name": "Delivery Note Item-branch_",
-   "no_copy": 0,
-   "non_negative": 0,
-   "options": "Branch",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
@@ -690,65 +489,38 @@
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-<<<<<<< HEAD
    "creation": "2022-05-10 16:48:12.846703",
-=======
-   "creation": "2022-04-18 12:29:52.553526",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default_value": null,
    "doc_type": "Delivery Note Item",
    "docstatus": 0,
    "doctype_or_field": "DocField",
-<<<<<<< HEAD
    "field_name": "conversion_factor",
    "idx": 0,
    "modified": "2022-05-10 16:48:12.846703",
    "modified_by": "Administrator",
    "name": "Delivery Note Item-conversion_factor-label",
-=======
-   "field_name": "rate",
-   "idx": 0,
-   "modified": "2022-04-18 12:29:52.553526",
-   "modified_by": "Administrator",
-   "name": "Delivery Note Item-rate-columns",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
    "parenttype": null,
-<<<<<<< HEAD
    "property": "label",
    "property_type": "Data",
    "row_name": null,
    "value": "Conversion Factor"
-=======
-   "property": "columns",
-   "property_type": "Int",
-   "row_name": null,
-   "value": "1"
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
   },
   {
    "_assign": null,
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-<<<<<<< HEAD
    "creation": "2022-05-10 14:36:41.989249",
-=======
-   "creation": "2022-03-29 15:38:35.627969",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default_value": null,
    "doc_type": "Delivery Note Item",
    "docstatus": 0,
    "doctype_or_field": "DocField",
    "field_name": "target_warehouse",
    "idx": 0,
-<<<<<<< HEAD
    "modified": "2022-05-10 14:36:41.989249",
-=======
-   "modified": "2022-03-29 15:38:35.627969",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "modified_by": "Administrator",
    "name": "Delivery Note Item-target_warehouse-hidden",
    "owner": "Administrator",
@@ -765,22 +537,14 @@
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-<<<<<<< HEAD
    "creation": "2022-05-10 14:36:41.584528",
-=======
-   "creation": "2022-03-29 15:38:35.406998",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "default_value": null,
    "doc_type": "Delivery Note Item",
    "docstatus": 0,
    "doctype_or_field": "DocField",
    "field_name": "barcode",
    "idx": 0,
-<<<<<<< HEAD
    "modified": "2022-05-10 14:36:41.584528",
-=======
-   "modified": "2022-03-29 15:38:35.406998",
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "modified_by": "Administrator",
    "name": "Delivery Note Item-barcode-hidden",
    "owner": "Administrator",
@@ -791,7 +555,6 @@
    "property_type": "Check",
    "row_name": null,
    "value": "1"
-<<<<<<< HEAD
   },
   {
    "_assign": null,
@@ -816,8 +579,6 @@
    "property_type": "Int",
    "row_name": null,
    "value": "1"
-=======
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
   }
  ],
  "sync_on_migrate": 1

@@ -299,7 +299,6 @@
    "translatable": 0,
    "unique": 0,
    "width": null
-<<<<<<< HEAD
   },
   {
    "_assign": null,
@@ -420,8 +419,6 @@
    "translatable": 0,
    "unique": 0,
    "width": null
-=======
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
   }
  ],
  "custom_perms": [
@@ -569,7 +566,6 @@
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-<<<<<<< HEAD
    "creation": "2022-05-09 12:53:51.155788",
    "default_value": null,
    "doc_type": "Employee",
@@ -690,8 +686,6 @@
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-=======
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
    "creation": "2022-04-27 10:25:30.836294",
    "default_value": null,
    "doc_type": "Employee",

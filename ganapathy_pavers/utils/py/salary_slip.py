@@ -1,14 +1,9 @@
-<<<<<<< HEAD
 from time import time
 from frappe.utils import (getdate,flt)
-=======
-from frappe.utils import getdate
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip
 import frappe
 class CustomSalary(SalarySlip):
     def set_time_sheet(self):
-<<<<<<< HEAD
         if self.salary_slip_based_on_timesheet:
             self.set("timesheets", [])
             timesheets = frappe.db.sql(
@@ -28,20 +23,6 @@ class CustomSalary(SalarySlip):
                 ot_hours+=data.overtime_hours
             self.total_overtime_hours=ot_hours
             self.days_worked=total_days
-=======
-            if self.salary_slip_based_on_timesheet:
-                self.set("timesheets", [])
-                employee= frappe.get_doc("Employee", {"name":self.employee})
-                email=employee.user_id
-                timesheets = frappe.get_list('Timesheet',filters=
-                [["start_date", ">=", self.start_date],
-                ["end_date", "<=", self.end_date],
-                ['status','=','Submitted']],
-                fields=["name","_assign",'total_hours']);
-                for data in timesheets:
-                    if email in data._assign:
-                        self.append("timesheets", {"time_sheet": data.name, "working_hours": data.total_hours})
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
 
 @frappe.whitelist(allow_guest=True)
 def site_work_details(employee,start_date,end_date):
@@ -58,7 +39,6 @@ def employee_update(doc,action):
     employee_doc = frappe.get_doc('Employee',doc.employee)
     employee_doc.salary_balance=doc.total_unpaid_amount
     employee_doc.save()
-<<<<<<< HEAD
 
 # def round_off(doc,action):
 #         net_pay=(round(doc.net_pay))%10
@@ -101,5 +81,3 @@ def set_net_pay(self,event):
         SalarySlip.compute_month_to_date(self)
         SalarySlip.compute_component_wise_year_to_date(self)
         SalarySlip.set_net_total_in_words(self)
-=======
->>>>>>> 62319c38eb8687c6054e0a77b0969d58f4224bbd
