@@ -927,11 +927,14 @@ def set_work_order_ops(name):
 	po.save()
 
 
-def make_repack_sgp(stock_entry, work_order_id, purpose, qty=0, sw=None, tw=None, manufacturing_uom=None,repack_uom="bundle",batch=None):
+def make_repack_sgp(work_order_id, purpose, qty=0, sw=None, tw=None, manufacturing_uom=None,repack_uom="bundle",batch=None):
 	from ganapathy_pavers.custom.py.warehouse import create_scrap_warehouse
 	create_scrap_warehouse()
-
+	stock_entry = frappe.new_doc("Stock Entry")
+	stock_entry.ts_work_order = work_order_id
+	stock_entry.purpose = purpose
 	work_order = frappe.get_doc("Work Order", work_order_id)
+	stock_entry.company = work_order.company
 	item_code = frappe.get_value("Work Order",work_order_id,'production_item')
 	item = frappe.get_doc("Item",item_code)
 	abbr = frappe.get_value("Company",stock_entry.company, 'abbr')
@@ -941,23 +944,25 @@ def make_repack_sgp(stock_entry, work_order_id, purpose, qty=0, sw=None, tw=None
 	if(repack_uom.lower()=="bundle"):
 		conv = flt(item.bundle_per_sqr_ft)
 		uom='bundle'
-	print(batch)
 	se_items=[]
-	if(batch):
-		batch = json.loads(batch)
-		for i in batch:
-			if(i):
-				items={
-					'item_code': item.item_code,
-					"item_group": item.item_group, 
-					"item_name":item.item_name, 
-					"qty": i['qty'] , 
-					"uom":uom, 
-					"conversion_factor": conv,
-					'batch_no': i['batch_no'],
-					's_warehouse': f'Remaining Pavers - {abbr}'
-				}
-				se_items.append(items)
+	# if(batch):
+	# 	batch = json.loads(batch)
+	# 	for i in batch:
+	# 		if(i):
+	# 			items={
+	# 				'item_code': item.item_code,
+	# 				"item_group": item.item_group, 
+	# 				"item_name":item.item_name, 
+	# 				"qty": i['qty'] , 
+	# 				"uom":uom, 
+	# 				"conversion_factor": conv,
+	# 				'batch_no': i['batch_no'],
+	# 				's_warehouse': f'Remaining Pavers - {abbr}'
+	# 			}
+	# 			se_items.append(items)
+	parent_wo = frappe.get_value("Work Order", work_order_id, 'parent_work_order')
+	se_name = frappe.get_value("Stock Entry", {'ts_work_order':parent_wo},'name')
+	batch_no = frappe.get_value("Batch",{'reference_doctype':'Stock Entry','reference_name':se_name},'name')
 	
 	items={
 		'item_code': item.item_code,
@@ -966,7 +971,8 @@ def make_repack_sgp(stock_entry, work_order_id, purpose, qty=0, sw=None, tw=None
 		"qty": qty , 
 		"uom":uom, 
 		"conversion_factor": conv,
-		's_warehouse': sw
+		's_warehouse': sw,
+		'batch_no': batch_no
 	}
 	se_items.append(items)
 	items={
@@ -984,39 +990,35 @@ def make_repack_sgp(stock_entry, work_order_id, purpose, qty=0, sw=None, tw=None
 	## Move Remaining Items from Jobcard to Remaing Warehouse
 	job_card = frappe.get_all("Job Card", filters={'work_order':work_order_id},pluck = 'name')[0]
 	jc_doc = frappe.get_doc("Job Card", job_card)
-	scrap_item = jc_doc.scrap_items
-	parent_wo = frappe.get_value("Work Order", work_order_id, 'parent_work_order')
-	scrap_qty = sum([i.stock_qty for i in scrap_item])
-	if(scrap_qty == None):
-		scrap_qty=0
-	act_qty = frappe.get_value("Job Card",{'work_order':parent_wo},'total_completed_qty') - scrap_qty
-	uom = frappe.get_value("Job Card",{'work_order':parent_wo},'manufacturing_uom')
-	conv = 1
-
-	pending_qty_pcs = act_qty-(float(qty)*conv)
 	se_item = frappe.get_doc("Item",work_order.production_item)
-	if(uom):
-		conv = frappe.get_value('UOM Conversion Detail',{'uom':uom, 'parent':item.name},'conversion_factor')
-		bundle_conv = frappe.get_value('UOM Conversion Detail',{'uom':repack_uom, 'parent':item.name},'conversion_factor')
-		# pending_qty_pcs = act_qty-(float(qty)*bundle_conv)
-		frappe.errprint(bundle_conv,"ll")
-		# frappe.errprint(act_qty, (float(qty)*bundle_conv))
-		frappe.errprint(act_qty, qty)
-		frappe.errprint(flt(qty)*bundle_conv, act_qty*conv)
-		pending_qty_pcs = act_qty*conv - flt(qty)*bundle_conv
-	if(pending_qty_pcs>0):
+	pcs_conv = frappe.get_value("UOM Conversion Detail",{'parent':se_item.name, 'uom':["like","pcs"]}, 'conversion_factor')
+	scrap_qty = sum([i.stock_qty for i in jc_doc.scrap_items])
+	if(scrap_qty):
 		items ={ 
 		"item_code":se_item.item_code,
 		"item_group": se_item.item_group, 
 		"item_name":se_item.item_name, 
-		"qty": pending_qty_pcs , 
-		"uom":item.stock_uom, 
-		"conversion_factor": 1,
+		"qty": scrap_qty , 
+		"uom":"pcs", 
+		"conversion_factor": pcs_conv,
+		"s_warehouse": sw,
+		"t_warehouse" : f'Scrap Warehouse - {abbr}'
+		}
+		if(purpose != 'Manufacture'):items['batch_no'] = batch_no
+		se_items.append(items)
+	if(jc_doc.remaining_pavers>0):
+		items ={ 
+		"item_code":se_item.item_code,
+		"item_group": se_item.item_group, 
+		"item_name":se_item.item_name, 
+		"qty": jc_doc.remaining_pavers , 
+		"uom":"pcs", 
+		"conversion_factor": pcs_conv,
+		"s_warehouse": sw,
 		"t_warehouse" : f'Remaining Pavers - {abbr}'
 		}
-		print(pending_qty_pcs,"777777777777777777777")
+		if(purpose != 'Manufacture'):items['batch_no'] = batch_no
 		se_items.append(items)
-	print(se_items)
 	stock_entry.update({
 		'items': se_items
 	})
@@ -1034,7 +1036,9 @@ def make_stock_entry(work_order_id, purpose, qty=0, sw=None, tw=None, manufactur
 	se_item = frappe.get_doc("Item",work_order.production_item)
 	company = frappe.db.get_value("Company",frappe.db.get_single_value('Global Defaults', 'default_company'))
 	abbr = frappe.get_value("Company",company, 'abbr')
-	print(purpose,"???")
+	parent_wo = frappe.get_value("Work Order", work_order_id, 'parent_work_order')
+	se_name = frappe.get_value("Stock Entry", {'ts_work_order':parent_wo},'name')
+	batch_no = frappe.get_value("Batch",{'reference_doctype':'Stock Entry','reference_name':se_name},'name')
 	if not frappe.db.get_value("Warehouse", work_order.wip_warehouse, "is_group"):
 		wip_warehouse = work_order.wip_warehouse
 	else:
@@ -1045,8 +1049,7 @@ def make_stock_entry(work_order_id, purpose, qty=0, sw=None, tw=None, manufactur
 	stock_entry.purpose = purpose
 	stock_entry.company = work_order.company
 	if(purpose == 'Repack'):
-		print(repack_uom,"0000000000000000000000000")
-		return make_repack_sgp(stock_entry,work_order_id, purpose, qty, sw, tw, manufacturing_uom,repack_uom,batch)
+		return make_repack_sgp(work_order_id, purpose, qty, sw, tw, manufacturing_uom,repack_uom,batch)
 	else:
 		if(purpose not in  ["Material Transfer",'Repack']):
 			stock_entry.bom_no = work_order.bom_no
@@ -1068,6 +1071,7 @@ def make_stock_entry(work_order_id, purpose, qty=0, sw=None, tw=None, manufactur
 				"qty": qty , 
 				"uom":se_item.stock_uom, 
 				"conversion_factor": 1 }
+			if(purpose != 'Manufacture'):items['batch_no'] = batch_no
 			stock_entry.append("items", items)
 			from ganapathy_pavers.custom.py.warehouse import create_scrap_warehouse
 			create_scrap_warehouse()
@@ -1080,8 +1084,9 @@ def make_stock_entry(work_order_id, purpose, qty=0, sw=None, tw=None, manufactur
 				"uom":i.stock_uom, 
 				"conversion_factor": 1,
 				"is_scrap_item": 1,
-				"t_warehouse" : f'Scrap Warehouse - {abbr}'
+				"t_warehouse" : f'Scrap Warehouse - {abbr}',
 				}
+				if(purpose != 'Manufacture'):items['batch_no'] = batch_no
 				stock_entry.append("items", items)
 
 			
@@ -1105,37 +1110,27 @@ def make_stock_entry(work_order_id, purpose, qty=0, sw=None, tw=None, manufactur
 		if(purpose != "Material Transfer"):
 			stock_entry.get_items()
 			stock_entry.set_serial_no_batch_for_finished_good()
-		frappe.errprint(stock_entry.items,"/./.")
 		if(purpose != "Manufacture"):
 			## Move Remaining Items from Jobcard to Remaing Warehouse
 			job_card = frappe.get_all("Job Card", filters={'work_order':work_order_id},pluck = 'name')[0]
 			jc_doc = frappe.get_doc("Job Card", job_card)
-			scrap_item = jc_doc.scrap_items
-			parent_wo = frappe.get_value("Work Order", work_order_id, 'parent_work_order')
-			scrap_qty = sum([i.stock_qty for i in scrap_item])
-			if(scrap_qty == None):
-				scrap_qty=0
-			act_qty = frappe.get_value("Job Card",{'work_order':parent_wo},'total_completed_qty') - scrap_qty
-			uom = frappe.get_value("Job Card",{'work_order':parent_wo},'manufacturing_uom')
-			pending_qty = act_qty-float(qty)
 			se_item = frappe.get_doc("Item",work_order.production_item)
-			if(uom):
-				conv = frappe.get_value('UOM Conversion Detail',{'uom':uom, 'parent':se_item.name},'conversion_factor')
-				pending_qty = (act_qty)/conv-float(qty)
-			if(pending_qty>0):
+			pcs_conv = frappe.get_value("UOM Conversion Detail",{'parent':se_item.name, 'uom':["like","pcs"]}, 'conversion_factor')
+			if(jc_doc.remaining_pavers>0):
 				items ={ 
 				"item_code":se_item.item_code,
 				"item_group": se_item.item_group, 
 				"item_name":se_item.item_name, 
-				"qty": pending_qty , 
-				"uom":se_item.stock_uom, 
-				"conversion_factor": 1,
+				"qty": jc_doc.remaining_pavers , 
+				"uom":"pcs", 
+				"conversion_factor": pcs_conv,
+				"s_warehouse": sw,
 				"t_warehouse" : f'Remaining Pavers - {abbr}'
 				}
+				if(purpose != 'Manufacture'):items['batch_no'] = batch_no
 				stock_entry.append("items", items)
 
 
-		frappe.errprint(stock_entry.items[0].__dict__,stock_entry.items)
 		if purpose=="Manufacture":
 			if(tw):
 				for i in range(len(stock_entry.items)):
@@ -1143,10 +1138,8 @@ def make_stock_entry(work_order_id, purpose, qty=0, sw=None, tw=None, manufactur
 						't_warehouse': tw
 					})
 			if(manufacturing_uom):
-				print(">...........................")
 				for i in range(len(stock_entry.items)):
 					if(stock_entry.items[i].item_code == work_order.production_item):
-						print(stock_entry.items[i].item_code,stock_entry.items[i].t_warehouse,".....")
 						stock_entry.items[i].update({
 							'uom': manufacturing_uom,
 							'conversion_factor': frappe.get_value('UOM Conversion Detail',{'uom':manufacturing_uom, 'parent':se_item.name},'conversion_factor')
