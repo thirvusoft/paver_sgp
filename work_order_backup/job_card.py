@@ -37,6 +37,36 @@ class JobCard(Document):
 		excess_transfer = frappe.db.get_single_value("Manufacturing Settings", "job_card_excess_transfer")
 		self.set_onload("job_card_excess_transfer", excess_transfer)
 		self.set_onload("work_order_stopped", self.is_work_order_stopped())
+		parent_wo = frappe.get_value("Work Order", self.work_order, 'parent_work_order')
+		if(parent_wo):
+			act_qty, se_type = frappe.get_value("Job Card",{'work_order':parent_wo},['total_completed_qty',"stock_entry_type"]) 
+			uom=""
+			if(se_type == "Manufacture"):uom = "PCS"
+			elif(se_type == "Repack"):uom = "Bundle"
+			elif(se_type == "Material Transfer"):uom = "Square Foot"
+			stock_uom = frappe.get_value("Item",self.production_item, 'stock_uom')
+			conv=1
+			if(uom !="PCS"):
+				conv = frappe.get_value("UOM Conversion Detail",{'parent':self.production_item, 'uom':["like",uom]}, 'conversion_factor')
+				act_qty *= conv
+				pcs_conv = frappe.get_value("UOM Conversion Detail",{'parent':self.production_item, 'uom':["like","pcs"]}, 'conversion_factor')
+				act_qty /= pcs_conv
+			
+			## Find Cureent jc completed qty in pcs uom
+			curr_qty = self.total_completed_qty
+			curr_uom = ""
+			curr_conv, pcs_conv,curr_scrap_qty = 1,1,0
+			if(self.stock_entry_type == "Repack"):curr_uom = "Bundle"
+			elif(self.stock_entry_type == "Material Transfer"):curr_uom = "Square Foot"
+			curr_conv = conv = frappe.get_value("UOM Conversion Detail",{'parent':self.production_item, 'uom':["like",curr_uom]}, 'conversion_factor')
+			pcs_conv = conv = frappe.get_value("UOM Conversion Detail",{'parent':self.production_item, 'uom':["like","pcs"]}, 'conversion_factor')
+			curr_scrap_qty = sum([i.stock_qty for i in self.scrap_items])/pcs_conv
+			curr_qty_pcs = (curr_qty*curr_conv/pcs_conv) + curr_scrap_qty
+			
+			pending_qty = act_qty-curr_qty_pcs
+			self.remaining_pavers = pending_qty
+
+
 
 	def validate(self):
 		self.validate_time_logs()
@@ -353,13 +383,15 @@ class JobCard(Document):
 		self.validate_job_card()
 		self.update_work_order()
 		self.set_transferred_qty()
-	def before_submit(self):
-		parent_wo = frappe.get_value("Work Order", self.work_order, 'parent_work_order')
-		if(parent_wo):
-			act_qty = frappe.get_value("Job Card",{'work_order':parent_wo},'total_completed_qty') - sum([i.stock_qty for i in self.scrap_items])
-			pending_qty = act_qty-float(self.total_completed_qty)
-			if(pending_qty>0):
-				self.remaining_pavers = pending_qty
+	# def onload(self):
+	# 	parent_wo = frappe.get_value("Work Order", self.work_order, 'parent_work_order')
+	# 	if(parent_wo):
+	# 		act_qty, se_type = frappe.get_value("Job Card",{'work_order':parent_wo},['total_completed_qty',"stock_entry_type"]) 
+	# 		print(act_qty, se_type)
+	# 		# - sum([i.stock_qty for i in self.scrap_items])
+	# 		pending_qty = act_qty-float(self.total_completed_qty)
+	# 		if(pending_qty>0):
+	# 			self.remaining_pavers = pending_qty
 	def on_cancel(self):
 		self.update_work_order()
 		self.set_transferred_qty()
@@ -775,35 +807,51 @@ def make_corrective_job_card(source_name, operation=None, for_operation=None, ta
 	return doclist
 
 @frappe.whitelist()
-def get_remaining_pavers(work_order, item, operation,cur_jc_qty=0):
-	jc_qty = frappe.get_all('Job Card', fields=['name', 'remaining_pavers'],
-			 filters={'production_item':item, 'operation':operation, 'docstatus':1,'remaining_pavers':['>',0]})
-	parent_wo = frappe.get_value("Work Order",work_order, 'parent_work_order')
-	total_qty_to_manufacture=0
-	if(parent_wo):
-		parent_wo_jc_qty = frappe.get_value("Job Card",{'work_order':parent_wo},'total_completed_qty')
-		total_qty_to_manufacture += parent_wo_jc_qty-float(cur_jc_qty)
-	message = []
-	count=0
-	for i in jc_qty:
-		count+=1
-		field = {"fieldname":f"jc_name{count}", "label":frappe.bold("Job Card"),"fieldtype":"Link",'default':i['name'], 'read_only':1}
-		message.append(field)
-		field = {"fieldtype":'Column Break'}
-		message.append(field)
-		field = {"fieldname":f"jc_qty{count}", "label":frappe.bold("Remaining Qty"),"fieldtype":"Data", "default":f"{i['remaining_pavers']}",'read_only':1}
-		message.append(field)
-		field = {"fieldtype":'Column Break'}
-		message.append(field)
-		field = {"fieldname":f"jc_add_qty{count}", "label":frappe.bold("Add QTY"),"fieldtype":"Float"}
-		message.append(field)
-		field = {"fieldtype":'Section Break'}
-		message.append(field)
-		
-	message.append({"fieldtype":'Data','label':'test','hidden':1})
-	message.append({"fieldtype":'Column Break'})
-	message.append({"fieldname":"total_qty_to_manufacture", "label":frappe.bold("Total Qty to Manufacture"),"fieldtype":"Data", "default":str(total_qty_to_manufacture),'read_only':1})
-	return message, count
+def get_remaining_pavers(work_order, item, operation,se_type,scrap_qty,cur_jc_qty=0):
+	jc_qty = frappe.get_all('Job Card', fields=['name', 'remaining_pavers','stock_entry_type'],
+			 filters={'production_item':item, 'operation':operation, 'docstatus':1,'remaining_pavers':['>',0]},limit=1, order_by="`creation` desc")
+	if(len(jc_qty)):
+		parent_wo = frappe.get_value("Work Order",work_order, 'parent_work_order')
+		total_qty_to_manufacture=0
+		uom = ""
+		if(se_type == "Manufacture"):uom = "PCS"
+		elif(se_type == "Repack"):uom = "Bundle"
+		elif(se_type == "Material Transfer"):uom = "Square Foot"
+		sqrft_conv = frappe.get_value("UOM Conversion Detail",{'parent':item, 'uom':["like",uom]}, 'conversion_factor')
+		sqrft_qty = flt(cur_jc_qty)*sqrft_conv
+		pcs_conv = frappe.get_value("UOM Conversion Detail",{'parent':item, 'uom':["like","pcs"]}, 'conversion_factor')
+		pcs_qty = sqrft_qty/pcs_conv
+		if(parent_wo):
+			parent_wo_jc_qty,parent_jc_se_type = frappe.get_value("Job Card",{'work_order':parent_wo},['total_completed_qty','stock_entry_type'])
+			if(parent_jc_se_type == "Manufacture"):uom = "PCS"
+			elif(parent_jc_se_type == "Repack"):uom = "Bundle"
+			elif(parent_jc_se_type == "Material Transfer"):uom = "Square Foot"
+			sqrft_conv = frappe.get_value("UOM Conversion Detail",{'parent':item, 'uom':["like",uom]}, 'conversion_factor')
+			sqrft_qty = flt(parent_wo_jc_qty)*sqrft_conv
+			pcs_conv = frappe.get_value("UOM Conversion Detail",{'parent':item, 'uom':["like","pcs"]}, 'conversion_factor')
+			parent_wo_jc_qty = sqrft_qty/pcs_conv
+			total_qty_to_manufacture += parent_wo_jc_qty-float(pcs_qty) - flt(scrap_qty)
+		message = []
+		count=0
+		for i in jc_qty:
+			count+=1
+			field = {"fieldname":f"jc_name{count}", "label":frappe.bold("Job Card"),"fieldtype":"Link",'default':i['name'], 'read_only':1}
+			message.append(field)
+			field = {"fieldtype":'Column Break'}
+			message.append(field)
+			field = {"fieldname":f"jc_qty{count}", "label":frappe.bold("Remaining Qty"),"fieldtype":"Data", "default":f"{i['remaining_pavers']}",'read_only':1}
+			message.append(field)
+			field = {"fieldtype":'Column Break'}
+			message.append(field)
+			field = {"fieldname":f"jc_add_qty{count}", "label":frappe.bold("Add QTY"),"fieldtype":"Float"}
+			message.append(field)
+			field = {"fieldtype":'Section Break'}
+			message.append(field)
+			
+		message.append({"fieldtype":'Data','label':'test','hidden':1})
+		message.append({"fieldtype":'Column Break'})
+		message.append({"fieldname":"total_qty_to_manufacture", "label":frappe.bold("Total Qty to Manufacture (PCS)"),"fieldtype":"Data", "default":str(total_qty_to_manufacture),'read_only':1})
+		return message, count
 
 @frappe.whitelist()
 def update_jc_remaining_pavers(qtys, jcs, max_qty, times, wo):
@@ -821,3 +869,4 @@ def update_jc_remaining_pavers(qtys, jcs, max_qty, times, wo):
 		se_batch = frappe.get_value("Stock Entry Detail" ,{'parent':se}, 'batch_no')
 		batch.append([se_batch, qtys[i]])
 	return qty, time_diff_in_hours(times['end_time'], times['start_time']), batch
+

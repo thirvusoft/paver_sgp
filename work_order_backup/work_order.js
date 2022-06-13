@@ -517,6 +517,7 @@ frappe.ui.form.on("Work Order Operation", {
 
 erpnext.work_order = {
 	set_custom_buttons: function(frm) {
+
 		var doc = frm.doc;
 		if (doc.docstatus === 1 && doc.status != "Closed") {
 			frm.add_custom_button(__('Close'), function() {
