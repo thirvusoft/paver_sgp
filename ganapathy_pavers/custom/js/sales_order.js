@@ -140,9 +140,22 @@ frappe.ui.form.on('Sales Order',{
            
         refresh_field("items");
         
-        let tax_category=frm.doc.tax_category
-        await cur_frm.set_value('tax_category', '')
-        await cur_frm.set_value('tax_category', tax_category)
+        let tax=false;
+        for(let i=0;i<cur_frm.doc.taxes.length;i++){
+            if(!cur_frm.doc.taxes[i].tax_amount){
+                tax=true;
+            }
+        }
+
+        if(cur_frm.doc.taxes.length==0){
+            tax=true;
+        }
+        
+        if(tax){
+            let tax_category=frm.doc.tax_category
+            await cur_frm.set_value('tax_category', '')
+            await cur_frm.set_value('tax_category', tax_category)
+        }
 
     },
     after_save:function(frm){
