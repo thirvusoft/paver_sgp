@@ -662,30 +662,6 @@
    "property_type": "Data",
    "row_name": null,
    "value": "Workstation Detail"
-  },
-  {
-   "_assign": null,
-   "_comments": null,
-   "_liked_by": null,
-   "_user_tags": null,
-   "creation": "2022-04-12 14:12:58.317418",
-   "default_value": null,
-   "doc_type": "Timesheet",
-   "docstatus": 0,
-   "doctype_or_field": "DocField",
-   "field_name": "employee",
-   "idx": 0,
-   "modified": "2022-04-12 14:12:58.317418",
-   "modified_by": "Administrator",
-   "name": "Timesheet-employee-hidden",
-   "owner": "Administrator",
-   "parent": null,
-   "parentfield": null,
-   "parenttype": null,
-   "property": "hidden",
-   "property_type": "Check",
-   "row_name": null,
-   "value": "1"
   }
  ],
  "sync_on_migrate": 1
