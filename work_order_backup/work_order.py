@@ -933,6 +933,7 @@ def make_repack_sgp(work_order_id, purpose, qty=0, sw=None, tw=None, manufacturi
 	stock_entry = frappe.new_doc("Stock Entry")
 	stock_entry.ts_work_order = work_order_id
 	stock_entry.purpose = purpose
+	stock_entry.set_stock_entry_type()
 	work_order = frappe.get_doc("Work Order", work_order_id)
 	stock_entry.company = work_order.company
 	item_code = frappe.get_value("Work Order",work_order_id,'production_item')
@@ -945,21 +946,23 @@ def make_repack_sgp(work_order_id, purpose, qty=0, sw=None, tw=None, manufacturi
 		conv = flt(item.bundle_per_sqr_ft)
 		uom='bundle'
 	se_items=[]
-	# if(batch):
-	# 	batch = json.loads(batch)
-	# 	for i in batch:
-	# 		if(i):
-	# 			items={
-	# 				'item_code': item.item_code,
-	# 				"item_group": item.item_group, 
-	# 				"item_name":item.item_name, 
-	# 				"qty": i['qty'] , 
-	# 				"uom":uom, 
-	# 				"conversion_factor": conv,
-	# 				'batch_no': i['batch_no'],
-	# 				's_warehouse': f'Remaining Pavers - {abbr}'
-	# 			}
-	# 			se_items.append(items)
+	batch_qty = 0
+	if(batch):
+		batch = json.loads(batch)
+		for i in batch:
+			if(i):
+				batch_qty += i['qty']
+				items={
+					'item_code': item.item_code,
+					"item_group": item.item_group, 
+					"item_name":item.item_name, 
+					"qty": i['qty'] , 
+					"uom":uom, 
+					"conversion_factor": conv,
+					'batch_no': i['batch_no'],
+					's_warehouse': f'Remaining Pavers - {abbr}'
+				}
+				se_items.append(items)
 	parent_wo = frappe.get_value("Work Order", work_order_id, 'parent_work_order')
 	se_name = frappe.get_value("Stock Entry", {'ts_work_order':parent_wo},'name')
 	batch_no = frappe.get_value("Batch",{'reference_doctype':'Stock Entry','reference_name':se_name},'name')
@@ -968,7 +971,7 @@ def make_repack_sgp(work_order_id, purpose, qty=0, sw=None, tw=None, manufacturi
 		'item_code': item.item_code,
 		"item_group": item.item_group, 
 		"item_name":item.item_name, 
-		"qty": qty , 
+		"qty": flt(qty) - batch_qty , 
 		"uom":uom, 
 		"conversion_factor": conv,
 		's_warehouse': sw,
@@ -1144,11 +1147,11 @@ def make_stock_entry(work_order_id, purpose, qty=0, sw=None, tw=None, manufactur
 							'uom': manufacturing_uom,
 							'conversion_factor': frappe.get_value('UOM Conversion Detail',{'uom':manufacturing_uom, 'parent':se_item.name},'conversion_factor')
 						})
-				# stock_entry.fg_completed_qty = flt(qty)/frappe.get_value('UOM Conversion Detail',{'uom':manufacturing_uom, 'parent':se_item.name},'conversion_factor')
+				stock_entry.fg_completed_qty = flt(qty)*frappe.get_value('UOM Conversion Detail',{'uom':manufacturing_uom, 'parent':se_item.name},'conversion_factor')
 			stock_entry.from_warehouse = sw
 
 			stock_entry.to_warehouse = tw
-		stock_entry.insert(ignore_mandatory=True)
+		stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
 		stock_entry.submit()
 		from ganapathy_pavers.custom.py.work_order import change_status
 		change_status(work_order_id)
