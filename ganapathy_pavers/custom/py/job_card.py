@@ -23,7 +23,8 @@ def create_timesheet(doc,action):
         timesheet.update({
             'company': doc.company,
             'workstation' : doc.workstation,
-            'time_logs' : timelogs_timesheet
+            'time_logs' : timelogs_timesheet,
+            'employee' : i
         })
         timesheet.insert(ignore_permissions = True)
         timesheet.submit()
