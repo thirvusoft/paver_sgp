@@ -69,10 +69,19 @@ frappe.ui.form.on('Job Card', {
 
 
 		cur_frm.add_custom_button(__("Add Remaining Pavers"), function(){
+			cur_frm.doc.time_logs.forEach( (i)=>{
+				if(!i.to_time){frappe.throw("Please Complete the current Job.")}
+			})
 			var item = cur_frm.doc.production_item
 			var bom = cur_frm.doc.bom_no
 			var operation = cur_frm.doc.operation 
 			var work_order = cur_frm.doc.work_order
+			var old_jc_added_qty = 0
+			if(cur_frm.doc.remaining_item_batch_qty.length){
+				cur_frm.doc.remaining_item_batch_qty.forEach( (i)=>{
+					old_jc_added_qty+=i.qty
+				})
+			}
 			let jc_scrap_qty=0
 				if(cur_frm.doc.scrap_items.length){
 					cur_frm.doc.scrap_items.forEach( (i)=>{
@@ -80,9 +89,9 @@ frappe.ui.form.on('Job Card', {
 					})
 				}
 			if(item && bom && operation && work_order && cur_frm.doc.stock_entry_type != "Manufacture"){
-			let added_qty=0
-			let added_jc=''
-			let remaining_qty=0
+			let added_qty=[]
+			let added_jc=[]
+			let remaining_qty=[]
 			frappe.call({
 				method: "erpnext.manufacturing.doctype.job_card.job_card.get_remaining_pavers",
 				args: {
@@ -91,7 +100,9 @@ frappe.ui.form.on('Job Card', {
 					operation: operation,
 					se_type: cur_frm.doc.stock_entry_type,
 					scrap_qty: jc_scrap_qty,
-					cur_jc_qty: cur_frm.doc.total_completed_qty  
+					company: cur_frm.doc.company,
+					cur_jc_qty: cur_frm.doc.total_completed_qty ,
+					old_jc_added_qty: old_jc_added_qty
 				},
 				callback(r){
 						var d=new frappe.ui.Dialog({
@@ -125,9 +136,10 @@ frappe.ui.form.on('Job Card', {
 											{'fieldname':'end_time','label':"End Time",'fieldtype':'Datetime','reqd':1}
 										],
 										primary_action: function(times){
+											console.log(item)
 											frappe.call({
 												method:"erpnext.manufacturing.doctype.job_card.job_card.update_jc_remaining_pavers",
-												args:{qtys:added_qty,jcs:added_jc,max_qty:remaining_qty,times:times, wo:cur_frm.doc.work_order},
+												args:{qtys:added_qty,jcs:added_jc,max_qty:remaining_qty,times:times, item:item},
 												callback: function(r){
 													let hrs = r.message[1]
 													let mins = r.message[1] * 60

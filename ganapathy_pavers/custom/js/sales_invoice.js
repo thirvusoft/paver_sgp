@@ -113,4 +113,26 @@ function amount(frm,cdt,cdn){
         },
     })
 
-    
+frappe.ui.form.on('Sales Invoice',{
+    refresh:function(frm){
+        if(cur_frm.doc.docstatus==0){
+            cur_frm.fields_dict.site_work.$input.on("click", function() {
+                if(!cur_frm.doc.customer){
+                    frappe.throw('Please Select Customer')
+                }
+            });
+        }
+    },
+    customer:function(frm){
+        cur_frm.set_value('site_work','')
+        frm.set_query('site_work',function(frm){
+            return {
+                filters:{
+                    'customer': cur_frm.doc.customer,
+                    'status': 'Open',
+                    'is_multi_customer':1
+                }
+            }
+        })
+    },
+})
