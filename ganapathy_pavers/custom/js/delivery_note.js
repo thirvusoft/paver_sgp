@@ -96,14 +96,6 @@ frappe.ui.form.on('Delivery Note', {
             
         },
 
-    current_odometer_value:function(frm,cdt,cdn){
-        odometer_value(frm,cdt,cdn)
-    },
-    return_odometer_value:function(frm,cdt,cdn){
-        odometer_value(frm,cdt,cdn)
-    }
+    
 })
 
-function odometer_value(frm,cdt,cdn){
-    frm.set_value('total_distance', (frm.doc.return_odometer_value?frm.doc.return_odometer_value:0) - (frm.doc.current_odometer_value?frm.doc.current_odometer_value:0))
-}
