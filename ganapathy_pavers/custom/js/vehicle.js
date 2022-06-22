@@ -15,7 +15,7 @@ frappe.ui.form.on("Vehicle" ,{
                                   }
                               }
                     });
-        
+                if (cur_frm.is_new()){
                     let Maintenance=["Insurance","FC Details","Road Tax","Permit","Pollution Certificate","Green Tax"]
                     for(let row=0;row<Maintenance.length;row++){
                        
@@ -23,6 +23,7 @@ frappe.ui.form.on("Vehicle" ,{
                         new_row.maintenance=Maintenance[row]
                          }
                                   refresh_field("maintanence_details_");
+                         }
 
     }
 

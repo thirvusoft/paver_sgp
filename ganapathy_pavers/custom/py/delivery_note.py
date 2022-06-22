@@ -154,8 +154,19 @@ def update_customer(self,event):
                 frappe.db.set(doc, "customer", cus)
 
 def validate(doc,action):
+    
     for d in doc.items:
         if d.pieces:
-            doc.value_in_pieces = True
+            doc.value_pieces = True
         if d.ts_qty:
-            doc.value_in_bundle = True
+            doc.value_bundle = True
+
+        
+  
+def odometer_validate(doc,action):
+    if(doc.return_odometer_value):
+        doc.total_distance=doc.return_odometer_value-doc.current_odometer_value
+        frappe.db.set_value("Delivery Note" , doc.name, "total_distance",doc.return_odometer_value-doc.current_odometer_value)
+        
+
+
