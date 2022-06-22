@@ -141,13 +141,14 @@ frappe.ui.form.on('Sales Order',{
         refresh_field("items");
         
         let tax=false;
-        for(let i=0;i<cur_frm.doc.taxes.length;i++){
+        let taxes=cur_frm.doc.taxes?cur_frm.doc.taxes:[]
+        for(let i=0;i<taxes.length;i++){
             if(!cur_frm.doc.taxes[i].tax_amount){
                 tax=true;
             }
         }
 
-        if(cur_frm.doc.taxes.length==0){
+        if(taxes.length==0){
             tax=true;
         }
         
