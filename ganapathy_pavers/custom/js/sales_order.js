@@ -211,14 +211,22 @@ frappe.ui.form.on('Sales Order',{
                 }
             })
         }
+    },
+
+    length:function(frm){
+        cur_frm.set_value('post',Math.ceil(cur_frm.doc.length/7))
+        frm.trigger('height')
+    },
+    post:function(frm){
+        cur_frm.set_value('double_post',Math.ceil(cur_frm.doc.post/15))
+    },
+    double_post:function(frm){
+        cur_frm.set_value('total_post',Math.ceil(cur_frm.doc.post+cur_frm.doc.double_post))
+    },
+    height:function(frm){
+        cur_frm.set_value('total_slab',Math.ceil(cur_frm.doc.post*(cur_frm.doc.height-2)))
     }
 })
-
-
-
-
-
-
 
 frappe.ui.form.on('TS Raw Materials',{
     item: function(frm,cdt,cdn){
@@ -243,4 +251,32 @@ frappe.ui.form.on('TS Raw Materials',{
 function amount_rawmet(frm,cdt,cdn){
     let row=locals[cdt][cdn]
     frappe.model.set_value(cdt,cdn,'amount', (row.rate?row.rate:0)*(row.qty?row.qty:0))
+}
+
+frappe.ui.form.on('Item Detail Compound Wall',{
+    item:function(frm,cdt,cdtn){
+        compoun_walls_calc(frm,cdt,cdtn)
+    },
+    compound_wall_type:function(frm,cdt,cdtn){
+        compoun_walls_calc(frm,cdt,cdtn)
+    }
+})
+
+function compoun_walls_calc(frm,cdt,cdtn){
+    let row = locals[cdt][cdtn];
+    let Post=0, Slab=0;
+    for(let i = 0; i<frm.doc.compoun_walls.length; i++){
+        if(cur_frm.doc.compoun_walls[i].compound_wall_type=='Slab'){
+            Slab+=1;
+        }
+        else if(cur_frm.doc.compoun_walls[i].compound_wall_type=='Post'){
+            Post+=1;
+        }
+    }
+    if (row.compound_wall_type=='Slab' && Slab==1){
+    frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_slab);
+    }
+    else if(row.compound_wall_type=='Post' && Post==1){
+    frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_post);
+    }
 }
