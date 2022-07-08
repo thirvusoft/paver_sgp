@@ -9,10 +9,6 @@
   "item",
   "work",
   "compound_wall_type",
-  "height",
-  "pcs",
-  "double_post",
-  "running_sqft",
   "allocated_ft",
   "rate",
   "amount",
@@ -47,38 +43,6 @@
   },
   {
    "columns": 1,
-   "fieldname": "height",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Height",
-   "width": "1"
-  },
-  {
-   "columns": 1,
-   "fieldname": "pcs",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "Pcs",
-   "width": "1"
-  },
-  {
-   "columns": 1,
-   "fieldname": "double_post",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "Double Post",
-   "width": "1"
-  },
-  {
-   "columns": 1,
-   "fieldname": "running_sqft",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Running Sqft",
-   "width": "1"
-  },
-  {
-   "columns": 1,
    "fieldname": "allocated_ft",
    "fieldtype": "Float",
    "in_list_view": 1,
@@ -106,14 +70,13 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Work",
-   "options": "\nSupply Only\nLaying Only\nSupply & Laying",
-   "reqd": 1
+   "options": "\nSupply Only\nFixing Only\nSupply & Fixing"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-04-19 11:12:07.710969",
+ "modified": "2022-07-08 17:04:07.674623",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Compound Wall",
