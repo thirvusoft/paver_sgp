@@ -13,6 +13,26 @@ function setquery(frm){
 }
 
 var prop_name;
+
+function amt(frm, cdt, cdn){
+    let row=locals[cdt][cdn]
+    if(row.allocated_ft>=0 && row.rate>=0){
+        frappe.model.set_value(cdt,cdn,'amount',Math.round(row.allocated_ft*row.rate));
+}
+}
+
+frappe.ui.form.on('Item Detail Compound Wall',{
+  allocated_ft:function(frm,cdt,cdn){
+     amt(frm, cdt, cdn)
+  },
+  rate:function(frm,cdt,cdn){
+    amt(frm, cdt, cdn)
+
+  },
+
+})
+
+
 frappe.ui.form.on('Sales Order',{
 
     refresh:function(frm){
@@ -37,7 +57,7 @@ frappe.ui.form.on('Sales Order',{
             frm.clear_table('items')
         }
         cur_frm.set_df_property('items','reqd',0);
-     ///////////   // cur_frm.set_df_property('items','hidden',1);
+        cur_frm.set_df_property('items','hidden',1);
         frm.set_query('supervisor', function(frm){
             return {
                 filters:{
@@ -80,16 +100,6 @@ frappe.ui.form.on('Sales Order',{
         setquery(frm)
     },
     before_save:async function(frm){
-
-        // frappe.call({
-        //     method:"ganapathy_pavers.custom.py.sales_invoice.compount_wall",
-        //     args:{
-        //         'name':cur_frm.doc.compoun_walls?cur_frm.doc.compoun_walls:{}
-        //     },
-        //     callback(r){
-        //        console.log(compoun_walls)
-        //     }
-        // })
 
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_value('customer','');
