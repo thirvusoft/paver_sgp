@@ -13,8 +13,7 @@ function setquery(frm){
 }
 
 var prop_name;
-
-function amt(frm, cdt, cdn){
+ function amt(frm, cdt, cdn){
     let row=locals[cdt][cdn]
     if(row.allocated_ft>=0 && row.rate>=0){
         frappe.model.set_value(cdt,cdn,'amount',Math.round(row.allocated_ft*row.rate));
@@ -29,6 +28,29 @@ frappe.ui.form.on('Item Detail Compound Wall',{
     amt(frm, cdt, cdn)
 
   },
+  item:async function(frm,cdt,cdn){
+    let row=locals[cdt][cdn]
+    if(row.item){
+        await frappe.db.get_list('Bin',{filters:{'warehouse':'Stores - TS', 'item_code':row.item},fields:['valuation_rate']}).then((item)=>{
+             frappe.model.set_value(cdt,cdn,'valuation_rate', item[0].valuation_rate);
+         })
+        await frappe.db.get_list('Item',{filters:{'item_name':row.item},fields:['compound_wall_type']}).then((item)=>{
+            frappe.model.set_value(cdt,cdn,'compound_wall_type', item[0].compound_wall_type);
+        })
+
+     }
+    await frappe.call({
+        method:"ganapathy_pavers.custom.py.sales_order.item_price",
+         args:{
+            'item':row.item
+        },
+        callback:async function(r){
+            let rate=r.message;
+            await frappe.model.set_value(cdt,cdn,'rate',rate);
+        }
+    })
+
+  }
 
 })
 
