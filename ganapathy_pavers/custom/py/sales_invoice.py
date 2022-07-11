@@ -1,4 +1,5 @@
 import frappe
+import json
 from erpnext.controllers.taxes_and_totals import get_itemised_tax
 from erpnext.controllers.taxes_and_totals import get_itemised_taxable_amount
 def update_customer(self,event):
@@ -10,7 +11,25 @@ def update_customer(self,event):
             if(cus!=doc.customer):
                 frappe.db.set(doc, "customer", cus)
 
-	
+
+      
+    # doc = frappe.new_doc("Sales Invoice
+    name=frappe.get_all("Item",filters={'name':item},pluck='name')
+    #     'customer':args.get("customer"),
+    #     'due_date':args.get("due_date"),
+    #     'items':items,
+    #     'project':args.get("project"),
+    #     'cost_center':args.get("cost_center"),
+    #     'po_no':args.get("po_no") ,
+    #     'po_date':args.get("po_date"),
+    #     'tax_category':args.get("tax_category"),
+    #     'taxes_and_charges':args.get("taxes_and_charges"),
+    #     'taxes':taxes
+
+
+    # })   
+    # doc.insert(ignore_permissions=True)
+    # return 'Item Created Successfully'
 
 
 

@@ -42,6 +42,15 @@ def create_site(doc):
             'work': row['work'],
             'sales_order':doc['name']
             } for row in doc['pavers']]
+    compoun_walls=[{
+            'item':row['item'],
+            'compound_wall_type':row['compound_wall_type'],
+            'allocated_ft':row['allocated_ft'],
+            'rate':row['rate'],
+            'amount':row['amount'],
+            'work': row['work'],
+            'sales_order':doc['name']
+            } for row in doc['compoun_walls']]
     raw_material=[{
             'item':row['item'],
             'qty':row['qty'],
@@ -57,6 +66,10 @@ def create_site(doc):
         total_area+=item.required_area
     for item in pavers:
         total_area+=item['required_area']
+    for item in (site_work.get('item_details_compound_wall') or []):
+        total_area+=item.allocated_ft
+    for item in compoun_walls:
+        total_area+=item['allocated_ft']
     for item in (site_work.get('job_worker') or []):
         completed_area+=item.sqft_allocated
     
@@ -64,6 +77,7 @@ def create_site(doc):
         'customer': doc['customer'] or '',
         'supervisor_name': supervisor,
         'item_details': (site_work.get('item_details') or []) +pavers,
+        'item_details_compound_wall': (site_work.get('item_details_compound_wall') or []) +compoun_walls,
         'raw_material': (site_work.get('raw_material') or []) + raw_material,
         'total_required_area': total_area,
         'total_completed_area': completed_area,

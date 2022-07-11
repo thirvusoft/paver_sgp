@@ -32,7 +32,8 @@ frappe.ui.form.on("Item", {
             else
                 frm.set_value("has_batch_no",0)
     
-     }
+     },
+
 })
 
 
