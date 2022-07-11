@@ -12,26 +12,9 @@ def update_customer(self,event):
                 frappe.db.set(doc, "customer", cus)
 
 
-# @frappe.whitelist()
-# def compount_wall(name):
-#     name=json.loads(name)
-#     print(name)
-#     item=[]
-#     for i in name:
-#         item.append(i.get("item"))
-    
-#     return item
-
-# def item_rate(item):
-#     name=frappe.get_all("Item",filters={'name':item},pluck='name')
-#     print("///////////////")
-#     print(name)
-
       
     # doc = frappe.new_doc("Sales Invoice
     name=frappe.get_all("Item",filters={'name':item},pluck='name')
-    print("///////////////")
-    print(name)
     #     'customer':args.get("customer"),
     #     'due_date':args.get("due_date"),
     #     'items':items,
