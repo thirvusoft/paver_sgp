@@ -37,7 +37,7 @@ frappe.ui.form.on('Sales Order',{
             frm.clear_table('items')
         }
         cur_frm.set_df_property('items','reqd',0);
-     ///////////   // cur_frm.set_df_property('items','hidden',1);
+        cur_frm.set_df_property('items','hidden',1);
         frm.set_query('supervisor', function(frm){
             return {
                 filters:{
@@ -80,16 +80,6 @@ frappe.ui.form.on('Sales Order',{
         setquery(frm)
     },
     before_save:async function(frm){
-
-        // frappe.call({
-        //     method:"ganapathy_pavers.custom.py.sales_invoice.compount_wall",
-        //     args:{
-        //         'name':cur_frm.doc.compoun_walls?cur_frm.doc.compoun_walls:{}
-        //     },
-        //     callback(r){
-        //        console.log(compoun_walls)
-        //     }
-        // })
 
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_value('customer','');
