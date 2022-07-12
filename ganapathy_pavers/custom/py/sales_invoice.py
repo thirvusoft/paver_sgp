@@ -11,5 +11,3 @@ def update_customer(self,event):
             if(cus!=doc.customer):
                 frappe.db.set(doc, "customer", cus)
 
-
-             
