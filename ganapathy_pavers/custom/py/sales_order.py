@@ -99,6 +99,12 @@ def create_site(doc):
 
 
 @frappe.whitelist()
+def item_price(item):
+    rate=frappe.get_last_doc('Item Price',filters={'item_code':item, 'selling':1})
+    rate=rate.price_list_rate
+    return rate
+
+@frappe.whitelist()
 def create_property():
     doc=frappe.new_doc('Property Setter')
     doc.update({
