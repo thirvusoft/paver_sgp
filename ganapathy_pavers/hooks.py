@@ -58,7 +58,8 @@ app_license = "MIT"
 # ------------
 
 before_install = "ganapathy_pavers.custom.py.warehouse.create_scrap_warehouse"
-after_install = "ganapathy_pavers.custom.py.item_group.item_group"
+after_install = ["ganapathy_pavers.custom.py.item_group.item_group", "ganapathy_pavers.utils.py.vehicle", 
+"ganapathy_pavers.utils.py.maintenance_details" ]
 
 # Desk Notifications
 # ------------------
