@@ -148,7 +148,8 @@ doc_events = {
 	}
 
 }
-after_migrate=["ganapathy_pavers.custom.py.site_work.create_status"]
+after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
+              "ganapathy_pavers.custom.py.lead.property_setter",]
 doctype_js = {
 				"Item" : "/custom/js/item.js",
 				"Payment Entry" : "/custom/js/payment_entry.js",
