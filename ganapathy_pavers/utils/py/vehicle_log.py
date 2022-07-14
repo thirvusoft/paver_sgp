@@ -33,6 +33,6 @@ def batch_custom_fields():
     }
     create_custom_fields(custom_fields)
 def batch_property_setter():                
-    make_property_setter("Vehicle Log", "add_on_service_details", "hidden", "1", "Section Break")
-    make_property_setter("Vehicle Log", "purpose", "hidden", "1", "Data")
+    make_property_setter("Vehicle Log", "add_on_service_details", "hidden", "1", "Check")
+    make_property_setter("Vehicle Log", "purpose", "hidden", "1", "Check")
     

@@ -24,4 +24,4 @@ def batch_custom_fields():
     }
     create_custom_fields(custom_fields)
 def batch_property_setter():                
-    make_property_setter("Vehicle", "add_on_details", "hidden", "1", "Section Break")
+    make_property_setter("Vehicle", "add_on_details", "hidden", "1", "Check")
