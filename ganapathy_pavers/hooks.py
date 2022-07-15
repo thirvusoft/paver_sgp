@@ -58,7 +58,8 @@ app_license = "MIT"
 # ------------
 
 before_install = "ganapathy_pavers.custom.py.warehouse.create_scrap_warehouse"
-after_install = "ganapathy_pavers.custom.py.item_group.item_group"
+after_install = ["ganapathy_pavers.utils.py.vehicle.batch_customization", "ganapathy_pavers.custom.py.item_group.item_group", 
+"ganapathy_pavers.utils.py.maintenance_details.batch_customization", "ganapathy_pavers.utils.py.vehicle_log.batch_customization", "ganapathy_pavers.custom.py.defaults.create_designation" ]
 
 # Desk Notifications
 # ------------------
@@ -93,7 +94,7 @@ override_doctype_class = {
 # ---------------
 # Hook on document methods and events
 
-after_install="ganapathy_pavers.custom.py.defaults.create_designation"
+
 
 doc_events = {
 	"Payment Entry":{
