@@ -58,7 +58,10 @@ app_license = "MIT"
 # ------------
 
 before_install = "ganapathy_pavers.custom.py.warehouse.create_scrap_warehouse"
-after_install = "ganapathy_pavers.custom.py.item_group.item_group"
+after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
+				 "ganapathy_pavers.custom.py.defaults.create_designation",
+				 "ganapathy_pavers.custom.py.defaults.create_asset_category",
+				 "ganapathy_pavers.custom.py.defaults.create_role"]
 
 # Desk Notifications
 # ------------------
@@ -93,9 +96,12 @@ override_doctype_class = {
 # ---------------
 # Hook on document methods and events
 
-after_install="ganapathy_pavers.custom.py.defaults.create_designation"
 
 doc_events = {
+	"Stock Entry": {
+		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
+		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset"
+	},
 	"Payment Entry":{
                       "on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary"
           },
@@ -151,6 +157,7 @@ doc_events = {
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
               "ganapathy_pavers.custom.py.lead.property_setter",]
 doctype_js = {
+				"Asset": "/custom/js/asset.js",
 				"Item" : "/custom/js/item.js",
 				"Payment Entry" : "/custom/js/payment_entry.js",
 				"Project": "/custom/js/site_work.js",

@@ -39,3 +39,22 @@ def create_designation():
     })
     doc.save()
     frappe.db.commit()
+
+
+def create_asset_category():
+    if(not frappe.db.exists('Asset Category', 'Mould')):
+        doc=frappe.get_doc({
+            'doctype': 'Asset Category',
+            'asset_category_name': 'Mould'
+            })
+        doc.flags.ignore_mandatory=True
+        doc.save()
+
+def create_role():
+    if(not frappe.db.exists('Role', 'Admin')):
+        doc=frappe.get_doc({
+            'doctype': 'Role',
+            'role_name': 'Admin'
+        })
+        doc.flags.ignore_mandatory=True
+        doc.save()

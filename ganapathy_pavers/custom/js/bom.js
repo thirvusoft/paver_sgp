@@ -36,5 +36,29 @@ frappe.ui.form.on('BOM',{
                 filters:{"is_group":0}
             }
         })
+    },
+    refresh: function(frm){
+        if(cur_frm.doc.docstatus==0){
+            cur_frm.fields_dict.asset_name.$input.on("click", function() {
+                if(!cur_frm.doc.item){
+                    frappe.throw({title:'Message', message:'Please Select an Item'})
+                }
+            });
+        }
+        query(frm)
+    },
+    item: function(frm){
+        query(frm)
     }
 })
+
+function query(frm){
+    frm.set_query('asset_name', function(frm){
+        return {
+            filters: {
+                'asset_category': 'Mould',
+                'paver_name': cur_frm.doc.item
+            }
+        }
+    })
+}
