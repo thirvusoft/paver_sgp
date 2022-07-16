@@ -61,7 +61,13 @@ before_install = "ganapathy_pavers.custom.py.warehouse.create_scrap_warehouse"
 after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.custom.py.defaults.create_designation",
 				 "ganapathy_pavers.custom.py.defaults.create_asset_category",
-				 "ganapathy_pavers.custom.py.defaults.create_role"]
+				 "ganapathy_pavers.custom.py.defaults.create_role",
+				 "ganapathy_pavers.utils.py.vehicle.batch_customization",
+				 "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
+				 "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
+				 "ganapathy_pavers.utils.py.assets.item_customization",
+				 "ganapathy_pavers.utils.py.worstation.item_customization"
+				 ]
 
 # Desk Notifications
 # ------------------
@@ -122,6 +128,9 @@ doc_events = {
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
 	},
+	"Job Card":{
+		"on_submit":"afterganapathy_pavers.ganapathy_pavers.utils.py.jobcard.workstation"
+	},
 	"Delivery Note":{
 		"before_validate":"ganapathy_pavers.custom.py.delivery_note.update_customer",
 		"on_submit":[
@@ -137,18 +146,18 @@ doc_events = {
 		"on_change":["ganapathy_pavers.custom.py.delivery_note.odometer_validate",]
 
 	},
-	"Job Card":{
-		"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
-	},
+	# "Job Card":{
+	# 	"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
+	# },
 	"Sales Invoice":{
     	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer"
   	},
 	"Vehicle":{
         "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
     },
-	"Work Order":{
-		'before_submit': "ganapathy_pavers.custom.py.work_order.before_submit"
-	},
+	# "Work Order":{
+	# 	'before_submit': "ganapathy_pavers.custom.py.work_order.before_submit"
+	# },
 	"Workstation":{
 		"validate": "ganapathy_pavers.custom.py.workstation.validate"
 	}
@@ -170,12 +179,12 @@ doctype_js = {
 				"Salary Slip":"utils/js/salary_slip.js",
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
 				"Workstation":"/custom/js/workstation.js",
-				"Work Order": "/custom/js/work_order.js",
+				# "Work Order": "/custom/js/work_order.js",
 				"Delivery Note": "/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
 				"Vehicle Log":"/custom/js/vehicle_log.js",
-				"BOM": "/custom/js/bom.js",
-				"Job Card": "/custom/js/job_card.js"
+				# "BOM": "/custom/js/bom.js",
+				# "Job Card": "/custom/js/job_card.js"
 			 }
 # Scheduled Tasks
 # ---------------

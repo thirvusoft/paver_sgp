@@ -52,7 +52,6 @@ def change_status(wo, action=None):
         status = 'Cancelled'
     work_order.status = status
     work_order.save('Update')
-    print(work_order.status,"444444444444444444444444444444444444")
 
 
 

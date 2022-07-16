@@ -1,0 +1,32 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-15 14:00:44.402550",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "assets_value_stoke"
+ ],
+ "fields": [
+  {
+   "fieldname": "assets_value_stoke",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Assets",
+   "options": "Asset",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-07-15 14:00:44.402550",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Asset_table",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
