@@ -68,6 +68,7 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
 				 "ganapathy_pavers.utils.py.worstation.item_customization"
 				 ]
+				
 
 # Desk Notifications
 # ------------------
@@ -146,6 +147,12 @@ doc_events = {
 		"on_change":["ganapathy_pavers.custom.py.delivery_note.odometer_validate",]
 
 	},
+	"Vehicle Log":{
+		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
+		"on_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
+		"on_cancel": "ganapathy_pavers.custom.py.vehicle_log.onsubmit"		
+
+	},
 	# "Job Card":{
 	# 	"on_submit": "ganapathy_pavers.custom.py.job_card.create_timesheet"
 	# },
@@ -164,7 +171,11 @@ doc_events = {
 
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
-              "ganapathy_pavers.custom.py.lead.property_setter",]
+              "ganapathy_pavers.custom.py.lead.property_setter",
+			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
+			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
+			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization"]
+
 doctype_js = {
 				"Asset": "/custom/js/asset.js",
 				"Item" : "/custom/js/item.js",
@@ -193,6 +204,13 @@ scheduler_events = {
     "all": [
 		"ganapathy_pavers.custom.py.note.note_alert"
 	],
+
+	"cron": {
+		"0 2 * * *": [
+			"ganapathy_pavers.custom.py.vehicle_log.days"
+		]
+	},
+	
 # 	"all": [
 # 		"ganapathy_pavers.tasks.all"
 # 	"daily": [

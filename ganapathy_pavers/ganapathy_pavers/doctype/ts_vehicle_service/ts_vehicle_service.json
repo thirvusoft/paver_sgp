@@ -1,0 +1,73 @@
+{
+ "actions": [],
+ "creation": "2022-07-18 09:09:04.772079",
+ "doctype": "DocType",
+ "document_type": "Document",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "service_item",
+  "frequency",
+  "expense_amount",
+  "alert_kilometers",
+  "last_service_date",
+  "kilometers_after_last_service"
+ ],
+ "fields": [
+  {
+   "fieldname": "service_item",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Service Item",
+   "options": "\nBrake Oil\nBrake Pad\nClutch Plate\nEngine Oil\nOil Change\nWheels",
+   "reqd": 1
+  },
+  {
+   "fieldname": "frequency",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Frequency",
+   "options": "\nMileage\nMonthly\nQuarterly\nHalf Yearly\nYearly",
+   "reqd": 1
+  },
+  {
+   "fieldname": "expense_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Expense",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.frequency=='Mileage'",
+   "fieldname": "alert_kilometers",
+   "fieldtype": "Float",
+   "label": "Alert Kilometers",
+   "mandatory_depends_on": "eval:doc.frequency=='Mileage'"
+  },
+  {
+   "depends_on": "eval:doc.frequency!='Mileage'",
+   "fieldname": "last_service_date",
+   "fieldtype": "Date",
+   "label": "Last Service Date",
+   "mandatory_depends_on": "eval:doc.frequency!='Mileage'"
+  },
+  {
+   "fieldname": "kilometers_after_last_service",
+   "fieldtype": "Float",
+   "label": "Kilometers after last service",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2022-07-18 09:18:54.456276",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "TS Vehicle Service",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
