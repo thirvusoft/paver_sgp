@@ -28,6 +28,14 @@ def batch_custom_fields():
                 insert_after="odometer",
                 options="Purchase Invoice",
                 depends_on="eval:doc.select_purpose == 'Raw Material' "
+            ),
+            dict(
+                fieldname="purchase_receipt",
+                fieldtype="Link",
+                label="Purchase Receipt",
+                insert_after="select_purpose",
+                options="Purchase Receipt",
+                depends_on="eval:doc.select_purpose == 'Raw Material' "
             )
             ]
     }
