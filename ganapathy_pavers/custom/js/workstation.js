@@ -12,3 +12,4 @@ frappe.ui.form.on("Workstation",{
         }
     }
 })
+
