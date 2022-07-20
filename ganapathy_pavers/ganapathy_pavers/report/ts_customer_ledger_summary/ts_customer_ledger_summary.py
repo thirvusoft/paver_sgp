@@ -68,6 +68,13 @@ class PartyLedgerSummaryReport(object):
 				"width": 120,
 			},
 			{
+				"label": _("Delivered Amount"),
+				"fieldname": "out_delivery_amount",
+				"fieldtype": "Currency",
+				"options": "currency",
+				"width": 120,
+			},
+			{
 				"label": _("Invoiced Amount"),
 				"fieldname": "invoiced_amount",
 				"fieldtype": "Currency",
@@ -77,6 +84,13 @@ class PartyLedgerSummaryReport(object):
 			{
 				"label": _("Paid Amount"),
 				"fieldname": "paid_amount",
+				"fieldtype": "Currency",
+				"options": "currency",
+				"width": 120,
+			},
+            {
+				"label": _("OutStanding Based Delivery Amount"),
+				"fieldname": "delivery_amount",
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
@@ -107,13 +121,6 @@ class PartyLedgerSummaryReport(object):
 			{
 				"label": _("Closing Balance"),
 				"fieldname": "closing_balance",
-				"fieldtype": "Currency",
-				"options": "currency",
-				"width": 120,
-			},
-			{
-				"label": _("Delivery Based Amount"),
-				"fieldname": "delivery_amount",
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
@@ -159,6 +166,7 @@ class PartyLedgerSummaryReport(object):
 						"return_amount": 0,
 						"closing_balance": 0,
 						"delivery_amount":0,
+						"out_delivery_amount":0,   
 						"currency": company_currency,
 					}
 				),
@@ -205,6 +213,7 @@ class PartyLedgerSummaryReport(object):
 		out=[]
 		for customer in data:
 			customer['delivery_amount']=sum(frappe.get_all('Delivery Note', {'customer': customer.party_name}, pluck='rounded_total'))-customer['paid_amount']
+			customer['out_delivery_amount']=sum(frappe.get_all('Delivery Note', {'customer': customer.party_name}, pluck='rounded_total'))
 			out.append(customer)
 		return out
  
