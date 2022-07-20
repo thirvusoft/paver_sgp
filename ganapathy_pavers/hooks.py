@@ -190,7 +190,7 @@ doctype_js = {
 				"Salary Slip":"utils/js/salary_slip.js",
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
 				"Workstation":"/custom/js/workstation.js",
-				# "Work Order": "/custom/js/work_order.js",
+				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
 				"Delivery Note": "/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
 				"Vehicle Log":"/custom/js/vehicle_log.js",
