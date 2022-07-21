@@ -154,7 +154,7 @@ doc_events = {
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 		"on_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
-		"on_cancel": "ganapathy_pavers.custom.py.vehicle_log.onsubmit"		
+		"on_cancel": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 
 	},
 	"Sales Invoice":{
@@ -193,6 +193,7 @@ doctype_js = {
 				"Delivery Note": "/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
 				"Vehicle Log":"/custom/js/vehicle_log.js",
+				"Vehicle Log":"/custom/js/vehicle_log_service.js",
 
 			 }
 # Scheduled Tasks
