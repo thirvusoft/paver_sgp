@@ -10,7 +10,6 @@ def attenance(table_list, atten_date, checkout, company):
     doc1=frappe.get_single('Global Defaults')
     if(not doc1.default_company and not company):
         frappe.throw('Please Enter Default Company in '+getlink('global-defaults','Global Defaults'))
-    frappe.errprint(table_list)
     for i in table_list:
         doc = frappe.new_doc("Attendance")
         doc.update({
