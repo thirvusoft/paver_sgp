@@ -10,7 +10,7 @@ frappe.ui.form.on("Employee Advance Tool",{
 				frm.clear_table("employee_advance_details");
 				for(var i=0;i<r.message.length;i++){
 					var child = cur_frm.add_child("employee_advance_details");
-					// frappe.model.set_value(child.doctype, child.name, "employee", r.message[i]["name"])
+					frappe.model.set_value(child.doctype, child.name, "employee", r.message[i]["name"])
 					frappe.model.set_value(child.doctype, child.name, "employee_name", r.message[i]["employee_name"])
 					frappe.model.set_value(child.doctype, child.name, "designation", advance1)
 					if (frm.doc.designation == "Labour Worker"){

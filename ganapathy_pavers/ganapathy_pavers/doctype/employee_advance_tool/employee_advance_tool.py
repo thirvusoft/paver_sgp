@@ -9,7 +9,7 @@ class EmployeeAdvanceTool(Document):
 def employee_finder(advance1):
 
 	employee_names=[]
-	a=frappe.db.get_all("Employee",filters={"designation":advance1},fields=[ "employee_name"],order_by="employee_name")
+	a=frappe.db.get_all("Employee",filters={"designation":advance1},fields=["name", "employee_name"],order_by="last_name desc")
 	for name in a:
 		employee_names.append(name)
 	return employee_names
