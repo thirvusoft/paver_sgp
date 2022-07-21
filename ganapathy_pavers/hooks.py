@@ -66,7 +66,8 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
 				 "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
-				 "ganapathy_pavers.utils.py.worstation.item_customization"
+				 "ganapathy_pavers.utils.py.worstation.item_customization",
+				 "ganapathy_pavers.utils.py.purchase_order.batch_customization"
 				 ]
 				
 
@@ -147,6 +148,9 @@ doc_events = {
 		"on_change":["ganapathy_pavers.custom.py.delivery_note.odometer_validate",]
 
 	},
+	"Purchase Order":{
+		"before_submit":"ganapathy_pavers.custom.py.purchase_order.getdate"
+	},
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 		"on_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
@@ -168,7 +172,8 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
               "ganapathy_pavers.custom.py.lead.property_setter",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
-			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization"]
+			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
+			  "ganapathy_pavers.utils.py.purchase_order.batch_customization"]
 
 doctype_js = {
 				"Asset": "/custom/js/asset.js",
@@ -203,6 +208,12 @@ scheduler_events = {
 			"ganapathy_pavers.custom.py.vehicle_log.days"
 		]
 	},
+
+	"daily":
+		[
+		"ganapathy_pavers.custom.py.purchase_order.purchasenotification"
+		]
+
 	
 # 	"all": [
 # 		"ganapathy_pavers.tasks.all"
