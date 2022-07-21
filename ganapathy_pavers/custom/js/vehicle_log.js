@@ -40,13 +40,8 @@ function total_cost(frm){
     if(frm.doc.license_plate){
         frappe.db.get_doc('Vehicle', frm.doc.license_plate).then( async(doc) => {
             let fuel_cost_per_km=(doc.fuel_cost_per_km?doc.fuel_cost_per_km:zero_alert('Fuel Cost'))*(frm.doc.today_odometer_value?frm.doc.today_odometer_value:0)/(doc.mileage?doc.mileage:zero_alert('Mileage'));
-            console.log(fuel_cost_per_km)
             let mc=(frm.doc.today_odometer_value?frm.doc.today_odometer_value:0)*(doc.maintenance_cost?doc.maintenance_cost:zero_alert('Maintenance Cost'))
-            console.log(mc)
-
             let dc=(frm.doc.today_odometer_value?frm.doc.today_odometer_value:0)*(frm.doc.driver_cost?frm.doc.driver_cost:0)
-            console.log(dc)
-
             frm.set_value('ts_total_cost', (fuel_cost_per_km?fuel_cost_per_km:0)+(mc?mc:0)+(dc?dc:0))
         })
     }
