@@ -193,6 +193,7 @@ doctype_js = {
 				"Delivery Note": "/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
 				"Vehicle Log":"/custom/js/vehicle_log.js",
+				"Vehicle Log":"/custom/js/vehicle_log_service.js",
 
 			 }
 # Scheduled Tasks
