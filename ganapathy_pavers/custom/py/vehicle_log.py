@@ -21,7 +21,7 @@ def onsubmit(doc, event):
 
 def updateservice(doc):
     vehicle = frappe.get_doc('Vehicle' , doc.license_plate)
-    for j in doc.service_detail:
+    for j in doc.service_item_table:
         service=[]
         for k in vehicle.service_details_table:
             if j.service_item == k.service_item and j.type == 'Service':
