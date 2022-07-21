@@ -67,6 +67,7 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
 				 "ganapathy_pavers.utils.py.worstation.item_customization",
+          "ganapathy_pavers.custom.py.employee_atten_tool.deparment",
 				 "ganapathy_pavers.utils.py.purchase_order.batch_customization"
 				 ]
 				
@@ -169,13 +170,15 @@ doc_events = {
 
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
-              "ganapathy_pavers.custom.py.lead.property_setter",
+              "ganapathy_pavers.custom.py.property_setter.property_setter",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
 			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
-			  "ganapathy_pavers.utils.py.purchase_order.batch_customization"]
+        "ganapathy_pavers.custom.py.employee_atten_tool.operation_customize_field"]
+
 
 doctype_js = {
+                "TS Emloyee Attendance Tool":"custom/py/ts_employee_atten_tool.js",
 				"Asset": "/custom/js/asset.js",
 				"Item" : "/custom/js/item.js",
 				"Payment Entry" : "/custom/js/payment_entry.js",

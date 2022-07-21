@@ -27,3 +27,16 @@ def create_employee_advance(name,amount,date,payment_type):
 		advance_doc.save()
 		advance_doc.submit()
 		frappe.db.commit()
+
+@frappe.whitelist()
+def employee_finder_attendance(designation='', department=''):
+	employee_names=[]
+	filters={}
+	if(designation):
+		filters["designation"]=designation
+	if(department):
+		filters['department']=department
+	a=frappe.db.get_all("Employee",filters=filters,fields=["name", "employee_name"], order_by='employee_name')
+	for name in a:
+		employee_names.append(name)
+	return employee_names
