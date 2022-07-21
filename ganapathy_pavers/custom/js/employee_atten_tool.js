@@ -91,7 +91,8 @@ erpnext.EmployeeSelector = Class.extend({
 		var employee_toolbar = $('<div class="col-sm-12 top-toolbar">\
 			<button class="btn btn-default btn-add btn-xs"></button>\
 			<button class="btn btn-xs btn-default btn-remove"></button>\
-            <button class="btn btn-secondary btn-present btn-xs"></button>\
+            <button class="btn btn-primary btn-present btn-xs"></button>\
+			<button class="btn btn-danger btn-absent btn-remove"></button>\
 			</div>').appendTo($(this.wrapper));
 
 		var mark_employee_toolbar = $('<div class="col-sm-12 bottom-toolbar">\
@@ -130,25 +131,30 @@ erpnext.EmployeeSelector = Class.extend({
 						employee_present.push(employee[i]);
 					}
 				});
+				
 				frappe.call({
-					method: "erpnext.hr.doctype.employee_attendance_tool.employee_attendance_tool.mark_employee_attendance",
+					method: "ganapathy_pavers.custom.py.employee_atten_tool.docheckin",
 					args:{
-						"employee_list":employee_present,
-						"status":"Present",
-						"date":frm.doc.date,
-						"company":frm.doc.company
+						"incheck":cur_frm.doc.ts_date,
+						"employee_list":employee_present
+						         
 					},
 
-					callback: function(r) {
-						erpnext.employee_attendance_tool.load_employees(frm);
-
+					
+					}
+				});
+			});
+		employee_toolbar.find(".btn-absent")
+			.html(__('check Out'))
+			.on("click", function() {
+				$(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {
+					if($(check).is(":checked")) {
+						check.checked = false;
 					}
 				});
 			});
 
-        
-
-        
+    
 		mark_employee_toolbar.find(".btn-mark-present")
 			.html(__('Mark Present'))
 			.on("click", function() {
