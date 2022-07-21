@@ -3,7 +3,7 @@ import json
 from frappe.utils.csvutils import getlink
 from frappe.utils import nowdate
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import get_bank_cash_account
-from sgp.sgp.custom.py.sales_order import get_item_rate
+from ganapathy_pavers.custom.py.sales_order import get_item_rate
 
 
 
