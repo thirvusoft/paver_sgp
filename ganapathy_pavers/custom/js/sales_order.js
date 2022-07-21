@@ -375,19 +375,38 @@ frappe.ui.form.on('Item Detail Compound Wall',{
 
 function compoun_walls_calc(frm,cdt,cdtn){
     let row = locals[cdt][cdtn];
-    let Post=0, Slab=0;
-    for(let i = 0; i<frm.doc.compoun_walls.length; i++){
-        if(cur_frm.doc.compoun_walls[i].compound_wall_type=='Slab'){
-            Slab+=1;
+    if(row.item){
+        let Post=0, Slab=0;
+        for(let i = 0; i<frm.doc.compoun_walls.length; i++){
+            if(cur_frm.doc.compoun_walls[i].compound_wall_type=='Slab'){
+                Slab+=1;
+            }
+            else if(cur_frm.doc.compoun_walls[i].compound_wall_type=='Post'){
+                Post+=1;
+            }
         }
-        else if(cur_frm.doc.compoun_walls[i].compound_wall_type=='Post'){
-            Post+=1;
-        }
-    }
-    if (row.compound_wall_type=='Slab' && Slab==1){
-    frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_slab);
-    }
-    else if(row.compound_wall_type=='Post' && Post==1){
-    frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_post);
+        frappe.call({
+            method: "ganapathy_pavers.custom.py.sales_order.get_sqrfoot_uom",
+            args:{
+                item: row.item
+            },
+            callback: async function(res){
+                if(res.message.qty){
+                    if (row.compound_wall_type=='Slab' && Slab==1){
+                        await frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_slab*parseFloat(res.message.qty));
+                        }
+                    else if(row.compound_wall_type=='Post' && Post==1){
+                        await frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_post*parseFloat(res.message.qty));
+                        }
+                    else {
+                        await frappe.model.set_value(cdt, cdtn, 'allocated_ft', 0)
+                    }
+                }
+                else{
+                    frappe.show_alert({message: "Please enter "+res.message.uom+" conversion for an Item "+row.item, indicator: 'red'})
+                }
+            }
+        })
+        
     }
 }
