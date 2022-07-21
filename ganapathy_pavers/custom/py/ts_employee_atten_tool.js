@@ -20,9 +20,7 @@ frappe.ui.form.on('TS Emloyee Attendance Tool',{
                 checkout: cur_frm.doc.checkout_time?cur_frm.doc.checkout_time:'',
                 company: cur_frm.doc.company?cur_frm.doc.company:''
             },
-            callback(r){
-                console.log("win")
-            }
+            
         })
     },
 })
