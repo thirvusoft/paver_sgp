@@ -53,3 +53,5 @@ def batch_property_setter():
     make_property_setter("Vehicle Service", "frequency", "reqd", "0", "Check")
     make_property_setter("Vehicle Service", "frequency", "hidden", "1", "Check")
     make_property_setter("Vehicle Log", "service_detail", "hidden", "1", "Check")
+    make_property_setter("Vehicle Log", "today_odometer_value", "label", "Distance Travelled", "Data")
+    make_property_setter("Vehicle Log", "today_odometer_value", "read_only", "1", "Check")
