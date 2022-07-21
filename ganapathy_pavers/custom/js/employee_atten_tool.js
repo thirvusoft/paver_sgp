@@ -140,8 +140,7 @@ erpnext.EmployeeSelector = Class.extend({
 						         
 					},
 
-					callback: function(r) {
-						console.log("hhhhhhhhhhhh")
+					
 					}
 				});
 			});
