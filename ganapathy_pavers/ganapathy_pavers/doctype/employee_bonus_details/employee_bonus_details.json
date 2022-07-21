@@ -15,7 +15,6 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Employee",
    "options": "Employee"
   },
@@ -43,7 +42,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-06-07 10:20:32.541571",
+ "modified": "2022-07-21 19:29:19.645733",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Employee Bonus Details",
