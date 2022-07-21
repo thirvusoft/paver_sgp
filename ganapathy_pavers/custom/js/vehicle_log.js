@@ -43,6 +43,7 @@ function total_cost(frm){
             let mc=(frm.doc.today_odometer_value?frm.doc.today_odometer_value:0)*(doc.maintenance_cost?doc.maintenance_cost:zero_alert('Maintenance Cost'))
             let dc=(frm.doc.today_odometer_value?frm.doc.today_odometer_value:0)*(frm.doc.driver_cost?frm.doc.driver_cost:0)
             frm.set_value('ts_total_cost', (fuel_cost_per_km?fuel_cost_per_km:0)+(mc?mc:0)+(dc?dc:0))
+            frm.refresh()
         })
     }
 }
