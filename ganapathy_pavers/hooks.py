@@ -32,7 +32,8 @@ app_license = "MIT"
 
 # include js in doctype views
 
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {"Project" : "/custom/js/sw_quick_entry.js"}
+
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -106,6 +107,9 @@ override_doctype_class = {
 
 
 doc_events = {
+	"Bin": {
+		"on_update": "ganapathy_pavers.custom.py.site_work.update_site_work"
+	},
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
 		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset"
@@ -125,7 +129,9 @@ doc_events = {
 	},
 	"Project":{
 		"autoname":"ganapathy_pavers.custom.py.site_work.autoname",
-		"before_save":"ganapathy_pavers.custom.py.site_work.before_save"
+		"before_save":"ganapathy_pavers.custom.py.site_work.before_save",
+		"validate":"ganapathy_pavers.custom.py.site_work.validate",
+		"after_insert":"ganapathy_pavers.custom.py.site_work.validate"
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
@@ -158,7 +164,15 @@ doc_events = {
 
 	},
 	"Sales Invoice":{
-    	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer"
+    	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer",
+    	"on_submit":[
+					"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
+					"ganapathy_pavers.custom.py.delivery_note.update_return_qty_sitework",
+					],
+		"on_cancel":[
+					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
+					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
+					 ]
   	},
 	"Vehicle":{
         "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
