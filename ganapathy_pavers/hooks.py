@@ -67,7 +67,8 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
 				 "ganapathy_pavers.utils.py.worstation.item_customization",
-                 "ganapathy_pavers.custom.py.employee_atten_tool.deparment",
+          "ganapathy_pavers.custom.py.employee_atten_tool.deparment",
+				 "ganapathy_pavers.utils.py.purchase_order.batch_customization"
 				 ]
 				
 
@@ -148,10 +149,13 @@ doc_events = {
 		"on_change":["ganapathy_pavers.custom.py.delivery_note.odometer_validate",]
 
 	},
+	"Purchase Order":{
+		"before_submit":"ganapathy_pavers.custom.py.purchase_order.getdate"
+	},
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 		"on_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
-		"on_cancel": "ganapathy_pavers.custom.py.vehicle_log.onsubmit"		
+		"on_cancel": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 
 	},
 	"Sales Invoice":{
@@ -170,7 +174,8 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
 			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
-              "ganapathy_pavers.custom.py.employee_atten_tool.operation_customize_field"]
+        "ganapathy_pavers.custom.py.employee_atten_tool.operation_customize_field"]
+
 
 doctype_js = {
                 "TS Emloyee Attendance Tool":"custom/py/ts_employee_atten_tool.js",
@@ -191,6 +196,7 @@ doctype_js = {
 				"Delivery Note": "/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
 				"Vehicle Log":"/custom/js/vehicle_log.js",
+				"Vehicle Log":"/custom/js/vehicle_log_service.js",
 
 			 }
 # Scheduled Tasks
@@ -206,6 +212,12 @@ scheduler_events = {
 			"ganapathy_pavers.custom.py.vehicle_log.days"
 		]
 	},
+
+	"daily":
+		[
+		"ganapathy_pavers.custom.py.purchase_order.purchasenotification"
+		]
+
 	
 # 	"all": [
 # 		"ganapathy_pavers.tasks.all"
