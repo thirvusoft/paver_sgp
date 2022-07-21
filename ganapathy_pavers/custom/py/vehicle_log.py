@@ -26,7 +26,7 @@ def updateservice(doc):
         for k in vehicle.service_details_table:
             if j.service_item == k.service_item and j.type == 'Service':
                 k.kilometers_after_last_service = 0
-                k.expense_amount=(k.expense_amount or 0) + (j.expense_amount or 0)
+                # k.expense_amount=(k.expense_amount or 0) + (j.expense_amount or 0)
                 if k.frequency!='Mileage' and k.frequency!='':
                     k.last_service_date = doc.date
             service.append(k)

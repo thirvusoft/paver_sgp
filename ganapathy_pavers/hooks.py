@@ -192,7 +192,8 @@ doctype_js = {
 				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
 				"Delivery Note": "/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
-				"Vehicle Log":"/custom/js/vehicle_log.js"
+				"Vehicle Log":"/custom/js/vehicle_log.js",
+				"Vehicle Log":"/custom/js/vehicle_log_service.js",
 
 			 }
 # Scheduled Tasks
