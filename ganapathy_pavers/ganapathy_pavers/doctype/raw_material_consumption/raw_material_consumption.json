@@ -1,0 +1,139 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-21 12:43:15.173476",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "bin1_t",
+  "batch",
+  "bin1_a",
+  "bin2_t",
+  "id",
+  "bin2_a",
+  "bin3_t",
+  "bin4_t",
+  "bin4_a",
+  "total",
+  "cm2_t",
+  "cm2_a",
+  "ggbs2_t",
+  "ggbs2_a",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "DATE"
+  },
+  {
+   "fieldname": "bin1_t",
+   "fieldtype": "Int",
+   "label": "BIN1 T"
+  },
+  {
+   "fieldname": "batch",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "BATCH"
+  },
+  {
+   "fieldname": "bin1_a",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "BIN1 A"
+  },
+  {
+   "fieldname": "bin2_t",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "BIN2 T"
+  },
+  {
+   "fieldname": "id",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "ID"
+  },
+  {
+   "fieldname": "bin2_a",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "BIN2 A"
+  },
+  {
+   "fieldname": "bin3_t",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "BIN3 T"
+  },
+  {
+   "fieldname": "bin4_t",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "BIN4 T"
+  },
+  {
+   "fieldname": "bin4_a",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "BIN4 A"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "TOTAL"
+  },
+  {
+   "fieldname": "cm2_t",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "CM2 T"
+  },
+  {
+   "fieldname": "cm2_a",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "CM2 A"
+  },
+  {
+   "fieldname": "ggbs2_t",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "GGBS2 T"
+  },
+  {
+   "fieldname": "ggbs2_a",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "GGBS2 A"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Raw Material Consumption",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "istable": 1,
+ "links": [],
+ "max_attachments": 10,
+ "modified": "2022-07-21 17:31:33.947553",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Raw Material Consumption",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
