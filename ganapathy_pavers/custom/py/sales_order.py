@@ -3,7 +3,7 @@ import site
 import frappe
 import json
 from frappe.model.mapper import get_mapped_doc
-
+from frappe.utils.csvutils import getlink
 
 @frappe.whitelist()
 def get_item_value(doctype):
@@ -173,3 +173,12 @@ def remove_project_fields(self,event):
         doc.save()
         frappe.db.commit()
         
+@frappe.whitelist()        
+def get_sqrfoot_uom(item):
+    doc=frappe.get_doc('Item', item)
+    if(not doc.sales_uom):
+        frappe.throw('Please Enter Sales UOM for an Item: '+getlink('Item', item))
+    for uom in doc.uoms:
+        if(uom.uom==doc.sales_uom):
+            return {'uom': doc.sales_uom, 'qty': uom.conversion_factor}
+    return {'uom': doc.sales_uom, 'qty': 0}
