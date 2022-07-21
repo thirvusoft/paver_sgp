@@ -131,20 +131,7 @@ erpnext.EmployeeSelector = Class.extend({
 						employee_present.push(employee[i]);
 					}
 				});
-				// frappe.call({
-				// 	method: "erpnext.hr.doctype.employee_attendance_tool.employee_attendance_tool.mark_employee_attendance",
-				// 	args:{
-				// 		"employee_list":employee_present,
-				// 		"status":"Present",
-				// 		"date":frm.doc.date,
-				// 		"company":frm.doc.company
-				// 	},
-
-				// 	callback: function(r) {
-				// 		erpnext.employee_attendance_tool.load_employees(frm);
-
-				// 	}
-				// });
+				
 				frappe.call({
 					method: "ganapathy_pavers.custom.py.employee_atten_tool.docheckin",
 					args:{
