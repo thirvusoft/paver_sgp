@@ -68,3 +68,6 @@ def days():
                 if date_diff(frappe.utils.nowdate(), doc.last_service_date) == 365:
                     notification(doc.owner, doc.service_item, doc.kilometers_after_last_service, doc.name, doc.doctype, "admin@gmail.com")
                     notification(doc.owner, doc.service_item, doc.kilometers_after_last_service, doc.name, doc.doctype, "agalya@gpy.com")
+            
+
+
