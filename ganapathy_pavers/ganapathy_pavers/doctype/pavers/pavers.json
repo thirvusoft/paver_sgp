@@ -14,7 +14,8 @@
   "allocated_paver_area",
   "rate",
   "amount",
-  "sales_order"
+  "sales_order",
+  "warehouse"
  ],
  "fields": [
   {
@@ -85,18 +86,23 @@
    "in_list_view": 1,
    "label": "Work",
    "options": "\nSupply Only\nLaying Only\nSupply and Laying"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-16 12:27:36.747560",
+ "modified": "2022-07-21 23:23:52.881755",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Pavers",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_order": "DESC"
 }

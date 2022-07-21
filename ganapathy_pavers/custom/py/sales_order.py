@@ -13,12 +13,12 @@ def get_item_value(doctype):
         conv=1
     else:
         if(not uom.sales_uom):
-                frappe.throw("Please Enter Sales Uom for an item:"+doctype)
+                frappe.throw("Please Enter Sales Uom for an item:"+getlink('Item', doctype))
         for row in uom.uoms:
             if(row.uom==uom.sales_uom):
                 conv=row.conversion_factor
         if(not conv):
-            frappe.throw(f'Please enter UOM conversion for Square foot in item:{doctype}')
+            frappe.throw('Please enter UOM conversion for Square foot in item: '+getlink('Item', doctype))
     res={
         'item_name':frappe.get_value('Item',doctype,'item_name'),
         'description':frappe.get_value('Item',doctype,'description'),
@@ -30,72 +30,90 @@ def get_item_value(doctype):
 @frappe.whitelist()
 def create_site(doc):
     doc=json.loads(doc)
-    supervisor=doc.get('supervisor_name') if('supervisor_name' in doc) else ''
-    pavers=[{
-            'item':row['item'],
-            'required_area':row['required_area'],
-            'area_per_bundle':row['area_per_bundle'],
-            'number_of_bundle':row['number_of_bundle'],
-            'allocated_paver_area':row['allocated_paver_area'],
-            'rate':row['rate'],
-            'amount':row['amount'],
-            'work': row['work'],
-            'sales_order':doc['name']
-            } for row in doc['pavers']]
-    compoun_walls=[{
-            'item':row['item'],
-            'compound_wall_type':row['compound_wall_type'],
-            'allocated_ft':row['allocated_ft'],
-            'rate':row['rate'],
-            'amount':row['amount'],
-            'work': row['work'],
-            'sales_order':doc['name']
-            } for row in doc['compoun_walls']]
-    raw_material=[{
-            'item':row['item'],
-            'qty':row['qty'],
-            'uom':row['uom'],
-            'rate':row['rate'],
-            'amount':row['amount'],
-            'sales_order':doc['name']
-            } for row in doc['raw_materials']]
-    site_work=frappe.get_doc('Project',doc['site_work'])
-    total_area=0
-    completed_area=0
-    for item in (site_work.get('item_details') or []):
-        total_area+=item.required_area
-    for item in pavers:
-        total_area+=item['required_area']
-    for item in (site_work.get('item_details_compound_wall') or []):
-        total_area+=item.allocated_ft
-    for item in compoun_walls:
-        total_area+=item['allocated_ft']
-    for item in (site_work.get('job_worker') or []):
-        completed_area+=item.sqft_allocated
-    
-    site_work.update({
-        'customer': doc['customer'] or '',
-        'supervisor_name': supervisor,
-        'item_details': (site_work.get('item_details') or []) +pavers,
-        'item_details_compound_wall': (site_work.get('item_details_compound_wall') or []) +compoun_walls,
-        'raw_material': (site_work.get('raw_material') or []) + raw_material,
-        'total_required_area': total_area,
-        'total_completed_area': completed_area,
-        'completed': (completed_area/total_area)*100,
-        'distance':doc.get('distance') or 0
-    })
-    if(doc['is_multi_customer']):
-        sw_cust=[cus.customer for cus in (site_work.get('customer_name') or [] )]
-        customer=[]
-        for cust in doc['customers_name']:
-            if(cust['customer'] not in sw_cust):
-                customer.append({'customer':cust['customer']})
+    create=False
+    if(doc['type']=='Pavers'):
+        for row in (doc['pavers'] or []):
+            if(row["work"]!="Supply Only"):
+                create=True
+    if(doc['type']=='Compound Wall'):
+        for row in (doc['compoun_walls'] or []):
+            if(row["work"]!="Supply Only"):
+                create=True
+    if(doc['work']!="Supply Only" and create):
+        supervisor=doc.get('supervisor_name') if('supervisor_name' in doc) else ''
+        pavers=[]
+        compoun_walls=[]
+        if(doc['type']=='Pavers'):
+            pavers=[{
+                    'item':row['item'],
+                    'required_area':row['required_area'],
+                    'area_per_bundle':row['area_per_bundle'],
+                    'number_of_bundle':row['number_of_bundle'],
+                    'allocated_paver_area':row['allocated_paver_area'],
+                    'rate':row['rate'],
+                    'amount':row['amount'],
+                    'work': row['work'],
+                    'sales_order':doc['name'],
+                    'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse')
+                    } for row in doc['pavers']]
+        if(doc['type']=='Compound Wall'):
+            compoun_walls=[{
+                    'item':row['item'],
+                    'compound_wall_type':row['compound_wall_type'],
+                    'allocated_ft':row['allocated_ft'],
+                    'rate':row['rate'],
+                    'amount':row['amount'],
+                    'work': row['work'],
+                    'sales_order':doc['name'],
+                    'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse')
+                    } for row in doc['compoun_walls']]
+        raw_material=[{
+                'item':row['item'],
+                'qty':row['qty'],
+                'uom':row['uom'],
+                'rate':row['rate'],
+                'amount':row['amount'],
+                'sales_order':doc['name']
+                } for row in doc['raw_materials']]
+        site_work=frappe.get_doc('Project',doc['site_work'])
+        total_area=0
+        completed_area=0
+        
+        for item in (site_work.get('item_details') or []):
+            total_area+=item.required_area
+        for item in pavers:
+            total_area+=item['required_area']
+        for item in (site_work.get('item_details_compound_wall') or []):
+            total_area+=item.allocated_ft
+        for item in compoun_walls:
+            total_area+=item['allocated_ft']
+        for item in (site_work.get('job_worker') or []):
+            completed_area+=item.sqft_allocated
+        
         site_work.update({
-            'customer_name': (site_work.get('customer_name') or [] ) + customer
+            'customer': doc['customer'] or '',
+            'supervisor': doc.get('supervisor') if('supervisor' in doc) else '',
+            'supervisor_name': supervisor,
+            'item_details': (site_work.get('item_details') or []) +pavers,
+            'item_details_compound_wall': (site_work.get('item_details_compound_wall') or []) +compoun_walls,
+            'raw_material': (site_work.get('raw_material') or []) + raw_material,
+            'total_required_area': total_area,
+            'total_completed_area': completed_area,
+            'completed': (completed_area/total_area)*100,
+            'distance':(site_work.get('distance') or 0)+(doc.get('distance') or 0)
         })
-    site_work.save()
-    frappe.db.commit()
-    return 1
+        if(doc['is_multi_customer']):
+            sw_cust=[cus.customer for cus in (site_work.get('customer_name') or [] )]
+            customer=[]
+            for cust in doc['customers_name']:
+                if(cust['customer'] not in sw_cust):
+                    customer.append({'customer':cust['customer']})
+            site_work.update({
+                'customer_name': (site_work.get('customer_name') or [] ) + customer
+            })
+        site_work.save()
+        frappe.db.commit()
+        return 1
 
 
 @frappe.whitelist()
@@ -182,3 +200,11 @@ def get_sqrfoot_uom(item):
         if(uom.uom==doc.sales_uom):
             return {'uom': doc.sales_uom, 'qty': uom.conversion_factor}
     return {'uom': doc.sales_uom, 'qty': 0}
+    
+
+@frappe.whitelist()
+def get_item_rate(item='', selling=1):
+    if(not item or item not in frappe.get_all('Item Price', {'selling': selling}, pluck='item_code')):
+        return 0
+    doc=frappe.get_last_doc('Item Price', {'item_code': item, 'selling': selling})
+    return doc.price_list_rate or 0

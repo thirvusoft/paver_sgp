@@ -41,7 +41,7 @@
    "name": "Sales Order Item-work",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "\nSupply Only\nLaying Only\nSupply and Laying",
+   "options": "\nSupply Only\nLaying Only\nSupply and Laying\nFixing Only\nSupply & Fixing",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
