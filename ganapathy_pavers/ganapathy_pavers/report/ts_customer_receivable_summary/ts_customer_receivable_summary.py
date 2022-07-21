@@ -160,13 +160,13 @@ class PartyLedgerSummaryReport(object):
 					{
 						"party": gle.party,
 						"party_name": gle.party_name,
-						"opening_balance": -1000,
-						"invoiced_amount": 0,
-						"paid_amount": 0,
+						"opening_balance":0,
+						"invoiced_amount":0,
+						"paid_amount":0,
 						"return_amount": 0,
 						"closing_balance": 0,
 						"outstanding_amount":0,
-						"out_delivery_amount":200,   
+						"out_delivery_amount":0,   
 						"currency": company_currency,
 					}
 				),
