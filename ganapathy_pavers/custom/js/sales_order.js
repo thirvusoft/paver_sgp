@@ -32,10 +32,10 @@ frappe.ui.form.on('Item Detail Compound Wall',{
     let row=locals[cdt][cdn]
     if(row.item){
         await frappe.db.get_list('Bin',{filters:{'warehouse':'Stores - TS', 'item_code':row.item},fields:['valuation_rate']}).then((item)=>{
-             frappe.model.set_value(cdt,cdn,'valuation_rate', item[0].valuation_rate);
+             frappe.model.set_value(cdt,cdn,'valuation_rate', item?item[0].valuation_rate:0);
          })
         await frappe.db.get_list('Item',{filters:{'item_name':row.item},fields:['compound_wall_type']}).then((item)=>{
-            frappe.model.set_value(cdt,cdn,'compound_wall_type', item[0].compound_wall_type);
+            frappe.model.set_value(cdt,cdn,'compound_wall_type', item?item[0].compound_wall_type:0);
         })
 
      }
