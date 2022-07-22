@@ -1,0 +1,111 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-21 14:57:24.279355",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "raw_material_consumption",
+  "section_break_2",
+  "total_no_of_raw_material",
+  "total_no_of_cement",
+  "total_no_of_ggbs2",
+  "column_break_4",
+  "average_of_raw_material",
+  "average_of_cement",
+  "average_of__ggbs2",
+  "section_break_11",
+  "damage_counts",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "allow_bulk_edit": 1,
+   "fieldname": "raw_material_consumption",
+   "fieldtype": "Table",
+   "label": "Raw Material Consumption",
+   "options": "Raw Material Consumption"
+  },
+  {
+   "fieldname": "total_no_of_raw_material",
+   "fieldtype": "Int",
+   "label": "Total No of Raw Material"
+  },
+  {
+   "fieldname": "average_of_raw_material",
+   "fieldtype": "Float",
+   "label": "Average of Raw Material"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_no_of_cement",
+   "fieldtype": "Int",
+   "label": "Total No of Cement"
+  },
+  {
+   "fieldname": "average_of_cement",
+   "fieldtype": "Float",
+   "label": "Average of Cement"
+  },
+  {
+   "fieldname": "total_no_of_ggbs2",
+   "fieldtype": "Int",
+   "label": "Total No of GGBS2"
+  },
+  {
+   "fieldname": "average_of__ggbs2",
+   "fieldtype": "Float",
+   "label": "Average of  GGBS2"
+  },
+  {
+   "fieldname": "damage_counts",
+   "fieldtype": "Data",
+   "label": "Damage Count(s)"
+  },
+  {
+   "fieldname": "section_break_11",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Material Manufacturing",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-07-21 17:32:13.175412",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Material Manufacturing",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
