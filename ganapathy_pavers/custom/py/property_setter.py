@@ -13,7 +13,8 @@ def property_setter():
     })
     doc.save()
     doc.insert(ignore_permissions=True)
-    
+        
+   
     doc1=frappe.new_doc("Property Setter")
     doc1.update({
         'doctype_or_field' : 'DocField',
@@ -41,3 +42,4 @@ def property_setter():
     doc2.save()
     doc2.insert(ignore_permissions=True)
     
+

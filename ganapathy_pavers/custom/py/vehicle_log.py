@@ -21,12 +21,12 @@ def onsubmit(doc, event):
 
 def updateservice(doc):
     vehicle = frappe.get_doc('Vehicle' , doc.license_plate)
-    for j in doc.service_detail:
+    for j in doc.service_item_table:
         service=[]
         for k in vehicle.service_details_table:
             if j.service_item == k.service_item and j.type == 'Service':
                 k.kilometers_after_last_service = 0
-                k.expense_amount=(k.expense_amount or 0) + (j.expense_amount or 0)
+                # k.expense_amount=(k.expense_amount or 0) + (j.expense_amount or 0)
                 if k.frequency!='Mileage' and k.frequency!='':
                     k.last_service_date = doc.date
             service.append(k)
@@ -68,3 +68,6 @@ def days():
                 if date_diff(frappe.utils.nowdate(), doc.last_service_date) == 365:
                     notification(doc.owner, doc.service_item, doc.kilometers_after_last_service, doc.name, doc.doctype, "admin@gmail.com")
                     notification(doc.owner, doc.service_item, doc.kilometers_after_last_service, doc.name, doc.doctype, "agalya@gpy.com")
+            
+
+

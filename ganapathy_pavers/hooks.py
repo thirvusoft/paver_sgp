@@ -32,7 +32,8 @@ app_license = "MIT"
 
 # include js in doctype views
 
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {"Project" : "/custom/js/sw_quick_entry.js"}
+
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -66,7 +67,8 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
 				 "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
-				 "ganapathy_pavers.utils.py.worstation.item_customization"
+				 "ganapathy_pavers.utils.py.worstation.item_customization",
+				 "ganapathy_pavers.utils.py.purchase_order.batch_customization"
 				 ]
 				
 
@@ -105,6 +107,9 @@ override_doctype_class = {
 
 
 doc_events = {
+	"Bin": {
+		"on_update": "ganapathy_pavers.custom.py.site_work.update_site_work"
+	},
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
 		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset"
@@ -124,7 +129,9 @@ doc_events = {
 	},
 	"Project":{
 		"autoname":"ganapathy_pavers.custom.py.site_work.autoname",
-		"before_save":"ganapathy_pavers.custom.py.site_work.before_save"
+		"before_save":"ganapathy_pavers.custom.py.site_work.before_save",
+		"validate":"ganapathy_pavers.custom.py.site_work.validate",
+		"after_insert":"ganapathy_pavers.custom.py.site_work.validate"
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
@@ -147,14 +154,25 @@ doc_events = {
 		"on_change":["ganapathy_pavers.custom.py.delivery_note.odometer_validate",]
 
 	},
+	"Purchase Order":{
+		"before_submit":"ganapathy_pavers.custom.py.purchase_order.getdate"
+	},
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 		"on_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
-		"on_cancel": "ganapathy_pavers.custom.py.vehicle_log.onsubmit"		
+		"on_cancel": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 
 	},
 	"Sales Invoice":{
-    	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer"
+    	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer",
+    	"on_submit":[
+					"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
+					"ganapathy_pavers.custom.py.delivery_note.update_return_qty_sitework",
+					],
+		"on_cancel":[
+					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
+					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
+					 ]
   	},
 	"Vehicle":{
         "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
@@ -165,12 +183,14 @@ doc_events = {
 
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
-              "ganapathy_pavers.custom.py.lead.property_setter",
+              "ganapathy_pavers.custom.py.property_setter.property_setter",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
 			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization"]
 
+
 doctype_js = {
+                "TS Emloyee Attendance Tool":"custom/py/ts_employee_atten_tool.js",
 				"Asset": "/custom/js/asset.js",
 				"Item" : "/custom/js/item.js",
 				"Payment Entry" : "/custom/js/payment_entry.js",
@@ -184,12 +204,15 @@ doctype_js = {
 				"Salary Slip":"utils/js/salary_slip.js",
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
 				"Workstation":"/custom/js/workstation.js",
+				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
 				"Delivery Note": "/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
-				"Vehicle Log":"/custom/js/vehicle_log.js",
+				"Vehicle Log":[
+								"/custom/js/vehicle_log.js", 
+								"/custom/js/vehicle_log_service.js"
+								],
 				"Work Order" : "/utils/js/workorder.js",
 				"BOM" : "/utils/js/bom.js"
-
 			 }
 # Scheduled Tasks
 # ---------------
@@ -204,6 +227,12 @@ scheduler_events = {
 			"ganapathy_pavers.custom.py.vehicle_log.days"
 		]
 	},
+
+	"daily":
+		[
+		"ganapathy_pavers.custom.py.purchase_order.purchasenotification"
+		]
+
 	
 # 	"all": [
 # 		"ganapathy_pavers.tasks.all"

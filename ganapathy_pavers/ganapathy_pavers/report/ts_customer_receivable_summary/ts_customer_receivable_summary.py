@@ -68,6 +68,13 @@ class PartyLedgerSummaryReport(object):
 				"width": 120,
 			},
 			{
+				"label": _("Delivered Amount"),
+				"fieldname": "out_delivery_amount",
+				"fieldtype": "Currency",
+				"options": "currency",
+				"width": 120,
+			},
+			{
 				"label": _("Invoiced Amount"),
 				"fieldname": "invoiced_amount",
 				"fieldtype": "Currency",
@@ -77,6 +84,13 @@ class PartyLedgerSummaryReport(object):
 			{
 				"label": _("Paid Amount"),
 				"fieldname": "paid_amount",
+				"fieldtype": "Currency",
+				"options": "currency",
+				"width": 120,
+			},
+			{
+				"label": _("OutStanding Based Delivery Amount"),
+				"fieldname": "outstanding_amount",
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
@@ -107,13 +121,6 @@ class PartyLedgerSummaryReport(object):
 			{
 				"label": _("Closing Balance"),
 				"fieldname": "closing_balance",
-				"fieldtype": "Currency",
-				"options": "currency",
-				"width": 120,
-			},
-			{
-				"label": _("Delivery Based Amount"),
-				"fieldname": "delivery_amount",
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
@@ -153,12 +160,13 @@ class PartyLedgerSummaryReport(object):
 					{
 						"party": gle.party,
 						"party_name": gle.party_name,
-						"opening_balance": 0,
-						"invoiced_amount": 0,
-						"paid_amount": 0,
+						"opening_balance":0,
+						"invoiced_amount":0,
+						"paid_amount":0,
 						"return_amount": 0,
 						"closing_balance": 0,
-						"delivery_amount":0,
+						"outstanding_amount":0,
+						"out_delivery_amount":0,   
 						"currency": company_currency,
 					}
 				),
@@ -185,7 +193,7 @@ class PartyLedgerSummaryReport(object):
 				or row.paid_amount
 				or row.return_amount
 				or row.closing_amount
-				or row.delivery_amount
+				or row.outstanding_amount
 
 			):
 				total_party_adjustment = sum(
@@ -204,7 +212,16 @@ class PartyLedgerSummaryReport(object):
 	def get_outstand_based_on_delivery_note(self,data):
 		out=[]
 		for customer in data:
-			customer['delivery_amount']=sum(frappe.get_all('Delivery Note', {'customer': customer.party_name}, pluck='rounded_total'))-customer['paid_amount']
+			delivered=sum(frappe.get_all('Delivery Note', {'customer': customer.party, 'docstatus':1}, pluck='rounded_total'))
+			customer['out_delivery_amount']=sum(frappe.get_all('Delivery Note', {'customer': customer.party, 'docstatus':1 }, pluck='rounded_total'))
+			if (customer['opening_balance'] < 0):
+				cus=customer['opening_balance']
+				paid=((-cus)+customer['paid_amount'])
+				customer['outstanding_amount']=(delivered-paid)
+			if (customer['opening_balance'] > 0):
+				bls=(delivered-customer['paid_amount'])
+				customer['outstanding_amount']=bls+customer['opening_balance']
+
 			out.append(customer)
 		return out
  

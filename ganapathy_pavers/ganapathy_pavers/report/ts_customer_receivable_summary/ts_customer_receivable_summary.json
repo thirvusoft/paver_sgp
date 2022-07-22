@@ -13,11 +13,11 @@
  "modified": "2022-07-19 15:10:59.006874",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "TS Customer Ledger Summary",
+ "name": "TS Customer Receivable Summary",
  "owner": "Administrator",
  "prepared_report": 0,
  "ref_doctype": "Sales Invoice",
- "report_name": "TS Customer Ledger Summary",
+ "report_name": "TS Customer Receivable Summary",
  "report_type": "Script Report",
  "roles": [
   {

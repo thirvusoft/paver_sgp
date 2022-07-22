@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "item",
+  "work",
   "compound_wall_type",
   "height",
   "pcs",
@@ -14,7 +15,8 @@
   "running_sqft",
   "allocated_ft",
   "rate",
-  "amount"
+  "amount",
+  "warehouse"
  ],
  "fields": [
   {
@@ -61,12 +63,24 @@
    "fieldname": "amount",
    "fieldtype": "Read Only",
    "label": "Amount"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "work",
+   "fieldtype": "Select",
+   "label": "Work",
+   "options": "\nSupply Only\nFixing Only\nSupply & Fixing"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-03-26 12:47:59.580409",
+ "modified": "2022-07-21 23:42:10.534303",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Item Details Compound Wall",

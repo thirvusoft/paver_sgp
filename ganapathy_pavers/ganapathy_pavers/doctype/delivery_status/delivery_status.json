@@ -7,9 +7,11 @@
  "engine": "InnoDB",
  "field_order": [
   "item",
+  "delivered_stock_qty",
   "delivered_bundle",
   "delivered_pieces",
   "column_break_4",
+  "returned_stock_qty",
   "returned_bundle",
   "returned_pieces"
  ],
@@ -57,19 +59,29 @@
    "in_list_view": 1,
    "label": "Returned Pieces",
    "read_only": 1
+  },
+  {
+   "fieldname": "delivered_stock_qty",
+   "fieldtype": "Float",
+   "label": "Delivered Stock Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "returned_stock_qty",
+   "fieldtype": "Float",
+   "label": "Returned Stock Qty",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-16 12:43:15.810998",
+ "modified": "2022-07-21 23:19:54.765074",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Delivery Status",
- "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_order": "DESC"
 }

@@ -36,6 +36,13 @@ def batch_custom_fields():
                 insert_after="select_purpose",
                 options="Purchase Receipt",
                 depends_on="eval:doc.select_purpose == 'Raw Material' "
+            ),
+            dict(
+                fieldname="service_item_table",
+                fieldtype="Table",
+                label="Service Item",
+                insert_after="service_detail",
+                options="Vehicle Log Service"
             )
             ]
     }
@@ -45,3 +52,7 @@ def batch_property_setter():
     make_property_setter("Vehicle Log", "purpose", "hidden", "1", "Check")
     make_property_setter("Vehicle Service", "frequency", "reqd", "0", "Check")
     make_property_setter("Vehicle Service", "frequency", "hidden", "1", "Check")
+    make_property_setter("Vehicle Log", "service_detail", "hidden", "1", "Check")
+    make_property_setter("Vehicle Log", "today_odometer_value", "label", "Distance Travelled", "Data")
+    make_property_setter("Vehicle Log", "today_odometer_value", "read_only", "1", "Check")
+    make_property_setter("Vehicle Log", "select_purpose", "reqd", "1", "Check")
