@@ -13,8 +13,8 @@
  "is_standard": 1,
  "label": "HR Cycle",
  "links": [],
- "modified": "2022-04-28 14:51:40.571068",
- "modified_by": "Administrator",
+ "modified": "2022-07-22 15:11:17.297964",
+ "modified_by": "parameshwari@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "HR Cycle",
  "owner": "Administrator",
@@ -85,6 +85,24 @@
    "doc_view": "List",
    "label": "Payment Entry",
    "link_to": "Payment Entry",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Employee Checkin",
+   "link_to": "Employee Checkin",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "TS Emloyee Attendance Tool",
+   "link_to": "TS Emloyee Attendance Tool",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Attendance",
+   "link_to": "Attendance",
    "type": "DocType"
   },
   {
