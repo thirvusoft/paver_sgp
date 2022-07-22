@@ -13,7 +13,7 @@ def purchasenotification():
     for i in notification:
         doc=frappe.new_doc('Notification Log')
         doc.update({
-        'subject': f'{ i } has no Purchase receipt',
+        'subject': f'Goods for this PO({ i }) has not been received',
         'type': 'Alert',
         'document_type': 'Purchase Order',
         'message': f'The Purchase Order { i } does not have a purchase receipt'

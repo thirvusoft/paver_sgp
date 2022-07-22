@@ -1,18 +1,19 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "{department}.-.{designation}.-.####",
  "creation": "2022-07-21 17:53:45.191962",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "date",
+  "company",
+  "designation",
   "department",
   "column_break_3",
   "branch",
+  "date",
   "checkout_time",
-  "company",
-  "designation",
   "ts_employee_details_section",
   "employee_detail",
   "amended_from"
@@ -69,7 +70,8 @@
    "fieldname": "designation",
    "fieldtype": "Link",
    "label": "Designation",
-   "options": "Designation"
+   "options": "Designation",
+   "reqd": 1
   },
   {
    "fieldname": "checkout_time",
@@ -81,7 +83,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-21 22:06:56.196495",
+ "modified": "2022-07-22 15:32:44.830120",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Emloyee Attendance Tool",
