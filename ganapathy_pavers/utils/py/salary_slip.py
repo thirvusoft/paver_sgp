@@ -64,15 +64,15 @@ def set_net_pay(self,event):
 
     # Calculation of net Pay by round off
     if self.gross_pay:
-        net_pay=(round(self.gross_pay))%10
+        net_pay=(round(self.gross_pay) - round(self.total_deduction))%10
         if(net_pay<=2):
-            self.rounded_total=round(self.gross_pay)-net_pay
-            self.net_pay=round(self.gross_pay)-net_pay
+            self.rounded_total=round(self.gross_pay - round(self.total_deduction))-net_pay
+            self.net_pay=round(self.gross_pay - round(self.total_deduction))-net_pay
         
         elif(net_pay>2):
             value = 10- net_pay
-            self.rounded_total=round(self.gross_pay)+value
-            self.net_pay=round(self.gross_pay)+value
+            self.rounded_total=round(self.gross_pay - round(self.total_deduction))+value
+            self.net_pay=round(self.gross_pay - round(self.total_deduction))+value
 
         #Calculation of year to date
         SalarySlip.compute_year_to_date(self)
