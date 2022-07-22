@@ -124,6 +124,9 @@ doc_events = {
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
 	},
+    "Employee Checkin":{
+		"on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail"
+	},
 	"Employee Advance":{
 		"on_submit":"ganapathy_pavers.utils.py.employee_advance.create_payment_entry"
 	},
@@ -190,7 +193,7 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
 
 
 doctype_js = {
-                "TS Emloyee Attendance Tool":"custom/py/ts_employee_atten_tool.js",
+                "TS Employee Attendance Tool":"custom/py/ts_employee_atten_tool.js",
 				"Asset": "/custom/js/asset.js",
 				"Item" : "/custom/js/item.js",
 				"Payment Entry" : "/custom/js/payment_entry.js",
