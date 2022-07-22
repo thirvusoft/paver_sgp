@@ -118,9 +118,12 @@ def create_site(doc):
 
 @frappe.whitelist()
 def item_price(item):
-    rate=frappe.get_last_doc('Item Price',filters={'item_code':item, 'selling':1})
-    rate=rate.price_list_rate
-    return rate
+    if(item):
+        rate=frappe.get_last_doc('Item Price',filters={'item_code':item, 'selling':1})
+        rate=rate.price_list_rate
+        return rate
+    else:
+        return 0
 
 @frappe.whitelist()
 def create_property():
@@ -193,13 +196,11 @@ def remove_project_fields(self,event):
         
 @frappe.whitelist()        
 def get_sqrfoot_uom(item):
-    doc=frappe.get_doc('Item', item)
-    if(not doc.sales_uom):
-        frappe.throw('Please Enter Sales UOM for an Item: '+getlink('Item', item))
-    for uom in doc.uoms:
-        if(uom.uom==doc.sales_uom):
-            return {'uom': doc.sales_uom, 'qty': uom.conversion_factor}
-    return {'uom': doc.sales_uom, 'qty': 0}
+    if(item):
+        doc=frappe.get_doc('Item', item)
+        if(doc.sqft_per_piece):
+            return {'msg':1, 'qty': doc.sqft_per_piece}
+        return {'msg':0, 'qty':0}
     
 
 @frappe.whitelist()

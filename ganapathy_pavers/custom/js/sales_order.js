@@ -403,19 +403,21 @@ frappe.ui.form.on('Item Detail Compound Wall',{
     },
     item:function(frm,cdt,cdtn){
         let row=locals[cdt][cdtn]
-        frappe.db.get_doc('Item',row.item).then((item)=>{
-            frappe.call({
-                method: "ganapathy_pavers.custom.py.sales_order.get_item_rate",
-                args:{
-                    item: row.item
-                },
-                callback: async function(r){
-                    await frappe.model.set_value(cdt,cdtn,'rate', r.message?r.message:0);
-                }
+        if(row.item){
+            frappe.db.get_doc('Item',row.item).then((item)=>{
+                frappe.call({
+                    method: "ganapathy_pavers.custom.py.sales_order.get_item_rate",
+                    args:{
+                        item: row.item
+                    },
+                    callback: async function(r){
+                        await frappe.model.set_value(cdt,cdtn,'rate', r.message?r.message:0);
+                    }
+                })
+                frappe.model.set_value(cdt,cdtn,'uom', item.stock_uom);
             })
-            frappe.model.set_value(cdt,cdtn,'uom', item.stock_uom);
-        })
-        compoun_walls_calc(frm,cdt,cdtn)
+            compoun_walls_calc(frm,cdt,cdtn)
+        }
     },
     allocated_ft:function(frm,cdt,cdn){
         amt(frm, cdt, cdn)
@@ -446,28 +448,29 @@ function compoun_walls_calc(frm,cdt,cdtn){
                 Post+=1;
             }
         }
-        frappe.call({
-            method: "ganapathy_pavers.custom.py.sales_order.get_sqrfoot_uom",
-            args:{
-                item: row.item
-            },
-            callback: async function(res){
-                if(res.message.qty){
-                    if (row.compound_wall_type=='Slab' && Slab==1){
-                        await frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_slab*parseFloat(res.message.qty));
+        if(row.item){
+            frappe.call({
+                method: "ganapathy_pavers.custom.py.sales_order.get_sqrfoot_uom",
+                args:{
+                    item: row.item
+                },
+                callback: async function(res){
+                    if(res.message.msg==1){
+                        if (row.compound_wall_type=='Slab' && Slab==1 && cur_frm.doc.total_slab){
+                            await frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_slab*parseFloat(res.message.qty));
+                            }
+                        else if(row.compound_wall_type=='Post' && Post==1 && cur_frm.doc.total_post){
+                            await frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_post*parseFloat(res.message.qty));
+                            }
+                        else {
+                            await frappe.model.set_value(cdt, cdtn, 'allocated_ft', 0)
                         }
-                    else if(row.compound_wall_type=='Post' && Post==1){
-                        await frappe.model.set_value(cdt, cdtn, 'allocated_ft', cur_frm.doc.total_post*parseFloat(res.message.qty));
-                        }
-                    else {
-                        await frappe.model.set_value(cdt, cdtn, 'allocated_ft', 0)
+                    }
+                    else if(cur_frm.doc.total_slab || cur_frm.doc.total_post){
+                        frappe.show_alert({message: "Please enter Sqft Per Piece for an Item "+row.item, indicator: 'red'})
                     }
                 }
-                else{
-                    frappe.show_alert({message: "Please enter "+res.message.uom+" conversion for an Item "+row.item, indicator: 'red'})
-                }
-            }
-        })
-        
+            })
+        }
     }
 }
