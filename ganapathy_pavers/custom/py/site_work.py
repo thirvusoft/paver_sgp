@@ -33,6 +33,8 @@ def before_save(doc, action=None):
     doc.total = additionalcost_total
     for i in doc.item_details:
         item_details_total = item_details_total+(i.amount or 0)
+    for i in doc.item_details_compound_wall:
+        item_details_total = item_details_total+(i.amount or 0)
     doc.total_amount=item_details_total
     for i in doc.job_worker:
         job_worker_total = job_worker_total+(i.amount or 0)
@@ -61,7 +63,8 @@ def before_save(doc, action=None):
         if(doc1):
             rm_cost+=(doc1[0] or 0)
 
-    doc.actual_site_cost_calculation=(item_cost or 0)+(doc.total or 0)+(doc.total_job_worker_cost or 0)+ (rm_cost or 0)
+    doc.actual_site_cost_calculation=(item_cost or 0)+(doc.total or 0)+(doc.total_job_worker_cost or 0)+ (rm_cost or 0) + (doc.transporting_cost or 0)
+    doc.site_profit_amount=(doc.actual_site_cost_calculation or 0) - (doc.total_expense_amount or 0)
     return doc
 
 @frappe.whitelist()
