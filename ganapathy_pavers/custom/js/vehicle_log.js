@@ -10,6 +10,7 @@ frappe.ui.form.on("Vehicle Log" ,{
                         }
                     });                
     },
+    
     odometer: function(frm){
         distance(frm)
         total_cost(frm)
@@ -35,6 +36,15 @@ frappe.ui.form.on("Vehicle Log" ,{
     },
     after_save:function(frm){
         frappe.db.set_value("Vehicle",frm.doc.license_plate,"driver_cost",frm.doc.driver_cost)
+        frappe.db.get_doc('Vehicle', frm.doc.license_plate).then( async(doc) => {
+            if(doc.fuel_type=='Petrol'){
+                await frappe.db.set_value("Vehicle Settings","vehicle_settings","petrol_per_liter",frm.doc.price)
+            }
+            else if(doc.fuel_type=='Diesel'){
+                await frappe.db.set_value("Vehicle Settings","vehicle_settings","diesel_per_liter",frm.doc.price)
+
+            }
+        })
     }
 });
 
@@ -75,3 +85,4 @@ function zero_alert(field,vehicle="Vehicle", lp=cur_frm.doc.license_plate, name=
     frappe.show_alert({message: field+' is Empty in '+frappe.utils.get_form_link(vehicle, lp, name)+'..!', indicator: 'red'})
     return 0
 }
+
