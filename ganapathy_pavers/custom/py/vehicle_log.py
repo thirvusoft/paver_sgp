@@ -70,4 +70,30 @@ def days():
                     notification(doc.owner, doc.service_item, doc.kilometers_after_last_service, doc.name, doc.doctype, "agalya@gpy.com")
             
 
+def validate(self, event):
+    if(self.select_purpose=='Goods Supply' and self.delivery_note and self.sales_invoice):
+        frappe.throw(f"Please don't choose both {frappe.bold('Delivery Note')} and {frappe.bold('Sales Invoice')} under {frappe.bold('Purpose')}")
+    if(self.select_purpose=='Raw Material' and self.purchase_invoice and self.purchase_receipt):
+        frappe.throw(f"Please don't choose both {frappe.bold('Purchase Receipt')} and {frappe.bold('Purchase Invoice')} under {frappe.bold('Purpose')}")
 
+def update_transport_cost(self, event):
+    sw=''
+    if(self.select_purpose=='Goods Supply' and self.delivery_note):
+        sw=frappe.get_value('Delivery Note', self.delivery_note, 'site_work')
+    
+    if(self.select_purpose=='Goods Supply' and self.sales_invoice):
+        sw=frappe.get_value('Sales Invoice', self.sales_invoice, 'site_work')
+    
+    if(sw):
+        doc=frappe.get_doc('Project', sw)
+        cost=0
+        if(event=='on_submit'):
+            cost=(doc.transporting_cost + self.ts_total_cost or 0)  
+        elif(event=='on_cancel'):
+            cost=(doc.transporting_cost - self.ts_total_cost or 0)
+        doc.update({
+            'transporting_cost': cost 
+        })
+        doc.flags.ignore_mandatory=True
+        doc.flags.ignore_permissions=True
+        doc.save()
