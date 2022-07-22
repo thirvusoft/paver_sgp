@@ -1,0 +1,46 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-22 16:00:04.488494",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "petrol_per_liter",
+  "diesel_per_liter"
+ ],
+ "fields": [
+  {
+   "fieldname": "petrol_per_liter",
+   "fieldtype": "Float",
+   "label": "Petrol Per Liter"
+  },
+  {
+   "fieldname": "diesel_per_liter",
+   "fieldtype": "Float",
+   "label": "Diesel Per Liter"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-07-22 16:00:04.488494",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Vehicle Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
