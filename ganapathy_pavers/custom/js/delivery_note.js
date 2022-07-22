@@ -8,6 +8,7 @@ frappe.ui.form.on('Delivery Note Item', {
     pieces: function(frm,cdt,cdn){
         bundle_calc(frm, cdt, cdn)
     }
+    
 })
 
 
@@ -94,6 +95,13 @@ frappe.ui.form.on('Delivery Note', {
             
             }
             
+        },
+    on_submit: function(frm) {
+            if (frm.doc.docstatus === 1){
+                frm.add_custom_button(__('Notify Supervisor'), function(){
+                                       
+                }).addClass("btn btn-primary btn-sm primary-action").css({' background-color': '#2490ef',});
+            }
         },
 
     
