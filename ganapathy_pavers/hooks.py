@@ -210,7 +210,9 @@ doctype_js = {
 				"Vehicle Log":[
 								"/custom/js/vehicle_log.js", 
 								"/custom/js/vehicle_log_service.js"
-								]
+								],
+				"Work Order" : "/utils/js/workorder.js",
+				"BOM" : "/utils/js/bom.js"
 			 }
 # Scheduled Tasks
 # ---------------
