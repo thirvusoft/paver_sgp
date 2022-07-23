@@ -210,17 +210,13 @@ doctype_js = {
 				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
 				"Delivery Note": "/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
-<<<<<<< HEAD
 				"Vehicle Log":[
 								"/custom/js/vehicle_log.js", 
 								"/custom/js/vehicle_log_service.js"
-								]
-=======
-				"Vehicle Log":"/custom/js/vehicle_log.js",
+								],
 				"Work Order" : "/utils/js/workorder.js",
 				"BOM" : "/utils/js/bom.js"
 
->>>>>>> bed126d (Feat: Created doctype for upload raw material documents and calculate the raw materials and averages and then work order set the field of mould name and add to the filter of paver name and production wise filter applied for this field.)
 			 }
 # Scheduled Tasks
 # ---------------
