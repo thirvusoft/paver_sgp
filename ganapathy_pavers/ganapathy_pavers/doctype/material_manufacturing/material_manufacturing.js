@@ -38,6 +38,39 @@ frappe.ui.form.on('Material Manufacturing', {
 				}
 			})
 		}
+	},
+	onload: function(frm){
+		frm.set_query("source_warehouse",function(){
+			return {
+				"filters": {
+					is_group:0
+				}
+			}
+		})
+		// var company = frappe.get_single('Global Defaults').default_company
+		// cur_frm.set_value("company",company)
+		
+		frm.set_query("target_warehouse",function(){
+			return {
+				"filters": {
+					is_group:0
+				}
+			}
+		})
+		frm.set_query("cement_item",function(){
+			return {
+				"filters": {
+					item_group:"Raw Material"
+				}
+			}
+		})
+		frm.set_query("ggbs_item",function(){
+			return {
+				"filters": {
+					item_group:"Raw Material"
+				}
+			}
+		})
 	}
 });
 function total_hrs(frm){
