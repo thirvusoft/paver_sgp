@@ -2,11 +2,140 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Material Manufacturing', {
-	// refresh: function(frm) {
-
-	// }
+	from_time: function(frm) {
+		total_hrs(frm)
+	},
+	to: function(frm){
+		total_hrs(frm)
+	},
+	additional_cost: function(frm){
+		cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense) 
+	},
+	refresh: function(frm){
+		if(frm.doc.ts_total_hours > 0 ){
+			frappe.call({
+				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_expense",
+				args:{
+					workstation:frm.doc.work_station,
+				},
+				callback(r){
+					cur_frm.set_value('total_manufacturing_expense', r.message*frm.doc.ts_total_hours);
+					cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense);
+				}
+			})
+		}
+	},
+	bom_no: function(frm){
+		item_adding(frm)
+	},
+	cement_item: function(frm){
+		item_adding(frm)
+	},
+	ggbs_item: function(frm){
+		item_adding(frm)
+	},
+	onload: function(frm){
+		frm.set_query("source_warehouse",function(){
+			return {
+				"filters": {
+					is_group:0
+				}
+			}
+		})
+		// var company = frappe.get_single('Global Defaults').default_company
+		// cur_frm.set_value("company",company)
+		
+		frm.set_query("target_warehouse",function(){
+			return {
+				"filters": {
+					is_group:0
+				}
+			}
+		})
+		frm.set_query("cement_item",function(){
+			return {
+				"filters": {
+					item_group:"Raw Material"
+				}
+			}
+		})
+		frm.set_query("ggbs_item",function(){
+			return {
+				"filters": {
+					item_group:"Raw Material"
+				}
+			}
+		})
+		frm.set_query("item_to_manufacture",function(){
+			return {
+					filters: [
+						['Item', 'item_group', '!=', 'Raw Material']
+					]
+			}
+		})
+		frm.set_query("bom_no",function(){
+			return {
+				"filters": {
+					item:frm.doc.item_to_manufacture
+				}
+			}
+		})
+	}
 });
-
+function total_hrs(frm){
+	frappe.call({
+		method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_hrs",
+        args:{
+			from_time:frm.doc.from_time,
+			to:frm.doc.to
+		},
+		callback(r){
+			cur_frm.set_value('ts_total_hours', r.message);
+		}
+	})
+}
+function item_adding(frm){
+	if(frm.doc.bom_no){
+		frappe.call({
+			method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.add_item",
+			args:{
+				bom_no:frm.doc.bom_no,
+				doc:cur_frm.doc
+			},
+			callback(r){
+				cur_frm.set_value('items',r.message)
+			}
+		})
+	}
+}
+frappe.ui.form.on('BOM Item', {
+	rate: function(frm, cdt, cdn) {
+		total_amount(frm, cdt, cdn)
+		frappe.model.set_value(cdt,cdn,"item_tax_template",r.message)
+	},
+	qty: function(frm, cdt, cdn){
+		total_amount(frm, cdt, cdn)
+	},
+	item_code: function(frm, cdt, cdn){
+		var d = locals[cdt][cdn];
+		frappe.call({
+			method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.item_data",
+			args:{
+				item_code:d.item_code,
+			},
+			callback(r){
+				frappe.model.set_value(cdt,cdn,"rate",r.message[2])
+				frappe.model.set_value(cdt,cdn,"uom",r.message[1])
+				frappe.model.set_value(cdt,cdn,"stock_uom",r.message[1])
+			}
+		})
+		total_amount(frm, cdt, cdn)
+	},
+});
+function total_amount(frm, cdt, cdn){
+	var d = locals[cdt][cdn];
+	frappe.model.set_value(cdt,cdn,"amount",d.qty*d.rate)
+}
 // import FileUploaderComponent from './FileUploader.vue';
 
 // export default class FileUploader {
