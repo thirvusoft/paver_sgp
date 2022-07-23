@@ -81,8 +81,10 @@ function total_cost(frm){
 
     }
 }
+
 function zero_alert(field,vehicle="Vehicle", lp=cur_frm.doc.license_plate, name=cur_frm.doc.license_plate){
     frappe.show_alert({message: field+' is Empty in '+frappe.utils.get_form_link(vehicle, lp, name)+'..!', indicator: 'red'})
+
     return 0
 }
 
