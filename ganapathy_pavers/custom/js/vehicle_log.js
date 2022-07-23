@@ -1,3 +1,5 @@
+var from_lp=0;
+
 frappe.ui.form.on("Vehicle Log" ,{
     onload:function(frm){
             frm.set_query('employee', function(frm){
@@ -21,9 +23,16 @@ frappe.ui.form.on("Vehicle Log" ,{
         total_cost(frm)
     },
     driver_cost: function(frm){
-        total_cost(frm)
+        console.log(from_lp)
+        if(from_lp){
+            total_cost(frm)
+        }
+        else{
+            from_lp=1
+        }
     },
     ts_driver_cost:function(frm){
+        from_lp=0
         frm.set_value("driver_cost",frm.doc.ts_driver_cost)
     },
     after_save:function(frm){
@@ -48,6 +57,6 @@ function total_cost(frm){
     }
 }
 function zero_alert(field){
-    frappe.show_alert({message: field+' is Empty in Vehicle..!', indicator: 'red'})
+    frappe.show_alert({message: field+' is Empty in '+frappe.utils.get_form_link('Vehicle', cur_frm.doc.license_plate, cur_frm.doc.license_plate)+'..!', indicator: 'red'})
     return 0
 }    

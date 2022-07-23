@@ -1,0 +1,107 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "{department}.-.{designation}.-.####",
+ "creation": "2022-07-21 17:53:45.191962",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "designation",
+  "department",
+  "column_break_3",
+  "branch",
+  "date",
+  "checkout_time",
+  "ts_employee_details_section",
+  "employee_detail",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Checkin Time"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "TS Emloyee Attendance Tool",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "ts_employee_details_section",
+   "fieldtype": "Section Break",
+   "label": "TS Employee Details"
+  },
+  {
+   "fieldname": "employee_detail",
+   "fieldtype": "Table",
+   "options": "TS Employee Details"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation",
+   "reqd": 1
+  },
+  {
+   "fieldname": "checkout_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Checkout Time"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-07-22 15:32:44.830120",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "TS Emloyee Attendance Tool",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
