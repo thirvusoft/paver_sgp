@@ -35,6 +35,8 @@ class MaterialManufacturing(Document):
     
     
     def before_submit(doc):
+        if doc.total_completed_qty == 0 or doc.cement_item == '' or doc.ggbs_item == '':
+            frappe.throw("Please Enter the Total Completed Qty, Cement Item and GGBS Item")
         expenses_included_in_valuation = frappe.get_cached_value("Company", doc.company, "expenses_included_in_valuation")
         stock_entry = frappe.new_doc("Stock Entry")
         stock_entry.stock_entry_type = doc.stock_entry_type
@@ -57,9 +59,10 @@ class MaterialManufacturing(Document):
             stock_entry.submit()
 
 @frappe.whitelist()
-def total_hrs(from_time,to):
-    time_in_mins = time_diff_in_hours(to,from_time)
-    return time_in_mins
+def total_hrs(from_time = None,to = None):
+    if(from_time and to):
+        time_in_mins = time_diff_in_hours(to,from_time)
+        return time_in_mins
 @frappe.whitelist()
 def total_expense(workstation):
     sum_of_wages, hour_rate=frappe.get_value("Workstation",workstation,["sum_of_wages_per_hours","hour_rate"])
@@ -73,13 +76,13 @@ def add_item(bom_no,doc):
     for i in bom_doc.items:
         row = {field:i.__dict__[field] for field in fields}
         items.append(row)
-    if doc.get('cement_item'):
+    if doc.get('cement_item') and doc.get('total_no_of_cement'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['cement_item'],['item_code','stock_uom','stock_uom','valuation_rate'])
         row['qty']=doc.get('total_no_of_cement')
         row['amount']=doc.get('total_no_of_cement')*row['rate']
         items.append(row)
-    if doc.get('ggbs_item'):
+    if doc.get('ggbs_item') and doc.get('total_no_of_cement'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['ggbs_item'],['item_code','stock_uom','stock_uom','valuation_rate'])
         row['qty']=doc.get('total_no_of_ggbs2')

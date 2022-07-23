@@ -26,18 +26,13 @@ frappe.ui.form.on('Material Manufacturing', {
 		}
 	},
 	bom_no: function(frm){
-		if(frm.doc.bom_no){
-			frappe.call({
-				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.add_item",
-				args:{
-					bom_no:frm.doc.bom_no,
-					doc:cur_frm.doc
-				},
-				callback(r){
-					cur_frm.set_value('items',r.message)
-				}
-			})
-		}
+		item_adding(frm)
+	},
+	cement_item: function(frm){
+		item_adding(frm)
+	},
+	ggbs_item: function(frm){
+		item_adding(frm)
 	},
 	onload: function(frm){
 		frm.set_query("source_warehouse",function(){
@@ -71,6 +66,20 @@ frappe.ui.form.on('Material Manufacturing', {
 				}
 			}
 		})
+		frm.set_query("item_to_manufacture",function(){
+			return {
+					filters: [
+						['Item', 'item_group', '!=', 'Raw Material']
+					]
+			}
+		})
+		frm.set_query("bom_no",function(){
+			return {
+				"filters": {
+					item:frm.doc.item_to_manufacture
+				}
+			}
+		})
 	}
 });
 function total_hrs(frm){
@@ -84,6 +93,20 @@ function total_hrs(frm){
 			cur_frm.set_value('ts_total_hours', r.message);
 		}
 	})
+}
+function item_adding(frm){
+	if(frm.doc.bom_no){
+		frappe.call({
+			method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.add_item",
+			args:{
+				bom_no:frm.doc.bom_no,
+				doc:cur_frm.doc
+			},
+			callback(r){
+				cur_frm.set_value('items',r.message)
+			}
+		})
+	}
 }
 frappe.ui.form.on('BOM Item', {
 	rate: function(frm, cdt, cdn) {

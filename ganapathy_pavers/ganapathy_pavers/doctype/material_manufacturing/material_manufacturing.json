@@ -280,31 +280,29 @@
    "fieldname": "cement_item",
    "fieldtype": "Link",
    "label": "Cement Item Name",
-   "options": "Item",
-   "reqd": 1
+   "options": "Item"
   },
   {
    "fieldname": "ggbs_item",
    "fieldtype": "Link",
    "label": "GGBS Item Name",
-   "options": "Item",
-   "reqd": 1
+   "options": "Item"
   },
   {
    "fieldname": "section_break_42",
    "fieldtype": "Section Break"
   },
   {
+   "default": "0",
    "fieldname": "total_completed_qty",
    "fieldtype": "Int",
-   "label": "Total Completed Qty",
-   "reqd": 1
+   "label": "Total Completed Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-22 20:35:16.007925",
+ "modified": "2022-07-23 14:21:27.507475",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
