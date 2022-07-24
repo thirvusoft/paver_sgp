@@ -74,13 +74,13 @@
    "fieldname": "work",
    "fieldtype": "Select",
    "label": "Work",
-   "options": "\nSupply Only\nFixing Only\nSupply & Fixing"
+   "options": "\nSupply Only\nLaying Only\nSupply and Laying\nFixing Only\nSupply & Fixing"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-07-21 23:42:10.534303",
+ "modified": "2022-07-24 18:35:59.151316",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Item Details Compound Wall",

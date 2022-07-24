@@ -67,7 +67,7 @@ def create_site(doc):
                 'rate':row['rate'],
                 'amount':row['amount'],
                 'sales_order':doc['name']
-                } for row in doc['items'] if(row['item_group']=='Raw Materials')]
+                } for row in doc['items'] if(row['item_group']=='Raw Material')]
         site_work=frappe.get_doc('Project',doc['site_work'])
         total_area=0
         completed_area=0

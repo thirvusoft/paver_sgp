@@ -85,7 +85,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Work",
-   "options": "\nSupply Only\nLaying Only\nSupply and Laying"
+   "options": "\nSupply Only\nLaying Only\nSupply and Laying\nFixing Only\nSupply & Fixing"
   },
   {
    "fieldname": "warehouse",
@@ -97,7 +97,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-07-21 23:23:52.881755",
+ "modified": "2022-07-24 18:39:47.050949",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Pavers",

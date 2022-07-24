@@ -232,7 +232,7 @@ function amount_rawmet(frm,cdt,cdn){
 function customer_query(){
 	let frm=cur_frm;
 	let customer_list = []
-	for(let row=0; row<frm.doc.customer_name.length; row++){
+	for(let row=0; row<frm.doc.customer_name?frm.doc.customer_name.length:0; row++){
 		if(!(customer_list.includes(frm.doc.customer_name[row].customer))){
 			customer_list.push(frm.doc.customer_name[row].customer)
 		}

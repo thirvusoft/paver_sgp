@@ -200,10 +200,7 @@ doctype_js = {
 				"Item" : "/custom/js/item.js",
 				"Payment Entry" : "/custom/js/payment_entry.js",
 				"Project": "/custom/js/site_work.js",
-				"Sales Order": [
-								"/custom/js/site_work.js",
-								"/custom/js/sales_order.js",
-								],
+				"Sales Order":"/custom/js/sales_order.js",
 				"Vehicle":"/custom/js/vehicle.js",
 				"Timesheet" : "utils/js/timesheet.js",
 				"Salary Slip":"utils/js/salary_slip.js",

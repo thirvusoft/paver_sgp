@@ -1,31 +1,31 @@
 {
  "custom_fields": [],
  "custom_perms": [],
- "doctype": "Item Default",
+ "doctype": "Item Tax",
  "property_setters": [
   {
    "_assign": null,
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-   "creation": "2022-03-14 18:04:35.443915",
+   "creation": "2022-04-05 13:46:05.855727",
    "default_value": null,
-   "doc_type": "Item Default",
+   "doc_type": "Item Tax",
    "docstatus": 0,
    "doctype_or_field": "DocField",
-   "field_name": "default_warehouse",
+   "field_name": "tax_category",
    "idx": 0,
-   "modified": "2022-03-14 18:04:35.443915",
+   "modified": "2022-04-05 13:46:05.855727",
    "modified_by": "Administrator",
-   "name": "Item Default-default_warehouse-default",
+   "name": "Item Tax-tax_category-reqd",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
    "parenttype": null,
-   "property": "default",
-   "property_type": "Text",
+   "property": "reqd",
+   "property_type": "Check",
    "row_name": null,
-   "value": "Stores - GP"
+   "value": "1"
   }
  ],
  "sync_on_migrate": 1

@@ -1,10 +1,4 @@
 var prop_name;
- function amt(frm, cdt, cdn){
-    let row=locals[cdt][cdn]
-    if(row.allocated_ft>=0 && row.rate>=0){
-        frappe.model.set_value(cdt,cdn,'amount',Math.round(row.allocated_ft*row.rate));
-    }
-}
 
 
 frappe.ui.form.on('Sales Order', {
@@ -34,12 +28,12 @@ frappe.ui.form.on('Sales Order', {
             }
         });
           
-        if(cur_frm.doc.is_multi_customer){
-            cur_frm.set_df_property('customer','reqd',0);
-        }
-        else{
-            cur_frm.set_df_property('customer','reqd',1);
-        }
+        // if(cur_frm.doc.is_multi_customer){
+        //     cur_frm.set_df_property('customer','reqd',0);
+        // }
+        // else{
+        //     cur_frm.set_df_property('customer','reqd',1);
+        // }
         
         frm.set_query('supervisor', function(frm){
             return {
@@ -49,9 +43,10 @@ frappe.ui.form.on('Sales Order', {
             }
         });
          if(cur_frm.doc.docstatus==0){
-            cur_frm.fields_dict.site_work.$input.on("click", function() {
-                if(!cur_frm.doc.customer && cur_frm.doc.is_multi_customer==0){
-                    frappe.throw('Please Select Customer')
+            cur_frm.fields_dict.site_work.$input.on("click", async function() {
+                await cur_frm.trigger('refresh')
+                if(!cur_frm.doc.customer && !cur_frm.doc.is_multi_customer){
+                    frappe.throw({'message':'Please Select Customer'})
                 }
             });
         }
