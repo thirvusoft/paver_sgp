@@ -180,20 +180,21 @@ frappe.ui.form.on('Sales Order', {
 
 
 async function compoun_walls_calc(frm,cdt,cdtn){
-    let sales_uom, def_uom, ig, conv;
+    let sales_uom, def_uom, ig, conv=1, ts_uom;
     let row = locals[cdt][cdtn];
     if(row.item_code){
         await frappe.db.get_doc('Item', row.item_code).then((doc) => {
             sales_uom=doc.sales_uom;
             def_uom=doc.stock_uom;
             ig=doc.item_group;
+            ts_uom=(sales_uom?sales_uom:def_uom);
             for(let i=0; i<doc.uoms.length; i++){
-                if(doc.uoms[i].uom==sales_uom?sales_uom:def_uom){
+                if(doc.uoms[i].uom==ts_uom){
                     conv=doc.uoms[i].conversion_factor
                 }
             }
         })
-        await frappe.model.set_value(cdt, cdtn, 'uom', sales_uom?sales_uom:def_uom)
+        await frappe.model.set_value(cdt, cdtn, 'uom', ts_uom)
         if(conv){
             await frappe.model.set_value(cdt, cdtn, 'conversion_factor', conv)
         }
@@ -246,13 +247,13 @@ frappe.ui.form.on('Sales Order Item', {
     },
     ts_required_area_qty: async function(frm, cdt, cdn){
         let row = locals[cdt][cdn]
-        let uom=row.uom
         let conv1
         let conv2
         if(row.item_code && (row.item_group=='Pavers' || row.item_group=='Compound Walls')){
             await frappe.db.get_doc('Item', row.item_code).then((doc) => {
                 let other_conv=1;
-                let sqft_conv=1
+                let sqft_conv=1;
+                let nos_conv=1;
                 for(let doc_row=0; doc_row<doc.uoms.length; doc_row++){
                     if(doc.uoms[doc_row].uom=='bundle'){
                         other_conv=doc.uoms[doc_row].conversion_factor
@@ -260,10 +261,14 @@ frappe.ui.form.on('Sales Order Item', {
                     if(doc.uoms[doc_row].uom=='Square Foot'){
                         sqft_conv=doc.uoms[doc_row].conversion_factor
                     }
+                    if(doc.uoms[doc_row].uom=='Nos'){
+                        nos_conv=doc.uoms[doc_row].conversion_factor
+                    }
                 }
                 conv1=sqft_conv/other_conv
+                conv2=nos_conv/other_conv
             })
-            await frappe.model.set_value(cdt, cdn, 'ts_qty', (parseInt(row.ts_required_area_qty*conv1)<row.ts_required_area_qty*conv1)?(parseInt(row.ts_required_area_qty*conv1)+1):parseInt(row.ts_required_area_qty*conv1))
+            await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(row.ts_required_area_qty*conv1))
     }
 
     }
