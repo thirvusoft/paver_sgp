@@ -1,0 +1,91 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-06-07 13:00:15.575625",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "api_endpoint",
+  "api_key",
+  "api_functionality_section",
+  "send_document",
+  "send_dynamic_cta",
+  "contact_no",
+  "template_box",
+  "url"
+ ],
+ "fields": [
+  {
+   "fieldname": "api_endpoint",
+   "fieldtype": "Data",
+   "label": "API Endpoint"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Password",
+   "label": "API Key"
+  },
+  {
+   "fieldname": "api_functionality_section",
+   "fieldtype": "Section Break",
+   "label": "API Functionality"
+  },
+  {
+   "default": "0",
+   "fieldname": "send_document",
+   "fieldtype": "Check",
+   "label": "Send Document"
+  },
+  {
+   "default": "0",
+   "fieldname": "send_dynamic_cta",
+   "fieldtype": "Check",
+   "label": "Send Dynamic CTA"
+  },
+  {
+   "depends_on": "eval:doc.send_dynamic_cta==1",
+   "fieldname": "url",
+   "fieldtype": "Data",
+   "label": "Dynamic CTA URL",
+   "options": "URL"
+  },
+  {
+   "depends_on": "eval:doc.send_dynamic_cta==1",
+   "fieldname": "contact_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "contact no.",
+   "mandatory_depends_on": "eval:doc.send_dynamic_cta==1",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.send_dynamic_cta==1",
+   "fieldname": "template_box",
+   "fieldtype": "Small Text",
+   "label": "Message Template"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-06-09 15:09:45.643262",
+ "modified_by": "Administrator",
+ "module": "Interakt",
+ "name": "Interakt Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
