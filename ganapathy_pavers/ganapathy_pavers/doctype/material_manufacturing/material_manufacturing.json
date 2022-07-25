@@ -35,7 +35,7 @@
   "to",
   "column_break_20",
   "ts_total_hours",
-  "section_break_11",
+  "section_break_30",
   "additional_cost",
   "column_break_26",
   "total_manufacturing_expense",
@@ -49,7 +49,40 @@
   "stock_entry_type",
   "section_break_42",
   "total_completed_qty",
-  "damage_counts",
+  "column_break_44",
+  "damage_qty",
+  "column_break_46",
+  "create_stock_entry",
+  "rack_shifting_section",
+  "total_no_of_produced_qty",
+  "total_no_of_bundle",
+  "rack_shift_damage_qty",
+  "remaining_qty",
+  "create_rack_shiftingstock_entry",
+  "column_break_53",
+  "from_time_rack",
+  "to_time_rack",
+  "total_hours_rack",
+  "cb52",
+  "workstation",
+  "total_rack_shift_expense",
+  "rack_shifting_additional_cost",
+  "rack_shifting_total_expense",
+  "rack_shift_ware_section",
+  "rack_shift_source_warehouse",
+  "column_break_65",
+  "rack_shift_target_warehouse",
+  "column_break_55",
+  "stock_entry_rack_shift",
+  "section_break_51",
+  "no_of_bundle",
+  "curing_damaged_qty",
+  "labour_cost",
+  "curing_stock_entry",
+  "section_break_72",
+  "curing_source_warehouse",
+  "curing_target_warehouse",
+  "curing_stock_entry_type",
   "amended_from"
  ],
  "fields": [
@@ -99,17 +132,6 @@
    "label": "Average of  GGBS2"
   },
   {
-   "fieldname": "damage_counts",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Damage Count(s)"
-  },
-  {
-   "fieldname": "section_break_11",
-   "fieldtype": "Section Break",
-   "label": "Total Amount"
-  },
-  {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
@@ -146,6 +168,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "collapsible": 1,
    "fieldname": "section_break_15",
    "fieldtype": "Section Break"
   },
@@ -154,14 +177,16 @@
    "fieldtype": "Column Break"
   },
   {
+   "collapsible": 1,
    "fieldname": "section_break_17",
    "fieldtype": "Section Break",
-   "label": "Stock Entry"
+   "label": "Stock Entry Manufacture"
   },
   {
+   "collapsible": 1,
    "fieldname": "section_break_16",
    "fieldtype": "Section Break",
-   "label": "Wroking Time"
+   "label": "Wroking Time "
   },
   {
    "fieldname": "total_expense",
@@ -266,6 +291,7 @@
    "reqd": 1
   },
   {
+   "collapsible": 1,
    "fieldname": "items_section",
    "fieldtype": "Section Break",
    "label": "Items"
@@ -290,19 +316,205 @@
   },
   {
    "fieldname": "section_break_42",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Total Qty"
   },
   {
    "default": "0",
    "fieldname": "total_completed_qty",
    "fieldtype": "Int",
-   "label": "Total Completed Qty"
+   "label": "Produced Qty"
+  },
+  {
+   "default": "0",
+   "fieldname": "damage_qty",
+   "fieldtype": "Int",
+   "label": "Damage Qty"
+  },
+  {
+   "fieldname": "column_break_44",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_46",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "create_stock_entry",
+   "fieldtype": "Button",
+   "label": "Create Stock Entry For Manufacturing"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "rack_shifting_section",
+   "fieldtype": "Section Break",
+   "label": "Rack Shifting"
+  },
+  {
+   "fieldname": "total_no_of_produced_qty",
+   "fieldtype": "Int",
+   "label": "Total No of Produced Qty"
+  },
+  {
+   "fieldname": "total_no_of_bundle",
+   "fieldtype": "Int",
+   "label": "Total No. of Bundle"
+  },
+  {
+   "fieldname": "rack_shift_source_warehouse",
+   "fieldtype": "Link",
+   "label": "Rack shift Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "rack_shift_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Rack shift Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "create_rack_shiftingstock_entry",
+   "fieldtype": "Button",
+   "label": "Create Stock Entry For Rack Shifting"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_51",
+   "fieldtype": "Section Break",
+   "label": "Curing"
+  },
+  {
+   "fieldname": "column_break_53",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_55",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Repack",
+   "fieldname": "stock_entry_rack_shift",
+   "fieldtype": "Link",
+   "label": "Stock Entry Type",
+   "options": "Stock Entry Type"
+  },
+  {
+   "fieldname": "rack_shift_damage_qty",
+   "fieldtype": "Int",
+   "label": "Damage Qty"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "rack_shift_ware_section",
+   "fieldtype": "Section Break",
+   "label": "Rack Shift Warehouse"
+  },
+  {
+   "fieldname": "cb52",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "from_time_rack",
+   "fieldtype": "Datetime",
+   "label": "From Time"
+  },
+  {
+   "fieldname": "to_time_rack",
+   "fieldtype": "Datetime",
+   "label": "To Time "
+  },
+  {
+   "fieldname": "total_hours_rack",
+   "fieldtype": "Float",
+   "label": "Total Hours"
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "label": "Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "total_rack_shift_expense",
+   "fieldtype": "Float",
+   "label": "Total Rack Shift Expense"
+  },
+  {
+   "fieldname": "rack_shifting_additional_cost",
+   "fieldtype": "Float",
+   "label": "Rack Shifting Additional Cost"
+  },
+  {
+   "fieldname": "rack_shifting_total_expense",
+   "fieldtype": "Data",
+   "label": "Rack Shifting Total Expense"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_30",
+   "fieldtype": "Section Break",
+   "label": "Total Amount"
+  },
+  {
+   "fieldname": "remaining_qty",
+   "fieldtype": "Int",
+   "label": "Remaining Qty"
+  },
+  {
+   "fieldname": "column_break_65",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "no_of_bundle",
+   "fieldtype": "Int",
+   "label": "No. of Bundle"
+  },
+  {
+   "fieldname": "labour_cost",
+   "fieldtype": "Float",
+   "label": "Labour Cost"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_72",
+   "fieldtype": "Section Break",
+   "label": "Curing Warehouse"
+  },
+  {
+   "fieldname": "curing_source_warehouse",
+   "fieldtype": "Link",
+   "label": "Curing Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "curing_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Curing Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "default": "Material Transfer",
+   "fieldname": "curing_stock_entry_type",
+   "fieldtype": "Link",
+   "label": "Curing Stock Entry Type",
+   "options": "Stock Entry Type"
+  },
+  {
+   "fieldname": "curing_stock_entry",
+   "fieldtype": "Button",
+   "label": "Stock Entry For Curing"
+  },
+  {
+   "default": "0",
+   "fieldname": "curing_damaged_qty",
+   "fieldtype": "Int",
+   "label": "Curing Damage Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-23 14:21:27.507475",
+ "modified": "2022-07-25 16:01:53.343589",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
