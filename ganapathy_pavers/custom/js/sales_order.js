@@ -243,6 +243,29 @@ frappe.ui.form.on('Sales Order Item', {
     items_add: function(frm, cdt, cdn){
         let data=locals[cdt][cdn]
         frappe.model.set_value(cdt, cdn, 'work', (data.idx>1)?cur_frm.doc.items[data.idx -2].work:'')
+    },
+    ts_required_area_qty: async function(frm, cdt, cdn){
+        let row = locals[cdt][cdn]
+        let uom=row.uom
+        let conv1
+        let conv2
+        if(row.item_code && (row.item_group=='Pavers' || row.item_group=='Compound Walls')){
+            await frappe.db.get_doc('Item', row.item_code).then((doc) => {
+                let other_conv=1;
+                let sqft_conv=1
+                for(let doc_row=0; doc_row<doc.uoms.length; doc_row++){
+                    if(doc.uoms[doc_row].uom=='bundle'){
+                        other_conv=doc.uoms[doc_row].conversion_factor
+                    }
+                    if(doc.uoms[doc_row].uom=='Square Foot'){
+                        sqft_conv=doc.uoms[doc_row].conversion_factor
+                    }
+                }
+                conv1=sqft_conv/other_conv
+            })
+            await frappe.model.set_value(cdt, cdn, 'ts_qty', (parseInt(row.ts_required_area_qty*conv1)<row.ts_required_area_qty*conv1)?(parseInt(row.ts_required_area_qty*conv1)+1):parseInt(row.ts_required_area_qty*conv1))
+    }
+
     }
     
 })
