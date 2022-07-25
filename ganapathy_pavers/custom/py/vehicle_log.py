@@ -97,3 +97,17 @@ def update_transport_cost(self, event):
         doc.flags.ignore_mandatory=True
         doc.flags.ignore_permissions=True
         doc.save()
+
+def vehicle_log_creation(self, event):
+    vehicle_log=frappe.new_doc('Vehicle Log')
+    vehicle_log.update({
+        'license_plate':self.own_vehicle_no,
+        'employee':self.employee_ts,
+        "date":self.lr_date,
+        "odometer":self.return_odometer_value,
+        "driver_cost":self.driver_cost,
+        "select_purpose":"Goods Supply",
+        "delivery_note":self.name
+    })
+    vehicle_log.flags.ignore_permissions=True
+    vehicle_log.save()
