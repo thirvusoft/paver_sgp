@@ -182,6 +182,9 @@ doc_events = {
 	"Vehicle":{
         "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
     },
+ 	"Employee Checkin":{
+		"on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail"
+	},
 	"Workstation":{
 		"validate": "ganapathy_pavers.custom.py.workstation.validate"
 	}
