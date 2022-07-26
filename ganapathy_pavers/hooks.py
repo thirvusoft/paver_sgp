@@ -188,6 +188,9 @@ doc_events = {
 	},
 	"Workstation":{
 		"validate": "ganapathy_pavers.custom.py.workstation.validate"
+	},
+	"Purchase Receipt":{
+		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
 	}
 
 }
