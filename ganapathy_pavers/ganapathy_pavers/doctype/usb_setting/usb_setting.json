@@ -1,0 +1,195 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-25 16:06:40.944667",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "default_warehouse_section",
+  "default_stock_entry_manufacture",
+  "default_manufacture_source_warehouse",
+  "default_manufacture_target_warehouse",
+  "column_break_4",
+  "default_stock_entry_rack_shifting",
+  "default_rack_shift_source_warehouse",
+  "default_rack_shift_target_warehouse",
+  "column_break_8",
+  "default_stock_entry_curing",
+  "default_curing_source_warehouse",
+  "default_curing_target_warehouse",
+  "default_stock_uom_section",
+  "default_manufacture_uom",
+  "section_break_16",
+  "default_rack_shift_uom",
+  "default_workstation_section",
+  "default_manufacture_operation",
+  "default_manufacture_workstation",
+  "column_break_21",
+  "default_rack_shift_workstation",
+  "default_item_section",
+  "cement",
+  "ggbs"
+ ],
+ "fields": [
+  {
+   "fieldname": "default_stock_entry_manufacture",
+   "fieldtype": "Heading",
+   "label": "Default Manufacture Warehouse "
+  },
+  {
+   "fieldname": "default_manufacture_source_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Manufacture Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "default_manufacture_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Manufacture Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "default_rack_shift_source_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Rack Shift Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "default_rack_shift_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Rack Shift Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "default_curing_source_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Curing Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "default_curing_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Curing Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "default_stock_entry_rack_shifting",
+   "fieldtype": "Heading",
+   "label": "Default Rack Shifting Warehouse"
+  },
+  {
+   "fieldname": "default_stock_entry_curing",
+   "fieldtype": "Heading",
+   "label": "Default Curing Warehouse"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "default_warehouse_section",
+   "fieldtype": "Section Break",
+   "label": "Default Warehouse"
+  },
+  {
+   "fieldname": "default_stock_uom_section",
+   "fieldtype": "Section Break",
+   "label": "Default Stock UOM"
+  },
+  {
+   "fieldname": "default_manufacture_uom",
+   "fieldtype": "Link",
+   "label": "Default Manufacture UOM",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "default_rack_shift_uom",
+   "fieldtype": "Link",
+   "label": "Default Rack Shift UOM",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "section_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_workstation_section",
+   "fieldtype": "Section Break",
+   "label": "Default Workstation"
+  },
+  {
+   "fieldname": "default_manufacture_operation",
+   "fieldtype": "Link",
+   "label": "Default Manufacture Operation",
+   "options": "Operation"
+  },
+  {
+   "fetch_from": "operation.workstation",
+   "fieldname": "default_manufacture_workstation",
+   "fieldtype": "Link",
+   "label": "Default Manufacture Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_rack_shift_workstation",
+   "fieldtype": "Link",
+   "label": "Default Rack Shift Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "default_item_section",
+   "fieldtype": "Section Break",
+   "label": "Default Item"
+  },
+  {
+   "fieldname": "cement",
+   "fieldtype": "Link",
+   "label": "Cement",
+   "options": "Item"
+  },
+  {
+   "fieldname": "ggbs",
+   "fieldtype": "Link",
+   "label": "GGBS",
+   "options": "Item"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-07-25 17:56:05.465347",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "USB Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
