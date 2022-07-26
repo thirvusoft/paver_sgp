@@ -212,6 +212,7 @@ function make_stock_entry(frm,type){
 			type:type
 		}
 	})
+	frm.refresh()
 }
 function total_hrs(frm,field,from,to){
 	frappe.call({
@@ -296,6 +297,7 @@ function default_value(usb_field,set_field){
 	frappe.db.get_single_value("USB Setting",usb_field).then(value =>{
 		cur_frm.set_value(set_field, value) 
 	})
+	refresh_field(usb_field);
 }
 frappe.ui.form.on('BOM Item', {
 	rate: function(frm, cdt, cdn) {
