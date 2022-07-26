@@ -118,15 +118,5 @@ frappe.ui.form.on('Delivery Note', {
         var  total_distance= (cur_frm.doc.return_odometer_value - cur_frm.doc.current_odometer_value)
         cur_frm.set_value("total_distance",total_distance)
     },
-    onload:function(frm){
-		console.log
-		frm.set_query('driver_name_2', function(frm){
-				  return {
-					  filters:{
-						  'designation': 'Driver'
-					  }
-				  }
-			  });		   
-		}
 })
 

@@ -102,7 +102,7 @@ def vehicle_log_creation(self, event):
     vehicle_log=frappe.new_doc('Vehicle Log')
     vehicle_log.update({
         'license_plate':self.own_vehicle_no,
-        'employee':self.driver_name_2,
+        'employee':self.employee,
         "date":self.lr_date,
         "odometer":self.return_odometer_value,
         "driver_cost":self.driver_cost,
