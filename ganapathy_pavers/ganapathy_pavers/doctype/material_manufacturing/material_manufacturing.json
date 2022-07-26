@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "USB-.#####",
  "creation": "2022-07-21 14:57:24.279355",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -96,12 +97,14 @@
   {
    "fieldname": "total_no_of_raw_material",
    "fieldtype": "Int",
-   "label": "Total No of Raw Material"
+   "label": "Total No of Raw Material",
+   "read_only": 1
   },
   {
    "fieldname": "average_of_raw_material",
    "fieldtype": "Float",
-   "label": "Average of Raw Material"
+   "label": "Average of Raw Material",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_2",
@@ -114,22 +117,26 @@
   {
    "fieldname": "total_no_of_cement",
    "fieldtype": "Int",
-   "label": "Total No of Cement"
+   "label": "Total No of Cement",
+   "read_only": 1
   },
   {
    "fieldname": "average_of_cement",
    "fieldtype": "Float",
-   "label": "Average of Cement"
+   "label": "Average of Cement",
+   "read_only": 1
   },
   {
    "fieldname": "total_no_of_ggbs2",
    "fieldtype": "Int",
-   "label": "Total No of GGBS2"
+   "label": "Total No of GGBS2",
+   "read_only": 1
   },
   {
    "fieldname": "average_of__ggbs2",
    "fieldtype": "Float",
-   "label": "Average of  GGBS2"
+   "label": "Average of  GGBS2",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -239,7 +246,8 @@
   {
    "fieldname": "ts_total_hours",
    "fieldtype": "Float",
-   "label": "Total Hours"
+   "label": "Total Hours",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_26",
@@ -358,7 +366,8 @@
   {
    "fieldname": "total_no_of_bundle",
    "fieldtype": "Int",
-   "label": "Total No. of Bundle"
+   "label": "Total No. of Bundle",
+   "read_only": 1
   },
   {
    "fieldname": "rack_shift_source_warehouse",
@@ -426,7 +435,8 @@
   {
    "fieldname": "total_hours_rack",
    "fieldtype": "Float",
-   "label": "Total Hours"
+   "label": "Total Hours",
+   "read_only": 1
   },
   {
    "fieldname": "workstation",
@@ -437,7 +447,8 @@
   {
    "fieldname": "total_rack_shift_expense",
    "fieldtype": "Float",
-   "label": "Total Rack Shift Expense"
+   "label": "Total Rack Shift Expense",
+   "read_only": 1
   },
   {
    "fieldname": "rack_shifting_additional_cost",
@@ -447,7 +458,8 @@
   {
    "fieldname": "rack_shifting_total_expense",
    "fieldtype": "Data",
-   "label": "Rack Shifting Total Expense"
+   "label": "Rack Shifting Total Expense",
+   "read_only": 1
   },
   {
    "collapsible": 1,
@@ -456,9 +468,11 @@
    "label": "Total Amount"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "remaining_qty",
    "fieldtype": "Int",
-   "label": "Remaining Qty"
+   "label": "Remaining Qty",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_65",
@@ -514,7 +528,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-25 16:01:53.343589",
+ "modified": "2022-07-26 17:57:34.114747",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
