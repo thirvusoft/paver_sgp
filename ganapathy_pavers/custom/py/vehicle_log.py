@@ -11,8 +11,8 @@ def onsubmit(doc, event):
             if event == 'on_submit':
                 i.kilometers_after_last_service = (i.kilometers_after_last_service or 0) + km
                 if i.kilometers_after_last_service>=i.alert_kilometers and i.frequency == 'Mileage':
-                    notification(doc.owner, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "admin@gmail.com")
-                    notification(doc.owner, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "agalya@gpy.com")
+                    notification(doc.owner, doc.license_plate, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "admin@gmail.com")
+                    notification(doc.owner, doc.license_plate, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "agalya@gpy.com")
             elif event == 'on_cancel':
                 i.kilometers_after_last_service = (i.kilometers_after_last_service or 0) - km
             service.append(i)
@@ -34,16 +34,16 @@ def updateservice(doc):
     vehicle.save()
 
 
-def notification(owner, service_item, kilometers_after_last_service, name, doctype, user):
+def notification(owner, license_plate, service_item, kilometers_after_last_service, name, doctype, user):
     doc=frappe.new_doc('Notification Log')
     doc.update({
-    'subject': f'Service Alert for {service_item}',
+    'subject': f'{license_plate} - Service Alert for {service_item}',
     'for_user': user,
     'type': 'Alert',
     'document_type': doctype,
     'document_name': name,
     'from_user':owner,
-    'email_content': f'{kilometers_after_last_service} KM have been reached after the last service of {service_item}'
+    'email_content': f'{kilometers_after_last_service} KM have been reached for {license_plate} after the last service of {service_item}'
     })
     doc.flags.ignore_permissions=True
     doc.save()
