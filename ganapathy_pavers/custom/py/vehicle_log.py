@@ -11,8 +11,8 @@ def onsubmit(doc, event):
             if event == 'on_submit':
                 i.kilometers_after_last_service = (i.kilometers_after_last_service or 0) + km
                 if i.kilometers_after_last_service>=i.alert_kilometers and i.frequency == 'Mileage':
-                    notification(doc.owner, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "admin@gmail.com")
-                    notification(doc.owner, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "agalya@gpy.com")
+                    notification(doc.owner, doc.license_plate, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "admin@gmail.com")
+                    notification(doc.owner, doc.license_plate, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "agalya@gpy.com")
             elif event == 'on_cancel':
                 i.kilometers_after_last_service = (i.kilometers_after_last_service or 0) - km
             service.append(i)
