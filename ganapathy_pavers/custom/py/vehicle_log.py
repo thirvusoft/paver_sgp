@@ -34,16 +34,16 @@ def updateservice(doc):
     vehicle.save()
 
 
-def notification(owner, service_item, kilometers_after_last_service, name, doctype, user):
+def notification(owner, license_plate, service_item, kilometers_after_last_service, name, doctype, user):
     doc=frappe.new_doc('Notification Log')
     doc.update({
-    'subject': f'Service Alert for {service_item}',
+    'subject': f'{license_plate} - Service Alert for {service_item}',
     'for_user': user,
     'type': 'Alert',
     'document_type': doctype,
     'document_name': name,
     'from_user':owner,
-    'email_content': f'{kilometers_after_last_service} KM have been reached after the last service of {service_item}'
+    'email_content': f'{kilometers_after_last_service} KM have been reached for {license_plate} after the last service of {service_item}'
     })
     doc.flags.ignore_permissions=True
     doc.save()
