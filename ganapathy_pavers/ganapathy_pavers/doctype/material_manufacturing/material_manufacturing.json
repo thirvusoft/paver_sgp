@@ -457,6 +457,7 @@
    "label": "Total Amount"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "remaining_qty",
    "fieldtype": "Int",
    "label": "Remaining Qty"
@@ -515,7 +516,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-26 17:33:51.215235",
+ "modified": "2022-07-26 17:49:44.700251",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
