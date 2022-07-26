@@ -141,9 +141,8 @@ erpnext.EmployeeSelector = Class.extend({
 					},
 
 					
-					}
+					})
 				});
-			});
 		employee_toolbar.find(".btn-absent")
 			.html(__('check Out'))
 			.on("click", function() {

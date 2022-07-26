@@ -13,7 +13,7 @@
  "is_standard": 1,
  "label": "HR Cycle",
  "links": [],
- "modified": "2022-07-22 15:11:17.297964",
+ "modified": "2022-07-25 10:38:37.667686",
  "modified_by": "parameshwari@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "HR Cycle",
@@ -95,8 +95,8 @@
   },
   {
    "doc_view": "List",
-   "label": "TS Emloyee Attendance Tool",
-   "link_to": "TS Emloyee Attendance Tool",
+   "label": "TS Employee Attendance Tool",
+   "link_to": "TS employee Attendance Tool",
    "type": "DocType"
   },
   {
@@ -109,6 +109,18 @@
    "doc_view": "List",
    "label": "Employee Checkin",
    "link_to": "Employee Checkin",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Employee Bonus Tool",
+   "link_to": "Employee Bonus Tool",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Employee Advance Tool",
+   "link_to": "Employee Advance Tool",
    "type": "DocType"
   }
  ]

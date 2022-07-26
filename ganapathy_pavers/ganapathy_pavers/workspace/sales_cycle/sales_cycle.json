@@ -13,8 +13,8 @@
  "is_standard": 1,
  "label": "Sales Cycle",
  "links": [],
- "modified": "2022-04-21 17:23:50.076183",
- "modified_by": "Administrator",
+ "modified": "2022-07-25 14:55:01.121106",
+ "modified_by": "admin@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "Sales Cycle",
  "owner": "Administrator",
@@ -43,6 +43,12 @@
    "doc_view": "List",
    "label": "Quotation",
    "link_to": "Quotation",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Site Work",
+   "link_to": "Project",
    "type": "DocType"
   }
  ],

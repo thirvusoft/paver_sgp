@@ -31,50 +31,43 @@ def get_item_value(doctype):
 def create_site(doc):
     doc=json.loads(doc)
     create=False
-    if(doc['type']=='Pavers'):
-        for row in (doc['pavers'] or []):
-            if(row["work"]!="Supply Only"):
-                create=True
-    if(doc['type']=='Compound Wall'):
-        for row in (doc['compoun_walls'] or []):
-            if(row["work"]!="Supply Only"):
-                create=True
+    for row in (doc['items'] or []):
+        if(row["work"]!="Supply Only"):
+            create=True
     if(doc['work']!="Supply Only" and create):
         supervisor=doc.get('supervisor_name') if('supervisor_name' in doc) else ''
         pavers=[]
         compoun_walls=[]
-        if(doc['type']=='Pavers'):
-            pavers=[{
-                    'item':row['item'],
-                    'required_area':row['required_area'],
-                    'area_per_bundle':row['area_per_bundle'],
-                    'number_of_bundle':row['number_of_bundle'],
-                    'allocated_paver_area':row['allocated_paver_area'],
-                    'rate':row['rate'],
-                    'amount':row['amount'],
-                    'work': row['work'],
-                    'sales_order':doc['name'],
-                    'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse')
-                    } for row in doc['pavers']]
-        if(doc['type']=='Compound Wall'):
-            compoun_walls=[{
-                    'item':row['item'],
-                    'compound_wall_type':row['compound_wall_type'],
-                    'allocated_ft':row['allocated_ft'],
-                    'rate':row['rate'],
-                    'amount':row['amount'],
-                    'work': row['work'],
-                    'sales_order':doc['name'],
-                    'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse')
-                    } for row in doc['compoun_walls']]
+        pavers=[{
+                'item':row['item_code'],
+                'required_area':row['qty'],
+                'area_per_bundle':row['area_per_bundle'],
+                'number_of_bundle':row['ts_qty'],
+                'allocated_paver_area':row['qty'],
+                'rate':row['rate'],
+                'amount':row['amount'],
+                'work': row['work'],
+                'sales_order':doc['name'],
+                'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse')
+                } for row in doc['items'] if(row['item_group']=='Pavers')]
+        compoun_walls=[{
+                'item':row['item_code'],
+                'compound_wall_type':row['compound_wall_type'],
+                'allocated_ft':row['qty'],
+                'rate':row['rate'],
+                'amount':row['amount'],
+                'work': row['work'],
+                'sales_order':doc['name'],
+                'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse')
+                } for row in doc['items'] if(row['item_group']=='Compound Walls')]
         raw_material=[{
-                'item':row['item'],
+                'item':row['item_code'],
                 'qty':row['qty'],
                 'uom':row['uom'],
                 'rate':row['rate'],
                 'amount':row['amount'],
                 'sales_order':doc['name']
-                } for row in doc['raw_materials']]
+                } for row in doc['items'] if(row['item_group']=='Raw Material')]
         site_work=frappe.get_doc('Project',doc['site_work'])
         total_area=0
         completed_area=0
@@ -99,7 +92,7 @@ def create_site(doc):
             'raw_material': (site_work.get('raw_material') or []) + raw_material,
             'total_required_area': total_area,
             'total_completed_area': completed_area,
-            'completed': (completed_area/total_area)*100,
+            'completed': ((completed_area/total_area)*100) if(total_area) else 0,
             'distance':(site_work.get('distance') or 0)+(doc.get('distance') or 0)
         })
         if(doc['is_multi_customer']):
@@ -162,12 +155,17 @@ def remove_project_fields(self,event):
     if(project):
         doc=frappe.get_doc('Project',project)
         paver=doc.get('item_details') or []
+        cw=doc.get('item_details_compound_wall') or []
         raw_material=doc.get('raw_material')
         new_paver=[]
+        new_cw=[]
         new_rm=[]
         for item in paver:
             if(item.sales_order!=self.name):
                 new_paver.append(item)
+        for item in cw:
+            if(item.sales_order!=self.name):
+                new_cw.append(item)
         for item in raw_material:
             if(item.sales_order!=self.name):
                 new_rm.append(item)
@@ -177,6 +175,8 @@ def remove_project_fields(self,event):
         completed_area=0
         for item in (new_paver or []):
             total_area+=(item.get('required_area') or 0)
+        for item in (new_cw or []):
+            total_area+=(item.get('allocated_ft') or 0)
         for item in (doc.get('job_worker') or []):
             completed_area+=(item.get('sqft_allocated') or 0)
         
@@ -186,6 +186,7 @@ def remove_project_fields(self,event):
             percent=0
         doc.update({
             'item_details':new_paver,
+            'item_details_compound_wall':new_cw,
             'raw_material':new_rm,
             'total_required_area': total_area,
             'total_completed_area': completed_area,
@@ -194,13 +195,7 @@ def remove_project_fields(self,event):
         doc.save()
         frappe.db.commit()
         
-@frappe.whitelist()        
-def get_sqrfoot_uom(item):
-    if(item):
-        doc=frappe.get_doc('Item', item)
-        if(doc.sqft_per_piece):
-            return {'msg':1, 'qty': doc.sqft_per_piece}
-        return {'msg':0, 'qty':0}
+
     
 
 @frappe.whitelist()
