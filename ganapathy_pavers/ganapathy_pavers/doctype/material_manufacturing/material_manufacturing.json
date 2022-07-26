@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "USB-.#####",
  "creation": "2022-07-21 14:57:24.279355",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -514,7 +515,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-25 16:01:53.343589",
+ "modified": "2022-07-26 17:33:51.215235",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

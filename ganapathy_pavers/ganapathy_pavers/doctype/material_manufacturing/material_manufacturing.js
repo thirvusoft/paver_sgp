@@ -1,5 +1,7 @@
 // Copyright (c) 2022, Thirvusoft and contributors
 // For license information, please see license.txt
+var uom_nos = 0
+var uom_bundle = 0
 frappe.ui.form.on('Material Manufacturing', {
 	setup: function(frm){
 		default_value("default_manufacture_operation","operation")
@@ -74,6 +76,39 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	total_completed_qty: function(frm){
 		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_completed_qty);
+	},
+	total_no_of_produced_qty: function(frm){
+		var bundle_cf = 0
+		var nos_cf = 0
+		var default_cf = 0
+		frappe.db.get_single_value("USB Setting","default_manufacture_uom").then(value =>{
+			uom_nos = value 
+		})
+		frappe.db.get_single_value("USB Setting","default_rack_shift_uom").then(value =>{
+			uom_bundle = value 
+		})
+		frappe.db.get_doc('Item', frm.doc.item_to_manufacture).then((doc) => {
+			var default_uom = doc.stock_uom
+			for(var i of doc.uoms){
+				if(uom_bundle == i.uom){
+					bundle_cf=i.conversion_factor	
+				}
+				if(uom_nos == i.uom){
+					nos_cf=i.conversion_factor	
+				}
+				if(default_uom == i.uom){
+					default_cf=i.conversion_factor	
+				}
+			}
+			var total_amount = (frm.doc.total_no_of_produced_qty/default_cf)/bundle_cf
+			cur_frm.set_value('remaining_qty', Math.round((frm.doc.total_no_of_produced_qty/default_cf)%bundle_cf));
+			if(total_amount >= 1){
+				cur_frm.set_value('total_no_of_bundle', Math.floor(total_amount));
+			}
+			else{
+				cur_frm.set_value('total_no_of_bundle', 0);
+			}
+		});
 	},
 	total_no_of_bundle: function(frm){
 		cur_frm.set_value('no_of_bundle', frm.doc.total_no_of_bundle);
@@ -203,7 +238,6 @@ function item_adding(frm){
 				var t = 0
 				for (const d of r.message){
 					for(const i of frm.doc.items){
-						console.log(i.item_code,d.item_code)
 						if(i.item_code == d.item_code){
 							t=1
 						}
@@ -218,7 +252,6 @@ function item_adding(frm){
 						row.uom = d.uom;
 						row.rate = d.rate;
 						row.amount= d.amount
-						console.log(d.item_code)
 					}
 				}
 				refresh_field("items");
@@ -238,7 +271,6 @@ function std_item(frm){
 				var t = 0
 				for (const d of r.message){
 					for(const i of frm.doc.items){
-						console.log(i.item_code,d.item_code)
 						if(i.item_code == d.item_code){
 							t=1
 						}
@@ -253,7 +285,6 @@ function std_item(frm){
 						row.uom = d.uom;
 						row.rate = d.rate;
 						row.amount= d.amount
-						console.log(d.item_code)
 					}
 				}
 				refresh_field("items");

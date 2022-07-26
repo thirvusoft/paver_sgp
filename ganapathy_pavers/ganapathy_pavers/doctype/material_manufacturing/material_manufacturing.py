@@ -108,13 +108,14 @@ def make_stock_entry(doc,type):
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("stock_entry_rack_shift")=="Repack" and type == "create_rack_shiftingstock_entry":
         stock_entry.stock_entry_type = doc.get("stock_entry_rack_shift")
-        if doc.get("total_no_of_bundle") == 0:
+        if doc.get("total_no_of_produced_qty") == 0:
             frappe.throw("Please Enter the Total No of Bundle")
         stock_entry.append('items', dict(
-        s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("total_no_of_produced_qty")
+        s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("total_no_of_produced_qty"),uom = default_nos
         ))
+        qty = doc.get("total_no_of_bundle") + remaining_qty(doc.get("item_to_manufacture"),default_bundle,doc.get("name"))
         stock_entry.append('items', dict(
-            t_warehouse = doc.get("rack_shift_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("total_no_of_bundle"),uom = default_bundle
+            t_warehouse = doc.get("rack_shift_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = qty,uom = default_bundle
             ))
         if doc.get("damage_qty") > 0:
             stock_entry.append('items', dict(
@@ -143,3 +144,27 @@ def make_stock_entry(doc,type):
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
+def remaining_qty(item_code,default_bundle,cur_doc):
+    uom =frappe.get_doc("Item",item_code)
+    uom_qty = 0
+    for i in uom.uoms:
+        if(default_bundle == i.uom):
+            uom_qty=i.conversion_factor	
+    total_qty=0
+    remaining_qty = frappe.get_all("Material Manufacturing",fields=['name','remaining_qty'],filters={"item_to_manufacture" : item_code})
+    for j in remaining_qty:
+        total_qty = total_qty+j.remaining_qty
+    set_qty = 0
+    while(int(total_qty) > int(uom_qty)):
+        total_qty = total_qty - uom_qty
+        set_qty = set_qty+1
+    if set_qty:
+        for j in range (len(remaining_qty)):
+            if remaining_qty[j].name == cur_doc:
+                frappe.db.set_value("Material Manufacturing",remaining_qty[j].name,'remaining_qty', total_qty)
+            else:
+                frappe.db.set_value("Material Manufacturing",remaining_qty[j].name,'remaining_qty', 0)
+        frappe.db.commit()
+        return set_qty
+    return 0
+            

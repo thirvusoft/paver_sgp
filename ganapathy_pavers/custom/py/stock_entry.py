@@ -1,3 +1,4 @@
+from dataclasses import field
 import frappe
 
 def update_asset(self, event):
