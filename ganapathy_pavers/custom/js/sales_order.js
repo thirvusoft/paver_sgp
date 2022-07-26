@@ -251,12 +251,12 @@ frappe.ui.form.on('Sales Order Item', {
         let conv2
         if(row.item_code && (row.item_group=='Pavers' || row.item_group=='Compound Walls')){
             await frappe.db.get_doc('Item', row.item_code).then((doc) => {
-                let other_conv=1;
+                let bundle_conv=1;
                 let sqft_conv=1;
                 let nos_conv=1;
                 for(let doc_row=0; doc_row<doc.uoms.length; doc_row++){
                     if(doc.uoms[doc_row].uom=='bundle'){
-                        other_conv=doc.uoms[doc_row].conversion_factor
+                        bundle_conv=doc.uoms[doc_row].conversion_factor
                     }
                     if(doc.uoms[doc_row].uom=='Square Foot'){
                         sqft_conv=doc.uoms[doc_row].conversion_factor
@@ -265,10 +265,18 @@ frappe.ui.form.on('Sales Order Item', {
                         nos_conv=doc.uoms[doc_row].conversion_factor
                     }
                 }
-                conv1=sqft_conv/other_conv
-                conv2=nos_conv/other_conv
+                conv1=sqft_conv/bundle_conv
+                conv2=sqft_conv/nos_conv
+                console.log(conv1, conv2)
             })
+
             await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(row.ts_required_area_qty*conv1))
+            let rem_ft=((row.ts_required_area_qty*conv1)%1)/conv1
+            await frappe.model.set_value(cdt, cdn, 'pieces', Math.ceil(rem_ft*conv2))
+
+    }
+    else{
+        await frappe.model.set_value(cdt, cdn, 'qty', row.ts_required_area_qty)
     }
 
     }
@@ -294,7 +302,7 @@ async function bundle_calc(frm, cdt, cdn){
                     bundle_conv=doc.uoms[doc_row].conversion_factor
                 }
                 if(doc.uoms[doc_row].uom=='Nos'){
-                    bundle_conv=doc.uoms[doc_row].conversion_factor
+                    nos_conv=doc.uoms[doc_row].conversion_factor
                 }
             }
             conv1=bundle_conv/other_conv

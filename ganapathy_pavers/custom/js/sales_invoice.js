@@ -28,7 +28,7 @@ async function bundle_calc(frm, cdt, cdn){
                 bundle_conv=doc.uoms[doc_row].conversion_factor
             }
             if(doc.uoms[doc_row].uom=='Nos'){
-                bundle_conv=doc.uoms[doc_row].conversion_factor
+                nos_conv=doc.uoms[doc_row].conversion_factor
             }
         }
         conv1=bundle_conv/other_conv
@@ -67,7 +67,7 @@ frappe.ui.form.on('Sales Invoice', {
                             bundle_conv=doc.uoms[doc_row].conversion_factor
                         }
                         if(doc.uoms[doc_row].uom=='Nos'){
-                            bundle_conv=doc.uoms[doc_row].conversion_factor
+                            nos_conv=doc.uoms[doc_row].conversion_factor
                         }
                     }
                     conv1=bundle_conv/other_conv
