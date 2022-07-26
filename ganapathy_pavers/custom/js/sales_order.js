@@ -297,7 +297,14 @@ frappe.ui.form.on('Sales Order Item', {
                 conv1=sqft_conv/bundle_conv
                 conv2=sqft_conv/nos_conv
             })
-            await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(ts_bundle))
+
+            await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(row.ts_required_area_qty*conv1))
+            let rem_ft=((row.ts_required_area_qty*conv1)%1)/conv1
+            await frappe.model.set_value(cdt, cdn, 'pieces', Math.ceil(rem_ft*conv2))
+
+    }
+    else{
+        await frappe.model.set_value(cdt, cdn, 'qty', row.ts_required_area_qty)
     }
 
     }
@@ -323,7 +330,7 @@ async function bundle_calc(frm, cdt, cdn){
                     bundle_conv=doc.uoms[doc_row].conversion_factor
                 }
                 if(doc.uoms[doc_row].uom=='Nos'){
-                    bundle_conv=doc.uoms[doc_row].conversion_factor
+                    nos_conv=doc.uoms[doc_row].conversion_factor
                 }
             }
             conv1=bundle_conv/other_conv

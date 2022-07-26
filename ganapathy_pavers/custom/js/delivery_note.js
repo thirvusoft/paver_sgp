@@ -29,7 +29,7 @@ async function bundle_calc(frm, cdt, cdn){
                 bundle_conv=doc.uoms[doc_row].conversion_factor
             }
             if(doc.uoms[doc_row].uom=='Nos'){
-                bundle_conv=doc.uoms[doc_row].conversion_factor
+                nos_conv=doc.uoms[doc_row].conversion_factor
             }
         }
         conv1=bundle_conv/other_conv
@@ -69,7 +69,7 @@ frappe.ui.form.on('Delivery Note', {
                                 bundle_conv=doc.uoms[doc_row].conversion_factor
                             }
                             if(doc.uoms[doc_row].uom=='Nos'){
-                                bundle_conv=doc.uoms[doc_row].conversion_factor
+                                nos_conv=doc.uoms[doc_row].conversion_factor
                             }
                         }
                         conv1=bundle_conv/other_conv
@@ -112,8 +112,11 @@ frappe.ui.form.on('Delivery Note', {
                                        
                 }).addClass("btn btn-primary btn-sm primary-action").css({' background-color': '#2490ef',});
             }
-        },
-
     
+        },
+    return_odometer_value: function(frm){
+        var  total_distance= (cur_frm.doc.return_odometer_value - cur_frm.doc.current_odometer_value)
+        cur_frm.set_value("total_distance",total_distance)
+    },
 })
 
