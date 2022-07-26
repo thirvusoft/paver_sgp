@@ -92,7 +92,7 @@ def create_site(doc):
             'raw_material': (site_work.get('raw_material') or []) + raw_material,
             'total_required_area': total_area,
             'total_completed_area': completed_area,
-            'completed': (completed_area/total_area)*100,
+            'completed': ((completed_area/total_area)*100) if(total_area) else 0,
             'distance':(site_work.get('distance') or 0)+(doc.get('distance') or 0)
         })
         if(doc['is_multi_customer']):
