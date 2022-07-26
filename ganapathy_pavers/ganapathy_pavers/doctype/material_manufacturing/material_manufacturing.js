@@ -67,20 +67,9 @@ frappe.ui.form.on('Material Manufacturing', {
 				}
 			})
 		}
+		std_item(frm)
 	},
 	bom_no: function(frm){
-		item_adding(frm)
-	},
-	cement_item: function(frm){
-		item_adding(frm)
-	},
-	ggbs_item: function(frm){
-		item_adding(frm)
-	},
-	total_no_of_cement: function(frm){
-		item_adding(frm)
-	},
-	total_no_of_ggbs2: function(frm){
 		item_adding(frm)
 	},
 	total_completed_qty: function(frm){
@@ -210,7 +199,64 @@ function item_adding(frm){
 				doc:cur_frm.doc
 			},
 			callback(r){
-				cur_frm.set_value('items',r.message)
+				// cur_frm.set_value('items',r.message)
+				var t = 0
+				for (const d of r.message){
+					for(const i of frm.doc.items){
+						console.log(i.item_code,d.item_code)
+						if(i.item_code == d.item_code){
+							t=1
+						}
+					}
+				}
+				if(t == 0){
+					for (const d of r.message){
+						var row = frm.add_child('items');
+						row.item_code = d.item_code;
+						row.qty = d.qty;
+						row.stock_uom = d.stock_uom;
+						row.uom = d.uom;
+						row.rate = d.rate;
+						row.amount= d.amount
+						console.log(d.item_code)
+					}
+				}
+				refresh_field("items");
+			}
+		})
+	}
+}
+function std_item(frm){
+	if(frm.doc.bom_no){
+		frappe.call({
+			method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.std_item",
+			args:{
+				doc:cur_frm.doc
+			},
+			callback(r){
+				// cur_frm.set_value('items',r.message)
+				var t = 0
+				for (const d of r.message){
+					for(const i of frm.doc.items){
+						console.log(i.item_code,d.item_code)
+						if(i.item_code == d.item_code){
+							t=1
+						}
+					}
+				}
+				if(t == 0){
+					for (const d of r.message){
+						var row = frm.add_child('items');
+						row.item_code = d.item_code;
+						row.qty = d.qty;
+						row.stock_uom = d.stock_uom;
+						row.uom = d.uom;
+						row.rate = d.rate;
+						row.amount= d.amount
+						console.log(d.item_code)
+					}
+				}
+				refresh_field("items");
 			}
 		})
 	}

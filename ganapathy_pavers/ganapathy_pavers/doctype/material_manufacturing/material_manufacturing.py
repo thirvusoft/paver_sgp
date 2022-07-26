@@ -50,6 +50,11 @@ def add_item(bom_no,doc):
     for i in bom_doc.items:
         row = {field:i.__dict__[field] for field in fields}
         items.append(row)
+    return items
+@frappe.whitelist()
+def std_item(doc):
+    items=[]
+    doc=json.loads(doc)
     if doc.get('cement_item') and doc.get('total_no_of_cement'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['cement_item'],['item_code','stock_uom','stock_uom','valuation_rate'])
@@ -100,15 +105,16 @@ def make_stock_entry(doc,type):
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
+        frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("stock_entry_rack_shift")=="Repack" and type == "create_rack_shiftingstock_entry":
         stock_entry.stock_entry_type = doc.get("stock_entry_rack_shift")
         if doc.get("total_no_of_bundle") == 0:
             frappe.throw("Please Enter the Total No of Bundle")
         stock_entry.append('items', dict(
-        s_warehouse = doc.get("source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("total_no_of_produced_qty")
+        s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("total_no_of_produced_qty")
         ))
         stock_entry.append('items', dict(
-            t_warehouse = doc.get("target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("total_no_of_bundle"),uom = default_bundle
+            t_warehouse = doc.get("rack_shift_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("total_no_of_bundle"),uom = default_bundle
             ))
         if doc.get("damage_qty") > 0:
             stock_entry.append('items', dict(
@@ -119,6 +125,7 @@ def make_stock_entry(doc,type):
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
+        frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("curing_stock_entry_type")=="Material Transfer" and type == "curing_stock_entry":
         stock_entry.stock_entry_type = doc.get("curing_stock_entry_type")
         if doc.get("no_of_bundle") == 0:
@@ -135,3 +142,4 @@ def make_stock_entry(doc,type):
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
+        frappe.msgprint("New Stock Entry Created "+stock_entry.name)
