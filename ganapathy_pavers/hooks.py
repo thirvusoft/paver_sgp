@@ -153,8 +153,7 @@ doc_events = {
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
 					 ],
-		"validate":["ganapathy_pavers.custom.py.delivery_note.validate",
-					],
+		"validate":["ganapathy_pavers.custom.py.delivery_note.validate",],
 	},
 	"Purchase Order":{
 		"before_submit":"ganapathy_pavers.custom.py.purchase_order.getdate"

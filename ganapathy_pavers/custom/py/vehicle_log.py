@@ -116,4 +116,3 @@ def vehicle_log_draft(self, event):
     vehicle_draft=frappe.get_all("Vehicle Log",filters={"docstatus":0,"license_plate":self.license_plate})
     for i in vehicle_draft:
         frappe.db.set_value("Vehicle Log",i.name,"last_odometer",self.odometer)
-
