@@ -68,7 +68,8 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
 				 "ganapathy_pavers.utils.py.worstation.item_customization",
-				 "ganapathy_pavers.utils.py.purchase_order.batch_customization"
+				 "ganapathy_pavers.utils.py.purchase_order.batch_customization",
+				 "ganapathy_pavers.patches.execute"
 				 ]
 				
 

@@ -1,1 +1,1 @@
-ganapathy_pavers.execute_patches
+ganapathy_pavers.patches

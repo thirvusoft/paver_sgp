@@ -27,13 +27,20 @@ frappe.ui.form.on('Sales Order', {
                 };
             }
         });
-          
-        // if(cur_frm.doc.is_multi_customer){
-        //     cur_frm.set_df_property('customer','reqd',0);
-        // }
-        // else{
-        //     cur_frm.set_df_property('customer','reqd',1);
-        // }
+        
+        frm.set_query('customer', function(frm){
+            return {
+                filters: {
+                    'customer_name': ['!=', 'MlutiCustomer']
+                }
+            }
+        })
+        if(cur_frm.doc.is_multi_customer){
+            cur_frm.set_df_property('customer','reqd',0);
+        }
+        else{
+            cur_frm.set_df_property('customer','reqd',1);
+        }
         
         frm.set_query('supervisor', function(frm){
             return {
@@ -53,16 +60,27 @@ frappe.ui.form.on('Sales Order', {
         
     },
     customer:function(frm){
-        cur_frm.set_value('site_work','')
-        frm.set_query('site_work',function(frm){
-            return {
-                filters:{
-                    'customer': cur_frm.doc.customer,
-                    'status': 'Open',
-                    'is_multi_customer':cur_frm.doc.is_multi_customer
+        if(cur_frm.doc.customer!='MultiCutomer'){
+            frm.set_query('site_work',function(frm){
+                return {
+                    filters:{
+                        'customer': cur_frm.doc.customer,
+                        'status': 'Open',
+                        'is_multi_customer':cur_frm.doc.is_multi_customer
+                    }
                 }
-            }
-        })
+            })
+        }
+        else{
+            frm.set_query('site_work',function(frm){
+                return {
+                    filters:{
+                        'status': 'Open',
+                        'is_multi_customer':cur_frm.doc.is_multi_customer
+                    }
+                }
+            })
+        }
     },
     site_work:function(frm){
         cur_frm.set_value('project',cur_frm.doc.site_work)
@@ -128,21 +146,32 @@ frappe.ui.form.on('Sales Order', {
                 }
         })
     },
-    is_multi_customer: function(frm){
+    is_multi_customer: async function(frm){
         cur_frm.set_value('site_work','')
+        
         if(cur_frm.doc.is_multi_customer){
+            frappe.db.exists('Customer', 'MultiCustomer').then((doc) =>{
+                if(doc==true){
+                    cur_frm.set_value('customer', 'MultiCustomer')
+                }
+                else{
+                    frappe.throw({'message': "Can't find MultiCustomer"})
+                }
+            })
             cur_frm.set_df_property('customer','reqd',0);
             frm.set_query('site_work',function(frm){
                 return {
                     filters:{
                         'status': 'Open',
-                        'is_multi_customer':cur_frm.doc.is_multi_customer
+                        'is_multi_customer':cur_frm.doc.is_multi_customer,
+                        'customer': ''
                     }
                 }
             })
         }
         else{
             cur_frm.set_df_property('customer','reqd',1);
+            cur_frm.set_value('customer', '')
             frm.set_query('site_work',function(frm){
                 return {
                     filters:{
@@ -251,12 +280,12 @@ frappe.ui.form.on('Sales Order Item', {
         let conv2
         if(row.item_code && (row.item_group=='Pavers' || row.item_group=='Compound Walls')){
             await frappe.db.get_doc('Item', row.item_code).then((doc) => {
-                let other_conv=1;
+                let bundle_conv=1;
                 let sqft_conv=1;
                 let nos_conv=1;
                 for(let doc_row=0; doc_row<doc.uoms.length; doc_row++){
                     if(doc.uoms[doc_row].uom=='bundle'){
-                        other_conv=doc.uoms[doc_row].conversion_factor
+                        bundle_conv=doc.uoms[doc_row].conversion_factor
                     }
                     if(doc.uoms[doc_row].uom=='Square Foot'){
                         sqft_conv=doc.uoms[doc_row].conversion_factor
@@ -265,10 +294,10 @@ frappe.ui.form.on('Sales Order Item', {
                         nos_conv=doc.uoms[doc_row].conversion_factor
                     }
                 }
-                conv1=sqft_conv/other_conv
-                conv2=nos_conv/other_conv
+                conv1=sqft_conv/bundle_conv
+                conv2=sqft_conv/nos_conv
             })
-            await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(row.ts_required_area_qty*conv1))
+            await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(ts_bundle))
     }
 
     }
