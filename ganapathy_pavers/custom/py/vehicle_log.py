@@ -105,7 +105,6 @@ def vehicle_log_creation(self, event):
         'employee':self.employee,
         "date":self.lr_date,
         "odometer":self.return_odometer_value,
-        "driver_cost":self.driver_cost,
         "select_purpose":"Goods Supply",
         "delivery_note":self.name
     })
