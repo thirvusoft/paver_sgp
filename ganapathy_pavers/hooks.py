@@ -124,9 +124,7 @@ doc_events = {
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
 	},
-    "Employee Checkin":{
-		"on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail"
-	},
+
 	"Employee Advance":{
 		"on_submit":"ganapathy_pavers.utils.py.employee_advance.create_payment_entry"
 	},
@@ -183,7 +181,9 @@ doc_events = {
         "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
     },
  	"Employee Checkin":{
-		"on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail"
+        "validate": "ganapathy_pavers.custom.py.employee.working_hr",
+        "on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
+
 	},
 	"Workstation":{
 		"validate": "ganapathy_pavers.custom.py.workstation.validate"
@@ -210,7 +210,7 @@ doctype_js = {
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
 				"Workstation":"/custom/js/workstation.js",
 				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
-				"Delivery Note": "/custom/js/delivery_note.js",
+				"Delivery Note":"/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
 				"Vehicle Log":[
 								"/custom/js/vehicle_log.js", 
