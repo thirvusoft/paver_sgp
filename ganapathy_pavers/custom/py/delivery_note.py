@@ -184,11 +184,5 @@ def validate(doc,action):
             doc.value_bundle = True
 
         
-  
-def odometer_validate(doc,action):
-    if(doc.return_odometer_value):
-        doc.total_distance=doc.return_odometer_value-doc.current_odometer_value
-        frappe.db.set_value("Delivery Note" , doc.name, "total_distance",doc.return_odometer_value-doc.current_odometer_value)
-        
 
 

@@ -68,7 +68,8 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
 				 "ganapathy_pavers.utils.py.worstation.item_customization",
-				 "ganapathy_pavers.utils.py.purchase_order.batch_customization"
+				 "ganapathy_pavers.utils.py.purchase_order.batch_customization",
+				 "ganapathy_pavers.utils.py.item.batch_customization"
 				 ]
 				
 
@@ -144,16 +145,14 @@ doc_events = {
 		"before_validate":"ganapathy_pavers.custom.py.delivery_note.update_customer",
 		"on_submit":[
 					"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
-					"ganapathy_pavers.custom.py.delivery_note.update_return_qty_sitework"
+					"ganapathy_pavers.custom.py.delivery_note.update_return_qty_sitework",
 					],
 		"on_cancel":[
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
 					 ],
-		"validate":["ganapathy_pavers.custom.py.delivery_note.validate",
-					],
-		"on_change":["ganapathy_pavers.custom.py.delivery_note.odometer_validate",]
-
+		"validate":"ganapathy_pavers.custom.py.delivery_note.validate",
+		"before_submit":"ganapathy_pavers.custom.py.vehicle_log.vehicle_log_creation"
 	},
 	"Purchase Order":{
 		"before_submit":"ganapathy_pavers.custom.py.purchase_order.getdate"
@@ -161,7 +160,8 @@ doc_events = {
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 		"on_submit": ["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
-					  "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
+					  "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
+					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_draft"],
 		"on_cancel":["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 					 "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
 		"validate": "ganapathy_pavers.custom.py.vehicle_log.validate"
@@ -175,7 +175,8 @@ doc_events = {
 		"on_cancel":[
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
-					 ]
+					 ],
+		
   	},
 	"Vehicle":{
         "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
@@ -187,6 +188,9 @@ doc_events = {
 	},
 	"Workstation":{
 		"validate": "ganapathy_pavers.custom.py.workstation.validate"
+	},
+	"Purchase Receipt":{
+		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
 	}
 
 }
@@ -194,7 +198,8 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
               "ganapathy_pavers.custom.py.property_setter.property_setter",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
-			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization"]
+			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
+			  "ganapathy_pavers.utils.py.item.batch_customization"]
 
 
 doctype_js = {
