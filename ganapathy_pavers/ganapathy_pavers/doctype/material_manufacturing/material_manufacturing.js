@@ -218,7 +218,6 @@ function item_adding(frm){
 						row.uom = d.uom;
 						row.rate = d.rate;
 						row.amount= d.amount
-						console.log(d.item_code)
 					}
 				}
 				refresh_field("items");
@@ -253,7 +252,6 @@ function std_item(frm){
 						row.uom = d.uom;
 						row.rate = d.rate;
 						row.amount= d.amount
-						console.log(d.item_code)
 					}
 				}
 				refresh_field("items");
