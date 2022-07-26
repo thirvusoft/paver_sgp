@@ -14,6 +14,11 @@
   "branch",
   "date",
   "checkout_time",
+  "help_session_section",
+  "employee",
+  "column_break_12",
+  "updated_checkout",
+  "update",
   "ts_employee_details_section",
   "employee_detail",
   "employee_chekin_cancle_details_section",
@@ -84,19 +89,44 @@
   {
    "fieldname": "employee_chekin_cancle_details_section",
    "fieldtype": "Section Break",
-   "label": "Employee Chekin Cancel Details"
+   "label": "Employee Checkin Cancel Details"
   },
   {
    "allow_on_submit": 1,
    "fieldname": "ts_emp_checkin",
    "fieldtype": "Table",
    "options": "TS EMP Checkin Cancel table"
+  },
+  {
+   "fieldname": "help_session_section",
+   "fieldtype": "Section Break",
+   "label": "Help Session"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Update Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "updated_checkout",
+   "fieldtype": "Datetime",
+   "label": "Update Checkout"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "update",
+   "fieldtype": "Button",
+   "label": "Update"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-25 11:49:33.303712",
+ "modified": "2022-07-25 17:39:27.444336",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Attendance Tool",

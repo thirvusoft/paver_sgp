@@ -24,6 +24,25 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
             
         })
     },
+    update:function(frm,cdt,cdn){
+        if (cur_frm.doc.employee){
+            if (cur_frm.doc.updated_checkout){
+                frappe.call({
+                    method:"ganapathy_pavers.custom.py.employee_atten_tool.help_session",
+                    args:{
+                        emp: cur_frm.doc.employee,
+                        upd_cout: cur_frm.doc.updated_checkout,
+                        emp_tabl :cur_frm.doc.employee_detail
+                    },
+                    callback(r){
+                        cur_frm.set_value("employee_detail", r.message)
+                    }
+                })
+                
+                    
+            }
+        } 
+    },
     date:function(frm, cdt,cdn){
         for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
            frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_in", cur_frm.doc.date)
@@ -65,6 +84,7 @@ function get_data(frm, cdt, cdn){
                 if (frm.doc.designation == "Labour Worker"){
                     frappe.model.set_value(child.doctype, child.name, "payment_method",'Deduct from Salary')
                 }
+                
             }
             cur_frm.refresh_field("employee_detail")
         }
