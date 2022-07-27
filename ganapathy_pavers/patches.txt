@@ -1,1 +1,2 @@
-ganapathy_pavers.patches
+ganapathy_pavers.patches.patches
+ganapathy_pavers.patches.item_patch
