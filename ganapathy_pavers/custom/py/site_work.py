@@ -52,15 +52,11 @@ def before_save(doc, action=None):
         if(item.get('warehouse')):
             bin_=frappe.get_value('Bin', {'warehouse': item.warehouse, 'item_code': item.item}, 'valuation_rate')
             item_cost+=(bin_ or 0)* (item.stock_qty or 0)
-            frappe.errprint((bin_ or 0)* (item.stock_qty or 0))
-            frappe.errprint(item.item)  
 
     for item in doc.item_details_compound_wall:
         if(item.get('warehouse')):
             bin_=frappe.get_value('Bin', {'warehouse': item.warehouse, 'item_code': item.item}, 'valuation_rate')
             item_cost+=(bin_ or 0)* (item.stock_qty or 0)
-            frappe.errprint((bin_ or 0)* (item.stock_qty or 0))
-            frappe.errprint(item.item)
 
     for item in doc.raw_material:
         doc1=frappe.get_all('Item Price', {'buying':1, 'item_code': item.item}, fields=["price_list_rate", "uom"])
