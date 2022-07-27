@@ -204,3 +204,14 @@ def get_item_rate(item='', selling=1):
         return 0
     doc=frappe.get_last_doc('Item Price', {'item_code': item, 'selling': selling})
     return doc.price_list_rate or 0
+
+
+def item_table_pa_cw(self, event):
+    types=self.type
+    for i in self.items:
+        if (types=="Pavers" and (i.item_group)=="Compound Walls"):
+            frappe.throw(f"You can't select both {frappe.bold('Pavers')} and {frappe.bold('Compound Walls')}. Please remove the item: "+frappe.bold(i.item_code))
+        elif (types=="Compound Wall" and (i.item_group)=="Pavers"):
+            frappe.throw(f"You can't select both {frappe.bold('Pavers')} and {frappe.bold('Compound Walls')}. Please remove the item: "+frappe.bold(i.item_code))
+
+
