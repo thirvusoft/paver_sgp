@@ -134,7 +134,15 @@ function completed_bundle_calc(frm,cdt,cdn){
 	var item = data.item
 	if(bundle && item){
 		frappe.db.get_doc('Item',item).then(value => {
-			item_bundle_per_sqft = value.bundle_per_sqr_ft
+			item_bundle_per_sqft = 0
+			for(let i=0; i<value.uoms.length; i++){
+				if(value.uoms[i].uom=='bundle'){
+					item_bundle_per_sqft=value.uoms[i].conversion_factor
+				}
+			}
+			if(!item_bundle_per_sqft){
+				frappe.throw({'message': 'Please enter bundle conversion for an item: '+item})
+			}
 			allocated_sqft = bundle * item_bundle_per_sqft
 			frappe.model.set_value(cdt,cdn,"sqft_allocated",allocated_sqft?allocated_sqft:0)
 		})
