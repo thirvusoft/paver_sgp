@@ -267,7 +267,6 @@ frappe.ui.form.on('Sales Order Item', {
                 }
                 conv1=sqft_conv/bundle_conv
                 conv2=sqft_conv/nos_conv
-                console.log(conv1, conv2)
             })
 
             await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(row.ts_required_area_qty*conv1))
