@@ -522,13 +522,14 @@
    "default": "0",
    "fieldname": "curing_damaged_qty",
    "fieldtype": "Int",
+   "hidden": 1,
    "label": "Curing Damage Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-26 17:57:34.114747",
+ "modified": "2022-07-27 18:45:28.346783",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

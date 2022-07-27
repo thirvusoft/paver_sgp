@@ -2,7 +2,9 @@
 # For license information, please see license.txt
 
 # import frappe
+from dataclasses import field
 import json
+from wsgiref import validate
 import frappe
 from frappe.model.document import Document
 from frappe.utils.data import time_diff_in_hours
@@ -31,6 +33,12 @@ class MaterialManufacturing(Document):
         doc.average_of_raw_material = avg_raw_material
         doc.average_of_cement = avg_cement
         doc.average_of__ggbs2 = avg_ggbs2   
+    def before_submit(doc):
+        manufacture = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
+        repack = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
+        material = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer"},pluck="name")
+        if len(manufacture) == 0 or len(repack) == 0 or len(material) == 0:
+            frappe.throw("Process Incomplete. Create Stock Entry To Submit")
 
 @frappe.whitelist()
 def total_hrs(from_time = None,to = None):
@@ -88,6 +96,9 @@ def make_stock_entry(doc,type):
     default_nos = frappe.db.get_singles_value("USB Setting", "default_manufacture_uom")
     default_bundle = frappe.db.get_singles_value("USB Setting", "default_rack_shift_uom")
     if doc.get("stock_entry_type")=="Manufacture" and type == "create_stock_entry":
+        valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
+        if len(valid) >= 1:
+            frappe.throw("Already Stock Entry("+valid[0]+") Created For Manufacture")
         stock_entry.stock_entry_type = doc.get("stock_entry_type")
         for i in doc.get("items"):
             stock_entry.append('items', dict(
@@ -107,6 +118,9 @@ def make_stock_entry(doc,type):
         stock_entry.save()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("stock_entry_rack_shift")=="Repack" and type == "create_rack_shiftingstock_entry":
+        valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Repack"},pluck="name")
+        if len(valid) >= 1:
+            frappe.throw("Already Stock Entry("+valid[0]+") Created For Repack")
         stock_entry.stock_entry_type = doc.get("stock_entry_rack_shift")
         if doc.get("total_no_of_produced_qty") == 0:
             frappe.throw("Please Enter the Total No of Bundle")
@@ -117,7 +131,7 @@ def make_stock_entry(doc,type):
         stock_entry.append('items', dict(
             t_warehouse = doc.get("rack_shift_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = qty,uom = default_bundle
             ))
-        if doc.get("damage_qty") > 0:
+        if doc.get("rack_shift_damage_qty") > 0:
             stock_entry.append('items', dict(
                 t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture"),qty = doc.get("rack_shift_damage_qty"),uom = default_nos
                 ))
@@ -128,6 +142,9 @@ def make_stock_entry(doc,type):
         stock_entry.save()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("curing_stock_entry_type")=="Material Transfer" and type == "curing_stock_entry":
+        valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer"},pluck="name")
+        if len(valid) >= 1:
+            frappe.throw("Already Stock Entry("+valid[0]+") Created For Material Transfer")
         stock_entry.stock_entry_type = doc.get("curing_stock_entry_type")
         if doc.get("no_of_bundle") == 0:
             frappe.throw("Please Enter No of Bundle")
