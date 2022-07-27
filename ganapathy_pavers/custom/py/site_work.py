@@ -166,26 +166,19 @@ def validate_jw_qty(self):
     for row in self.delivery_detail:
         if(row.item not  in delivered_item):
             delivered_item[row.item]=0
-        item_doc=frappe.get_doc('Item', row.item, 'uoms')
-        if(item_doc.item_group=='Pavers'):
-            sqft=((row.delivered_bundle or 0)*float(frappe.get_value('Item', row.item, 'bundle_per_sqr_ft') or 0))+((row.delivered_pieces or 0)*float(frappe.get_value('Item', row.item, 'pavers_per_sqft') or 0))
-        else:
-            sqft=0
-        conv_factor=[conv.conversion_factor for conv in item_doc.uoms if(conv.uom==item_doc.sales_uom)]
-        if(not sqft and not conv_factor):
-            frappe.throw('Please enter Sales UOM for an item: '+ frappe.bold(getlink('Item', row.item)))
-        stock_qty=(row.delivered_stock_qty or 0) *(conv_factor[0] if(conv_factor) else 0)
-        delivered_item[row.item]+=sqft if(sqft) else (stock_qty)
-        
+        delivered_item[row.item]+=row.delivered_stock_qty
+
     jw_items={}
     for row in self.job_worker:
         if(row.item not  in jw_items):
             jw_items[row.item]=0
-        jw_items[row.item]+=float(row.sqft_allocated or 0)
+        item_doc=frappe.get_doc('Item', row.item)
+        conv_factor=[conv.conversion_factor for conv in item_doc.uoms if(conv.uom=='Square Foot')]
+        if(not conv_factor):
+            frappe.throw('Please enter Square Feet Conversion for an item: '+ frappe.bold(getlink('Item', row.item)))
+        jw_items[row.item]+=float(row.sqft_allocated or 0)/conv_factor[0]
     wrong_items=[]
     for item in jw_items:
-        frappe.errprint(jw_items.get(item))
-        frappe.errprint(delivered_item.get(item) or 0)
         if((jw_items.get(item) or 0)>(delivered_item.get(item) or 0)):
             wrong_items.append(frappe.bold(item))
     if(wrong_items):
