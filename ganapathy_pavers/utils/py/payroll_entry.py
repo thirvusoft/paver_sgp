@@ -48,8 +48,13 @@ def create_salary_slips_for_employees(posting_date,start_date,end_date,employees
     salary_slips_not_created = []
     index=0
     for emp in employees:
+        st_date=getdate(start_date)
+        ed_date=getdate(end_date)
+        doc=sum(frappe.get_all('Attendance', filters={"employee":emp, "attendance_date":[
+				"between",(st_date, ed_date)],"docstatus":1},pluck='employee_working_hours'))
+        
         if emp not in salary_slips_exists_for:
-            args.update({"doctype": "Salary Slip", "total_time_of_food_taken": food_count[index]})
+            args.update({"doctype": "Salary Slip", "total_time_of_food_taken": food_count[index], 'total_working_hour':doc})
             args.update({"doctype": "Salary Slip", "employee": emp})
             employee=frappe.get_doc('Employee',emp)
             if(employee.designation=='Job Worker'):
