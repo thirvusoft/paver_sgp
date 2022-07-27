@@ -13,8 +13,8 @@
  "is_standard": 1,
  "label": "Vehicle Maintenance",
  "links": [],
- "modified": "2022-07-22 13:50:09.138152",
- "modified_by": "Administrator",
+ "modified": "2022-07-27 17:46:35.657566",
+ "modified_by": "parameshwari@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Maintenance",
  "owner": "Administrator",
@@ -31,6 +31,12 @@
    "doc_view": "List",
    "label": "Vehicle Log",
    "link_to": "Vehicle Log",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Vehicle Settings",
+   "link_to": "Vehicle Settings",
    "type": "DocType"
   }
  ]

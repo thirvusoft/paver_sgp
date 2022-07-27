@@ -111,7 +111,6 @@ frappe.ui.form.on('Sales Order', {
         }
         else{
             cur_frm.set_df_property('customer','reqd',1);
-            cur_frm.set_value('customer', '')
         }
         if(cur_frm.doc.is_multi_customer){
             await frappe.call({
@@ -176,6 +175,14 @@ frappe.ui.form.on('Sales Order', {
         cur_frm.set_value('site_work','')
         
         if(cur_frm.doc.is_multi_customer){
+            frappe.db.exists('Customer', 'MultiCustomer').then((doc) =>{
+                if(doc==true){
+                    cur_frm.set_value('customer', 'MultiCustomer')
+                }
+                else{
+                    frappe.throw({'message': "Can't find MultiCustomer"})
+                }
+            })
             frm.set_query('site_work',function(frm){
                 return {
                     filters:{
@@ -185,6 +192,7 @@ frappe.ui.form.on('Sales Order', {
                     }
                 }
             })
+            
         }
         else{
             frm.set_query('site_work',function(frm){

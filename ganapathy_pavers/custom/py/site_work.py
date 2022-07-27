@@ -186,7 +186,7 @@ def validate_jw_qty(self):
             conv_factor=[conv.conversion_factor for conv in item_doc.uoms if(conv.uom=='Square Foot')]
             if(not conv_factor):
                 frappe.throw('Please enter Square Feet Conversion for an item: '+ frappe.bold(getlink('Item', row.item)))
-            jw_items[row.item]+=float(row.sqft_allocated or 0)/conv_factor[0]
+            jw_items[row.item]+=float(row.sqft_allocated or 0)*conv_factor[0]
     wrong_items=[]
     for item in jw_items:
         if((jw_items.get(item) or 0)>(delivered_item.get(item) or 0)):

@@ -36,7 +36,6 @@ def checkin(table_list, atten_date, checkout, ts_name):
 				'ts_emp_att_tool_name':ts_name,
 			})
 			doc.insert(ignore_permissions=True)
-			doc.submit()
 		if i.get('check_out') or checkout:
 			doc1 = frappe.new_doc("Employee Checkin")
 			doc1.update({
@@ -46,7 +45,6 @@ def checkin(table_list, atten_date, checkout, ts_name):
 				'ts_emp_att_tool_name':ts_name,
 			})
 			doc1.insert(ignore_permissions=True)
-			doc1.submit()
 
 
 def fill_emp_cancel_detail(self, event):
