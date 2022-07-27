@@ -59,8 +59,10 @@ def before_save(doc, action=None):
             item_cost+=(bin_ or 0)* (item.stock_qty or 0)
 
     for item in doc.raw_material:
-        doc1=frappe.get_all('Item Price', {'buying':1, 'item_code': item.item}, fields=["price_list_rate", "uom"])
+        doc1=frappe.get_all('Item Price', {'buying':1, 'item_code': item.item}, ["price_list_rate", "uom"])
         if(doc1):
+            if(not doc1[0].uom):
+                doc1[0].uom=frappe.get_value('Item', item.item, 'stock_uom')
             if(item.stock_uom and doc1[0].uom):
                 item_doc=frappe.get_doc('Item', item.item)
                 conv=0
