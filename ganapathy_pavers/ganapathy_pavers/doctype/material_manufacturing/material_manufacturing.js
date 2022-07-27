@@ -70,6 +70,7 @@ frappe.ui.form.on('Material Manufacturing', {
 			})
 		}
 		std_item(frm)
+		item_adding(frm)
 	},
 	bom_no: function(frm){
 		item_adding(frm)
