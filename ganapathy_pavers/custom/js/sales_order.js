@@ -2,8 +2,14 @@ var prop_name;
 
 
 frappe.ui.form.on('Sales Order', {
-
-    refresh:function(frm){
+    onload: function(frm){
+        frm.set_query('customer', function(){
+            return {
+                filters: {
+                    'customer_name': ['!=', 'MultiCustomer']
+                }
+            }
+        })
         frappe.ui.form.ProjectQuickEntryForm = frappe.ui.form.QuickEntryForm.extend({
             render_dialog: async function() {
                 this._super();
@@ -27,13 +33,14 @@ frappe.ui.form.on('Sales Order', {
                 };
             }
         });
-          
-        // if(cur_frm.doc.is_multi_customer){
-        //     cur_frm.set_df_property('customer','reqd',0);
-        // }
-        // else{
-        //     cur_frm.set_df_property('customer','reqd',1);
-        // }
+    },
+    refresh:function(frm){
+        if(cur_frm.doc.is_multi_customer){
+            cur_frm.set_df_property('customer','reqd',0);
+        }
+        else{
+            cur_frm.set_df_property('customer','reqd',1);
+        }
         
         frm.set_query('supervisor', function(frm){
             return {
@@ -44,25 +51,41 @@ frappe.ui.form.on('Sales Order', {
         });
          if(cur_frm.doc.docstatus==0){
             cur_frm.fields_dict.site_work.$input.on("click", async function() {
-                await cur_frm.trigger('refresh')
+                await cur_frm.trigger('onload')
+                
                 if(!cur_frm.doc.customer && !cur_frm.doc.is_multi_customer){
                     frappe.throw({'message':'Please Select Customer'})
                 }
             });
+            cur_frm.fields_dict.customer.$input.on("click", async function() {
+                await cur_frm.trigger('onload')
+            })
         }
         
     },
     customer:function(frm){
-        cur_frm.set_value('site_work','')
-        frm.set_query('site_work',function(frm){
-            return {
-                filters:{
-                    'customer': cur_frm.doc.customer,
-                    'status': 'Open',
-                    'is_multi_customer':cur_frm.doc.is_multi_customer
+            if(cur_frm.doc.customer!='MultiCustomer'){
+            frm.set_query('site_work',function(frm){
+                return {
+                    filters:{
+                        'customer': cur_frm.doc.customer,
+                        'status': 'Open',
+                        'is_multi_customer':cur_frm.doc.is_multi_customer
+                    }
                 }
-            }
-        })
+            })
+        }
+        else{
+            frm.set_query('site_work',function(frm){
+                return {
+                    filters:{
+                        'status': 'Open',
+                        'is_multi_customer':cur_frm.doc.is_multi_customer,
+                        'customer': ''
+                    }
+                }
+            })
+        }
     },
     site_work:function(frm){
         cur_frm.set_value('project',cur_frm.doc.site_work)
@@ -128,21 +151,39 @@ frappe.ui.form.on('Sales Order', {
                 }
         })
     },
-    is_multi_customer: function(frm){
+    is_multi_customer: async function(frm){
         cur_frm.set_value('site_work','')
+        frm.set_query('customer', 'customers_name', function(){
+            return {
+                filters: {
+                    'customer_name': ['!=', 'MultiCustomer']
+                }
+            }
+        })
         if(cur_frm.doc.is_multi_customer){
+            frappe.db.exists('Customer', 'MultiCustomer').then((doc) =>{
+                if(doc==true){
+                    cur_frm.set_value('customer', 'MultiCustomer')
+                }
+                else{
+                    frappe.throw({'message': "Can't find MultiCustomer"})
+                }
+            })
             cur_frm.set_df_property('customer','reqd',0);
+            console.log(1)
             frm.set_query('site_work',function(frm){
                 return {
                     filters:{
                         'status': 'Open',
-                        'is_multi_customer':cur_frm.doc.is_multi_customer
+                        'is_multi_customer':cur_frm.doc.is_multi_customer,
+                        'customer': ''
                     }
                 }
             })
         }
         else{
             cur_frm.set_df_property('customer','reqd',1);
+            cur_frm.set_value('customer', '')
             frm.set_query('site_work',function(frm){
                 return {
                     filters:{
@@ -267,7 +308,6 @@ frappe.ui.form.on('Sales Order Item', {
                 }
                 conv1=sqft_conv/bundle_conv
                 conv2=sqft_conv/nos_conv
-                console.log(conv1, conv2)
             })
 
             await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(row.ts_required_area_qty*conv1))
