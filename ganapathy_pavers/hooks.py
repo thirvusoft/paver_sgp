@@ -138,7 +138,8 @@ doc_events = {
 		"after_insert":"ganapathy_pavers.custom.py.site_work.validate"
 	},
 	"Sales Order":{
-		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
+		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields",
+		"validate":"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw"
 	},
 	"Job Card":{
 		"on_submit":"afterganapathy_pavers.ganapathy_pavers.utils.py.jobcard.workstation"
