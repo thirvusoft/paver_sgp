@@ -12,5 +12,4 @@ def working_hr(self, event):
 
 def emp_hrs(diff_hrs, employee):
    doc=frappe.get_last_doc('Attendance', {'employee':employee})
-   print(doc)
    frappe.set_value(doc.doctype, doc.name, "employee_working_hours",  diff_hrs)
