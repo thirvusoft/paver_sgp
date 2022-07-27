@@ -373,13 +373,15 @@
    "fieldname": "rack_shift_source_warehouse",
    "fieldtype": "Link",
    "label": "Rack shift Source Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "reqd": 1
   },
   {
    "fieldname": "rack_shift_target_warehouse",
    "fieldtype": "Link",
    "label": "Rack shift Target Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "reqd": 1
   },
   {
    "fieldname": "create_rack_shiftingstock_entry",
@@ -498,13 +500,15 @@
    "fieldname": "curing_source_warehouse",
    "fieldtype": "Link",
    "label": "Curing Source Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "reqd": 1
   },
   {
    "fieldname": "curing_target_warehouse",
    "fieldtype": "Link",
    "label": "Curing Target Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "reqd": 1
   },
   {
    "default": "Material Transfer",
@@ -522,13 +526,14 @@
    "default": "0",
    "fieldname": "curing_damaged_qty",
    "fieldtype": "Int",
+   "hidden": 1,
    "label": "Curing Damage Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-26 17:57:34.114747",
+ "modified": "2022-07-27 19:21:58.997005",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

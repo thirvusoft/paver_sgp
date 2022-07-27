@@ -41,11 +41,11 @@ frappe.ui.form.on('Material Manufacturing', {
 	// damage_qty: function(frm){
 	// 	cur_frm.set_value('total_completed_qty', frm.doc.total_completed_qty - frm.doc.damage_qty) 
 	// },
-	// rack_shift_damage_qty: function(frm){
-	// 	cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty) 
-	// },
+	rack_shift_damage_qty: function(frm){
+		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty) 
+	},
 	refresh: function(frm){
-		if(frm.doc.ts_total_hours > 0 ){
+		if(frm.doc.ts_total_hours > 0 && frm.doc.docstatus == 0){
 			frappe.call({
 				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_expense",
 				args:{
@@ -57,7 +57,7 @@ frappe.ui.form.on('Material Manufacturing', {
 				}
 			})
 		}
-		if(frm.doc.total_hours_rack > 0 ){
+		if(frm.doc.total_hours_rack > 0 && frm.doc.docstatus == 0){
 			frappe.call({
 				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_expense",
 				args:{
