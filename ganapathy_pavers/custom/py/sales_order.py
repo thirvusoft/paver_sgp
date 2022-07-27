@@ -44,21 +44,27 @@ def create_site(doc):
                 'area_per_bundle':row['area_per_bundle'],
                 'number_of_bundle':row['ts_qty'],
                 'allocated_paver_area':row['qty'],
+                'uom': row['uom'],
                 'rate':row['rate'],
                 'amount':row['amount'],
                 'work': row['work'],
                 'sales_order':doc['name'],
-                'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse')
+                'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse'),
+                'stock_qty': row['stock_qty'],
+                'stock_uom': row['stock_uom']
                 } for row in doc['items'] if(row['item_group']=='Pavers')]
         compoun_walls=[{
                 'item':row['item_code'],
                 'compound_wall_type':row['compound_wall_type'],
                 'allocated_ft':row['qty'],
+                'uom': row['uom'],
                 'rate':row['rate'],
                 'amount':row['amount'],
                 'work': row['work'],
                 'sales_order':doc['name'],
-                'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse')
+                'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse'),
+                'stock_qty': row['stock_qty'],
+                'stock_uom': row['stock_uom']
                 } for row in doc['items'] if(row['item_group']=='Compound Walls')]
         raw_material=[{
                 'item':row['item_code'],
@@ -66,7 +72,9 @@ def create_site(doc):
                 'uom':row['uom'],
                 'rate':row['rate'],
                 'amount':row['amount'],
-                'sales_order':doc['name']
+                'sales_order':doc['name'],
+                'stock_qty': row['stock_qty'],
+                'stock_uom': row['stock_uom']
                 } for row in doc['items'] if(row['item_group']=='Raw Material')]
         site_work=frappe.get_doc('Project',doc['site_work'])
         total_area=0
