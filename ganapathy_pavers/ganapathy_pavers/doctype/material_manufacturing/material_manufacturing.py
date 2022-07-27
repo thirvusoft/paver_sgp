@@ -87,7 +87,6 @@ def make_stock_entry(doc,type):
     if doc.get("total_completed_qty") == 0 or doc.get("cement_item") == '' or doc.get("ggbs_item") == '':
             frappe.throw("Please Enter the Produced Qty Or Damage Qty")
     default_scrap_warehouse = frappe.db.get_singles_value("USB Setting", "scrap_warehouse")
-    print("wearesrdytu568888888",default_scrap_warehouse)
     expenses_included_in_valuation = frappe.get_cached_value("Company", doc.get("company"), "expenses_included_in_valuation")
     stock_entry = frappe.new_doc("Stock Entry")
     stock_entry.company = doc.get("company")
