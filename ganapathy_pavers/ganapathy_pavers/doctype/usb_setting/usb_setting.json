@@ -11,6 +11,8 @@
   "default_stock_entry_manufacture",
   "default_manufacture_source_warehouse",
   "default_manufacture_target_warehouse",
+  "default_scrap_warehouse",
+  "scrap_warehouse",
   "column_break_4",
   "default_stock_entry_rack_shifting",
   "default_rack_shift_source_warehouse",
@@ -168,12 +170,23 @@
    "fieldtype": "Link",
    "label": "GGBS",
    "options": "Item"
+  },
+  {
+   "fieldname": "scrap_warehouse",
+   "fieldtype": "Link",
+   "label": "Scrap Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "default_scrap_warehouse",
+   "fieldtype": "Heading",
+   "label": "Default Scrap Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-07-25 17:56:05.465347",
+ "modified": "2022-07-27 18:51:23.254070",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "USB Setting",
