@@ -24,15 +24,23 @@ class MaterialManufacturing(Document):
             total_ggbs2_t.append(i.ggbs2_t)
         total_cm = sum(total_cement_2a) + sum(total_cement)
         total_ggbs = sum(total_ggbs2) + sum(total_ggbs2_t)
-        avg_raw_material = sum(total_raw_material)/len(total_raw_material)
-        avg_cement = total_cm/(len(total_cement)+len(total_cement_2a))
-        avg_ggbs2 = total_ggbs/(len(total_ggbs2)+len(total_ggbs2_t))
-        doc.total_no_of_raw_material = sum(total_raw_material)
-        doc.total_no_of_cement = total_cm
-        doc.total_no_of_ggbs2 = total_ggbs
-        doc.average_of_raw_material = avg_raw_material
-        doc.average_of_cement = avg_cement
-        doc.average_of__ggbs2 = avg_ggbs2   
+        if len(total_raw_material) == 0:
+            doc.total_no_of_raw_material = 0
+            doc.total_no_of_cement = 0
+            doc.total_no_of_ggbs2 = 0
+            doc.average_of_raw_material = 0
+            doc.average_of_cement = 0
+            doc.average_of__ggbs2 = 0
+        else:
+            avg_raw_material = sum(total_raw_material)/len(total_raw_material)
+            avg_cement = total_cm/(len(total_cement)+len(total_cement_2a))
+            avg_ggbs2 = total_ggbs/(len(total_ggbs2)+len(total_ggbs2_t))
+            doc.total_no_of_raw_material = sum(total_raw_material)
+            doc.total_no_of_cement = total_cm
+            doc.total_no_of_ggbs2 = total_ggbs
+            doc.average_of_raw_material = avg_raw_material
+            doc.average_of_cement = avg_cement
+            doc.average_of__ggbs2 = avg_ggbs2   
     def before_submit(doc):
         manufacture = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
         repack = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
@@ -87,7 +95,6 @@ def make_stock_entry(doc,type):
     if doc.get("total_completed_qty") == 0 or doc.get("cement_item") == '' or doc.get("ggbs_item") == '':
             frappe.throw("Please Enter the Produced Qty Or Damage Qty")
     default_scrap_warehouse = frappe.db.get_singles_value("USB Setting", "scrap_warehouse")
-    print("wearesrdytu568888888",default_scrap_warehouse)
     expenses_included_in_valuation = frappe.get_cached_value("Company", doc.get("company"), "expenses_included_in_valuation")
     stock_entry = frappe.new_doc("Stock Entry")
     stock_entry.company = doc.get("company")
