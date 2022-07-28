@@ -185,7 +185,7 @@ doc_events = {
     },
  	"Employee Checkin":{
         "validate": "ganapathy_pavers.custom.py.employee.working_hr",
-        "on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
+        "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
 
 	},
 	"Workstation":{

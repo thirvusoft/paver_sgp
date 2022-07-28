@@ -3,6 +3,13 @@ var prop_name;
 
 frappe.ui.form.on('Sales Order', {
     onload: function(frm){
+        frm.set_query('customer', 'customers_name', function(){
+            return {
+                filters: {
+                    'customer_name': ['!=', 'MultiCustomer']
+                }
+            }
+        })
         frm.set_query('customer', function(){
             return {
                 filters: {
@@ -92,6 +99,20 @@ frappe.ui.form.on('Sales Order', {
     },
     before_save:async function(frm){
         if(cur_frm.doc.is_multi_customer){
+            frappe.db.exists('Customer', 'MultiCustomer').then((doc) =>{
+                if(doc==true){
+                    cur_frm.set_value('customer', 'MultiCustomer')
+                }
+                else{
+                    frappe.throw({'message': "Can't find MultiCustomer"})
+                }
+            })
+            cur_frm.set_df_property('customer','reqd',0);
+        }
+        else{
+            cur_frm.set_df_property('customer','reqd',1);
+        }
+        if(cur_frm.doc.is_multi_customer){
             await frappe.call({
                 "method":"ganapathy_pavers.custom.py.sales_order.create_property",
                 "callback":function(r){
@@ -152,13 +173,7 @@ frappe.ui.form.on('Sales Order', {
     },
     is_multi_customer: async function(frm){
         cur_frm.set_value('site_work','')
-        frm.set_query('customer', 'customers_name', function(){
-            return {
-                filters: {
-                    'customer_name': ['!=', 'MultiCustomer']
-                }
-            }
-        })
+        
         if(cur_frm.doc.is_multi_customer){
             frappe.db.exists('Customer', 'MultiCustomer').then((doc) =>{
                 if(doc==true){
@@ -168,8 +183,6 @@ frappe.ui.form.on('Sales Order', {
                     frappe.throw({'message': "Can't find MultiCustomer"})
                 }
             })
-            cur_frm.set_df_property('customer','reqd',0);
-            console.log(1)
             frm.set_query('site_work',function(frm){
                 return {
                     filters:{
@@ -179,10 +192,9 @@ frappe.ui.form.on('Sales Order', {
                     }
                 }
             })
+            
         }
         else{
-            cur_frm.set_df_property('customer','reqd',1);
-            cur_frm.set_value('customer', '')
             frm.set_query('site_work',function(frm){
                 return {
                     filters:{

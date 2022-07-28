@@ -59,8 +59,10 @@ def before_save(doc, action=None):
             item_cost+=(bin_ or 0)* (item.stock_qty or 0)
 
     for item in doc.raw_material:
-        doc1=frappe.get_all('Item Price', {'buying':1, 'item_code': item.item}, fields=["price_list_rate", "uom"])
+        doc1=frappe.get_all('Item Price', {'buying':1, 'item_code': item.item}, ["price_list_rate", "uom"])
         if(doc1):
+            if(not doc1[0].uom):
+                doc1[0].uom=frappe.get_value('Item', item.item, 'stock_uom')
             if(item.stock_uom and doc1[0].uom):
                 item_doc=frappe.get_doc('Item', item.item)
                 conv=0
@@ -184,7 +186,7 @@ def validate_jw_qty(self):
             conv_factor=[conv.conversion_factor for conv in item_doc.uoms if(conv.uom=='Square Foot')]
             if(not conv_factor):
                 frappe.throw('Please enter Square Feet Conversion for an item: '+ frappe.bold(getlink('Item', row.item)))
-            jw_items[row.item]+=float(row.sqft_allocated or 0)/conv_factor[0]
+            jw_items[row.item]+=float(row.sqft_allocated or 0)*conv_factor[0]
     wrong_items=[]
     for item in jw_items:
         if((jw_items.get(item) or 0)>(delivered_item.get(item) or 0)):
