@@ -139,7 +139,6 @@ frappe.ui.form.on('Sales Invoice',{
                 filters:{
                     'customer': cur_frm.doc.customer,
                     'status': 'Open',
-                    'is_multi_customer':1
                 }
             }
         })

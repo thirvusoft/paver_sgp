@@ -105,18 +105,22 @@ function percent_complete(frm,cdt,cdn){
 	let total_area=0;
 	let total_bundle = 0;
 	let paver= cur_frm.doc.item_details?cur_frm.doc.item_details:[]
+	let cw= cur_frm.doc.item_details_compound_wall?cur_frm.doc.item_details_compound_wall:[]
 	for(let row=0;row<paver.length;row++){
-		total_area+= cur_frm.doc.item_details[row].required_area
-		total_bundle += cur_frm.doc.item_details[row].number_of_bundle
+		total_area+= cur_frm.doc.item_details[row].required_area?cur_frm.doc.item_details[row].required_area:0
+		total_bundle += cur_frm.doc.item_details[row].number_of_bundle?cur_frm.doc.item_details[row].number_of_bundle:0
 	        }
+	for(let row=0;row<cw.length;row++){
+		total_area+= cur_frm.doc.item_details_compound_wall[row].allocated_ft?cur_frm.doc.item_details_compound_wall[row].allocated_ft:0
+			}
 	let completed_area=0;
 	let total_comp_bundle = 0;
 	let work= cur_frm.doc.job_worker?cur_frm.doc.job_worker:[]
 	for(let row=0;row<work.length;row++){
-		completed_area+= cur_frm.doc.job_worker[row].sqft_allocated
-		total_comp_bundle += cur_frm.doc.job_worker[row].completed_bundle
+		completed_area+= cur_frm.doc.job_worker[row].sqft_allocated?cur_frm.doc.job_worker[row].sqft_allocated:0
+		total_comp_bundle += cur_frm.doc.job_worker[row].completed_bundle?cur_frm.doc.job_worker[row].completed_bundle:0
 	}
-	let percent=(total_comp_bundle/total_bundle)*100
+	let percent=(completed_area/total_area)*100
 	frm.set_value('total_required_area',total_area)
 	frm.set_value('total_completed_area',completed_area)
 	frm.set_value('total_required_bundle',total_bundle)

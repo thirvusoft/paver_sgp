@@ -185,7 +185,7 @@ doc_events = {
     },
  	"Employee Checkin":{
         "validate": "ganapathy_pavers.custom.py.employee.working_hr",
-        "on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
+        "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
 
 	},
 	"Workstation":{
@@ -200,8 +200,8 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
               "ganapathy_pavers.custom.py.property_setter.property_setter",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
-			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
-			  "ganapathy_pavers.utils.py.item.batch_customization"]
+			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization"
+			  ]
 
 
 doctype_js = {
