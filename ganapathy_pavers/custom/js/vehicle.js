@@ -14,6 +14,13 @@ frappe.ui.form.on("Vehicle" ,{
                                       'employee_categories':'Driver'
                                   }
                               }
+                    }),
+                    frm.set_query("add_on", function(frm) {
+                        return {
+                            filters: {
+                                'is_add_on' : '0'
+                            }
+                        };
                     });
                 if (cur_frm.is_new()){
                     let Maintenance=["Insurance","FC Details","Road Tax","Permit","Pollution Certificate","Green Tax"]
