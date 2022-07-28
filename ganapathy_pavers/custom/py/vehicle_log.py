@@ -11,8 +11,8 @@ def onsubmit(doc, event):
             if event == 'on_submit':
                 i.kilometers_after_last_service = (i.kilometers_after_last_service or 0) + km
                 if i.kilometers_after_last_service>=i.alert_kilometers and i.frequency == 'Mileage':
-                    notification(doc.owner, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "admin@gmail.com")
-                    notification(doc.owner, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "agalya@gpy.com")
+                    notification(doc.owner, doc.license_plate, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "admin@gmail.com")
+                    notification(doc.owner, doc.license_plate, i.service_item, i.kilometers_after_last_service, doc.name, doc.doctype, "agalya@gpy.com")
             elif event == 'on_cancel':
                 i.kilometers_after_last_service = (i.kilometers_after_last_service or 0) - km
             service.append(i)
@@ -99,18 +99,18 @@ def update_transport_cost(self, event):
         doc.save()
 
 def vehicle_log_creation(self, event):
-    vehicle_log=frappe.new_doc('Vehicle Log')
-    vehicle_log.update({
-        'license_plate':self.own_vehicle_no,
-        'employee':self.employee,
-        "date":self.lr_date,
-        "odometer":self.return_odometer_value,
-        "driver_cost":self.driver_cost,
-        "select_purpose":"Goods Supply",
-        "delivery_note":self.name
-    })
-    vehicle_log.flags.ignore_permissions=True
-    vehicle_log.save()
+    if(self.own_vehicle_no):
+        vehicle_log=frappe.new_doc('Vehicle Log')
+        vehicle_log.update({
+            'license_plate':self.own_vehicle_no,
+            'employee':self.employee,
+            "date":self.lr_date,
+            "odometer":self.return_odometer_value,
+            "select_purpose":"Goods Supply",
+            "delivery_note":self.name
+        })
+        vehicle_log.flags.ignore_permissions=True
+        vehicle_log.save()
 
 def vehicle_log_draft(self, event):
     vehicle_draft=frappe.get_all("Vehicle Log",filters={"docstatus":0,"license_plate":self.license_plate})
