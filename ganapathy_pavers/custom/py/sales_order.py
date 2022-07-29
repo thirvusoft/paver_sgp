@@ -32,9 +32,9 @@ def create_site(doc):
     doc=json.loads(doc)
     create=False
     for row in (doc['items'] or []):
-        if(row["work"]!="Supply Only"):
+        if(row.get("work")!="Supply Only"):
             create=True
-    if(doc['work']!="Supply Only" and create):
+    if(doc.get('work')!="Supply Only" and create):
         supervisor=doc.get('supervisor_name') if('supervisor_name' in doc) else ''
         pavers=[]
         compoun_walls=[]
@@ -47,7 +47,7 @@ def create_site(doc):
                 'uom': row['uom'],
                 'rate':row['rate'],
                 'amount':row['amount'],
-                'work': row['work'],
+                'work': row.get('work'),
                 'sales_order':doc['name'],
                 'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse'),
                 'stock_qty': row['stock_qty'],
@@ -60,7 +60,7 @@ def create_site(doc):
                 'uom': row['uom'],
                 'rate':row['rate'],
                 'amount':row['amount'],
-                'work': row['work'],
+                'work': row.get('work'),
                 'sales_order':doc['name'],
                 'warehouse':row['warehouse'] if(row.get('warehouse')) else doc.get('set_warehouse'),
                 'stock_qty': row['stock_qty'],
