@@ -193,6 +193,9 @@ doc_events = {
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
+	},
+	"Journal Entry":{
+		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry"
 	}
 
 }
