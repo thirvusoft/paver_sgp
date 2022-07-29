@@ -51,20 +51,29 @@ def before_save(doc, action=None):
     for item in doc.item_details:
         if(item.get('warehouse')):
             bin_=frappe.get_value('Bin', {'warehouse': item.warehouse, 'item_code': item.item}, 'valuation_rate')
-            item_cost+=(bin_ or 0)* item.allocated_paver_area
+            item_cost+=(bin_ or 0)* (item.stock_qty or 0)
 
     for item in doc.item_details_compound_wall:
         if(item.get('warehouse')):
             bin_=frappe.get_value('Bin', {'warehouse': item.warehouse, 'item_code': item.item}, 'valuation_rate')
-            item_cost+=(bin_ or 0)* item.allocated_ft
+            item_cost+=(bin_ or 0)* (item.stock_qty or 0)
 
     for item in doc.raw_material:
-        doc1=frappe.get_all('Item Price', {'buying':1, 'item_code': item.item}, pluck="price_list_rate")
+        doc1=frappe.get_all('Item Price', {'buying':1, 'item_code': item.item}, ["price_list_rate", "uom"])
         if(doc1):
-            rm_cost+=(doc1[0] or 0)
-
+            if(not doc1[0].uom):
+                doc1[0].uom=frappe.get_value('Item', item.item, 'stock_uom')
+            if(item.stock_uom and doc1[0].uom):
+                item_doc=frappe.get_doc('Item', item.item)
+                conv=0
+                for row in item_doc.uoms:
+                    if(row.uom==doc1[0].uom):
+                        conv=row.conversion_factor
+                if(not conv):
+                    frappe.throw(f'Please enter {doc1[0].uom} conversion for an item: '+frappe.bold(getlink('Item', item.item)))
+                rm_cost+=(doc1[0]['price_list_rate'] or 0)*(item.stock_qty or 0)/conv
     doc.actual_site_cost_calculation=(item_cost or 0)+(doc.total or 0)+(doc.total_job_worker_cost or 0)+ (rm_cost or 0) + (doc.transporting_cost or 0)
-    doc.site_profit_amount=(doc.actual_site_cost_calculation or 0) - (doc.total_expense_amount or 0)
+    doc.site_profit_amount=(doc.total_expense_amount or 0) - (doc.actual_site_cost_calculation or 0)
     return doc
 
 @frappe.whitelist()
@@ -166,26 +175,20 @@ def validate_jw_qty(self):
     for row in self.delivery_detail:
         if(row.item not  in delivered_item):
             delivered_item[row.item]=0
-        item_doc=frappe.get_doc('Item', row.item, 'uoms')
-        if(item_doc.item_group=='Pavers'):
-            sqft=((row.delivered_bundle or 0)*float(frappe.get_value('Item', row.item, 'bundle_per_sqr_ft') or 0))+((row.delivered_pieces or 0)*float(frappe.get_value('Item', row.item, 'pavers_per_sqft') or 0))
-        else:
-            sqft=0
-        conv_factor=[conv.conversion_factor for conv in item_doc.uoms if(conv.uom==item_doc.sales_uom)]
-        if(not sqft and not conv_factor):
-            frappe.throw('Please enter Sales UOM for an item: '+ frappe.bold(getlink('Item', row.item)))
-        stock_qty=(row.delivered_stock_qty or 0) *(conv_factor[0] if(conv_factor) else 0)
-        delivered_item[row.item]+=sqft if(sqft) else (stock_qty)
-        
+        delivered_item[row.item]+=row.delivered_stock_qty
+
     jw_items={}
     for row in self.job_worker:
-        if(row.item not  in jw_items):
-            jw_items[row.item]=0
-        jw_items[row.item]+=float(row.sqft_allocated or 0)
+        if(row.item):
+            if(row.item not  in jw_items):
+                jw_items[row.item]=0
+            item_doc=frappe.get_doc('Item', row.item)
+            conv_factor=[conv.conversion_factor for conv in item_doc.uoms if(conv.uom=='Square Foot')]
+            if(not conv_factor):
+                frappe.throw('Please enter Square Feet Conversion for an item: '+ frappe.bold(getlink('Item', row.item)))
+            jw_items[row.item]+=float(row.sqft_allocated or 0)*conv_factor[0]
     wrong_items=[]
     for item in jw_items:
-        frappe.errprint(jw_items.get(item))
-        frappe.errprint(delivered_item.get(item) or 0)
         if((jw_items.get(item) or 0)>(delivered_item.get(item) or 0)):
             wrong_items.append(frappe.bold(item))
     if(wrong_items):

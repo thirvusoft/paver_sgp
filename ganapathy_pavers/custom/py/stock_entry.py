@@ -13,11 +13,11 @@ def update_asset(self, event):
                 doc.update({
                     'current_number_of_strokes': -float(self.fg_completed_qty)+float(float(doc.current_number_of_strokes) or 0)
                 })
-            if((float(doc.notification_alert_at or 0)>float(doc.current_number_of_strokes or 0)) and doc.to_notify!=1):
+            if((float(doc.notification_alert_at or 0)<float(doc.current_number_of_strokes or 0)) and doc.to_notify!=1):
                 doc.update({
                     'to_notify': 1
                 })
-            elif((float(doc.notification_alert_at or 0)<float(doc.current_number_of_strokes or 0)) and doc.to_notify!=0):
+            elif((float(doc.notification_alert_at or 0)>float(doc.current_number_of_strokes or 0)) and doc.to_notify!=0):
                 doc.update({
                     'to_notify': 0
                 })

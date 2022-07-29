@@ -11,6 +11,14 @@ frappe.ui.form.on('USB Setting', {
 				]
 			}
 		})
+		frm.set_query("scrap_warehouse",function(){
+			return {
+				filters: [
+					["Warehouse", "company", "in", ["", cstr(frm.doc.company)]],
+					["Warehouse","is_group","=","0"]
+				]
+			}
+		})
 		frm.set_query("default_manufacture_target_warehouse",function(){
 			return {
 				filters: [

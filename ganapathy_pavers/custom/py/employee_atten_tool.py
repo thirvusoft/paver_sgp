@@ -37,7 +37,7 @@ def checkin(table_list, atten_date, checkout, ts_name, atten_name):
 				'attendance': atten_name
 			})
 			doc.insert(ignore_permissions=True)
-			# doc.submit()
+
 		if i.get('check_out') or checkout:
 			doc1 = frappe.new_doc("Employee Checkin")
 			doc1.update({
@@ -48,11 +48,11 @@ def checkin(table_list, atten_date, checkout, ts_name, atten_name):
 				'attendance': atten_name
 			})
 			doc1.insert(ignore_permissions=True)
-			# doc1.submit()
+
 
 
 def fill_emp_cancel_detail(self, event):
-	if self.ts_emp_att_tool_name:
+	if self.ts_emp_att_tool_name and self.ts_emp_att_tool_name in frappe.get_all('TS Employee Attendance Tool', {'docstatus': 1}, pluck='name'):
 		doc=frappe.get_doc("TS Employee Attendance Tool", self.ts_emp_att_tool_name )
 		emp=False
 		cancel_list=[]
@@ -78,6 +78,7 @@ def fill_emp_cancel_detail(self, event):
 			'ts_emp_checkin':cancel_list
 		})
 		doc.flags.ignore_permissions=True
+		doc.flags.ignore_mandatory=True
 		doc.save('Update')
 
 

@@ -1,7 +1,7 @@
 {
  "category": "Modules",
  "charts": [],
- "creation": "2022-07-22 13:50:09.138152",
+ "creation": "2022-07-26 18:30:11.272651",
  "developer_mode_only": 0,
  "disable_user_customization": 0,
  "docstatus": 0,
@@ -11,32 +11,38 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "label": "Vehicle Maintenance",
+ "label": "TS Manufacturing",
  "links": [],
- "modified": "2022-07-27 17:46:35.657566",
- "modified_by": "parameshwari@gmail.com",
+ "modified": "2022-07-27 23:36:32.103363",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "Vehicle Maintenance",
+ "name": "TS Manufacturing",
  "owner": "Administrator",
  "pin_to_bottom": 0,
- "pin_to_top": 1,
+ "pin_to_top": 0,
  "shortcuts": [
   {
    "doc_view": "List",
-   "label": "Vehicle",
-   "link_to": "Vehicle",
+   "label": "Material Manufacturing",
+   "link_to": "Material Manufacturing",
    "type": "DocType"
   },
   {
    "doc_view": "List",
-   "label": "Vehicle Log",
-   "link_to": "Vehicle Log",
+   "label": "USB Setting",
+   "link_to": "USB Setting",
    "type": "DocType"
   },
   {
    "doc_view": "List",
-   "label": "Vehicle Settings",
-   "link_to": "Vehicle Settings",
+   "label": "Asset",
+   "link_to": "Asset",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "BOM",
+   "link_to": "BOM",
    "type": "DocType"
   }
  ]

@@ -69,6 +69,7 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
 				 "ganapathy_pavers.utils.py.worstation.item_customization",
 				 "ganapathy_pavers.utils.py.purchase_order.batch_customization",
+				 "ganapathy_pavers.utils.py.customer.create_multi_customer",
 				 "ganapathy_pavers.utils.py.item.batch_customization"
 				 ]
 				
@@ -136,7 +137,8 @@ doc_events = {
 		"after_insert":"ganapathy_pavers.custom.py.site_work.validate"
 	},
 	"Sales Order":{
-		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields"
+		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields",
+		"validate":"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw"
 	},
 	"Job Card":{
 		"on_submit":"afterganapathy_pavers.ganapathy_pavers.utils.py.jobcard.workstation"
@@ -182,8 +184,10 @@ doc_events = {
         "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
     },
  	"Employee Checkin":{
+
         "after_insert": "ganapathy_pavers.custom.py.employee.working_hr",
         "on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
+
 
 	},
 	"Workstation":{
@@ -191,6 +195,9 @@ doc_events = {
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
+	},
+	"Journal Entry":{
+		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry"
 	}
 
 }
@@ -198,8 +205,8 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
               "ganapathy_pavers.custom.py.property_setter.property_setter",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
-			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
-			  "ganapathy_pavers.utils.py.item.batch_customization"]
+			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization"
+			  ]
 
 
 doctype_js = {
@@ -222,7 +229,8 @@ doctype_js = {
 								"/custom/js/vehicle_log_service.js"
 								],
 				"Work Order" : "/utils/js/workorder.js",
-				"BOM" : "/utils/js/bom.js"
+				"BOM" : "/utils/js/bom.js",
+				"Employee":"/custom/js/employee.js"
 			 }
 # Scheduled Tasks
 # ---------------
