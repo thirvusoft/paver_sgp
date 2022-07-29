@@ -104,6 +104,13 @@ frappe.ui.form.on('Delivery Note', {
             
             
             }
+        frm.set_query("own_vehicle_no", function(frm) {
+            return {
+                filters: {
+                    'is_add_on' : ['!=', 1]
+                }
+            };
+        });
             
         },
     on_submit: function(frm) {

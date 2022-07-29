@@ -193,6 +193,9 @@ doc_events = {
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
+	},
+	"Journal Entry":{
+		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry"
 	}
 
 }
@@ -224,7 +227,8 @@ doctype_js = {
 								"/custom/js/vehicle_log_service.js"
 								],
 				"Work Order" : "/utils/js/workorder.js",
-				"BOM" : "/utils/js/bom.js"
+				"BOM" : "/utils/js/bom.js",
+				"Employee":"/custom/js/employee.js"
 			 }
 # Scheduled Tasks
 # ---------------
