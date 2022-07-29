@@ -24,15 +24,23 @@ class MaterialManufacturing(Document):
             total_ggbs2_t.append(i.ggbs2_t)
         total_cm = sum(total_cement_2a) + sum(total_cement)
         total_ggbs = sum(total_ggbs2) + sum(total_ggbs2_t)
-        avg_raw_material = sum(total_raw_material)/len(total_raw_material)
-        avg_cement = total_cm/(len(total_cement)+len(total_cement_2a))
-        avg_ggbs2 = total_ggbs/(len(total_ggbs2)+len(total_ggbs2_t))
-        doc.total_no_of_raw_material = sum(total_raw_material)
-        doc.total_no_of_cement = total_cm
-        doc.total_no_of_ggbs2 = total_ggbs
-        doc.average_of_raw_material = avg_raw_material
-        doc.average_of_cement = avg_cement
-        doc.average_of__ggbs2 = avg_ggbs2   
+        if len(total_raw_material) == 0:
+            doc.total_no_of_raw_material = 0
+            doc.total_no_of_cement = 0
+            doc.total_no_of_ggbs2 = 0
+            doc.average_of_raw_material = 0
+            doc.average_of_cement = 0
+            doc.average_of__ggbs2 = 0
+        else:
+            avg_raw_material = sum(total_raw_material)/len(total_raw_material)
+            avg_cement = total_cm/(len(total_cement)+len(total_cement_2a))
+            avg_ggbs2 = total_ggbs/(len(total_ggbs2)+len(total_ggbs2_t))
+            doc.total_no_of_raw_material = sum(total_raw_material)
+            doc.total_no_of_cement = total_cm
+            doc.total_no_of_ggbs2 = total_ggbs
+            doc.average_of_raw_material = avg_raw_material
+            doc.average_of_cement = avg_cement
+            doc.average_of__ggbs2 = avg_ggbs2   
     def before_submit(doc):
         manufacture = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
         repack = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
