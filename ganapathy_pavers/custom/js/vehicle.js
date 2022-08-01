@@ -18,7 +18,7 @@ frappe.ui.form.on("Vehicle" ,{
                     frm.set_query("add_on", function(frm) {
                         return {
                             filters: {
-                                'is_add_on' : '0'
+                                'is_add_on' : ['!=', 1]
                             }
                         };
                     });
