@@ -298,7 +298,7 @@ function default_value(usb_field,set_field){
 	frappe.db.get_single_value("USB Setting",usb_field).then(value =>{
 		cur_frm.set_value(set_field, value) 
 	})
-	refresh_field(usb_field);
+	cur_frm.refresh_field(set_field);
 }
 frappe.ui.form.on('BOM Item', {
 	rate: function(frm, cdt, cdn) {

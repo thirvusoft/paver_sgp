@@ -108,10 +108,13 @@ def make_stock_entry(doc,type):
         if len(valid) >= 1:
             frappe.throw("Already Stock Entry("+valid[0]+") Created For Manufacture")
         stock_entry.stock_entry_type = doc.get("stock_entry_type")
-        for i in doc.get("items"):
-            stock_entry.append('items', dict(
-            s_warehouse = doc.get("source_warehouse"), item_code = i["item_code"],qty = i["qty"], uom = i["uom"]
-            ))
+        if(doc.get("items")):  
+            for i in doc.get("items"):
+                stock_entry.append('items', dict(
+                s_warehouse = doc.get("source_warehouse"), item_code = i["item_code"],qty = i["qty"], uom = i["uom"]
+                ))
+        else:
+            frappe.throw("Kindly Save this Form")
         stock_entry.append('items', dict(
             t_warehouse = doc.get("target_warehouse"), item_code = doc.get("item_to_manufacture"), qty = doc.get("total_completed_qty"), uom = default_nos
             ))
