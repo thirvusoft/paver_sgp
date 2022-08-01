@@ -156,20 +156,22 @@ frappe.ui.form.on('Sales Order', {
         }
     },
     on_submit:function(frm){
-        frappe.call({
-            method:"ganapathy_pavers.custom.py.sales_order.create_site",
-            args:{
-                doc: cur_frm.doc
-            },
-            callback: function(r){
-                if(r.message){ 
-                        frappe.show_alert({message: __("Site Work Updated Successfully"),indicator: 'green'});
-                      }
-                else{
-                    frappe.show_alert({message: __("Couldn't Update Site Work"),indicator: 'red'});
+        if(cur_frm.doc.site_work){
+            frappe.call({
+                method:"ganapathy_pavers.custom.py.sales_order.create_site",
+                args:{
+                    doc: cur_frm.doc
+                },
+                callback: function(r){
+                    if(r.message){ 
+                            frappe.show_alert({message: __("Site Work Updated Successfully"),indicator: 'green'});
+                        }
+                    else{
+                        frappe.show_alert({message: __("Couldn't Update Site Work"),indicator: 'red'});
+                        }
                     }
-                }
-        })
+            })
+        }
     },
     is_multi_customer: async function(frm){
         cur_frm.set_value('site_work','')

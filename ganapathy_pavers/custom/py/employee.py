@@ -6,9 +6,10 @@ def working_hr(self, event):
     if(self.log_type!="OUT"):
         return
     employee=self.employee
-    doc=frappe.get_last_doc("Employee Checkin", {'employee':employee, 'log_type':'IN', 'docstatus':1})
-    diff_hrs= time_diff_in_hours(self.time, doc.time)
-    return emp_hrs(diff_hrs, employee)
+    if(frappe.get_all("Employee Checkin", {'employee':employee, 'log_type':'IN'})):
+        doc=frappe.get_last_doc("Employee Checkin", {'employee':employee, 'log_type':'IN'})
+        diff_hrs= time_diff_in_hours(self.time, doc.time)
+        return emp_hrs(diff_hrs, employee)
 
 def emp_hrs(diff_hrs, employee):
     if (diff_hrs>24):
