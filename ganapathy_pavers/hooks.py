@@ -109,9 +109,6 @@ override_doctype_class = {
 
 
 doc_events = {
-	"Bin": {
-		"on_update": "ganapathy_pavers.custom.py.site_work.update_site_work"
-	},
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
 		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset"
@@ -133,8 +130,13 @@ doc_events = {
 	"Project":{
 		"autoname":"ganapathy_pavers.custom.py.site_work.autoname",
 		"before_save":"ganapathy_pavers.custom.py.site_work.before_save",
-		"validate":"ganapathy_pavers.custom.py.site_work.validate",
-		"after_insert":"ganapathy_pavers.custom.py.site_work.validate"
+		"validate":[
+			"ganapathy_pavers.custom.py.site_work.validate",
+			"ganapathy_pavers.custom.py.site_work.validate_status",
+			"ganapathy_pavers.custom.py.site_work.rework_count"
+		],
+		"after_insert":"ganapathy_pavers.custom.py.site_work.validate",
+		"on_update":"ganapathy_pavers.custom.py.site_work.update_status"
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields",
@@ -224,7 +226,8 @@ doctype_js = {
 								"/custom/js/vehicle_log_service.js"
 								],
 				"Work Order" : "/utils/js/workorder.js",
-				"BOM" : "/utils/js/bom.js"
+				"BOM" : "/utils/js/bom.js",
+				"BOM" : "/custom/js/bom.js"
 			 }
 # Scheduled Tasks
 # ---------------

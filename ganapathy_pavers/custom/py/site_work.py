@@ -105,12 +105,12 @@ def create_status():
         "doc_type":"Project",
         "field_name":"status",
         "property":"options",
-        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site"
+        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site\nRework"
     })
     doc.save()
     frappe.db.commit()
     
-    
+
 
 def validate(self,event):
     validate_jw_qty(self)
@@ -193,13 +193,18 @@ def validate_jw_qty(self):
             wrong_items.append(frappe.bold(item))
     if(wrong_items):
         frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+', '.join(wrong_items))
-    
 
-def update_site_work(doc, action):
-    sw_list=frappe.get_all('Project', pluck="name")
-    for sw in sw_list:
-        doc=frappe.get_doc('Project', sw)
-        doc=before_save(doc)
-        doc.flags.ignore_mandatory=True
-        doc.flags.ignore_permissions=True
-        doc.save()
+def update_status(doc, events):
+    frappe.db.set_value("Project", doc.name, "previous_state", doc.status)
+    doc.reload()
+
+def validate_status(self,event):
+    if (self.previous_state == "Completed" and self.status != "Rework"):
+        frappe.throw("Completed Site Work cannot be updated.")
+
+def rework_count(self,event):
+    a = frappe.get_value("Project", self.name, 'status')
+    if (a =="Completed" and self.status =="Rework"):
+        self.total_rework = self.total_rework + 1
+    else:
+        pass
