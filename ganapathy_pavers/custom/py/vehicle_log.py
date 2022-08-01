@@ -125,8 +125,26 @@ def vehicle_log_mileage(self, event):
                 fields=["fuel_qty","last_odometer","odometer",],order_by="creation desc",limit=2
                 )
             if len(a)>=2:
-                mileage=(a[0]["last_odometer"]-a[1]['last_odometer'])/a[1]["fuel_qty"]
-                frappe.db.set_value("Vehicle", self.license_plate, "mileage",mileage)    
+                mileage=(a[0]["last_odometer"]-a[1]['last_odometer'])/a[0]["fuel_qty"]
+                frappe.db.set_value("Vehicle", self.license_plate, "mileage",mileage)
+                self.mileage= mileage
 
 def validate_distance(self, event):
     self.today_odometer_value=(self.odometer or 0)-(self.last_odometer or 0)
+
+def total_cost(self, event):
+    if(self.fuel_qty and self.price):
+        self.total_fuel=self.fuel_qty * self.price
+    
+    self.total_expence=0
+    if(self.service_item_table):
+        for i in self.service_item_table:
+            self.total_expence=(self.total_expence or 0 )+(i.get("expense_amount") or 0)
+    
+    self.total_expence_maintanence=0
+    if(self.maintanence_details):
+        self.total_expence_maintanence=0
+        for i in self.maintanence_details:
+            self.total_expence_maintanence= (self.total_expence_maintanence or 0) +(i.get("expense") or 0)
+
+    self.total_vehicle_costs=(self.total_fuel or 0)+ (self.total_expence or 0)+(self.total_expence_maintanence or 0)

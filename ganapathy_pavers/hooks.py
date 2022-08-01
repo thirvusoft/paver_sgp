@@ -168,7 +168,8 @@ doc_events = {
 		"on_cancel":["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 					 "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
 		"validate": ["ganapathy_pavers.custom.py.vehicle_log.validate",
-					"ganapathy_pavers.custom.py.vehicle_log.validate_distance"
+					"ganapathy_pavers.custom.py.vehicle_log.validate_distance",
+					"ganapathy_pavers.custom.py.vehicle_log.total_cost"
 					],
 	},
 	"Sales Invoice":{
