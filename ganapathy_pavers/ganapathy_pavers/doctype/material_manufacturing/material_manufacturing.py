@@ -118,7 +118,7 @@ def make_stock_entry(doc,type):
         if doc.get("damage_qty") > 0:
             if default_scrap_warehouse:
                 stock_entry.append('items', dict(
-                    t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture")	,qty = doc.get("damage_qty"), uom = default_nos
+                    t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture")	,qty = doc.get("damage_qty"), uom = default_nos, is_process_loss = 1
                     ))
             else:
                 frappe.throw("Set Scrap Warehouse in USB Setting")
@@ -144,7 +144,7 @@ def make_stock_entry(doc,type):
             ))
         if doc.get("rack_shift_damage_qty") > 0:
             stock_entry.append('items', dict(
-                t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture"),qty = doc.get("rack_shift_damage_qty"),uom = default_nos
+                t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture"),qty = doc.get("rack_shift_damage_qty"),uom = default_nos,  is_process_loss = 1
                 ))
         stock_entry.append('additional_costs', dict(
                 expense_account	 = expenses_included_in_valuation, amount = doc.get("rack_shifting_total_expense"),description = "Operating Cost as per Workstation"
@@ -164,7 +164,7 @@ def make_stock_entry(doc,type):
         ))
         if doc.get("curing_damaged_qty") > 0:
             stock_entry.append('items', dict(
-                t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture")	,qty = doc.get("curing_damaged_qty"), uom = default_nos
+                t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture")	,qty = doc.get("curing_damaged_qty"), uom = default_nos, is_process_loss = 1
                 ))
         stock_entry.append('additional_costs', dict(
                 expense_account	 = expenses_included_in_valuation, amount = doc.get("labour_cost"),description = "Operating Cost as per Labour Cost"
