@@ -127,7 +127,7 @@ def vehicle_log_mileage(self, event):
             if len(a)>=2:
                 mileage=(a[0]["last_odometer"]-a[1]['last_odometer'])/a[0]["fuel_qty"]
                 frappe.db.set_value("Vehicle", self.license_plate, "mileage",mileage)
-                self.mileage= mileage
+                frappe.db.set(self, 'mileage', mileage)
 
 def validate_distance(self, event):
     self.today_odometer_value=(self.odometer or 0)-(self.last_odometer or 0)
