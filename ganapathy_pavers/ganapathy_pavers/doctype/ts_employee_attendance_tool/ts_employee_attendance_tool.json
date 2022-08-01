@@ -36,7 +36,8 @@
    "fieldname": "department",
    "fieldtype": "Link",
    "label": "Department",
-   "options": "Department"
+   "options": "Department",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_3",
@@ -100,7 +101,7 @@
   {
    "fieldname": "help_session_section",
    "fieldtype": "Section Break",
-   "label": "Help Session"
+   "label": "Help section"
   },
   {
    "fieldname": "employee",
@@ -126,7 +127,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-25 17:39:27.444336",
+ "modified": "2022-07-29 16:14:18.025830",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Attendance Tool",

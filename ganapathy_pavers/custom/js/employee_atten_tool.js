@@ -36,7 +36,9 @@ erpnext.employee_attendance_tool = {
 				}
 			});
 		}
+		
 	}
+	
 }
 
 erpnext.MarkedEmployee = Class.extend({

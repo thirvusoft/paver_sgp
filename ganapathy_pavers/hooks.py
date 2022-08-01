@@ -187,8 +187,10 @@ doc_events = {
         "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
     },
  	"Employee Checkin":{
-        "validate": "ganapathy_pavers.custom.py.employee.working_hr",
-        "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
+
+        "after_insert": "ganapathy_pavers.custom.py.employee.working_hr",
+        "on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
+
 
 	},
 	"Workstation":{
@@ -230,7 +232,8 @@ doctype_js = {
 								"/custom/js/vehicle_log_service.js"
 								],
 				"Work Order" : "/utils/js/workorder.js",
-				"BOM" : "/utils/js/bom.js"
+				"BOM" : "/utils/js/bom.js",
+				"Employee":"/custom/js/employee.js"
 			 }
 # Scheduled Tasks
 # ---------------
