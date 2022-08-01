@@ -17,6 +17,8 @@ class MaterialManufacturing(Document):
         total_ggbs2 = []
         total_ggbs2_t = []
         for i in doc.raw_material_consumption:
+            if i.total == None or i.cm2_t == None or i.cm2_a == None or i.ggbs2_a == None or i.ggbs2_t == None:
+                frappe.throw("Kindly Fill The Raw Material Consumption Table Completely")
             total_raw_material.append(i.total)
             total_cement.append(i.cm2_t)
             total_ggbs2.append(i.ggbs2_a)
