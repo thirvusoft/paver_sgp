@@ -116,3 +116,17 @@ def vehicle_log_draft(self, event):
     vehicle_draft=frappe.get_all("Vehicle Log",filters={"docstatus":0,"license_plate":self.license_plate})
     for i in vehicle_draft:
         frappe.db.set_value("Vehicle Log",i.name,"last_odometer",self.odometer)
+
+def vehicle_log_mileage(self, event):
+    if((frappe.db.get_single_value('Vehicle Settings', 'vehicle_update'))==1):
+        if (self.fuel_qty):
+            a=frappe.get_all("Vehicle Log", 
+                filters={"fuel_qty": ['!=',0],"docstatus":1,"license_plate":self.license_plate},
+                fields=["fuel_qty","last_odometer","odometer",],order_by="creation desc",limit=2
+                )
+            if len(a)>=2:
+                mileage=(a[0]["last_odometer"]-a[1]['last_odometer'])/a[1]["fuel_qty"]
+                frappe.db.set_value("Vehicle", self.license_plate, "mileage",mileage)    
+
+def validate_distance(self, event):
+    self.today_odometer_value=(self.odometer or 0)-(self.last_odometer or 0)
