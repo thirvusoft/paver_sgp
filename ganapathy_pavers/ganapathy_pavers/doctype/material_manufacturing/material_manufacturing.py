@@ -94,8 +94,8 @@ def item_data(item_code):
 @frappe.whitelist()
 def make_stock_entry(doc,type):
     doc=json.loads(doc)
-    if doc.get("total_completed_qty") == 0 or doc.get("cement_item") == '' or doc.get("ggbs_item") == '':
-            frappe.throw("Please Enter the Produced Qty Or Damage Qty")
+    if doc.get("total_completed_qty") == 0 or doc.get("cement_item") == '' or doc.get("ggbs_item") == '' or doc.get("total_expense") == 0:
+            frappe.throw("Please Enter the Produced Qty and From Time - To Time in Manufacture Section and Save This Form")
     default_scrap_warehouse = frappe.db.get_singles_value("USB Setting", "scrap_warehouse")
     expenses_included_in_valuation = frappe.get_cached_value("Company", doc.get("company"), "expenses_included_in_valuation")
     stock_entry = frappe.new_doc("Stock Entry")
@@ -134,6 +134,8 @@ def make_stock_entry(doc,type):
         stock_entry.save()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("stock_entry_rack_shift")=="Repack" and type == "create_rack_shiftingstock_entry":
+        if doc.get("total_rack_shift_expense") == 0:
+            frappe.throw("Please Enter From Time - To Time in Rack Shifting Section and Save This Form")
         valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Repack","docstatus":["!=",2]},pluck="name")
         if len(valid) >= 1:
             frappe.throw("Already Stock Entry("+valid[0]+") Created For Repack")
