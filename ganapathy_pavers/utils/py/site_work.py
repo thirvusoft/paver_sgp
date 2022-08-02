@@ -1,4 +1,3 @@
-from frappe import read_only
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 def batch_customization():
     batch_custom_fields()
