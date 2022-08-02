@@ -31,6 +31,9 @@
   "column_break_21",
   "default_rack_shift_workstation",
   "default_item_section",
+  "chips",
+  "dust",
+  "column_break_28",
   "cement",
   "ggbs"
  ],
@@ -181,12 +184,28 @@
    "fieldname": "default_scrap_warehouse",
    "fieldtype": "Heading",
    "label": "Default Scrap Warehouse"
+  },
+  {
+   "fieldname": "chips",
+   "fieldtype": "Link",
+   "label": "Chips ",
+   "options": "Item"
+  },
+  {
+   "fieldname": "dust",
+   "fieldtype": "Link",
+   "label": "Dust",
+   "options": "Item"
+  },
+  {
+   "fieldname": "column_break_28",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-07-27 18:51:23.254070",
+ "modified": "2022-08-01 19:18:35.284368",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "USB Setting",

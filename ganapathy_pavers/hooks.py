@@ -109,9 +109,6 @@ override_doctype_class = {
 
 
 doc_events = {
-	"Bin": {
-		"on_update": "ganapathy_pavers.custom.py.site_work.update_site_work"
-	},
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
 		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset"
@@ -133,8 +130,13 @@ doc_events = {
 	"Project":{
 		"autoname":"ganapathy_pavers.custom.py.site_work.autoname",
 		"before_save":"ganapathy_pavers.custom.py.site_work.before_save",
-		"validate":"ganapathy_pavers.custom.py.site_work.validate",
-		"after_insert":"ganapathy_pavers.custom.py.site_work.validate"
+		"validate":[
+			"ganapathy_pavers.custom.py.site_work.validate",
+			"ganapathy_pavers.custom.py.site_work.validate_status",
+			"ganapathy_pavers.custom.py.site_work.rework_count"
+		],
+		"after_insert":"ganapathy_pavers.custom.py.site_work.validate",
+		"on_update":"ganapathy_pavers.custom.py.site_work.update_status"
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields",
@@ -163,10 +165,14 @@ doc_events = {
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 		"on_submit": ["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 					  "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
-					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_draft"],
+					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_draft",
+					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_mileage"],
 		"on_cancel":["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 					 "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
-		"validate": "ganapathy_pavers.custom.py.vehicle_log.validate"
+		"validate": ["ganapathy_pavers.custom.py.vehicle_log.validate",
+					"ganapathy_pavers.custom.py.vehicle_log.validate_distance",
+					"ganapathy_pavers.custom.py.vehicle_log.total_cost"
+					],
 	},
 	"Sales Invoice":{
     	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer",
@@ -186,7 +192,7 @@ doc_events = {
  	"Employee Checkin":{
 
         "after_insert": "ganapathy_pavers.custom.py.employee.working_hr",
-        "on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
+        "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
 
 
 	},
@@ -229,7 +235,7 @@ doctype_js = {
 								"/custom/js/vehicle_log_service.js"
 								],
 				"Work Order" : "/utils/js/workorder.js",
-				"BOM" : "/utils/js/bom.js",
+				"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
 				"Employee":"/custom/js/employee.js"
 			 }
 # Scheduled Tasks

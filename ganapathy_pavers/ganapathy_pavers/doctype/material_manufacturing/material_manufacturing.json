@@ -10,6 +10,7 @@
   "item_to_manufacture",
   "column_break_2",
   "company",
+  "status1",
   "section_break_1",
   "bom_no",
   "cb_1",
@@ -22,11 +23,17 @@
   "total_no_of_raw_material",
   "total_no_of_cement",
   "total_no_of_ggbs2",
+  "total_no_of_dust",
+  "total_no_of_chips",
+  "chips_item_name",
   "cement_item",
   "column_break_4",
   "average_of_raw_material",
   "average_of_cement",
   "average_of__ggbs2",
+  "average_of_dust",
+  "average_of_chips",
+  "dust_item_name",
   "ggbs_item",
   "items_section",
   "items",
@@ -97,12 +104,14 @@
   {
    "fieldname": "total_no_of_raw_material",
    "fieldtype": "Int",
+   "hidden": 1,
    "label": "Total No of Raw Material",
    "read_only": 1
   },
   {
    "fieldname": "average_of_raw_material",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Average of Raw Material",
    "read_only": 1
   },
@@ -528,12 +537,57 @@
    "fieldtype": "Int",
    "hidden": 1,
    "label": "Curing Damage Qty"
+  },
+  {
+   "fieldname": "total_no_of_dust",
+   "fieldtype": "Int",
+   "label": "Total No of Dust",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_no_of_chips",
+   "fieldtype": "Int",
+   "label": "Total No of Chips",
+   "read_only": 1
+  },
+  {
+   "fieldname": "average_of_chips",
+   "fieldtype": "Float",
+   "label": "Average of Chips",
+   "read_only": 1
+  },
+  {
+   "fieldname": "average_of_dust",
+   "fieldtype": "Float",
+   "label": "Average of Dust",
+   "read_only": 1
+  },
+  {
+   "fieldname": "chips_item_name",
+   "fieldtype": "Link",
+   "label": "Chips Item Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "dust_item_name",
+   "fieldtype": "Link",
+   "label": "Dust Item Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "status1",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Process",
+   "options": "Manufacture\nRack Shifting\nCuring\nCompleted"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-01 09:05:28.230974",
+ "modified": "2022-08-02 12:31:30.841634",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
