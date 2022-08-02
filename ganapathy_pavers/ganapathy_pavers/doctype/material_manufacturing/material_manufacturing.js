@@ -15,6 +15,8 @@ frappe.ui.form.on('Material Manufacturing', {
 		default_value("default_curing_target_warehouse","curing_target_warehouse")
 		default_value("cement","cement_item")
 		default_value("ggbs","ggbs_item")
+		default_value("chips","chips_item_name")
+		default_value("dust","dust_item_name")
 	},
 	from_time: function(frm) {
 		var field="ts_total_hours"
@@ -38,9 +40,9 @@ frappe.ui.form.on('Material Manufacturing', {
 	rack_shifting_additional_cost: function(frm){
 		cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense) 
 	},
-	// damage_qty: function(frm){
-	// 	cur_frm.set_value('total_completed_qty', frm.doc.total_completed_qty - frm.doc.damage_qty) 
-	// },
+	damage_qty: function(frm){
+		cur_frm.set_value('total_completed_qty', frm.doc.total_completed_qty - frm.doc.damage_qty) 
+	},
 	rack_shift_damage_qty: function(frm){
 		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty) 
 	},
@@ -190,7 +192,8 @@ frappe.ui.form.on('Material Manufacturing', {
 		frm.set_query("bom_no",function(){
 			return {
 				"filters": {
-					item:frm.doc.item_to_manufacture
+					item:frm.doc.item_to_manufacture,
+					is_default:1
 				}
 			}
 		})
@@ -211,9 +214,15 @@ function make_stock_entry(frm,type){
 		args:{
 			doc:frm.doc,
 			type:type
-		}
+		},
+		callback: function(r){
+			if(r.message){
+				cur_frm.set_value("status", r.message);
+				cur_frm.refresh()
+			}
+			
+		 }
 	})
-	frm.refresh()
 }
 function total_hrs(frm,field,from,to){
 	frappe.call({
