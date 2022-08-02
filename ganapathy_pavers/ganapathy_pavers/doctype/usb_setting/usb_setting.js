@@ -66,6 +66,20 @@ frappe.ui.form.on('USB Setting', {
 				}
 			}
 		})
+		frm.set_query("chips",function(){
+			return {
+				"filters": {
+					item_group:"Raw Material"
+				}
+			}
+		})
+		frm.set_query("dust",function(){
+			return {
+				"filters": {
+					item_group:"Raw Material"
+				}
+			}
+		})
 		frm.set_query("ggbs",function(){
 			return {
 				"filters": {
