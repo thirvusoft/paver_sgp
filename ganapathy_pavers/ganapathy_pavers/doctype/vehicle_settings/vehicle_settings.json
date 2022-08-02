@@ -7,7 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "petrol_per_liter",
-  "diesel_per_liter"
+  "diesel_per_liter",
+  "vehicle_update"
  ],
  "fields": [
   {
@@ -19,12 +20,18 @@
    "fieldname": "diesel_per_liter",
    "fieldtype": "Float",
    "label": "Diesel Per Liter"
+  },
+  {
+   "default": "1",
+   "fieldname": "vehicle_update",
+   "fieldtype": "Check",
+   "label": "Automatically Update Mileage based on Vehicle Log"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-07-22 16:00:04.488494",
+ "modified": "2022-08-01 12:07:27.474944",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Settings",

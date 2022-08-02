@@ -105,12 +105,12 @@ def create_status():
         "doc_type":"Project",
         "field_name":"status",
         "property":"options",
-        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site"
+        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site\nRework"
     })
     doc.save()
     frappe.db.commit()
     
-    
+
 
 def validate(self,event):
     validate_jw_qty(self)
@@ -215,3 +215,18 @@ def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, ex
     doc.flags.ignore_mandatory = True
     doc.save()
     doc.submit()
+
+def update_status(doc, events):
+    frappe.db.set_value("Project", doc.name, "previous_state", doc.status)
+    doc.reload()
+
+def validate_status(self,event):
+    if (self.previous_state == "Completed" and self.status != "Rework"):
+        frappe.throw("Completed Site Work cannot be updated.")
+
+def rework_count(self,event):
+    a = frappe.get_value("Project", self.name, 'status')
+    if (a =="Completed" and self.status =="Rework"):
+        self.total_rework = self.total_rework + 1
+    else:
+        pass

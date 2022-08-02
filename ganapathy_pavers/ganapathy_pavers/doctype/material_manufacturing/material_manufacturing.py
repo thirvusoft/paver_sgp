@@ -12,37 +12,41 @@ from frappe.utils.data import time_diff_in_hours
 class MaterialManufacturing(Document):
     def validate(doc):
         total_raw_material=[]
-        total_cement = []
         total_cement_2a = []
-        total_ggbs2 = []
-        total_ggbs2_t = []
+        total_ggbs2_a = []
+        total_dust_a = []
+        total_chips_a =[]
         for i in doc.raw_material_consumption:
             if i.total == None or i.cm2_t == None or i.cm2_a == None or i.ggbs2_a == None or i.ggbs2_t == None:
                 frappe.throw("Kindly Fill The Raw Material Consumption Table Completely")
             total_raw_material.append(i.total)
-            total_cement.append(i.cm2_t)
-            total_ggbs2.append(i.ggbs2_a)
             total_cement_2a.append(i.cm2_a)
-            total_ggbs2_t.append(i.ggbs2_t)
-        total_cm = sum(total_cement_2a) + sum(total_cement)
-        total_ggbs = sum(total_ggbs2) + sum(total_ggbs2_t)
+            total_ggbs2_a.append(i.ggbs2_a)
+            total_chips_a.append(i.bin1_a + i.bin2_a)
+            total_dust_a.append(i.bin3_a + i.bin4_a)
         if len(total_raw_material) == 0:
             doc.total_no_of_raw_material = 0
+            doc.total_no_of_dust=0
+            doc.total_no_of_chips=0
             doc.total_no_of_cement = 0
             doc.total_no_of_ggbs2 = 0
             doc.average_of_raw_material = 0
             doc.average_of_cement = 0
             doc.average_of__ggbs2 = 0
+            doc.average_of_chips=0
+            doc.average_of_dust=0
         else:
             avg_raw_material = sum(total_raw_material)/len(total_raw_material)
-            avg_cement = total_cm/(len(total_cement)+len(total_cement_2a))
-            avg_ggbs2 = total_ggbs/(len(total_ggbs2)+len(total_ggbs2_t))
             doc.total_no_of_raw_material = sum(total_raw_material)
-            doc.total_no_of_cement = total_cm
-            doc.total_no_of_ggbs2 = total_ggbs
+            doc.total_no_of_dust = sum(total_dust_a)
+            doc.total_no_of_chips = sum(total_chips_a)
+            doc.total_no_of_cement = sum(total_cement_2a)
+            doc.total_no_of_ggbs2 = sum(total_ggbs2_a)
             doc.average_of_raw_material = avg_raw_material
-            doc.average_of_cement = avg_cement
-            doc.average_of__ggbs2 = avg_ggbs2   
+            doc.average_of_cement = sum(total_cement_2a)/len(total_cement_2a)
+            doc.average_of__ggbs2 = sum(total_ggbs2_a)/len(total_ggbs2_a)   
+            doc.average_of_chips = sum(total_chips_a)/len(total_chips_a)   
+            doc.average_of_dust = sum(total_dust_a)/len(total_dust_a)
     def before_submit(doc):
         manufacture = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
         repack = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
@@ -54,7 +58,7 @@ class MaterialManufacturing(Document):
 def total_hrs(from_time = None,to = None):
     if(from_time and to):
         time_in_mins = time_diff_in_hours(to,from_time)
-        return time_in_mins
+        return time_in_mins-1
 @frappe.whitelist()
 def total_expense(workstation):
     sum_of_wages, hour_rate=frappe.get_value("Workstation",workstation,["sum_of_wages_per_hours","hour_rate"])
@@ -84,6 +88,18 @@ def std_item(doc):
         row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['ggbs_item'],['item_code','stock_uom','stock_uom','valuation_rate'])
         row['qty']=doc.get('total_no_of_ggbs2')
         row['amount']=doc.get('total_no_of_cement')*row['rate']
+        items.append(row)
+    if doc.get('chips_item_name') and doc.get('total_no_of_chips'):
+        row={}
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['chips_item_name'],['item_code','stock_uom','stock_uom','valuation_rate'])
+        row['qty']=doc.get('total_no_of_chips')
+        row['amount']=doc.get('total_no_of_chips')*row['rate']
+        items.append(row)
+    if doc.get('dust_item_name') and doc.get('total_no_of_dust'):
+        row={}
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['dust_item_name'],['item_code','stock_uom','stock_uom','valuation_rate'])
+        row['qty']=doc.get('total_no_of_dust')
+        row['amount']=doc.get('total_no_of_dust')*row['rate']
         items.append(row)
     return items
 
@@ -179,6 +195,12 @@ def make_stock_entry(doc,type):
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
+    if doc.get("status") == "Manufacture":
+        return "Rack Shifting"
+    elif doc.get("status") == "Rack Shifting":
+        return "Curing"
+    elif doc.get("status") == "Curing":
+        return "Completed"
 def remaining_qty(item_code,default_bundle,cur_doc):
     uom =frappe.get_doc("Item",item_code)
     uom_qty = 0
