@@ -8,6 +8,26 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
         get_data(frm, cdt, cdn)
         
     },
+    onload:function(frm){
+        cur_frm.doc.date=frappe.datetime.now_datetime()
+        emp_detail(frm);
+        frm.set_query("designation",function(frm)
+        {
+            return{
+                filters:{
+                    "name":["in",["Labour Worker","Operator"]]
+                }
+            }
+        })
+        frm.set_query("department",function(frm)
+        {
+            return{
+                filters:{
+                    "name":["in",["Compount Wall - GP","Paver - GP"]]
+                }
+            }
+        })
+    },
     on_submit: async function(){
         await frappe.call({
             method:"ganapathy_pavers.custom.py.employee_atten_tool.attenance",
@@ -21,7 +41,7 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
             
         })
     },
-    validate: async function(){
+    after_save: async function(){
         await frappe.call({
             method:"ganapathy_pavers.custom.py.employee_atten_tool.check_in",
             args:{
@@ -115,6 +135,7 @@ async function change_checkin(frm,cdt,cdn){
             },
             async:false,
             callback(r){
+                console.log("reached")
                 if (validate && !frm.is_new()){
                     validate=false;validate=true
                 frappe.confirm(
