@@ -31,6 +31,7 @@ def item_customization():
             label='No of Labour(s)',
             fieldtype='Int',
             insert_after='section_break2',
+            default=0
             
             ),
             dict(
