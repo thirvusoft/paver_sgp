@@ -5,6 +5,47 @@ import json
 from frappe.utils.csvutils import getlink
 
 
+
+
+@frappe.whitelist()
+def check_in(table_list, atten_date, checkout, ts_name):
+	table_list=json.loads(table_list)
+	for i in table_list:
+		if(frappe.get_all("Employee Checkin",filters={'employee':i.get("employee"),'time':i.get('check_in') or atten_date})):
+			pass
+		else:
+			if i.get('check_in') or atten_date:
+				doc = frappe.new_doc("Employee Checkin")
+				doc.update({
+					'employee':i.get("employee"),
+					'log_type':"IN",
+					'time': i.get('check_in') or atten_date,
+					'ts_emp_att_tool_name':ts_name,
+				})
+				doc.insert(ignore_permissions=True)
+    
+@frappe.whitelist()    
+def change_check_in(change_checkin, employee):
+        if(frappe.get_all("Employee Checkin", {'employee':employee, 'log_type':'IN'})):
+            doc=frappe.get_last_doc("Employee Checkin", {'employee':employee, 'log_type':'IN'})
+            date=doc.time
+            date=date.date()
+            new_checkin= change_checkin.split(' ')[0]
+            if (str(date)==str(new_checkin)):
+                return doc.name
+            else:
+                pass
+            
+@frappe.whitelist()             
+def update_check_in(doc_name, change_checkin):
+    doc=frappe.get_doc('Employee Checkin',doc_name)
+    doc.update({
+		'time': change_checkin,
+	})
+    doc.flags.ignore_permissions=True
+    doc.flags.ignore_mandatory=True
+    doc.save()
+
 @frappe.whitelist()
 def attenance(table_list, atten_date, checkout, company, ts_name):
 	table_list=json.loads(table_list)
@@ -22,32 +63,21 @@ def attenance(table_list, atten_date, checkout, company, ts_name):
 		doc.insert(ignore_permissions=True)
 		doc.submit()
 
-	return checkin(table_list, atten_date, checkout, ts_name, doc.name)
+	return check_outs(table_list, checkout, ts_name, doc.name)
 
-
-def checkin(table_list, atten_date, checkout, ts_name, atten_name):
+ 
+def check_outs(table_list, checkout, ts_name, atten_name):
 	for i in table_list:
-		if i.get('check_in') or atten_date:
+		if i.get('check_out') or checkout:
 			doc = frappe.new_doc("Employee Checkin")
 			doc.update({
-				'employee':i.get("employee"),
-				'log_type':"IN",
-				'time': i.get('check_in') or atten_date,
-				'ts_emp_att_tool_name':ts_name,
-				'attendance': atten_name
-			})
-			doc.insert(ignore_permissions=True)
-
-		if i.get('check_out') or checkout:
-			doc1 = frappe.new_doc("Employee Checkin")
-			doc1.update({
 				'employee':i.get("employee"),
 				'log_type':"OUT",
 				'time': i.get('check_out') or checkout,
 				'ts_emp_att_tool_name':ts_name,
 				'attendance': atten_name
 			})
-			doc1.insert(ignore_permissions=True)
+			doc.insert(ignore_permissions=True)
 
 
 
@@ -85,18 +115,17 @@ def fill_emp_cancel_detail(self, event):
 
 @frappe.whitelist()
 def help_session(emp, upd_cout, emp_tabl):
-    emp_tabl=json.loads(emp_tabl)
-    check_in=[]
-    for i in emp_tabl:
-        check_in.append({'employee': i['employee']})
-        if i['employee'] == emp:
-            i['check_out'] = upd_cout
-        check_in[-1].update({
-            'employee_name': i['employee_name'],
+	emp_tabl=json.loads(emp_tabl)
+	check_in=[]
+	for i in emp_tabl:
+		check_in.append({'employee': i['employee']})
+		if i['employee'] == emp:
+			i['check_out'] = upd_cout
+		check_in[-1].update({
+			'employee_name': i['employee_name'],
 			'check_out': i['check_out'],
 			'check_in': i['check_in']
 		})
-    frappe.errprint(check_in)
-    return check_in
+	return check_in
 
 

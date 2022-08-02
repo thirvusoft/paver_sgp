@@ -1,9 +1,7 @@
 frappe.ui.form.on('BOM', {
     refresh: function(frm) {
-        console.log("Mani")
         frm.remove_custom_button("Create","Work Order")
     	frm.add_custom_button("Work Order", ()=> {
-            console.log("Maniiii")
             make_work_order(frm)
         },("Create"))
   }

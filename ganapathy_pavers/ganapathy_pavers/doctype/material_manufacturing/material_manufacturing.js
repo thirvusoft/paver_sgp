@@ -15,6 +15,8 @@ frappe.ui.form.on('Material Manufacturing', {
 		default_value("default_curing_target_warehouse","curing_target_warehouse")
 		default_value("cement","cement_item")
 		default_value("ggbs","ggbs_item")
+		default_value("chips","chips_item_name")
+		default_value("dust","dust_item_name")
 	},
 	from_time: function(frm) {
 		var field="ts_total_hours"
@@ -38,9 +40,9 @@ frappe.ui.form.on('Material Manufacturing', {
 	rack_shifting_additional_cost: function(frm){
 		cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense) 
 	},
-	// damage_qty: function(frm){
-	// 	cur_frm.set_value('total_completed_qty', frm.doc.total_completed_qty - frm.doc.damage_qty) 
-	// },
+	damage_qty: function(frm){
+		cur_frm.set_value('total_completed_qty', frm.doc.total_completed_qty - frm.doc.damage_qty) 
+	},
 	rack_shift_damage_qty: function(frm){
 		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty) 
 	},
@@ -190,7 +192,8 @@ frappe.ui.form.on('Material Manufacturing', {
 		frm.set_query("bom_no",function(){
 			return {
 				"filters": {
-					item:frm.doc.item_to_manufacture
+					item:frm.doc.item_to_manufacture,
+					is_default:1
 				}
 			}
 		})
@@ -211,9 +214,15 @@ function make_stock_entry(frm,type){
 		args:{
 			doc:frm.doc,
 			type:type
-		}
+		},
+		callback: function(r){
+			if(r.message){
+				cur_frm.set_value("status1", r.message);
+				cur_frm.refresh()
+			}
+			
+		 }
 	})
-	frm.refresh()
 }
 function total_hrs(frm,field,from,to){
 	frappe.call({
@@ -237,23 +246,30 @@ function item_adding(frm){
 			},
 			callback(r){
 				// cur_frm.set_value('items',r.message)
-				var t = 0
+				var item1=[]
+				for (const d of r.message){
+					item1.push(d.item_code)
+				}
 				for (const d of r.message){
 					for(const i of frm.doc.items){
 						if(i.item_code == d.item_code){
-							t=1
+							item1.indexOf(d.item_code) !== -1 && item1.splice(item1.indexOf(d.item_code), 1)
 						}
 					}
 				}
-				if(t == 0){
-					for (const d of r.message){
-						var row = frm.add_child('items');
-						row.item_code = d.item_code;
-						row.qty = d.qty;
-						row.stock_uom = d.stock_uom;
-						row.uom = d.uom;
-						row.rate = d.rate;
-						row.amount= d.amount
+				if(item1){
+					for(var i=0;i<item1.length;i++){		
+						for (const d of r.message){
+							if(d.item_code == item1[i]){
+								var row = frm.add_child('items');
+								row.item_code = d.item_code;
+								row.qty = d.qty;
+								row.stock_uom = d.stock_uom;
+								row.uom = d.uom;
+								row.rate = d.rate;
+								row.amount= d.amount
+							}
+						}
 					}
 				}
 				refresh_field("items");
@@ -270,23 +286,30 @@ function std_item(frm){
 			},
 			callback(r){
 				// cur_frm.set_value('items',r.message)
-				var t = 0
+				var item1=[]
+				for (const d of r.message){
+					item1.push(d.item_code)
+				}
 				for (const d of r.message){
 					for(const i of frm.doc.items){
 						if(i.item_code == d.item_code){
-							t=1
+							item1.indexOf(d.item_code) !== -1 && item1.splice(item1.indexOf(d.item_code), 1)
 						}
 					}
 				}
-				if(t == 0){
-					for (const d of r.message){
-						var row = frm.add_child('items');
-						row.item_code = d.item_code;
-						row.qty = d.qty;
-						row.stock_uom = d.stock_uom;
-						row.uom = d.uom;
-						row.rate = d.rate;
-						row.amount= d.amount
+				if(item1){
+					for(var i=0;i<item1.length;i++){		
+						for (const d of r.message){
+							if(d.item_code == item1[i]){
+								var row = frm.add_child('items');
+								row.item_code = d.item_code;
+								row.qty = d.qty;
+								row.stock_uom = d.stock_uom;
+								row.uom = d.uom;
+								row.rate = d.rate;
+								row.amount= d.amount
+							}
+						}
 					}
 				}
 				refresh_field("items");
@@ -298,7 +321,7 @@ function default_value(usb_field,set_field){
 	frappe.db.get_single_value("USB Setting",usb_field).then(value =>{
 		cur_frm.set_value(set_field, value) 
 	})
-	refresh_field(usb_field);
+	cur_frm.refresh_field(set_field);
 }
 frappe.ui.form.on('BOM Item', {
 	rate: function(frm, cdt, cdn) {
