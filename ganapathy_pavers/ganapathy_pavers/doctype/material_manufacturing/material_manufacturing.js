@@ -40,8 +40,11 @@ frappe.ui.form.on('Material Manufacturing', {
 	rack_shifting_additional_cost: function(frm){
 		cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense) 
 	},
+	production_qty: function(frm){
+		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
+	},
 	damage_qty: function(frm){
-		cur_frm.set_value('total_completed_qty', frm.doc.total_completed_qty - frm.doc.damage_qty) 
+		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
 	},
 	rack_shift_damage_qty: function(frm){
 		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty) 

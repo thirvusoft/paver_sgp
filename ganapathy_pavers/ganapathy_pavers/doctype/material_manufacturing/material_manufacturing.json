@@ -56,11 +56,12 @@
   "column_break_34",
   "stock_entry_type",
   "section_break_42",
-  "total_completed_qty",
-  "column_break_44",
-  "damage_qty",
-  "column_break_46",
+  "production_qty",
   "create_stock_entry",
+  "column_break_44",
+  "total_completed_qty",
+  "column_break_46",
+  "damage_qty",
   "rack_shifting_section",
   "total_no_of_produced_qty",
   "total_no_of_bundle",
@@ -575,6 +576,7 @@
    "options": "Item"
   },
   {
+   "default": "Manufacture",
    "fieldname": "status1",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -582,12 +584,17 @@
    "in_standard_filter": 1,
    "label": "Process",
    "options": "Manufacture\nRack Shifting\nCuring\nCompleted"
+  },
+  {
+   "fieldname": "production_qty",
+   "fieldtype": "Int",
+   "label": "Production Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-02 12:31:30.841634",
+ "modified": "2022-08-02 18:49:08.179286",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
