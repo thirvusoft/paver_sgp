@@ -143,7 +143,8 @@ frappe.ui.form.on("Project",{
 				}
 			}
 		})
-}
+		customer_query()
+	}
 })
 
 function percent_complete(frm,cdt,cdn){ 
@@ -291,17 +292,16 @@ function customer_query(){
 	let customer_list = []
 	if(cur_frm.doc.is_multi_customer){
 		for(let row=0; row<(frm.doc.customer_name?frm.doc.customer_name.length:0); row++){
-			if(!(customer_list.includes(frm.doc.customer_name[row].customer))){
-				let cus=frm.doc.customer_name[row].customer
-				frappe.db.get_value('Customer', cus, 'customer_name').then(cus_name => {
+			let cus=frm.doc.customer_name[row].customer
+			frappe.db.get_value('Customer', cus, 'customer_name').then(cus_name => {
+				if(!(customer_list.includes(cus_name.message.customer_name))){
 					customer_list.push(cus_name.message.customer_name)
-				})
-			}
+				}
+			})
 		}
 	}else{
 		customer_list.push(cur_frm.doc.customer?cur_frm.doc.customer:'')
 	}
-	
 	cur_frm.set_query('customer', 'additional_cost', function(){
 		return {
 			filters: {
@@ -310,7 +310,7 @@ function customer_query(){
 		}
 	})
 	if(cur_frm.fields_dict.additional_cost.grid.open_grid_row){
-		cur_frm.fields_dict.additional_cost.grid.open_grid_row.render()
+		cur_frm.fields_dict.additional_cost.grid.refresh()
 	}
 }
 
@@ -321,12 +321,12 @@ frappe.ui.form.on('Additional Costs', {
 		let customer_list = []
 		if(cur_frm.doc.is_multi_customer){
 			for(let row=0; row<(frm.doc.customer_name?frm.doc.customer_name.length:0); row++){
-				if(!(customer_list.includes(frm.doc.customer_name[row].customer))){
-					let cus=frm.doc.customer_name[row].customer
-					frappe.db.get_value('Customer', cus, 'customer_name').then(cus_name => {
+				let cus=frm.doc.customer_name[row].customer
+				frappe.db.get_value('Customer', cus, 'customer_name').then(cus_name => {
+					if(!(customer_list.includes(cus_name.message.customer_name))){
 						customer_list.push(cus_name.message.customer_name)
-					})
-				}
+					}
+				})
 			}
 		}else{
 			customer_list.push(cur_frm.doc.customer?cur_frm.doc.customer:'')
@@ -339,7 +339,7 @@ frappe.ui.form.on('Additional Costs', {
 			}
 		})
 		if(cur_frm.fields_dict.additional_cost.grid.open_grid_row){
-			cur_frm.fields_dict.additional_cost.grid.open_grid_row.render()
+			cur_frm.fields_dict.additional_cost.grid.refresh()
 		}	
 	},
 	job_worker: function(frm, cdt, cdn){
