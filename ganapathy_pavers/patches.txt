@@ -1,7 +1,4 @@
 ganapathy_pavers.patches.patches
 ganapathy_pavers.patches.item_patches1
-<<<<<<< HEAD
 ganapathy_pavers.patches.workstation_patches
-=======
 ganapathy_pavers.patches.sitework_patch
->>>>>>> f31bfdf3c6610a19ccc9d5454dd2807f3f036062
