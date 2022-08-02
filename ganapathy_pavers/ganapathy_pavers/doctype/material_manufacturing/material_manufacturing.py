@@ -195,11 +195,11 @@ def make_stock_entry(doc,type):
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
-    if doc.get("status") == "Manufacture":
+    if doc.get("status1") == "Manufacture":
         return "Rack Shifting"
-    elif doc.get("status") == "Rack Shifting":
+    elif doc.get("status1") == "Rack Shifting":
         return "Curing"
-    elif doc.get("status") == "Curing":
+    elif doc.get("status1") == "Curing":
         return "Completed"
 def remaining_qty(item_code,default_bundle,cur_doc):
     uom =frappe.get_doc("Item",item_code)
