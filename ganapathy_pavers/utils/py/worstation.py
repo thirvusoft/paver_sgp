@@ -1,9 +1,8 @@
-from email.policy import default
-import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
+
 def item_customization():
         custom_fields={
-        "workstation":[
+        "Workstation":[
             dict(
             fieldname='assets_table_worksation',
             label='Assets',
@@ -32,6 +31,7 @@ def item_customization():
             label='No of Labour(s)',
             fieldtype='Int',
             insert_after='section_break2',
+            default=0
             
             ),
             dict(
@@ -142,9 +142,8 @@ def item_customization():
             label='Sum of wages per hours',
             fieldtype='Float',
             insert_after='sum_of_wages_per_hour_column_break',
-            ),
+            )
           
         ]
         }
-
         create_custom_fields(custom_fields)
