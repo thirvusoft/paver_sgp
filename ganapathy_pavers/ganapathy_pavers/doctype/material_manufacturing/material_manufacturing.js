@@ -217,7 +217,7 @@ function make_stock_entry(frm,type){
 		},
 		callback: function(r){
 			if(r.message){
-				cur_frm.set_value("status", r.message);
+				cur_frm.set_value("status1", r.message);
 				cur_frm.refresh()
 			}
 			
@@ -246,23 +246,30 @@ function item_adding(frm){
 			},
 			callback(r){
 				// cur_frm.set_value('items',r.message)
-				var t = 0
+				var item1=[]
+				for (const d of r.message){
+					item1.push(d.item_code)
+				}
 				for (const d of r.message){
 					for(const i of frm.doc.items){
 						if(i.item_code == d.item_code){
-							t=1
+							item1.indexOf(d.item_code) !== -1 && item1.splice(item1.indexOf(d.item_code), 1)
 						}
 					}
 				}
-				if(t == 0){
-					for (const d of r.message){
-						var row = frm.add_child('items');
-						row.item_code = d.item_code;
-						row.qty = d.qty;
-						row.stock_uom = d.stock_uom;
-						row.uom = d.uom;
-						row.rate = d.rate;
-						row.amount= d.amount
+				if(item1){
+					for(var i=0;i<item1.length;i++){		
+						for (const d of r.message){
+							if(d.item_code == item1[i]){
+								var row = frm.add_child('items');
+								row.item_code = d.item_code;
+								row.qty = d.qty;
+								row.stock_uom = d.stock_uom;
+								row.uom = d.uom;
+								row.rate = d.rate;
+								row.amount= d.amount
+							}
+						}
 					}
 				}
 				refresh_field("items");
@@ -279,23 +286,30 @@ function std_item(frm){
 			},
 			callback(r){
 				// cur_frm.set_value('items',r.message)
-				var t = 0
+				var item1=[]
+				for (const d of r.message){
+					item1.push(d.item_code)
+				}
 				for (const d of r.message){
 					for(const i of frm.doc.items){
 						if(i.item_code == d.item_code){
-							t=1
+							item1.indexOf(d.item_code) !== -1 && item1.splice(item1.indexOf(d.item_code), 1)
 						}
 					}
 				}
-				if(t == 0){
-					for (const d of r.message){
-						var row = frm.add_child('items');
-						row.item_code = d.item_code;
-						row.qty = d.qty;
-						row.stock_uom = d.stock_uom;
-						row.uom = d.uom;
-						row.rate = d.rate;
-						row.amount= d.amount
+				if(item1){
+					for(var i=0;i<item1.length;i++){		
+						for (const d of r.message){
+							if(d.item_code == item1[i]){
+								var row = frm.add_child('items');
+								row.item_code = d.item_code;
+								row.qty = d.qty;
+								row.stock_uom = d.stock_uom;
+								row.uom = d.uom;
+								row.rate = d.rate;
+								row.amount= d.amount
+							}
+						}
 					}
 				}
 				refresh_field("items");
