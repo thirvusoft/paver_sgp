@@ -30,13 +30,15 @@
    "fieldname": "date",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Checkin Time"
+   "label": "Checkin Time",
+   "set_only_once": 1
   },
   {
    "fieldname": "department",
    "fieldtype": "Link",
    "label": "Department",
-   "options": "Department"
+   "options": "Department",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_3",
@@ -77,7 +79,8 @@
    "fieldname": "designation",
    "fieldtype": "Link",
    "label": "Designation",
-   "options": "Designation"
+   "options": "Designation",
+   "reqd": 1
   },
   {
    "fieldname": "checkout_time",
@@ -125,7 +128,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-01 14:30:10.285714",
+ "modified": "2022-08-02 15:27:31.698043",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Attendance Tool",

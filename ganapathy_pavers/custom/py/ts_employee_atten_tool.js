@@ -8,6 +8,26 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
         get_data(frm, cdt, cdn)
         
     },
+    // onload:function(frm){
+    //     cur_frm.doc.date=frappe.datetime.now_datetime()
+    //     emp_detail(frm);
+    //     frm.set_query("designation",function(frm)
+    //     {
+    //         return{
+    //             filters:{
+    //                 "name":["in",["Labour Worker","Operator"]]
+    //             }
+    //         }
+    //     })
+    //     frm.set_query("department",function(frm)
+    //     {
+    //         return{
+    //             filters:{
+    //                 "name":["in",["Compount Wall - GP","Paver - GP"]]
+    //             }
+    //         }
+    //     })
+    // },
     on_submit: async function(){
         await frappe.call({
             method:"ganapathy_pavers.custom.py.employee_atten_tool.attenance",
@@ -114,18 +134,19 @@ async function change_checkin(frm,cdt,cdn){
                 "change_checkin":row.check_in
             },
             async:false,
-            callback(r){
-                console.log("reached")
-                if (validate && !frm.is_new()){
+            async callback(r){
+                if (validate && !frm.is_new() && r.message[1]){
                     validate=false;validate=true
-                frappe.confirm(
+                    let conform=true
+                await frappe.confirm(
                     'Are you sure to change the employee checkin time?',
                     async function(){
+                        conform=false
                         if (r.message){
                             await frappe.call({
                                 method:"ganapathy_pavers.custom.py.employee_atten_tool.update_check_in",
                                 args:{
-                                    "doc_name":r.message,
+                                    "doc_name":r.message[0],
                                     "change_checkin":row.check_in
                                     
                                 },
@@ -134,20 +155,56 @@ async function change_checkin(frm,cdt,cdn){
                         }
                       
                     
+                    },
+                    function(){
+                        frappe.call({
+                            method:"ganapathy_pavers.custom.py.employee_atten_tool.get_check_in",
+                            args:{
+                                "employee":row.employee,
+                                "name":cur_frm.doc.name
+                            
+                            },
+                            callback(r){
+                                frappe.model.set_value(cdt, cdn, 'check_in', r.message)
+                            }
+                        })  
                     }
                 )
+                console.log(conform)
                 }
             }
             
         })
 }
+
+function not_permitted(frm, cdt, cdn)
+  frappe.call({
+        method: "ganapathy_pavers.custom.py.employee_atten_tool.row_delete",
+        args: {
+            "employee":row.employee,
+            "name":cur_frm.doc.name
+        }, 
+        callback: function (r) {
+            if (r.message) {
+                if(r.message === "false") {
+                    frappe.throw(__("Item cannot be deleted"))
+                }
+            }
+        }
+})
+
 frappe.ui.form.on('TS Employee Details', {
 check_in:function(frm,cdt,cdn){
-   change_checkin(frm,cdt,cdn);
-   validate=true
+      change_checkin(frm,cdt,cdn);
+      validate=true
 },
 employee:function(frm,cdt,cdn){
     change_checkin(frm,cdt,cdn);
+    not_permitted(frm, cdt, cdn);
  },
+before_employee_detail_remove: function(frm, cdt, cdn) {
+	not_permitted(frm, cdt, cdn);
+	
+},
 
 })

@@ -10,41 +10,52 @@ from frappe.utils.csvutils import getlink
 @frappe.whitelist()
 def check_in(table_list, atten_date, checkout, ts_name):
 	table_list=json.loads(table_list)
+	emp_list=[]
 	for i in table_list:
-		if(frappe.get_all("Employee Checkin",filters={'employee':i.get("employee"),'time':i.get('check_in') or atten_date})):
-			pass
+		emp_list.append(i.get("employee"))
+		if emp_list.count(i.get("employee")) > 1:
+			frappe.throw(f"{i.get('employee')} {i.get('idx')}")
 		else:
-			if i.get('check_in') or atten_date:
-				doc = frappe.new_doc("Employee Checkin")
-				doc.update({
-					'employee':i.get("employee"),
-					'log_type':"IN",
-					'time': i.get('check_in') or atten_date,
-					'ts_emp_att_tool_name':ts_name,
-				})
-				doc.insert(ignore_permissions=True)
-    
+			if(frappe.get_all("Employee Checkin",filters={'employee':i.get("employee"),'time':i.get('check_in')})):
+				pass
+			else:
+				if i.get('check_in'):
+					doc = frappe.new_doc("Employee Checkin")
+					doc.update({
+						'employee':i.get("employee"),
+						'log_type':"IN",
+						'time': i.get('check_in'),
+						'ts_emp_att_tool_name':ts_name,
+					})
+					doc.insert(ignore_permissions=True)
+	
+@frappe.whitelist()
+def get_check_in(employee, name):
+	doc= frappe.get_last_doc("Employee Checkin", filters={'employee':employee, 'ts_emp_att_tool_name':name, 'log_type':'IN'})
+	doc=doc.time 
+	return doc
+
 @frappe.whitelist()    
 def change_check_in(change_checkin, employee):
-        if(frappe.get_all("Employee Checkin", {'employee':employee, 'log_type':'IN'})):
-            doc=frappe.get_last_doc("Employee Checkin", {'employee':employee, 'log_type':'IN'})
-            date=doc.time
-            date=date.date()
-            new_checkin= change_checkin.split(' ')[0]
-            if (str(date)==str(new_checkin)):
-                return doc.name
-            else:
-                pass
-            
+		if(frappe.get_all("Employee Checkin", {'employee':employee, 'log_type':'IN'})):
+			doc=frappe.get_last_doc("Employee Checkin", {'employee':employee, 'log_type':'IN'})
+			date=doc.time
+			date=date.date()
+			new_checkin= change_checkin.split(' ')[0]
+			if (str(date)==str(new_checkin)):
+				return doc.name, doc
+			else:
+				pass
+			
 @frappe.whitelist()             
 def update_check_in(doc_name, change_checkin):
-    doc=frappe.get_doc('Employee Checkin',doc_name)
-    doc.update({
+	doc=frappe.get_doc('Employee Checkin',doc_name)
+	doc.update({
 		'time': change_checkin,
 	})
-    doc.flags.ignore_permissions=True
-    doc.flags.ignore_mandatory=True
-    doc.save()
+	doc.flags.ignore_permissions=True
+	doc.flags.ignore_mandatory=True
+	doc.save()
 
 @frappe.whitelist()
 def attenance(table_list, atten_date, checkout, company, ts_name):
@@ -57,7 +68,7 @@ def attenance(table_list, atten_date, checkout, company, ts_name):
 		doc.update({
 			'employee':i.get("employee"),
 			'status':"Present",
-			'attendance_date': i.get('check_in') or atten_date,
+			'attendance_date': i.get('check_in'),
 			'company': company if(company) else doc1.default_company,
 		})
 		doc.insert(ignore_permissions=True)
@@ -129,3 +140,13 @@ def help_session(emp, upd_cout, emp_tabl):
 	return check_in
 
 
+@frappe.whitelist()
+def row_delete(employee, name):
+    if(frappe.get_last_doc("Employee Checkin", filters={'employee':employee, 'ts_emp_att_tool_name':name, 'log_type':'IN'})):
+        doc= frappe.get_last_doc("Employee Checkin", filters={'employee':employee, 'ts_emp_att_tool_name':name, 'log_type':'IN'})
+        frappe.errprint(doc)
+        frappe.errprint("IIIIIIIIII")
+        return doc
+    else:
+        frappe.errprint("IIIIIIIIIIefegtfrhg")
+        pass
