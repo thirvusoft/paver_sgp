@@ -87,10 +87,29 @@ frappe.ui.form.on("Project",{
                 }
             }
         });
-        
+        frm.set_query("advance_account", 'additional_cost', function(frm, cdt, cdn) {
+            let data=locals[cdt][cdn]
+			if (!data.job_worker) {
+				frappe.msgprint(__("Please select employee first"));
+			}
+			let company_currency = erpnext.get_currency(cur_frm.doc.company);
+			let currencies = [company_currency];
+			if (data.currency && (data.currency != company_currency)) {
+				currencies.push(data.currency);
+			}
+			return {
+				filters: {
+					"root_type": "Asset",
+					"is_group": 0,
+					"company": cur_frm.doc.company,
+					"account_currency": ["in", currencies],
+				}
+			};
+		});
 		customer_query()
     },
     is_multi_customer:function(frm){
+        customer_query()
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_df_property('customer','reqd',0)
             cur_frm.set_df_property('customer','hidden',1)
@@ -101,6 +120,9 @@ frappe.ui.form.on("Project",{
             cur_frm.set_df_property('customer','hidden',0)
             cur_frm.set_df_property('customer_name','hidden',1)
         }	
+    },
+    customer: function(frm){
+        customer_query()
     },
     onload:function(frm){
 	let  additional_cost=cur_frm.doc.additional_cost?cur_frm.doc.additional_cost:[]
@@ -260,17 +282,110 @@ function amount_rawmet(frm,cdt,cdn){
 function customer_query(){
 	let frm=cur_frm;
 	let customer_list = []
-	for(let row=0; row<frm.doc.customer_name?frm.doc.customer_name.length:0; row++){
-		if(!(customer_list.includes(frm.doc.customer_name[row].customer))){
-			customer_list.push(frm.doc.customer_name[row].customer)
+	if(cur_frm.doc.is_multi_customer){
+		for(let row=0; row<(frm.doc.customer_name?frm.doc.customer_name.length:0); row++){
+			if(!(customer_list.includes(frm.doc.customer_name[row].customer))){
+				let cus=frm.doc.customer_name[row].customer
+				frappe.db.get_value('Customer', cus, 'customer_name').then(cus_name => {
+					customer_list.push(cus_name.message.customer_name)
+				})
+			}
 		}
+	}else{
+		customer_list.push(cur_frm.doc.customer?cur_frm.doc.customer:'')
 	}
-	frm.set_query('customer', 'additional_cost', function(){
+	
+	cur_frm.set_query('customer', 'additional_cost', function(){
 		return {
 			filters: {
-				name: ['in', customer_list]
+				customer_name: ['in', customer_list]
 			}
 		}
 	})
+	if(cur_frm.fields_dict.additional_cost.grid.open_grid_row){
+		cur_frm.fields_dict.additional_cost.grid.open_grid_row.render()
+	}
 }
 
+
+frappe.ui.form.on('Additional Costs', {
+	customer: function(frm, cdt, cdn){
+		frm=cur_frm;
+		let customer_list = []
+		if(cur_frm.doc.is_multi_customer){
+			for(let row=0; row<(frm.doc.customer_name?frm.doc.customer_name.length:0); row++){
+				if(!(customer_list.includes(frm.doc.customer_name[row].customer))){
+					let cus=frm.doc.customer_name[row].customer
+					frappe.db.get_value('Customer', cus, 'customer_name').then(cus_name => {
+						customer_list.push(cus_name.message.customer_name)
+					})
+				}
+			}
+		}else{
+			customer_list.push(cur_frm.doc.customer?cur_frm.doc.customer:'')
+		}
+		cur_frm.set_query('customer', 'additional_cost', function(){
+			return {
+				filters: {
+					customer_name: ['in', customer_list]
+				}
+			}
+		})
+		if(cur_frm.fields_dict.additional_cost.grid.open_grid_row){
+			cur_frm.fields_dict.additional_cost.grid.open_grid_row.render()
+		}	
+	},
+	job_worker: function(frm, cdt, cdn){
+		let data=locals[cdt][cdn]
+		if(data.job_worker){
+			frappe.call({
+				method: "erpnext.payroll.doctype.salary_structure_assignment.salary_structure_assignment.get_employee_currency",
+				args: {
+					employee: data.job_worker,
+				},
+				callback: function(r) {
+					if (r.message) {
+						frappe.model.set_value(cdt, cdn, 'currency', r.message);
+						frm.refresh_fields();
+					}
+				}
+			});
+		}
+	},
+	currency: function(frm, cdt, cdn) {
+		let data=locals[cdt][cdn]
+		if (data.currency) {
+			var from_currency = data.currency;
+			var company_currency;
+			if (!cur_frm.doc.company) {
+				company_currency = erpnext.get_currency(frappe.defaults.get_default("Company"));
+			} else {
+				company_currency = erpnext.get_currency(cur_frm.doc.company);
+			}
+			if (from_currency != company_currency) {
+				set_exchange_rate(cdt, cdn, from_currency, company_currency);
+			} else {
+				frappe.model.set_value(cdt, cdn, "exchange_rate", 1.0);
+			}
+			cur_frm.refresh_fields();
+		}
+	}	
+})
+function set_exchange_rate(cdt, cdn, from_currency, company_currency) {
+	frappe.call({
+		method: "erpnext.setup.utils.get_exchange_rate",
+		args: {
+			from_currency: from_currency,
+			to_currency: company_currency,
+		},
+		callback: function(r) {
+			frappe.model.set_value(cdt, cdn, "exchange_rate", flt(r.message));
+		}
+	});
+}
+
+frappe.ui.form.on('TS Customer', {
+	customer: function(frm, cdt, cdn){
+		customer_query()
+	}
+})
