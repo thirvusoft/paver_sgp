@@ -6,30 +6,24 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
     designation:function(frm, cdt, cdn){
         emp_detail(frm);
         get_data(frm, cdt, cdn)
-    },
-    onload:function(frm){
-        cur_frm.doc.date=frappe.datetime.now_datetime()
-        emp_detail(frm);
-        frm.set_query("designation",function(frm)
-        {
-            return{
-                filters:{
-                    "name":["in",["Labour Worker","Operator"]]
-                }
-            }
-        })
-        frm.set_query("department",function(frm)
-        {
-            return{
-                filters:{
-                    "name":["in",["Compount Wall - GP","Paver - GP"]]
-                }
-            }
-        })
+        
     },
     on_submit: async function(){
         await frappe.call({
             method:"ganapathy_pavers.custom.py.employee_atten_tool.attenance",
+            args:{
+                "table_list":cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:'',
+                atten_date: cur_frm.doc.date?cur_frm.doc.date:'',
+                checkout: cur_frm.doc.checkout_time?cur_frm.doc.checkout_time:'',
+                company: cur_frm.doc.company?cur_frm.doc.company:'',
+                ts_name:cur_frm.doc.name?cur_frm.doc.name:'',
+            },
+            
+        })
+    },
+    validate: async function(){
+        await frappe.call({
+            method:"ganapathy_pavers.custom.py.employee_atten_tool.check_in",
             args:{
                 "table_list":cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:'',
                 atten_date: cur_frm.doc.date?cur_frm.doc.date:'',
@@ -59,6 +53,7 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
             }
         } 
     },
+   
     date:function(frm, cdt,cdn){
         for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
            frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_in", cur_frm.doc.date)
@@ -106,3 +101,52 @@ function get_data(frm, cdt, cdn){
         }
     })
 }
+
+var validate=true;
+async function change_checkin(frm,cdt,cdn){
+    let row=locals[cdt][cdn];
+    if(!row.check_in || !row.employee)return
+	
+        await frappe.call({
+            method:"ganapathy_pavers.custom.py.employee_atten_tool.change_check_in",
+            args:{
+                "employee":row.employee,
+                "change_checkin":row.check_in
+            },
+            async:false,
+            callback(r){
+                if (validate && !frm.is_new()){
+                    validate=false;validate=true
+                frappe.confirm(
+                    'Are you sure to change the employee checkin time?',
+                    async function(){
+                        if (r.message){
+                            await frappe.call({
+                                method:"ganapathy_pavers.custom.py.employee_atten_tool.update_check_in",
+                                args:{
+                                    "doc_name":r.message,
+                                    "change_checkin":row.check_in
+                                    
+                                },
+                            })
+
+                        }
+                      
+                    
+                    }
+                )
+                }
+            }
+            
+        })
+}
+frappe.ui.form.on('TS Employee Details', {
+check_in:function(frm,cdt,cdn){
+   change_checkin(frm,cdt,cdn);
+   validate=true
+},
+employee:function(frm,cdt,cdn){
+    change_checkin(frm,cdt,cdn);
+ },
+
+})
