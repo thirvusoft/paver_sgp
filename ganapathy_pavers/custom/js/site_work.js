@@ -20,8 +20,24 @@ function setquery(frm,cdt,cdn){
 }
 
 
-
+var validate=true
 frappe.ui.form.on("Project",{
+	after_save: function(frm){
+		validate=true;
+	},
+	validate: function(frm){
+		if (validate && frm.doc.status=="Completed" && frm.doc.previous_state!="Completed")
+		{frappe.validated=false;
+		frappe.confirm('Are you sure you want to complete this site?',
+    	function(){
+			validate=false;
+			frappe.validated=true;
+			cur_frm.save();
+			window.close();
+			cur_frm.refresh()
+		}
+    )}
+	},
     project_type:function(frm,cdt,cdn){
         setquery(frm,cdt,cdn)
     },
@@ -257,3 +273,4 @@ function customer_query(){
 		}
 	})
 }
+
