@@ -125,17 +125,24 @@ frappe.ui.form.on("Project",{
         customer_query()
     },
     onload:function(frm){
-	let  additional_cost=cur_frm.doc.additional_cost?cur_frm.doc.additional_cost:[]
-	 if(additional_cost.length==0 && cur_frm.is_new()){
-	
-		let add_on_cost=["Any Food Exp in Site","Other Labour Work","Site Advance"]
-			for(let row=0;row<add_on_cost.length;row++){
-			
-			var new_row = frm.add_child("additional_cost");
-			new_row.description=add_on_cost[row]
+		let  additional_cost=cur_frm.doc.additional_cost?cur_frm.doc.additional_cost:[]
+		if(additional_cost.length==0 && cur_frm.is_new()){
+		
+			let add_on_cost=["Any Food Exp in Site","Other Labour Work","Site Advance"]
+				for(let row=0;row<add_on_cost.length;row++){
+				
+				var new_row = frm.add_child("additional_cost");
+				new_row.description=add_on_cost[row]
+				}
+					refresh_field("additional_cost");
 			}
-				refresh_field("additional_cost");
-		}
+		cur_frm.set_query('job_worker', 'additional_cost', function(){
+			return {
+				filters: {
+					designation: 'Job Worker'
+				}
+			}
+		})
 }
 })
 
