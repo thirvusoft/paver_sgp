@@ -1,40 +1,27 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-07-22 16:00:04.488494",
+ "creation": "2022-07-29 14:14:29.062131",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "petrol_per_liter",
-  "diesel_per_liter",
-  "vehicle_update"
+  "buffer_time"
  ],
  "fields": [
   {
-   "fieldname": "petrol_per_liter",
+   "fieldname": "buffer_time",
    "fieldtype": "Float",
-   "label": "Petrol Per Liter"
-  },
-  {
-   "fieldname": "diesel_per_liter",
-   "fieldtype": "Float",
-   "label": "Diesel Per Liter"
-  },
-  {
-   "default": "1",
-   "fieldname": "vehicle_update",
-   "fieldtype": "Check",
-   "label": "Automatically Update Mileage based on Vehicle Log"
+   "label": "Buffer Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-08-01 12:07:27.474944",
+ "modified": "2022-07-29 14:14:29.062131",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "Vehicle Settings",
+ "name": "Biometric Settings",
  "owner": "Administrator",
  "permissions": [
   {

@@ -73,7 +73,7 @@ def before_save(doc, action=None):
                     frappe.throw(f'Please enter {doc1[0].uom} conversion for an item: '+frappe.bold(getlink('Item', item.item)))
                 rm_cost+=(doc1[0]['price_list_rate'] or 0)*(item.stock_qty or 0)/conv
     doc.actual_site_cost_calculation=(item_cost or 0)+(doc.total or 0)+(doc.total_job_worker_cost or 0)+ (rm_cost or 0) + (doc.transporting_cost or 0)
-    doc.site_profit_amount=(doc.actual_site_cost_calculation or 0) - (doc.total_expense_amount or 0)
+    doc.site_profit_amount=(doc.total_expense_amount or 0) - (doc.actual_site_cost_calculation or 0)
     return doc
 
 @frappe.whitelist()
@@ -105,12 +105,12 @@ def create_status():
         "doc_type":"Project",
         "field_name":"status",
         "property":"options",
-        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site"
+        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site\nRework"
     })
     doc.save()
     frappe.db.commit()
     
-    
+
 
 def validate(self,event):
     validate_jw_qty(self)
@@ -158,6 +158,7 @@ def validate(self,event):
                 })
                 doc.insert()
                 doc.submit()
+                create_jw_advance(row.job_worker, row.currency, amount, row.advance_account, row.mode_of_payment_for_advance, self.company, self.name, row.exchange_rate)
                 if(row.name and event=='after_insert'):
                     frappe.db.set_value("Additional Costs", row.name, 'amount', 0)
         else:
@@ -193,13 +194,39 @@ def validate_jw_qty(self):
             wrong_items.append(frappe.bold(item))
     if(wrong_items):
         frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+', '.join(wrong_items))
-    
+        
+        
+def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, exchange_rate):
+    doc=frappe.new_doc('Employee Advance')
+    doc.update({
+        'employee': emp_name,
+        'posting_date': frappe.utils.nowdate(),
+        'repay_unclaimed_amount_from_salary': 1,
+        'currency': currency,
+        'advance_amount': adv_amt,
+        'advance_account': adv_act,
+        'exchange_rate' : (exchange_rate or 1),
+        'company': company, 
+        'mode_of_payment': mop,
+        'purpose': f'Advance amount received from the site work {sw}',
+        'project' : sw
+    })
+    doc.flags.ignore_permissions = True
+    doc.flags.ignore_mandatory = True
+    doc.save()
+    doc.submit()
 
-def update_site_work(doc, action):
-    sw_list=frappe.get_all('Project', pluck="name")
-    for sw in sw_list:
-        doc=frappe.get_doc('Project', sw)
-        doc=before_save(doc)
-        doc.flags.ignore_mandatory=True
-        doc.flags.ignore_permissions=True
-        doc.save()
+def update_status(doc, events):
+    frappe.db.set_value("Project", doc.name, "previous_state", doc.status)
+    doc.reload()
+
+def validate_status(self,event):
+    if (self.previous_state == "Completed" and self.status != "Rework"):
+        frappe.throw("Completed Site Work cannot be updated.")
+
+def rework_count(self,event):
+    a = frappe.get_value("Project", self.name, 'status')
+    if (a =="Completed" and self.status =="Rework"):
+        self.total_rework = self.total_rework + 1
+    else:
+        pass

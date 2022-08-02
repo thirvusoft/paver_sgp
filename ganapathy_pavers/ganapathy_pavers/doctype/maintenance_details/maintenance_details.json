@@ -13,7 +13,8 @@
   "files",
   "month_before",
   "week_before",
-  "day_before"
+  "day_before",
+  "expense"
  ],
  "fields": [
   {
@@ -64,12 +65,17 @@
    "fieldname": "day_before",
    "fieldtype": "Check",
    "label": "Day Before"
+  },
+  {
+   "fieldname": "expense",
+   "fieldtype": "Float",
+   "label": "Expense"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-27 11:56:21.478038",
+ "modified": "2022-08-01 14:36:17.165071",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Maintenance Details",
