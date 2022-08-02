@@ -29,8 +29,8 @@ def get_item_value(doctype):
     
 @frappe.whitelist()
 def create_site(doc):
+    doc=json.loads(doc)
     if(doc.get('site_work')):
-        doc=json.loads(doc)
         create=False
         for row in (doc['items'] or []):
             if(row.get("work")!="Supply Only"):
