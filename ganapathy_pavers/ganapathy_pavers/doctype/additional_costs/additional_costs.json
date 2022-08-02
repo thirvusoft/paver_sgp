@@ -14,7 +14,8 @@
   "no_of_labours",
   "column_break_7",
   "job_worker",
-  "advance_amount",
+  "currency",
+  "exchange_rate",
   "advance_account",
   "mode_of_payment_for_advance"
  ],
@@ -53,11 +54,11 @@
    "options": "Mode of Payment"
   },
   {
-   "depends_on": "eval:doc.description==\"Site Advance\"",
+   "depends_on": "eval:doc.description==\"Site Advance\" ",
    "fieldname": "customer",
    "fieldtype": "Link",
    "label": "Customer",
-   "mandatory_depends_on": "eval:doc.description==\"Site Advance\"",
+   "mandatory_depends_on": "eval:doc.description==\"Site Advance\" && parent.is_multi_customer",
    "options": "Customer"
   },
   {
@@ -74,13 +75,6 @@
   },
   {
    "depends_on": "eval:doc.description==\"Site Advance\"",
-   "fieldname": "advance_amount",
-   "fieldtype": "Currency",
-   "label": "Advance Amount",
-   "mandatory_depends_on": "eval:doc.description==\"Site Advance\""
-  },
-  {
-   "depends_on": "eval:doc.description==\"Site Advance\"",
    "fieldname": "advance_account",
    "fieldtype": "Link",
    "label": "Advance Account",
@@ -93,12 +87,27 @@
    "fieldtype": "Link",
    "label": "Mode of Payment for Advance",
    "options": "Mode of Payment"
+  },
+  {
+   "depends_on": "eval:doc.description==\"Site Advance\"",
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "mandatory_depends_on": "eval:doc.description==\"Site Advance\"",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "exchange_rate",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Exchange Rate",
+   "precision": "9"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-07-29 17:59:42.424719",
+ "modified": "2022-08-02 12:10:45.080442",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Additional Costs",

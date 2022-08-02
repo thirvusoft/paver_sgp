@@ -109,9 +109,6 @@ override_doctype_class = {
 
 
 doc_events = {
-	"Bin": {
-		"on_update": "ganapathy_pavers.custom.py.site_work.update_site_work"
-	},
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
 		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset"
