@@ -100,7 +100,8 @@ override_doctype_class = {
 	# "ToDo": "custom_app.overrides.CustomToDo"
 	"Salary Slip":"ganapathy_pavers.utils.py.salary_slip.CustomSalary",
 	"Payroll Entry":"ganapathy_pavers.utils.py.payroll_entry.MessExpense",
-	"Opening Invoice Creation Tool":"ganapathy_pavers.custom.py.opening_invoice.OpeningInvoice"
+	"Opening Invoice Creation Tool":"ganapathy_pavers.custom.py.opening_invoice.OpeningInvoice",
+	"Stock Entry" : "ganapathy_pavers.custom.py.stock_entry.Tsstockentry"
 }
 
 # Document Events
@@ -111,7 +112,8 @@ override_doctype_class = {
 doc_events = {
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
-		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset"
+		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset",
+		
 	},
 	"Payment Entry":{
                       "on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary"
@@ -197,7 +199,7 @@ doc_events = {
 
 	},
 	"Workstation":{
-		"validate": "ganapathy_pavers.custom.py.workstation.validate"
+		"validate": "ganapathy_pavers.custom.py.workstation.total_salary"
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
@@ -226,7 +228,7 @@ doctype_js = {
 				"Timesheet" : "utils/js/timesheet.js",
 				"Salary Slip":"utils/js/salary_slip.js",
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
-				"Workstation":"/custom/js/workstation.js",
+				"Workstation":["/custom/js/workstation.js","/custom/js/ts_operator.js"],
 				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
 				"Delivery Note":"/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
@@ -236,7 +238,8 @@ doctype_js = {
 								],
 				"Work Order" : "/utils/js/workorder.js",
 				"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
-				"Employee":"/custom/js/employee.js"
+				"Employee":"/custom/js/employee.js",
+				
 			 }
 # Scheduled Tasks
 # ---------------
