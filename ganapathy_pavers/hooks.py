@@ -197,7 +197,7 @@ doc_events = {
 
 	},
 	"Workstation":{
-		"validate": "ganapathy_pavers.custom.py.workstation.validate"
+		"validate": "ganapathy_pavers.custom.py.workstation.total_salary"
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
@@ -226,7 +226,7 @@ doctype_js = {
 				"Timesheet" : "utils/js/timesheet.js",
 				"Salary Slip":"utils/js/salary_slip.js",
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
-				"Workstation":"/custom/js/workstation.js",
+				"Workstation":["/custom/js/workstation.js","/custom/js/ts_operator.js"],
 				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
 				"Delivery Note":"/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
@@ -236,7 +236,8 @@ doctype_js = {
 								],
 				"Work Order" : "/utils/js/workorder.js",
 				"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
-				"Employee":"/custom/js/employee.js"
+				"Employee":"/custom/js/employee.js",
+				
 			 }
 # Scheduled Tasks
 # ---------------
