@@ -23,31 +23,32 @@
   },
   {
    "fieldname": "batch",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Batch"
+   "label": "Batch",
+   "options": "Batch"
   },
   {
    "fieldname": "bundle",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Bundle"
   },
   {
    "fieldname": "damages_in_nos",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Damages in Nos"
   },
   {
    "fieldname": "sqft",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Sqft"
   },
   {
    "fieldname": "damages_in_sqft",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Damages in Sqft"
   }
@@ -55,7 +56,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-08-04 15:45:35.078061",
+ "modified": "2022-08-05 11:46:26.402253",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Items",
