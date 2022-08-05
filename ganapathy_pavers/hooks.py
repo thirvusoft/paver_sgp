@@ -204,6 +204,9 @@ doc_events = {
 	},
 	"Journal Entry":{
 		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry"
+	},
+	"Attendance":{
+		"on_submit":"ganapathy_pavers.custom.py.employee_checkin.check_in_out"
 	}
 
 }
