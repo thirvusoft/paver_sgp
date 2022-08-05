@@ -123,6 +123,8 @@ def make_stock_entry(doc,type):
     default_bundle = frappe.db.get_singles_value("USB Setting", "default_rack_shift_uom")
     if doc.get("stock_entry_type")=="Manufacture" and type == "create_stock_entry":
         valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture","docstatus":["!=",2]},pluck="name")
+        stock_entry.set_posting_time = 1
+        stock_entry.posting_date = frappe.utils.formatdate(doc.get("to"), "yyyy-MM-dd")
         if len(valid) >= 1:
             frappe.throw("Already Stock Entry("+valid[0]+") Created For Manufacture")
         stock_entry.stock_entry_type = doc.get("stock_entry_type")
@@ -155,13 +157,17 @@ def make_stock_entry(doc,type):
         valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Repack","docstatus":["!=",2]},pluck="name")
         if len(valid) >= 1:
             frappe.throw("Already Stock Entry("+valid[0]+") Created For Repack")
+        if doc.get("batch_no_manufacture"):
+            pass
+        else:
+            frappe.throw("Kindly Submit Manufacture Stock Entry")
         stock_entry.stock_entry_type = doc.get("stock_entry_rack_shift")
         if doc.get("total_no_of_produced_qty") == 0:
             frappe.throw("Please Enter the Total No of Bundle")
         stock_entry.append('items', dict(
-        s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("total_no_of_produced_qty"),uom = default_nos
+        s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("total_no_of_produced_qty")+doc.get("rack_shift_damage_qty"),uom = default_nos ,batch_no = doc.get("batch_no_manufacture")
         ))
-        qty = doc.get("total_no_of_bundle") + remaining_qty(doc.get("item_to_manufacture"),default_bundle,doc.get("name"))
+        qty = doc.get("total_no_of_bundle") + remaining_qty(doc.get("item_to_manufacture"),default_bundle,default_nos,doc.get("name"))
         stock_entry.append('items', dict(
             t_warehouse = doc.get("rack_shift_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = qty,uom = default_bundle
             ))
@@ -179,11 +185,15 @@ def make_stock_entry(doc,type):
         valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer","docstatus":["!=",2]},pluck="name")
         if len(valid) >= 1:
             frappe.throw("Already Stock Entry("+valid[0]+") Created For Material Transfer")
+        if doc.get("batch_no_rack_shifting"):
+            pass
+        else:
+            frappe.throw("Kindly Submit Repack Stock Entry")
         stock_entry.stock_entry_type = doc.get("curing_stock_entry_type")
         if doc.get("no_of_bundle") == 0:
             frappe.throw("Please Enter No of Bundle")
         stock_entry.append('items', dict(
-        s_warehouse = doc.get("curing_source_warehouse"),t_warehouse = doc.get("curing_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("no_of_bundle"), uom = default_bundle
+        s_warehouse = doc.get("curing_source_warehouse"),t_warehouse = doc.get("curing_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = doc.get("no_of_bundle"), uom = default_bundle,batch_no = doc.get("batch_no_rack_shifting")
         ))
         if doc.get("curing_damaged_qty") > 0:
             stock_entry.append('items', dict(
@@ -201,16 +211,19 @@ def make_stock_entry(doc,type):
         return "Curing"
     elif doc.get("status1") == "Curing":
         return "Completed"
-def remaining_qty(item_code,default_bundle,cur_doc):
+def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
     uom =frappe.get_doc("Item",item_code)
     uom_qty = 0
+    uom_nos = 0
     for i in uom.uoms:
         if(default_bundle == i.uom):
             uom_qty=i.conversion_factor	
+        if(default_nos == i.uom):
+            uom_nos=i.conversion_factor	
     total_qty=0
     remaining_qty = frappe.get_all("Material Manufacturing",fields=['name','remaining_qty'],filters={"item_to_manufacture" : item_code})
     for j in remaining_qty:
-        total_qty = total_qty+j.remaining_qty
+        total_qty = total_qty+(j.remaining_qty*uom_nos)
     set_qty = 0
     while(int(total_qty) > int(uom_qty)):
         total_qty = total_qty - uom_qty
@@ -224,4 +237,28 @@ def remaining_qty(item_code,default_bundle,cur_doc):
         frappe.db.commit()
         return set_qty
     return 0
-            
+@frappe.whitelist()
+def find_batch(name):
+    manufacture=""
+    repack=""
+    transfer=""
+    if name:
+        stock = frappe.get_all("Stock Entry",filters={"usb":name,"docstatus":1},fields=['name','stock_entry_type'])
+        for i in stock:
+            print(stock)
+            if i.stock_entry_type == "Manufacture":
+                batch = frappe.get_doc("Stock Entry",i.name)
+                for j in batch.items:
+                    if j.t_warehouse and j.is_finished_item and j.is_process_loss == 0:
+                        manufacture=j.batch_no
+            elif i.stock_entry_type == "Repack":
+                batch = frappe.get_doc("Stock Entry",i.name)
+                for j in batch.items:
+                    if j.t_warehouse and j.is_finished_item and j.is_process_loss == 0:
+                        repack=j.batch_no
+            elif i.stock_entry_type == "Material Transfer":
+                batch = frappe.get_doc("Stock Entry",i.name)
+                for j in batch.items:
+                    if j.t_warehouse and j.s_warehouse:
+                        transfer=j.batch_no
+    return manufacture,repack,transfer

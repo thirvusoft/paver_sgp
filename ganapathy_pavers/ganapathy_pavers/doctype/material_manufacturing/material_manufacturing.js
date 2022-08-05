@@ -18,6 +18,23 @@ frappe.ui.form.on('Material Manufacturing', {
 		default_value("chips","chips_item_name")
 		default_value("dust","dust_item_name")
 	},
+	item_to_manufacture: function(frm){
+		const find = frm.doc.item_to_manufacture.split("-");
+		if(find[1] == "SHOT BLAST"){
+			cur_frm.set_value("is_shot_blasting",1)
+		}
+		else{
+			cur_frm.set_value("is_shot_blasting",0)
+		}
+	},
+	is_shot_blasting: function(frm){
+		if(frm.doc.is_shot_blasting == 1){
+			default_value("default_curing_target_warehouse_for_setting","curing_target_warehouse")
+		}
+		else{
+			default_value("default_curing_target_warehouse","curing_target_warehouse")
+		}
+	},
 	from_time: function(frm) {
 		var field="ts_total_hours"
 		total_hrs(frm,field,frm.doc.from_time,frm.doc.to)
@@ -34,11 +51,22 @@ frappe.ui.form.on('Material Manufacturing', {
 		var field="total_hours_rack"
 		total_hrs(frm,field,frm.doc.from_time_rack,frm.doc.to_time_rack)
 	},
+	from_time_curing: function(frm) {
+		var field="total_hrs"
+		total_hrs(frm,field,frm.doc.from_time_curing,frm.doc.to_time_curing)
+	},
+	to_time_curing: function(frm){
+		var field="total_hrs"
+		total_hrs(frm,field,frm.doc.from_time_curing,frm.doc.to_time_curing)
+	},
 	additional_cost: function(frm){
 		cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense) 
 	},
 	rack_shifting_additional_cost: function(frm){
-		cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense) 
+		cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost) 
+	},
+	strapping_cost: function(frm){
+		cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost) 
 	},
 	production_qty: function(frm){
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
@@ -46,8 +74,20 @@ frappe.ui.form.on('Material Manufacturing', {
 	damage_qty: function(frm){
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
 	},
+	curing_damaged_qty: function(frm){
+		cur_frm.set_value('no_of_bundle', frm.doc.no_of_bundle - frm.doc.curing_damaged_qty) 
+	},
 	rack_shift_damage_qty: function(frm){
 		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty) 
+	},
+	rate_per_hrs: function(frm){
+		cur_frm.set_value('labour_cost', (frm.doc.rate_per_hrs * frm.doc.total_hrs)/frm.doc.no_of_division)
+	},
+	total_hrs: function(frm){
+		cur_frm.set_value('labour_cost', (frm.doc.rate_per_hrs * frm.doc.total_hrs)/frm.doc.no_of_division)
+	},
+	no_of_division: function(frm){
+		cur_frm.set_value('labour_cost', (frm.doc.rate_per_hrs * frm.doc.total_hrs)/frm.doc.no_of_division)
 	},
 	refresh: function(frm){
 		if(frm.doc.ts_total_hours > 0 && frm.doc.docstatus == 0){
@@ -70,10 +110,23 @@ frappe.ui.form.on('Material Manufacturing', {
 				},
 				callback(r){
 					cur_frm.set_value('total_rack_shift_expense', r.message*frm.doc.total_hours_rack);
-					cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense);
+					cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost);
 				}
 			})
 		}
+		frappe.call({
+			method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.find_batch",
+			args:{
+				name:frm.doc.name,
+			},
+			callback(r){
+				if (r.message){
+					cur_frm.set_value('batch_no_manufacture', r.message[0]);
+					cur_frm.set_value('batch_no_rack_shifting', r.message[1]);
+					cur_frm.set_value('batch_no_curing', r.message[2]);
+				}
+			}
+		})
 		std_item(frm)
 		item_adding(frm)
 	},
@@ -106,8 +159,9 @@ frappe.ui.form.on('Material Manufacturing', {
 					default_cf=i.conversion_factor	
 				}
 			}
-			var total_amount = (frm.doc.total_no_of_produced_qty/default_cf)/bundle_cf
-			cur_frm.set_value('remaining_qty', Math.round((frm.doc.total_no_of_produced_qty/default_cf)%bundle_cf));
+			var total_amount = (frm.doc.total_no_of_produced_qty*nos_cf)/bundle_cf
+			console.log((frm.doc.total_no_of_produced_qty*nos_cf)%bundle_cf)
+			cur_frm.set_value('remaining_qty', ((frm.doc.total_no_of_produced_qty*nos_cf)%bundle_cf)/nos_cf);
 			if(total_amount >= 1){
 				cur_frm.set_value('total_no_of_bundle', Math.floor(total_amount));
 			}
@@ -354,101 +408,6 @@ function total_amount(frm, cdt, cdn){
 	var d = locals[cdt][cdn];
 	frappe.model.set_value(cdt,cdn,"amount",d.qty*d.rate)
 }
-// import FileUploaderComponent from './FileUploader.vue';
-
-// export default class FileUploader {
-// 	constructor({
-// 		wrapper,
-// 		method,
-// 		on_success,
-// 		doctype,
-// 		docname,
-// 		fieldname,
-// 		files,
-// 		folder,
-// 		restrictions,
-// 		upload_notes,
-// 		allow_multiple,
-// 		as_dataurl,
-// 		disable_file_browser,
-// 		frm
-// 	} = {}) {
-
-// 		frm && frm.attachments.max_reached(true);
-
-// 		if (!wrapper) {
-// 			this.make_dialog();
-// 		} else {
-// 			this.wrapper = wrapper.get ? wrapper.get(0) : wrapper;
-// 		}
-
-// 		this.$fileuploader = new Vue({
-// 			el: this.wrapper,
-// 			render: h => h(FileUploaderComponent, {
-// 				props: {
-// 					show_upload_button: !Boolean(this.dialog),
-// 					doctype,
-// 					docname,
-// 					fieldname,
-// 					method,
-// 					folder,
-// 					on_success,
-// 					restrictions,
-// 					upload_notes,
-// 					allow_multiple,
-// 					as_dataurl,
-// 					disable_file_browser,
-// 				}
-// 			})
-// 		});
-
-// 		this.uploader = this.$fileuploader.$children[0];
-
-// 		this.uploader.$watch('files', (files) => {
-// 			let all_private = files.every(file => file.private);
-// 			if (this.dialog) {
-// 				this.dialog.set_secondary_action_label(all_private ? __('Set all public') : __('Set all private'));
-// 			}
-// 		}, { deep: true });
-
-// 		if (files && files.length) {
-// 			this.uploader.add_files(files);
-// 		}
-
-// 		this.uploader.$watch('close_dialog', (close_dialog) => {
-// 			if (close_dialog) {
-// 				this.dialog && this.dialog.hide();
-// 			}
-// 		});
-// 	}
-
-// 	upload_files() {
-// 		this.dialog && this.dialog.get_primary_btn().prop('disabled', true);
-// 		return this.uploader.upload_files()
-// 			.then(() => {
-// 				this.dialog && this.dialog.hide();
-// 			});
-// 	}
-
-// 	make_dialog() {
-// 		this.dialog = new frappe.ui.Dialog({
-// 			title: __('Upload'),
-// 			primary_action_label: __('Upload'),
-// 			primary_action: () => this.upload_files(),
-// 			secondary_action_label: __('Set all private'),
-// 			secondary_action: () => {
-// 				this.uploader.toggle_all_private();
-// 			}
-// 		});
-
-// 		this.wrapper = this.dialog.body;
-// 		this.dialog.show();
-// 		this.dialog.$wrapper.on('hidden.bs.modal', function() {
-// 			$(this).data('bs.modal', null);
-// 			$(this).remove();
-// 		});
-// 	}
-// }
 frappe.ui.form.on('Material Manufacturing', {
 	refresh : function(frm){
 		set_css(frm);

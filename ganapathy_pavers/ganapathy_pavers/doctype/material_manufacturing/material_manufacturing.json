@@ -1,13 +1,14 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "USB-.{operation}.-.####",
+ "autoname": "MM-.YYYY.-.####",
  "creation": "2022-07-21 14:57:24.279355",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "item_to_manufacture",
+  "is_shot_blasting",
   "column_break_2",
   "company",
   "status1",
@@ -76,6 +77,7 @@
   "workstation",
   "total_rack_shift_expense",
   "rack_shifting_additional_cost",
+  "strapping_cost",
   "rack_shifting_total_expense",
   "rack_shift_ware_section",
   "rack_shift_source_warehouse",
@@ -85,13 +87,27 @@
   "stock_entry_rack_shift",
   "section_break_51",
   "no_of_bundle",
-  "curing_damaged_qty",
-  "labour_cost",
   "curing_stock_entry",
+  "column_break_80",
+  "from_time_curing",
+  "curing_damaged_qty",
+  "to_time_curing",
+  "column_break_82",
+  "rate_per_hrs",
+  "total_hrs",
+  "cb4",
+  "no_of_division",
+  "labour_cost",
   "section_break_72",
   "curing_source_warehouse",
+  "column_break_84",
   "curing_target_warehouse",
+  "column_break_86",
   "curing_stock_entry_type",
+  "section_break_98",
+  "batch_no_manufacture",
+  "batch_no_rack_shifting",
+  "batch_no_curing",
   "amended_from"
  ],
  "fields": [
@@ -237,8 +253,10 @@
    "fieldtype": "Column Break"
   },
   {
+   "columns": 2,
    "fieldname": "from_time",
    "fieldtype": "Datetime",
+   "in_list_view": 1,
    "label": "From Time"
   },
   {
@@ -363,7 +381,6 @@
    "label": "Create Stock Entry For Manufacturing"
   },
   {
-   "collapsible": 1,
    "fieldname": "rack_shifting_section",
    "fieldtype": "Section Break",
    "label": "Rack Shifting"
@@ -465,6 +482,7 @@
   {
    "fieldname": "rack_shifting_additional_cost",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Rack Shifting Additional Cost"
   },
   {
@@ -537,7 +555,7 @@
    "fieldname": "curing_damaged_qty",
    "fieldtype": "Int",
    "hidden": 1,
-   "label": "Curing Damage Qty"
+   "label": "Damage Qty"
   },
   {
    "fieldname": "total_no_of_dust",
@@ -589,12 +607,92 @@
    "fieldname": "production_qty",
    "fieldtype": "Int",
    "label": "Production Qty"
+  },
+  {
+   "fieldname": "column_break_84",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_86",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate_per_hrs",
+   "fieldtype": "Currency",
+   "label": "Rate Per Hrs"
+  },
+  {
+   "default": "3",
+   "fieldname": "no_of_division",
+   "fieldtype": "Float",
+   "label": "No. of Division"
+  },
+  {
+   "fieldname": "from_time_curing",
+   "fieldtype": "Datetime",
+   "label": "From Time"
+  },
+  {
+   "fieldname": "to_time_curing",
+   "fieldtype": "Datetime",
+   "label": "To Time"
+  },
+  {
+   "fieldname": "total_hrs",
+   "fieldtype": "Float",
+   "label": "Total Hrs"
+  },
+  {
+   "fieldname": "column_break_80",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_82",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "strapping_cost",
+   "fieldtype": "Float",
+   "label": "Strapping Cost"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_shot_blasting",
+   "fieldtype": "Check",
+   "label": "Is Shot Blasting Item"
+  },
+  {
+   "fieldname": "batch_no_manufacture",
+   "fieldtype": "Link",
+   "label": "Batch no Manufacture",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "batch_no_rack_shifting",
+   "fieldtype": "Link",
+   "label": "Batch no Rack Shifting",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "batch_no_curing",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Batch no Curing",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "section_break_98",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-02 18:49:08.179286",
+ "modified": "2022-08-04 20:52:13.129190",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

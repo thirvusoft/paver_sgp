@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-08-04 15:43:40.552980",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_name",
+  "batch",
+  "bundle",
+  "damages_in_nos",
+  "sqft",
+  "damages_in_sqft"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "batch",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Batch"
+  },
+  {
+   "fieldname": "bundle",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Bundle"
+  },
+  {
+   "fieldname": "damages_in_nos",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Damages in Nos"
+  },
+  {
+   "fieldname": "sqft",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Sqft"
+  },
+  {
+   "fieldname": "damages_in_sqft",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Damages in Sqft"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-08-04 15:45:35.078061",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Shot Blast Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
