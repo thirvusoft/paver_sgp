@@ -50,6 +50,7 @@
   "total_manufacturing_expense",
   "column_break_28",
   "total_expense",
+  "total_expense_per_sqft",
   "section_break_17",
   "source_warehouse",
   "column_break_32",
@@ -58,6 +59,7 @@
   "stock_entry_type",
   "section_break_42",
   "production_qty",
+  "production_sqft",
   "create_stock_entry",
   "column_break_44",
   "total_completed_qty",
@@ -73,6 +75,7 @@
   "from_time_rack",
   "to_time_rack",
   "total_hours_rack",
+  "rack_shifting_total_expense_per_sqft",
   "cb52",
   "workstation",
   "total_rack_shift_expense",
@@ -93,12 +96,14 @@
   "from_time_curing",
   "curing_damaged_qty",
   "to_time_curing",
+  "shot_blast_per_sqft",
   "column_break_82",
   "rate_per_hrs",
   "total_hrs",
   "cb4",
   "no_of_division",
   "labour_cost",
+  "labour_cost_per_sqft",
   "section_break_72",
   "curing_source_warehouse",
   "column_break_84",
@@ -106,6 +111,8 @@
   "column_break_86",
   "curing_stock_entry_type",
   "section_break_98",
+  "item_price",
+  "section_break_105",
   "batch_no_manufacture",
   "batch_no_rack_shifting",
   "batch_no_curing",
@@ -602,7 +609,7 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "Process",
-   "options": "Manufacture\nRack Shifting\nCuring\nCompleted"
+   "options": "Manufacture\nRack Shifting\nCuring\nShot Blast\nCompleted"
   },
   {
    "fieldname": "production_qty",
@@ -669,24 +676,28 @@
   {
    "fieldname": "batch_no_manufacture",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Batch no Manufacture",
    "options": "Batch"
   },
   {
    "fieldname": "batch_no_rack_shifting",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Batch no Rack Shifting",
    "options": "Batch"
   },
   {
    "fieldname": "batch_no_curing",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Batch no Curing",
    "options": "Batch"
   },
   {
    "fieldname": "section_break_98",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Item Price Per Sqft"
   },
   {
    "allow_on_submit": 1,
@@ -696,12 +707,47 @@
    "fieldtype": "Int",
    "label": "Shot Blasted Bundle",
    "read_only": 1
+  },
+  {
+   "fieldname": "production_sqft",
+   "fieldtype": "Float",
+   "label": "Production Sqft"
+  },
+  {
+   "fieldname": "total_expense_per_sqft",
+   "fieldtype": "Float",
+   "label": "Total Expense per Sqft"
+  },
+  {
+   "fieldname": "rack_shifting_total_expense_per_sqft",
+   "fieldtype": "Float",
+   "label": "Total Expense per Sqft"
+  },
+  {
+   "fieldname": "labour_cost_per_sqft",
+   "fieldtype": "Float",
+   "label": "Labour Cost per Sqft"
+  },
+  {
+   "fieldname": "shot_blast_per_sqft",
+   "fieldtype": "Float",
+   "label": "Shot Blast per Sqft"
+  },
+  {
+   "fieldname": "section_break_105",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "item_price",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Item Price"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-05 14:56:02.241839",
+ "modified": "2022-08-05 22:07:10.001173",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

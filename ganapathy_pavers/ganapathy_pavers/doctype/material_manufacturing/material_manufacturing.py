@@ -215,6 +215,11 @@ def make_stock_entry(doc,type):
     elif doc.get("status1") == "Rack Shifting":
         return "Curing"
     elif doc.get("status1") == "Curing":
+        if doc.get("is_shot_blasting") ==1:
+            return "Shot Blast"
+        else:
+            return "Completed"
+    elif doc.get("status1") == "Shot Blast":
         return "Completed"
 def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
     emp_batch=[]

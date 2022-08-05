@@ -59,6 +59,15 @@ frappe.ui.form.on('Material Manufacturing', {
 		var field="total_hrs"
 		total_hrs(frm,field,frm.doc.from_time_curing,frm.doc.to_time_curing)
 	},
+	no_of_bundle: function(frm){
+		cur_frm.set_value("shot_blasted_bundle",frm.doc.no_of_bundle)
+	},
+	shot_blasted_bundle: function(frm){
+		if(frm.doc.shot_blasted_bundle == 0){
+			cur_frm.set_value("status1","Completed")
+			frm.save()
+		}
+	},
 	additional_cost: function(frm){
 		cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense) 
 	},
@@ -70,6 +79,9 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	production_qty: function(frm){
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
+		frappe.db.get_value("Item", {"name": frm.doc.item_to_manufacture},"pavers_per_sqft", (sqft) => {
+			cur_frm.set_value('production_sqft', frm.doc.production_qty * sqft.pavers_per_sqft)		
+		}); 
 	},
 	damage_qty: function(frm){
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
@@ -129,6 +141,17 @@ frappe.ui.form.on('Material Manufacturing', {
 		})
 		std_item(frm)
 		item_adding(frm)
+		var total_bundle = 0
+		for(var i=0;i<frm.doc.items.length;i++){
+			total_bundle += frm.doc.items[i].amount
+			if(frm.doc.items[i].amount == 0){
+				frappe.throw("Kindly Enter Rate in Item Table")
+			}
+		}
+		cur_frm.set_value('total_expense_per_sqft', (total_bundle+frm.doc.total_expense)/frm.doc.production_sqft);
+		cur_frm.set_value('rack_shifting_total_expense_per_sqft', (frm.doc.rack_shifting_total_expense+frm.doc.strapping_cost)/frm.doc.production_sqft);
+		cur_frm.set_value('labour_cost_per_sqft', frm.doc.labour_cost/frm.doc.production_sqft);
+		cur_frm.set_value('item_price', frm.doc.total_expense_per_sqft+frm.doc.rack_shifting_total_expense_per_sqft+frm.doc.labour_cost_per_sqft+frm.doc.shot_blast_per_sqft);
 	},
 	bom_no: function(frm){
 		item_adding(frm)
@@ -276,6 +299,7 @@ function make_stock_entry(frm,type){
 			if(r.message){
 				cur_frm.set_value("status1", r.message);
 				cur_frm.refresh()
+				frm.save()
 			}
 			
 		 }

@@ -2,20 +2,28 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Shot Blast Costing', {
-	refresh: function(frm) {
+	onload: function(frm) {
 		frm.set_query("material_manufacturing","items",function(){
 			return {
 				"filters": {
 					is_shot_blasting:1,
+					docstatus:0
 				}
 			}
 		})
 	},
+	create_stock_entry: function(frm){
+		make_stock_entry(frm)
+	},
 	setup: function(frm){
-		frappe.db.get_single_value("USB Setting","default_curing_target_warehouse_for_setting").then(value =>{
+		frappe.db.get_single_value("USB Setting","default_curing_target_warehouse").then(value =>{
 			cur_frm.set_value("warehouse", value) 
 		})
 		cur_frm.refresh_field("warehouse");
+		frappe.db.get_single_value("USB Setting","default_curing_target_warehouse_for_setting").then(value =>{
+			cur_frm.set_value("source_warehouse", value) 
+		})
+		cur_frm.refresh_field("source_warehouse");
 	},
 	validate: function(frm){	   
 		total(frm) 
@@ -44,10 +52,13 @@ frappe.ui.form.on('Shot Blast Costing', {
 frappe.ui.form.on('Shot Blast Items', {
 	material_manufacturing: function(frm,cdt,cdn){
 		var row= locals[cdt][cdn]
+		if(!row.material_manufacturing){
+			return
+		}
 		frappe.db.get_doc("Material Manufacturing", row.material_manufacturing).then((r) => {
 			frappe.model.set_value(cdt,cdn,"item_name",r.item_to_manufacture)
 			frappe.model.set_value(cdt,cdn,"batch",r.batch_no_curing)
-			frappe.model.set_value(cdt,cdn,"bundle",r.no_of_bundle-r.shot_blasted_bundle)                
+			frappe.model.set_value(cdt,cdn,"bundle",r.shot_blasted_bundle)                
 		});
 	},
 	damages_in_nos: function(frm,cdt,cdn){
@@ -71,6 +82,7 @@ frappe.ui.form.on('Shot Blast Items', {
 		var row= locals[cdt][cdn]   
 		total(frm) 
 	},
+	
 
 });
 function total(frm){
@@ -116,21 +128,17 @@ frappe.ui.form.on('Shot Blast Costing', {
 	refresh : function(frm){
 		set_css(frm);
 	},
-	// create_stock_entry: function(frm){
-	// 	make_stock_entry(frm,"create_stock_entry")
-	// },
 });
 function set_css(frm){
 	document.querySelectorAll("[data-fieldname='create_stock_entry']")[1].style.color = 'white'
 	document.querySelectorAll("[data-fieldname='create_stock_entry']")[1].style.fontWeight = 'bold'
 	document.querySelectorAll("[data-fieldname='create_stock_entry']")[1].style.backgroundColor = '#3399ff'
 }
-// function make_stock_entry(frm,type){
-// 	frappe.call({
-// 		method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.make_stock_entry",
-// 		args:{
-// 			doc:frm.doc,
-// 			type:type
-// 		},
-// 	})
-// }
+function make_stock_entry(frm,type){
+	frappe.call({
+		method:"ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.make_stock_entry",
+		args:{
+			doc:frm.doc
+		},
+	})
+}

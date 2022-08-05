@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "SBC-.YYYY.-.#####",
  "creation": "2022-08-04 15:06:09.158276",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -11,6 +12,8 @@
   "column_break_2",
   "workstation",
   "column_break_4",
+  "source_warehouse",
+  "column_break_7",
   "warehouse",
   "section_break_2",
   "items",
@@ -145,13 +148,15 @@
    "label": "Total Expense Cost"
   },
   {
+   "collapsible": 1,
    "fieldname": "column_break_4",
-   "fieldtype": "Column Break"
+   "fieldtype": "Section Break",
+   "label": "Warehouse"
   },
   {
    "fieldname": "warehouse",
    "fieldtype": "Link",
-   "label": "Warehouse",
+   "label": "Target Warehouse",
    "options": "Warehouse"
   },
   {
@@ -170,12 +175,22 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "source_warehouse",
+   "fieldtype": "Link",
+   "label": "Source Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-05 16:58:17.845225",
+ "modified": "2022-08-05 22:19:08.715163",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Costing",
