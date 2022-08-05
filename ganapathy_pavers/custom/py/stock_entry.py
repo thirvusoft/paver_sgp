@@ -1,6 +1,6 @@
 import erpnext
 from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
-from erpnext.stock.get_item_details import get_valuation_rate
+from erpnext.stock.stock_ledger import get_valuation_rate
 import frappe
 from frappe.utils.data import flt
 
@@ -29,11 +29,6 @@ def update_asset(self, event):
 
 class Tsstockentry(StockEntry):
     def set_basic_rate(self, reset_outgoing_rate=True, raise_error_if_no_rate=True):
-            if self.get("usb"):
-                for i in self.items:
-                    i.basic_amount = i.basic_rate * i.transfer_qty
-                     
-                return
            # Set rate for outgoing items
             outgoing_items_cost = self.set_rate_for_outgoing_items(
                 reset_outgoing_rate, raise_error_if_no_rate
@@ -74,3 +69,12 @@ class Tsstockentry(StockEntry):
                 if d.is_process_loss:
                     d.basic_rate = flt(0.0)
                 d.basic_amount = flt(flt(d.transfer_qty) * flt(d.basic_rate), d.precision("basic_amount"))
+         #start
+            if self.get("usb"):
+                for i in self.items:
+                    rate = frappe.get_value("BOM Item", {'parenttype': 'Material Manufacturing', 'parent':self.usb, 'item_code':i.item_code}, 'rate') or 0
+                    if(rate):
+                        i.basic_rate = rate
+                        i.basic_amount = rate * i.transfer_qty
+                return
+            #End

@@ -101,7 +101,7 @@ override_doctype_class = {
 	"Salary Slip":"ganapathy_pavers.utils.py.salary_slip.CustomSalary",
 	"Payroll Entry":"ganapathy_pavers.utils.py.payroll_entry.MessExpense",
 	"Opening Invoice Creation Tool":"ganapathy_pavers.custom.py.opening_invoice.OpeningInvoice",
-	# "Stock Entry" : "ganapathy_pavers.custom.py.stock_entry.Tsstockentry"
+	"Stock Entry" : "ganapathy_pavers.custom.py.stock_entry.Tsstockentry"
 }
 
 # Document Events
