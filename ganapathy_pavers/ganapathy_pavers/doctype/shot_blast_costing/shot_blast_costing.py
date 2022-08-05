@@ -46,4 +46,5 @@ def make_stock_entry(doc):
         ))
     stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
     stock_entry.save()
+    stock_entry.submit()
     frappe.msgprint("New Stock Entry Created "+stock_entry.name)

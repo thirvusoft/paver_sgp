@@ -150,6 +150,7 @@ def make_stock_entry(doc,type):
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
+        stock_entry.submit()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("stock_entry_rack_shift")=="Repack" and type == "create_rack_shiftingstock_entry":
         if doc.get("total_rack_shift_expense") == 0:
@@ -185,6 +186,7 @@ def make_stock_entry(doc,type):
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
+        stock_entry.submit()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("curing_stock_entry_type")=="Material Transfer" and type == "curing_stock_entry":
         valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer","docstatus":["!=",2]},pluck="name")
@@ -209,6 +211,7 @@ def make_stock_entry(doc,type):
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
+        stock_entry.submit()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     if doc.get("status1") == "Manufacture":
         return "Rack Shifting"
