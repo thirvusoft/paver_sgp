@@ -68,7 +68,7 @@ def add_item(bom_no,doc):
     items=[]
     doc=json.loads(doc)
     bom_doc = frappe.get_doc("BOM",bom_no)
-    fields = ['item_code','qty', 'uom', 'stock_uom', 'rate', 'amount']
+    fields = ['item_code','qty', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']
     for i in bom_doc.items:
         row = {field:i.__dict__[field] for field in fields}
         items.append(row)
@@ -258,7 +258,6 @@ def find_batch(name):
     if name:
         stock = frappe.get_all("Stock Entry",filters={"usb":name,"docstatus":1},fields=['name','stock_entry_type'])
         for i in stock:
-            print(stock)
             if i.stock_entry_type == "Manufacture":
                 batch = frappe.get_doc("Stock Entry",i.name)
                 for j in batch.items:

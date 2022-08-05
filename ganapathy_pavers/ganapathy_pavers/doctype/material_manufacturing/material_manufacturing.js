@@ -184,7 +184,6 @@ frappe.ui.form.on('Material Manufacturing', {
 				}
 			}
 			var total_amount = (frm.doc.total_no_of_produced_qty*nos_cf)/bundle_cf
-			console.log((frm.doc.total_no_of_produced_qty*nos_cf)%bundle_cf)
 			cur_frm.set_value('remaining_qty', ((frm.doc.total_no_of_produced_qty*nos_cf)%bundle_cf)/nos_cf);
 			if(total_amount >= 1){
 				cur_frm.set_value('total_no_of_bundle', Math.floor(total_amount));
@@ -334,7 +333,7 @@ function item_adding(frm){
 				}
 				for (const d of r.message){
 					for(const i of frm.doc.items){
-						if(i.item_code == d.item_code){
+						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse){
 							item1.indexOf(d.item_code) !== -1 && item1.splice(item1.indexOf(d.item_code), 1)
 						}
 					}
@@ -350,6 +349,7 @@ function item_adding(frm){
 								row.uom = d.uom;
 								row.rate = d.rate;
 								row.amount= d.amount
+								row.source_warehouse= d.source_warehouse
 							}
 						}
 					}
