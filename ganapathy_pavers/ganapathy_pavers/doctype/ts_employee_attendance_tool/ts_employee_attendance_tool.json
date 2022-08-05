@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "{department}.-.{designation}.-.####",
+ "autoname": "Attendance-.####",
  "creation": "2022-07-21 17:53:46.191962",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -12,6 +12,7 @@
   "department",
   "column_break_3",
   "branch",
+  "location",
   "date",
   "checkout_time",
   "help_session_section",
@@ -38,7 +39,8 @@
    "fieldtype": "Link",
    "label": "Department",
    "options": "Department",
-   "reqd": 1
+   "reqd": 1,
+   "set_only_once": 1
   },
   {
    "fieldname": "column_break_3",
@@ -54,7 +56,8 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "fieldname": "amended_from",
@@ -73,20 +76,23 @@
   {
    "fieldname": "employee_detail",
    "fieldtype": "Table",
-   "options": "TS Employee Details"
+   "options": "TS Employee Details",
+   "reqd": 1
   },
   {
    "fieldname": "designation",
    "fieldtype": "Link",
    "label": "Designation",
    "options": "Designation",
-   "reqd": 1
+   "reqd": 1,
+   "set_only_once": 1
   },
   {
    "fieldname": "checkout_time",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Checkout Time"
+   "label": "Checkout Time",
+   "set_only_once": 1
   },
   {
    "fieldname": "employee_chekin_cancle_details_section",
@@ -97,7 +103,9 @@
    "allow_on_submit": 1,
    "fieldname": "ts_emp_checkin",
    "fieldtype": "Table",
-   "options": "TS EMP Checkin Cancel table"
+   "no_copy": 1,
+   "options": "TS EMP Checkin Cancel table",
+   "read_only": 1
   },
   {
    "fieldname": "help_session_section",
@@ -123,30 +131,25 @@
    "fieldname": "update",
    "fieldtype": "Button",
    "label": "Update"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "Location",
+   "options": "Location",
+   "reqd": 1,
+   "set_only_once": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-02 15:27:31.698043",
+ "modified": "2022-08-05 21:46:40.348212",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Attendance Tool",
  "owner": "Administrator",
  "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
   {
    "create": 1,
    "delete": 1,
@@ -170,7 +173,18 @@
    "report": 1,
    "role": "HR User",
    "share": 1,
-   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Admin",
+   "share": 1,
    "write": 1
   }
  ],
