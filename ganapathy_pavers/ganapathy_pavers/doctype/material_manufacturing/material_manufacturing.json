@@ -87,6 +87,7 @@
   "stock_entry_rack_shift",
   "section_break_51",
   "no_of_bundle",
+  "shot_blasted_bundle",
   "curing_stock_entry",
   "column_break_80",
   "from_time_curing",
@@ -680,19 +681,27 @@
   {
    "fieldname": "batch_no_curing",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Batch no Curing",
    "options": "Batch"
   },
   {
    "fieldname": "section_break_98",
    "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "depends_on": "eval:doc.is_shot_blasting==1",
+   "fieldname": "shot_blasted_bundle",
+   "fieldtype": "Int",
+   "label": "Shot Blasted Bundle",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-04 20:52:13.129190",
+ "modified": "2022-08-05 14:56:02.241839",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

@@ -6,8 +6,10 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "material_manufacturing",
   "item_name",
   "batch",
+  "bundle_taken",
   "bundle",
   "damages_in_nos",
   "sqft",
@@ -15,6 +17,7 @@
  ],
  "fields": [
   {
+   "columns": 1,
    "fieldname": "item_name",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -22,6 +25,7 @@
    "options": "Item"
   },
   {
+   "columns": 1,
    "fieldname": "batch",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -29,34 +33,53 @@
    "options": "Batch"
   },
   {
+   "columns": 1,
    "fieldname": "bundle",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Bundle"
+   "label": "Total Bundle"
   },
   {
+   "columns": 1,
    "fieldname": "damages_in_nos",
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Damages in Nos"
   },
   {
+   "columns": 1,
    "fieldname": "sqft",
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Sqft"
   },
   {
+   "columns": 1,
    "fieldname": "damages_in_sqft",
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Damages in Sqft"
+  },
+  {
+   "columns": 1,
+   "fieldname": "bundle_taken",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Taken Bundle"
+  },
+  {
+   "columns": 1,
+   "fieldname": "material_manufacturing",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Material Manufacturing",
+   "options": "Material Manufacturing"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-08-05 11:46:26.402253",
+ "modified": "2022-08-05 12:25:20.253727",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Items",
