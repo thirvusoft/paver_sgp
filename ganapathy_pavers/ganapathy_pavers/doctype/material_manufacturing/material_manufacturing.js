@@ -148,7 +148,6 @@ frappe.ui.form.on('Material Manufacturing', {
 				frappe.throw("Kindly Enter Rate in Item Table")
 			}
 		}
-		cur_frm.set_value('strapping_cost', 0.75*frm.doc.production_sqft);
 		cur_frm.set_value('total_expense_per_sqft', (total_bundle+frm.doc.total_expense)/frm.doc.production_sqft);
 		cur_frm.set_value('rack_shifting_total_expense_per_sqft', (frm.doc.rack_shifting_total_expense+frm.doc.strapping_cost)/frm.doc.production_sqft);
 		cur_frm.set_value('labour_cost_per_sqft', frm.doc.labour_cost/frm.doc.production_sqft);
@@ -156,6 +155,9 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	bom_no: function(frm){
 		item_adding(frm)
+	},
+	strapping_cost_per_sqft: function(frm){
+		cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft*frm.doc.production_sqft);
 	},
 	total_completed_qty: function(frm){
 		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_completed_qty);

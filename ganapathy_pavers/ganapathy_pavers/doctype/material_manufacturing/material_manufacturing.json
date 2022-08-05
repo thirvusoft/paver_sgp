@@ -75,13 +75,14 @@
   "from_time_rack",
   "to_time_rack",
   "total_hours_rack",
+  "rack_shifting_total_expense",
   "rack_shifting_total_expense_per_sqft",
   "cb52",
   "workstation",
   "total_rack_shift_expense",
   "rack_shifting_additional_cost",
+  "strapping_cost_per_sqft",
   "strapping_cost",
-  "rack_shifting_total_expense",
   "rack_shift_ware_section",
   "rack_shift_source_warehouse",
   "column_break_65",
@@ -716,16 +717,19 @@
   {
    "fieldname": "total_expense_per_sqft",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Total Expense per Sqft"
   },
   {
    "fieldname": "rack_shifting_total_expense_per_sqft",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Total Expense per Sqft"
   },
   {
    "fieldname": "labour_cost_per_sqft",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Labour Cost per Sqft"
   },
   {
@@ -742,12 +746,18 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Item Price"
+  },
+  {
+   "default": "0.75",
+   "fieldname": "strapping_cost_per_sqft",
+   "fieldtype": "Float",
+   "label": "Strapping Cost Per Sqft"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-05 22:07:10.001173",
+ "modified": "2022-08-06 00:54:55.330724",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
