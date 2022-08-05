@@ -1,0 +1,202 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-08-04 15:06:09.158276",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "company",
+  "column_break_2",
+  "workstation",
+  "column_break_4",
+  "warehouse",
+  "section_break_2",
+  "items",
+  "section_break_4",
+  "total_bundle",
+  "column_break_6",
+  "total_sqft",
+  "section_break_7",
+  "from_time",
+  "additional_cost",
+  "total_cost_per_sqft",
+  "column_break_12",
+  "to_time",
+  "labour_cost",
+  "create_stock_entry",
+  "column_break_14",
+  "total_hrs",
+  "total_cost",
+  "section_break_16",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Shot Blast Costing",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Shot Blast Costing",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Shot Blast Items"
+  },
+  {
+   "fieldname": "total_bundle",
+   "fieldtype": "Float",
+   "label": "Total Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_sqft",
+   "fieldtype": "Float",
+   "label": "Total Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break",
+   "label": "Working Timing"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "label": "Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "from_time",
+   "fieldtype": "Datetime",
+   "label": "From Time"
+  },
+  {
+   "fieldname": "to_time",
+   "fieldtype": "Datetime",
+   "label": "To Time"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_hrs",
+   "fieldtype": "Float",
+   "label": "Total Hrs"
+  },
+  {
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "additional_cost",
+   "fieldtype": "Float",
+   "label": "Additional Cost"
+  },
+  {
+   "fieldname": "labour_cost",
+   "fieldtype": "Float",
+   "label": "Labour Cost"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Float",
+   "label": "Total Expense Cost"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "description": "per SQFT",
+   "fieldname": "total_cost_per_sqft",
+   "fieldtype": "Float",
+   "label": "Total Cost "
+  },
+  {
+   "fieldname": "create_stock_entry",
+   "fieldtype": "Button",
+   "label": "Create Stock Entry"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-08-05 16:58:17.845225",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Shot Blast Costing",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
+}
