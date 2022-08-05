@@ -1,4 +1,8 @@
+import erpnext
+from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
+from erpnext.stock.get_item_details import get_valuation_rate
 import frappe
+from frappe.utils.data import flt
 
 def update_asset(self, event):
     if(self.stock_entry_type=="Manufacture" and self.bom_no and self.fg_completed_qty):
@@ -22,3 +26,51 @@ def update_asset(self, event):
                     'to_notify': 0
                 })
             doc.save('Update')
+
+class Tsstockentry(StockEntry):
+    def set_basic_rate(self, reset_outgoing_rate=True, raise_error_if_no_rate=True):
+            if self.get("usb"):
+                for i in self.items:
+                    i.basic_amount = i.basic_rate * i.transfer_qty
+                     
+                return
+           # Set rate for outgoing items
+            outgoing_items_cost = self.set_rate_for_outgoing_items(
+                reset_outgoing_rate, raise_error_if_no_rate
+            )
+            finished_item_qty = sum(
+                d.transfer_qty for d in self.items if d.is_finished_item or d.is_process_loss
+            )
+
+            # Set basic rate for incoming items
+            for d in self.get("items"):
+                if d.s_warehouse or d.set_basic_rate_manually:
+                    continue
+
+                if d.allow_zero_valuation_rate:
+                    d.basic_rate = 0.0
+                elif d.is_finished_item:
+                    if self.purpose == "Manufacture":
+                        d.basic_rate = self.get_basic_rate_for_manufactured_item(
+                            finished_item_qty, outgoing_items_cost
+                        )
+                    elif self.purpose == "Repack":
+                        d.basic_rate = self.get_basic_rate_for_repacked_items(d.transfer_qty, outgoing_items_cost)
+
+                if not d.basic_rate and not d.allow_zero_valuation_rate:
+                    d.basic_rate = get_valuation_rate(
+                        d.item_code,
+                        d.t_warehouse,
+                        self.doctype,
+                        self.name,
+                        d.allow_zero_valuation_rate,
+                        currency=erpnext.get_company_currency(self.company),
+                        company=self.company,
+                        raise_error_if_no_rate=raise_error_if_no_rate,
+                    )
+
+                # do not round off basic rate to avoid precision loss
+                d.basic_rate = flt(d.basic_rate)
+                if d.is_process_loss:
+                    d.basic_rate = flt(0.0)
+                d.basic_amount = flt(flt(d.transfer_qty) * flt(d.basic_rate), d.precision("basic_amount"))
