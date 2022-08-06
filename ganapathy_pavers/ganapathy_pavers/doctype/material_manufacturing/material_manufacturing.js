@@ -80,7 +80,7 @@ frappe.ui.form.on('Material Manufacturing', {
 	production_qty: function(frm){
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
 		frappe.db.get_value("Item", {"name": frm.doc.item_to_manufacture},"pavers_per_sqft", (sqft) => {
-			cur_frm.set_value('production_sqft', frm.doc.production_qty * sqft.pavers_per_sqft)		
+			cur_frm.set_value('production_sqft', frm.doc.production_qty / sqft.pavers_per_sqft)		
 		}); 
 	},
 	damage_qty: function(frm){
