@@ -15,7 +15,8 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
         cur_frm.set_query('department', function(){
             return {
                 filters: {
-                    'designation': cur_frm.doc.designation
+                    'designation': cur_frm.doc.designation,
+                    'company': cur_frm.doc.company
                 }
             }
         })
