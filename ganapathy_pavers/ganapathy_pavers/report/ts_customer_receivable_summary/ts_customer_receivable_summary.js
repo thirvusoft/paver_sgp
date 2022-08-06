@@ -52,6 +52,12 @@ frappe.query_reports["TS Customer Receivable Summary"] = {
 			}
 		},
 		{
+			"fieldname":"project",
+			"label": __("Site Work"),
+			"fieldtype": "Link",
+			"options": "Project"
+		},
+		{
 			"fieldname":"customer_group",
 			"label": __("Customer Group"),
 			"fieldtype": "Link",
