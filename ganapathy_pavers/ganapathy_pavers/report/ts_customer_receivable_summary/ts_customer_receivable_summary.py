@@ -44,6 +44,13 @@ class PartyLedgerSummaryReport(object):
 				"fieldname": "party",
 				"options": self.filters.party_type,
 				"width": 200,
+			},
+			{
+				"label": _("Site Work"),
+				"fieldtype": "Link",
+				"fieldname": "project",
+				"options": "Project",
+				"width": 150,
 			}
 		]
 
@@ -155,11 +162,12 @@ class PartyLedgerSummaryReport(object):
 		self.party_data = frappe._dict({})
 		for gle in self.gl_entries:
 			self.party_data.setdefault(
-				gle.party,
+				gle.party+(gle.project or ''),
 				frappe._dict(
 					{
 						"party": gle.party,
 						"party_name": gle.party_name,
+						"project": gle.project,
 						"opening_balance":0,
 						"invoiced_amount":0,
 						"paid_amount":0,
@@ -173,17 +181,17 @@ class PartyLedgerSummaryReport(object):
 			)
 
 			amount = gle.get(invoice_dr_or_cr) - gle.get(reverse_dr_or_cr)
-			self.party_data[gle.party].closing_balance += amount
+			self.party_data[gle.party+(gle.project or '')].closing_balance += amount
 
 			if gle.posting_date < self.filters.from_date or gle.is_opening == "Yes":
-				self.party_data[gle.party].opening_balance += amount
+				self.party_data[gle.party+(gle.project or '')].opening_balance += amount
 			else:
 				if amount > 0:
-					self.party_data[gle.party].invoiced_amount += amount
+					self.party_data[gle.party+(gle.project or '')].invoiced_amount += amount
 				elif gle.voucher_no in self.return_invoices:
-					self.party_data[gle.party].return_amount -= amount
+					self.party_data[gle.party+(gle.project or '')].return_amount -= amount
 				else:
-					self.party_data[gle.party].paid_amount -= amount
+					self.party_data[gle.party+(gle.project or '')].paid_amount -= amount
 
 		out = []
 		for party, row in iteritems(self.party_data):
@@ -212,16 +220,20 @@ class PartyLedgerSummaryReport(object):
 	def get_outstand_based_on_delivery_note(self,data):
 		out=[]
 		for customer in data:
-			delivered=sum(frappe.get_all('Delivery Note', {'customer': customer.party, 'docstatus':1}, pluck='rounded_total'))
-			customer['out_delivery_amount']=sum(frappe.get_all('Delivery Note', {'customer': customer.party, 'docstatus':1 }, pluck='rounded_total'))
+			filters={'customer': customer.party, 'docstatus':1}
+			filters['project'] = (customer.get('project') or '')
+			filters["posting_date"] = ["between", [self.filters.from_date, self.filters.to_date]]
+
+			delivery_amount = sum(frappe.get_all('Delivery Note', filters, pluck='rounded_total'))
+			delivered=delivery_amount
+			customer['out_delivery_amount']=delivery_amount
 			if (customer['opening_balance'] < 0):
 				cus=customer['opening_balance']
 				paid=((-cus)+customer['paid_amount'])
 				customer['outstanding_amount']=(delivered-paid)
-			if (customer['opening_balance'] > 0):
+			if (customer['opening_balance'] >= 0):
 				bls=(delivered-customer['paid_amount'])
 				customer['outstanding_amount']=bls+customer['opening_balance']
-
 			out.append(customer)
 		return out
  
@@ -239,7 +251,7 @@ class PartyLedgerSummaryReport(object):
 		self.gl_entries = frappe.db.sql(
 			"""
 			select
-				gle.posting_date, gle.party, gle.voucher_type, gle.voucher_no, gle.against_voucher_type,
+				gle.posting_date, gle.party, gle.project, gle.voucher_type, gle.voucher_no, gle.against_voucher_type,
 				gle.against_voucher, gle.debit, gle.credit, gle.is_opening {join_field}
 			from `tabGL Entry` gle
 			{join}
@@ -253,12 +265,14 @@ class PartyLedgerSummaryReport(object):
 			self.filters,
 			as_dict=True,
 		)
-
 	def prepare_conditions(self):
 		conditions = [""]
 
 		if self.filters.company:
 			conditions.append("gle.company=%(company)s")
+
+		if self.filters.get('project'):
+			conditions.append(f"gle.project='{self.filters.get('project')}'")
 
 		if self.filters.finance_book:
 			conditions.append("ifnull(finance_book,'') in (%(finance_book)s, '')")
@@ -322,7 +336,6 @@ class PartyLedgerSummaryReport(object):
 					"""party in (select name from tabSupplier
 					where supplier_group=%(supplier_group)s)"""
 				)
-
 		return " and ".join(conditions)
 
 	def get_return_invoices(self):
@@ -371,7 +384,6 @@ class PartyLedgerSummaryReport(object):
 			self.filters,
 			as_dict=True,
 		)
-
 		self.party_adjustment_details = {}
 		self.party_adjustment_accounts = set()
 		adjustment_voucher_entries = {}

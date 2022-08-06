@@ -49,9 +49,9 @@ def get_payment_entry(dt, dn, party_amount=None, bank_account=None, bank_amount=
     pe.mode_of_payment = doc.get("mode_of_payment")
     pe.party_type = party_type
     pe.party = doc.get(scrub(party_type))
-    pe.site_work=doc.get('site_work')
-    pe.type=doc.get('type')
-    pe.project=doc.get("project")
+    pe.site_work = doc.get('site_work')
+    pe.type = doc.get('type')
+    pe.project = doc.get("project")
     pe.contact_person = doc.get("contact_person")
     pe.contact_email = doc.get("contact_email")
     pe.ensure_supplier_is_not_blocked()
