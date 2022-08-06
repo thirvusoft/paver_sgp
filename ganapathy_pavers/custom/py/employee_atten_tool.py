@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 @frappe.whitelist()
-def employee_finder_attendance(designation='', department='', location='', branch=''):
+def employee_finder_attendance(designation='', department='', location='', branch='', company=''):
 	employee_names=[]
 	filters={}
 	if(designation):
@@ -17,6 +17,8 @@ def employee_finder_attendance(designation='', department='', location='', branc
 		filters['location']=location
 	if(branch):
 		filters['branch']=branch
+	if(company):
+		filters['company']=company
 	a=frappe.db.get_all("Employee",filters=filters,fields=["name", "employee_name", 'department'], order_by='employee_name')
 	for name in a:
 		employee_names.append(name)
