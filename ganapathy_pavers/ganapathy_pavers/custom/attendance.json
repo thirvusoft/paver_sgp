@@ -1,5 +1,5 @@
 {
-  "custom_fields": [
+ "custom_fields": [
   {
    "_assign": null,
    "_comments": null,
@@ -33,7 +33,7 @@
    "in_preview": 0,
    "in_standard_filter": 0,
    "insert_after": "early_exit",
-   "label": "TS Employee Attendance Tool",
+   "label": "Employee Attendance Tool",
    "length": 0,
    "mandatory_depends_on": null,
    "modified": "2022-08-05 14:37:29.223512",

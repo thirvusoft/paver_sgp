@@ -21,4 +21,4 @@ def check_in_out(self, event):
     hours=0
     for j in total_hours:
        hours+=(time_diff_in_hours(j[1],j[0]))
-    self.working_hours=hours
+    frappe.db.set_value(self.doctype, self.name, 'working_hours',hours)

@@ -91,10 +91,10 @@ def item_customization():
             dict(
             fieldname='division_factors1',
             label='Division Labour',
-            fieldtype='Float',
+            fieldtype="Float",
             insert_after='division_factors',
             default=1,
-            precision = 4
+            precision=4,
             ),
             dict(
             fieldname='division_factors2',
