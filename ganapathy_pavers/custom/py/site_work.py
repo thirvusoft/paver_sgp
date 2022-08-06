@@ -152,6 +152,7 @@ def validate(self,event):
                     'paid_amount': amount,
                     'paid_to': get_bank_cash_account(mode, self.company).get('account'),
                     'project': self.name,
+                    'site_work': self.name,
                     'received_amount': amount,
                     'target_exchange_rate': 1,
                     'paid_to_account_currency': frappe.db.get_value('Account',acc_paid_to,'account_currency')
@@ -209,7 +210,8 @@ def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, ex
         'company': company, 
         'mode_of_payment': mop,
         'purpose': f'Advance amount received from the site work {sw}',
-        'project' : sw
+        'project' : sw,
+        'site_work': sw
     })
     doc.flags.ignore_permissions = True
     doc.flags.ignore_mandatory = True
