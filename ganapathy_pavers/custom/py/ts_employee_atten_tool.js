@@ -69,6 +69,9 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
     branch:function(frm, cdt, cdn){
         get_data(frm, cdt, cdn)
     },
+    company:function(frm, cdt, cdn){
+        get_data(frm, cdt, cdn)
+    },
     before_submit: async function(){
         await frappe.call({
             method:"ganapathy_pavers.custom.py.employee_atten_tool.attendance",
