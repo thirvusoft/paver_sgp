@@ -2,6 +2,13 @@ var from_lp=0;
 
 frappe.ui.form.on("Vehicle Log" ,{
     onload:function(frm){
+        frappe.call({
+            method:"ganapathy_pavers.custom.py.vehicle_log.fuel_supplier",
+            args:{name:frm.doc.name},
+            callback(fuel){
+                cur_frm.set_value("supplier",fuel.message)
+            }
+        })
             frm.set_query('employee', function(frm){
                         return {
                             filters:{
@@ -10,6 +17,7 @@ frappe.ui.form.on("Vehicle Log" ,{
                         }
                     });                
     },
+
     
     odometer: function(frm){
         distance(frm)

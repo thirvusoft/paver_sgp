@@ -167,6 +167,7 @@ doc_events = {
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 		"on_submit": ["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
+					  "ganapathy_pavers.custom.py.vehicle_log.onsubmit_hours",
 					  "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
 					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_draft",
 					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_mileage"],
