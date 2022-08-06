@@ -125,5 +125,8 @@ frappe.ui.form.on('Delivery Note', {
         var  total_distance= (cur_frm.doc.return_odometer_value - cur_frm.doc.current_odometer_value)
         cur_frm.set_value("total_distance",total_distance)
     },
+    site_work: function(frm, cdt, cdn){
+        cur_frm.set_value('project', cur_frm.doc.site_work)
+    }
 })
 
