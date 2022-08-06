@@ -212,6 +212,7 @@ doc_events = {
 	},
 	"TS Employee Attendance Tool": {
 		"validate": "ganapathy_pavers.custom.py.employee_atten_tool.day_wise_department",
+		"on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.doc_cancel"
 	}
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",

@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 @frappe.whitelist()
-def employee_finder_attendance(designation='', department='', location='', branch='', company=''):
+def employee_finder_attendance(designation='', department='', location='', branch=''):
 	employee_names=[]
 	filters={}
 	if(designation):
@@ -17,8 +17,6 @@ def employee_finder_attendance(designation='', department='', location='', branc
 		filters['location']=location
 	if(branch):
 		filters['branch']=branch
-	if(company):
-		filters['company']=company
 	a=frappe.db.get_all("Employee",filters=filters,fields=["name", "employee_name", 'department'], order_by='employee_name')
 	for name in a:
 		employee_names.append(name)
@@ -262,3 +260,12 @@ def day_wise_department(self, event):
 		docs=frappe.get_all('TS Employee Attendance Tool', filters)
 		if(docs):
 			frappe.throw(f'Attendance tool already exist for this date for{(" "+frappe.bold(self.department)) if self.department else ""}{(" "+frappe.bold(self.designation)) if self.designation else ""}{(" "+frappe.bold(self.branch)) if self.branch else ""}{(" "+frappe.bold(self.location)) if self.location else ""}')
+
+
+def doc_cancel(self, event):
+	for checkin in frappe.get_all("Employee Checkin",{'ts_emp_att_tool_name':self.name,}):
+		doc= frappe.get_doc("Employee Checkin", checkin.name)
+		if doc.docstatus == 1:
+			doc.cancel()
+		doc.delete()
+	frappe.msgprint("Cancelled all Employee Checkins and Attendances")
