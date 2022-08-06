@@ -18,8 +18,6 @@ function setquery(frm,cdt,cdn){
 	}
 });
 }
-
-
 var validate=true
 frappe.ui.form.on("Project",{
 	after_save: function(frm){
@@ -40,8 +38,7 @@ frappe.ui.form.on("Project",{
 	},
     project_type:function(frm,cdt,cdn){
         setquery(frm,cdt,cdn)
-    },
-    
+    }, 
     refresh:function(frm,cdt,cdn){
         if(!cur_frm.is_new()){
             cur_frm.set_df_property('is_multi_customer', 'read_only', 1)

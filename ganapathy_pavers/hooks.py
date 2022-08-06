@@ -70,7 +70,8 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.worstation.item_customization",
 				 "ganapathy_pavers.utils.py.purchase_order.batch_customization",
 				 "ganapathy_pavers.utils.py.customer.create_multi_customer",
-				 "ganapathy_pavers.utils.py.item.batch_customization"
+				 "ganapathy_pavers.utils.py.item.batch_customization",
+				 "ganapathy_pavers.patches.location.execute"
 				 ]
 				
 
@@ -100,7 +101,8 @@ override_doctype_class = {
 	# "ToDo": "custom_app.overrides.CustomToDo"
 	"Salary Slip":"ganapathy_pavers.utils.py.salary_slip.CustomSalary",
 	"Payroll Entry":"ganapathy_pavers.utils.py.payroll_entry.MessExpense",
-	"Opening Invoice Creation Tool":"ganapathy_pavers.custom.py.opening_invoice.OpeningInvoice"
+	"Opening Invoice Creation Tool":"ganapathy_pavers.custom.py.opening_invoice.OpeningInvoice",
+	"Stock Entry" : "ganapathy_pavers.custom.py.stock_entry.Tsstockentry"
 }
 
 # Document Events
@@ -111,7 +113,8 @@ override_doctype_class = {
 doc_events = {
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
-		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset"
+		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset",
+		
 	},
 	"Payment Entry":{
                       "on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary"
@@ -164,6 +167,7 @@ doc_events = {
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 		"on_submit": ["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
+					  "ganapathy_pavers.custom.py.vehicle_log.onsubmit_hours",
 					  "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
 					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_draft",
 					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_mileage"],
@@ -190,25 +194,25 @@ doc_events = {
         "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
     },
  	"Employee Checkin":{
-
-        "after_insert": "ganapathy_pavers.custom.py.employee.working_hr",
         "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
-
-
 	},
 	"Workstation":{
-		"validate": "ganapathy_pavers.custom.py.workstation.validate"
+		"validate": "ganapathy_pavers.custom.py.workstation.total_salary"
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
 	},
-	"Journal Entry":{
+	"Journal Entry": {
 		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry"
 	},
-	"Attendance":{
-		"on_submit":"ganapathy_pavers.custom.py.employee_checkin.check_in_out"
+	"Attendance": {
+		"on_submit": ["ganapathy_pavers.custom.py.employee_checkin.check_in_out",
+                  "ganapathy_pavers.custom.py.employee_atten_tool.update_attendance_to_checkin"],
+		"before_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_attn_cancel_detail"
+	},
+	"TS Employee Attendance Tool": {
+		"validate": "ganapathy_pavers.custom.py.employee_atten_tool.day_wise_department",
 	}
-
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
               "ganapathy_pavers.custom.py.property_setter.property_setter",
@@ -229,7 +233,7 @@ doctype_js = {
 				"Timesheet" : "utils/js/timesheet.js",
 				"Salary Slip":"utils/js/salary_slip.js",
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
-				"Workstation":"/custom/js/workstation.js",
+				"Workstation":["/custom/js/workstation.js","/custom/js/ts_operator.js"],
 				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
 				"Delivery Note":"/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
@@ -238,8 +242,7 @@ doctype_js = {
 								"/custom/js/vehicle_log_service.js"
 								],
 				"Work Order" : "/utils/js/workorder.js",
-				"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
-				"Employee":"/custom/js/employee.js"
+				"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"]
 			 }
 # Scheduled Tasks
 # ---------------

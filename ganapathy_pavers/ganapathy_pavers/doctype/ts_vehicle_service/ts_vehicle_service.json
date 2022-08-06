@@ -8,9 +8,11 @@
  "field_order": [
   "service_item",
   "frequency",
-  "alert_kilometers",
   "last_service_date",
-  "kilometers_after_last_service"
+  "alert_kilometers",
+  "kilometers_after_last_service",
+  "hours_after_last_service",
+  "alert_hours"
  ],
  "fields": [
   {
@@ -26,7 +28,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Frequency",
-   "options": "\nMileage\nMonthly\nQuarterly\nHalf Yearly\nYearly",
+   "options": "\nMileage\nHourly\nMonthly\nQuarterly\nHalf Yearly\nYearly",
    "reqd": 1
   },
   {
@@ -37,22 +39,37 @@
    "mandatory_depends_on": "eval:doc.frequency=='Mileage'"
   },
   {
-   "depends_on": "eval:doc.frequency!='Mileage'",
-   "fieldname": "last_service_date",
-   "fieldtype": "Date",
-   "label": "Last Service Date",
-   "mandatory_depends_on": "eval:doc.frequency!='Mileage'"
-  },
-  {
+   "depends_on": "eval:doc.frequency==\"Mileage\"",
    "fieldname": "kilometers_after_last_service",
    "fieldtype": "Float",
    "label": "Kilometers after last service",
    "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.frequency==\"Hourly\"",
+   "fieldname": "hours_after_last_service",
+   "fieldtype": "Float",
+   "label": "Hours after last service",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.frequency=='Hourly'",
+   "fieldname": "alert_hours",
+   "fieldtype": "Float",
+   "label": "Alert Hours",
+   "mandatory_depends_on": "eval:doc.frequency==\"Hourly\""
+  },
+  {
+   "depends_on": "eval:doc.frequency!=\"Mileage\" && doc.frequency!=\"Hourly\" && doc.frequency",
+   "fieldname": "last_service_date",
+   "fieldtype": "Date",
+   "label": "Last Service Date",
+   "mandatory_depends_on": "eval:doc.frequency!=\"Mileage\" && doc.frequency!=\"Hourly\" && doc.frequency"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2022-07-26 17:12:27.033944",
+ "modified": "2022-08-04 15:39:15.184374",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Vehicle Service",
