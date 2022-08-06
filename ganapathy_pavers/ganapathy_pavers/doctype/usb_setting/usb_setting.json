@@ -20,8 +20,8 @@
   "column_break_8",
   "default_stock_entry_curing",
   "default_curing_source_warehouse",
-  "default_curing_target_warehouse",
   "default_curing_target_warehouse_for_setting",
+  "default_curing_target_warehouse",
   "default_stock_uom_section",
   "default_manufacture_uom",
   "section_break_16",
@@ -75,10 +75,10 @@
    "options": "Warehouse"
   },
   {
-   "description": "for normal item",
+   "description": "for all item",
    "fieldname": "default_curing_target_warehouse",
    "fieldtype": "Link",
-   "label": "Default Curing Target Warehouse",
+   "label": "Default Finished Target Warehouse",
    "options": "Warehouse"
   },
   {
@@ -214,7 +214,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-08-04 13:51:18.976736",
+ "modified": "2022-08-05 18:30:01.340683",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "USB Setting",
