@@ -149,7 +149,7 @@ frappe.ui.form.on('Material Manufacturing', {
 			}
 		}
 		cur_frm.set_value('total_expense_per_sqft', (total_bundle+frm.doc.total_expense)/frm.doc.production_sqft);
-		cur_frm.set_value('rack_shifting_total_expense_per_sqft', (frm.doc.rack_shifting_total_expense+frm.doc.strapping_cost)/frm.doc.production_sqft);
+		cur_frm.set_value('rack_shifting_total_expense_per_sqft', (frm.doc.rack_shifting_total_expense)/frm.doc.production_sqft);
 		cur_frm.set_value('labour_cost_per_sqft', frm.doc.labour_cost/frm.doc.production_sqft);
 		cur_frm.set_value('item_price', frm.doc.total_expense_per_sqft+frm.doc.rack_shifting_total_expense_per_sqft+frm.doc.labour_cost_per_sqft+frm.doc.shot_blast_per_sqft);
 	},
