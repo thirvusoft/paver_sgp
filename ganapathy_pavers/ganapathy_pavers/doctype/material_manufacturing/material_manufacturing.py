@@ -68,7 +68,7 @@ def add_item(bom_no,doc):
     items=[]
     doc=json.loads(doc)
     bom_doc = frappe.get_doc("BOM",bom_no)
-    fields = ['item_code','qty', 'uom', 'stock_uom', 'rate', 'amount']
+    fields = ['item_code','qty', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']
     for i in bom_doc.items:
         row = {field:i.__dict__[field] for field in fields}
         items.append(row)
@@ -147,10 +147,11 @@ def make_stock_entry(doc,type):
             else:
                 frappe.throw("Set Scrap Warehouse in USB Setting")
         stock_entry.append('additional_costs', dict(
-                expense_account	 = expenses_included_in_valuation, amount = doc.get("total_expense"),description = "Operating Cost as per Workstation"
+                expense_account	 = expenses_included_in_valuation, amount = doc.get("total_expense"),description = "In This Labour, operator, Raw Material Cost Added"
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
+        stock_entry.submit()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("stock_entry_rack_shift")=="Repack" and type == "create_rack_shiftingstock_entry":
         if doc.get("total_rack_shift_expense") == 0:
@@ -182,10 +183,11 @@ def make_stock_entry(doc,type):
                 t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture"),qty = doc.get("rack_shift_damage_qty"),uom = default_nos,  is_process_loss = 1
                 ))
         stock_entry.append('additional_costs', dict(
-                expense_account	 = expenses_included_in_valuation, amount = doc.get("rack_shifting_total_expense"),description = "Operating Cost as per Workstation"
+                expense_account	 = expenses_included_in_valuation, amount = doc.get("rack_shifting_total_expense"),description = "In This Labour Cost Added"
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
+        stock_entry.submit()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     elif doc.get("curing_stock_entry_type")=="Material Transfer" and type == "curing_stock_entry":
         valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer","docstatus":["!=",2]},pluck="name")
@@ -206,16 +208,22 @@ def make_stock_entry(doc,type):
                 t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture")	,qty = doc.get("curing_damaged_qty"), uom = default_nos, is_process_loss = 1
                 ))
         stock_entry.append('additional_costs', dict(
-                expense_account	 = expenses_included_in_valuation, amount = doc.get("labour_cost"),description = "Operating Cost as per Labour Cost"
+                expense_account	 = expenses_included_in_valuation, amount = doc.get("labour_cost"),description = "In This Labour Cost Added"
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
+        stock_entry.submit()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
     if doc.get("status1") == "Manufacture":
         return "Rack Shifting"
     elif doc.get("status1") == "Rack Shifting":
         return "Curing"
     elif doc.get("status1") == "Curing":
+        if doc.get("is_shot_blasting") ==1:
+            return "Shot Blast"
+        else:
+            return "Completed"
+    elif doc.get("status1") == "Shot Blast":
         return "Completed"
 def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
     emp_batch=[]
@@ -254,7 +262,6 @@ def find_batch(name):
     if name:
         stock = frappe.get_all("Stock Entry",filters={"usb":name,"docstatus":1},fields=['name','stock_entry_type'])
         for i in stock:
-            print(stock)
             if i.stock_entry_type == "Manufacture":
                 batch = frappe.get_doc("Stock Entry",i.name)
                 for j in batch.items:
