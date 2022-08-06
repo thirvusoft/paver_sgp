@@ -103,6 +103,9 @@ frappe.ui.form.on('Sales Invoice', {
             
             }
             
+        },
+        site_work: function(frm, cdt, cdn){
+            cur_frm.set_value('project', cur_frm.doc.site_work)
         }
 })
 

@@ -1,5 +1,5 @@
 frappe.ui.form.on("Payment Entry",{
-    site: function(frm){
+    site_work: function(frm){
         frm.set_query("site",function(){
             let party=frm.doc.party
             return {
@@ -8,5 +8,6 @@ frappe.ui.form.on("Payment Entry",{
                 }
             }
         })
+        cur_frm.set_value('project', cur_frm.doc.site_work)
     }
 })
