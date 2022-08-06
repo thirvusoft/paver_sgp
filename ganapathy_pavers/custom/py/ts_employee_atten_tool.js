@@ -131,7 +131,8 @@ function get_data(frm, cdt, cdn){
             designation: cur_frm.doc.designation,
             department: cur_frm.doc.department,
             location: cur_frm.doc.location,
-            branch: cur_frm.doc.branch
+            branch: cur_frm.doc.branch,
+            company: cur_frm.doc.company
         },
         callback(r){
             frm.clear_table("employee_detail");
