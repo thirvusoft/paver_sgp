@@ -206,7 +206,8 @@ doc_events = {
 		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry"
 	},
 	"Attendance": {
-		"on_submit": "ganapathy_pavers.custom.py.employee_atten_tool.update_attendance_to_checkin",
+		"on_submit": ["ganapathy_pavers.custom.py.employee_checkin.check_in_out",
+                  "ganapathy_pavers.custom.py.employee_atten_tool.update_attendance_to_checkin"],
 		"before_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_attn_cancel_detail"
 	},
 	"TS Employee Attendance Tool": {
