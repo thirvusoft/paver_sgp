@@ -67,7 +67,7 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
 				 "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
-				 "ganapathy_pavers.utils.py.worstation.item_customization",
+				 "ganapathy_pavers.utils.py.worstation.workstation_item_customization",
 				 "ganapathy_pavers.utils.py.purchase_order.batch_customization",
 				 "ganapathy_pavers.utils.py.customer.create_multi_customer",
 				 "ganapathy_pavers.utils.py.item.batch_customization",
@@ -197,7 +197,7 @@ doc_events = {
         "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
 	},
 	"Workstation":{
-		"validate": "ganapathy_pavers.custom.py.workstation.total_salary"
+		"validate": "ganapathy_pavers.custom.py.workstation.total_no_salary"
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"

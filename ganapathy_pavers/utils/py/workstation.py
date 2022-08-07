@@ -1,13 +1,13 @@
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
-def item_customization():
-        custom_fields={
+def workstation_item_customization():
+        workstation_item_customization={
         "Workstation":[
             dict(
             fieldname='assets_table_worksation',
             label='Assets',
             fieldtype='Table',
-            options="Asset_table",
+            options='Asset_table',
             insert_after='column_break_4'
             ),
             dict(
@@ -19,31 +19,31 @@ def item_customization():
             fieldname='cost_per_hours',
             label='Cost Per Hour(s)',
             fieldtype='Int',
-            insert_after='section_break1',
+            insert_after='section_break1'
             ),
             dict(
             fieldname='ts_columnbreak1',
             fieldtype='Column Break',
-            insert_after='cost_per_hours',
+            insert_after='cost_per_hours'
             ),
             dict(
             fieldname='ts_machine_operator',
             label='Machine Operator',
             fieldtype='Link',
-            options="Employee",
-            insert_after='ts_columnbreak1',
+            options='Employee',
+            insert_after='ts_columnbreak1'
             ),
             dict(
             fieldname='ts_columnbreak2',
             fieldtype='Column Break',
-            insert_after='ts_machine_operator',
+            insert_after='ts_machine_operator'
             ),
             dict(
             fieldname='ts_panmix_operator',
             label='Panmix Operator',
             fieldtype='Link',
             options='Employee',
-            insert_after='ts_columnbreak2',
+            insert_after='ts_columnbreak2'
             ),
             dict(
             fieldname='section_break2',
@@ -56,7 +56,6 @@ def item_customization():
             fieldtype='Int',
             insert_after='section_break2',
             default=0
-            
             ),
             dict(
             fieldname='no_of_operators',
@@ -94,7 +93,7 @@ def item_customization():
             fieldtype="Float",
             insert_after='division_factors',
             default=1,
-            precision=4,
+            precision=4
             ),
             dict(
             fieldname='division_factors2',
@@ -163,7 +162,7 @@ def item_customization():
             collapsible=1
             ),
             dict(
-            fieldname='ts_operator_table',
+            fieldname='ts_operators_table',
             label='Operators',
             fieldtype='Table',
             insert_after='ts_operators',
@@ -172,7 +171,7 @@ def item_customization():
             dict(
             fieldname='ts_sectionbreak',
             fieldtype='Section Break',
-            insert_after='ts_operator_table'
+            insert_after='ts_operators_table'
             ),
             dict(
             fieldname='ts_no_of_operator',
@@ -212,8 +211,8 @@ def item_customization():
             label='Sum of wages per hours',
             fieldtype='Float',
             insert_after='sum_of_wages_per_hour_column_break',
-            )
+            ),
           
         ]
         }
-        create_custom_fields(custom_fields)
+        create_custom_fields(workstation_item_customization)

@@ -706,7 +706,7 @@
    "depends_on": "eval:doc.is_shot_blasting==1",
    "fieldname": "shot_blasted_bundle",
    "fieldtype": "Int",
-   "label": "Shot Blasted Bundle",
+   "label": "Remaining Shot Blast Bundle",
    "read_only": 1
   },
   {
@@ -717,19 +717,16 @@
   {
    "fieldname": "total_expense_per_sqft",
    "fieldtype": "Float",
-   "hidden": 1,
    "label": "Total Expense per Sqft"
   },
   {
    "fieldname": "rack_shifting_total_expense_per_sqft",
    "fieldtype": "Float",
-   "hidden": 1,
    "label": "Total Expense per Sqft"
   },
   {
    "fieldname": "labour_cost_per_sqft",
    "fieldtype": "Float",
-   "hidden": 1,
    "label": "Labour Cost per Sqft"
   },
   {
@@ -757,7 +754,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-06 00:54:55.330724",
+ "modified": "2022-08-07 10:16:32.670725",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
