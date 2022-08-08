@@ -751,6 +751,7 @@
    "label": "Strapping Cost Per Sqft"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "setting_oil_item_name",
    "fieldtype": "Link",
    "label": "Setting Oil Item Name",
@@ -773,7 +774,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-08 17:53:18.593463",
+ "modified": "2022-08-08 19:17:30.224629",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
