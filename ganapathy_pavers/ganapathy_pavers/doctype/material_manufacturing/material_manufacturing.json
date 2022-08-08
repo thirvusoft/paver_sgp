@@ -1,13 +1,14 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "USB-.{operation}.-.####",
+ "autoname": "MM-.YYYY.-.####",
  "creation": "2022-07-21 14:57:24.279355",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "item_to_manufacture",
+  "is_shot_blasting",
   "column_break_2",
   "company",
   "status1",
@@ -27,6 +28,7 @@
   "total_no_of_chips",
   "chips_item_name",
   "cement_item",
+  "setting_oil_item_name",
   "column_break_4",
   "average_of_raw_material",
   "average_of_cement",
@@ -35,6 +37,8 @@
   "average_of_chips",
   "dust_item_name",
   "ggbs_item",
+  "setting_oil_qty",
+  "total_setting_oil_qty",
   "items_section",
   "items",
   "section_break_16",
@@ -49,6 +53,7 @@
   "total_manufacturing_expense",
   "column_break_28",
   "total_expense",
+  "total_expense_per_sqft",
   "section_break_17",
   "source_warehouse",
   "column_break_32",
@@ -57,6 +62,7 @@
   "stock_entry_type",
   "section_break_42",
   "production_qty",
+  "production_sqft",
   "create_stock_entry",
   "column_break_44",
   "total_completed_qty",
@@ -72,11 +78,14 @@
   "from_time_rack",
   "to_time_rack",
   "total_hours_rack",
+  "rack_shifting_total_expense",
+  "rack_shifting_total_expense_per_sqft",
   "cb52",
   "workstation",
   "total_rack_shift_expense",
   "rack_shifting_additional_cost",
-  "rack_shifting_total_expense",
+  "strapping_cost_per_sqft",
+  "strapping_cost",
   "rack_shift_ware_section",
   "rack_shift_source_warehouse",
   "column_break_65",
@@ -85,13 +94,32 @@
   "stock_entry_rack_shift",
   "section_break_51",
   "no_of_bundle",
-  "curing_damaged_qty",
-  "labour_cost",
+  "shot_blasted_bundle",
   "curing_stock_entry",
+  "column_break_80",
+  "from_time_curing",
+  "curing_damaged_qty",
+  "to_time_curing",
+  "shot_blast_per_sqft",
+  "column_break_82",
+  "rate_per_hrs",
+  "total_hrs",
+  "cb4",
+  "no_of_division",
+  "labour_cost",
+  "labour_cost_per_sqft",
   "section_break_72",
   "curing_source_warehouse",
+  "column_break_84",
   "curing_target_warehouse",
+  "column_break_86",
   "curing_stock_entry_type",
+  "section_break_98",
+  "item_price",
+  "section_break_105",
+  "batch_no_manufacture",
+  "batch_no_rack_shifting",
+  "batch_no_curing",
   "amended_from"
  ],
  "fields": [
@@ -237,8 +265,10 @@
    "fieldtype": "Column Break"
   },
   {
+   "columns": 2,
    "fieldname": "from_time",
    "fieldtype": "Datetime",
+   "in_list_view": 1,
    "label": "From Time"
   },
   {
@@ -363,7 +393,6 @@
    "label": "Create Stock Entry For Manufacturing"
   },
   {
-   "collapsible": 1,
    "fieldname": "rack_shifting_section",
    "fieldtype": "Section Break",
    "label": "Rack Shifting"
@@ -465,6 +494,7 @@
   {
    "fieldname": "rack_shifting_additional_cost",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Rack Shifting Additional Cost"
   },
   {
@@ -537,7 +567,7 @@
    "fieldname": "curing_damaged_qty",
    "fieldtype": "Int",
    "hidden": 1,
-   "label": "Curing Damage Qty"
+   "label": "Damage Qty"
   },
   {
    "fieldname": "total_no_of_dust",
@@ -583,18 +613,169 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "Process",
-   "options": "Manufacture\nRack Shifting\nCuring\nCompleted"
+   "options": "Manufacture\nRack Shifting\nCuring\nShot Blast\nCompleted"
   },
   {
    "fieldname": "production_qty",
    "fieldtype": "Int",
    "label": "Production Qty"
+  },
+  {
+   "fieldname": "column_break_84",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_86",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate_per_hrs",
+   "fieldtype": "Currency",
+   "label": "Rate Per Hrs"
+  },
+  {
+   "default": "3",
+   "fieldname": "no_of_division",
+   "fieldtype": "Float",
+   "label": "No. of Division"
+  },
+  {
+   "fieldname": "from_time_curing",
+   "fieldtype": "Datetime",
+   "label": "From Time"
+  },
+  {
+   "fieldname": "to_time_curing",
+   "fieldtype": "Datetime",
+   "label": "To Time"
+  },
+  {
+   "fieldname": "total_hrs",
+   "fieldtype": "Float",
+   "label": "Total Hrs"
+  },
+  {
+   "fieldname": "column_break_80",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_82",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "strapping_cost",
+   "fieldtype": "Float",
+   "label": "Strapping Cost"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_shot_blasting",
+   "fieldtype": "Check",
+   "label": "Is Shot Blasting Item"
+  },
+  {
+   "fieldname": "batch_no_manufacture",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Batch no Manufacture",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "batch_no_rack_shifting",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Batch no Rack Shifting",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "batch_no_curing",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Batch no Curing",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "section_break_98",
+   "fieldtype": "Section Break",
+   "label": "Item Price Per Sqft"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "depends_on": "eval:doc.is_shot_blasting==1",
+   "fieldname": "shot_blasted_bundle",
+   "fieldtype": "Int",
+   "label": "Remaining Shot Blast Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "production_sqft",
+   "fieldtype": "Float",
+   "label": "Production Sqft"
+  },
+  {
+   "fieldname": "total_expense_per_sqft",
+   "fieldtype": "Float",
+   "label": "Total Expense per Sqft"
+  },
+  {
+   "fieldname": "rack_shifting_total_expense_per_sqft",
+   "fieldtype": "Float",
+   "label": "Total Expense per Sqft"
+  },
+  {
+   "fieldname": "labour_cost_per_sqft",
+   "fieldtype": "Float",
+   "label": "Labour Cost per Sqft"
+  },
+  {
+   "fieldname": "shot_blast_per_sqft",
+   "fieldtype": "Float",
+   "label": "Shot Blast per Sqft"
+  },
+  {
+   "fieldname": "section_break_105",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "item_price",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Item Price"
+  },
+  {
+   "default": "0.75",
+   "fieldname": "strapping_cost_per_sqft",
+   "fieldtype": "Float",
+   "label": "Strapping Cost Per Sqft"
+  },
+  {
+   "fieldname": "setting_oil_item_name",
+   "fieldtype": "Link",
+   "label": "Setting Oil Item Name",
+   "options": "Item"
+  },
+  {
+   "description": "per Batch in ml",
+   "fieldname": "setting_oil_qty",
+   "fieldtype": "Float",
+   "label": "Setting Oil Qty"
+  },
+  {
+   "description": "in kg",
+   "fieldname": "total_setting_oil_qty",
+   "fieldtype": "Float",
+   "label": "Total Setting Oil Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-02 18:49:08.179286",
+ "modified": "2022-08-07 10:16:32.670725",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

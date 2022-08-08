@@ -1,4 +1,4 @@
-from ganapathy_pavers.utils.py.worstation import item_customization
+from ganapathy_pavers.utils.py.workstation import workstation_item_customization
 
 def execute():
-    item_customization()
+    workstation_item_customization()

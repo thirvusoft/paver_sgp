@@ -20,6 +20,7 @@
   "column_break_8",
   "default_stock_entry_curing",
   "default_curing_source_warehouse",
+  "default_curing_target_warehouse_for_setting",
   "default_curing_target_warehouse",
   "default_stock_uom_section",
   "default_manufacture_uom",
@@ -33,6 +34,7 @@
   "default_item_section",
   "chips",
   "dust",
+  "setting_oil",
   "column_break_28",
   "cement",
   "ggbs"
@@ -74,9 +76,10 @@
    "options": "Warehouse"
   },
   {
+   "description": "for all item",
    "fieldname": "default_curing_target_warehouse",
    "fieldtype": "Link",
-   "label": "Default Curing Target Warehouse",
+   "label": "Default Finished Target Warehouse",
    "options": "Warehouse"
   },
   {
@@ -200,12 +203,25 @@
   {
    "fieldname": "column_break_28",
    "fieldtype": "Column Break"
+  },
+  {
+   "description": "for shot blasting item",
+   "fieldname": "default_curing_target_warehouse_for_setting",
+   "fieldtype": "Link",
+   "label": "Default Curing Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "setting_oil",
+   "fieldtype": "Link",
+   "label": "Setting Oil",
+   "options": "Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-08-01 19:18:35.284368",
+ "modified": "2022-08-08 09:00:24.190446",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "USB Setting",
