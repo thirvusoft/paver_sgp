@@ -17,6 +17,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		default_value("ggbs","ggbs_item")
 		default_value("chips","chips_item_name")
 		default_value("dust","dust_item_name")
+		default_value("setting_oil","setting_oil_item_name")
 	},
 	item_to_manufacture: function(frm){
 		const find = frm.doc.item_to_manufacture.split("-");
