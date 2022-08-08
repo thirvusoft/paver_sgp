@@ -148,6 +148,10 @@ frappe.ui.form.on('Material Manufacturing', {
 				frappe.throw("Kindly Enter Rate in Item Table")
 			}
 		}
+		if(frm.doc.setting_oil_item_name){
+			cur_frm.set_value('total_setting_oil_qty',(frm.doc.raw_material_consumption.length*frm.doc.setting_oil_qty)/1000)
+		  }
+		cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft*frm.doc.production_sqft);
 		cur_frm.set_value('total_expense_per_sqft', (total_bundle+frm.doc.total_expense)/frm.doc.production_sqft);
 		cur_frm.set_value('rack_shifting_total_expense_per_sqft', (frm.doc.rack_shifting_total_expense)/frm.doc.production_sqft);
 		cur_frm.set_value('labour_cost_per_sqft', frm.doc.labour_cost/frm.doc.production_sqft);
