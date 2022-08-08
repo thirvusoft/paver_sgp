@@ -22,3 +22,16 @@ def check_in_out(self, event):
     for j in total_hours:
        hours+=(time_diff_in_hours(j[1],j[0]))
     frappe.db.set_value(self.doctype, self.name, 'working_hours',hours)
+    return ot_hours_cal(self, float(hours))
+
+def ot_hours_cal(self, hours):
+    if hours==8.0:
+        frappe.set_value(self.doctype, self.name, "one_day_hours",  '8.0')
+        frappe.set_value(self.doctype, self.name,"full_day_workings",  '1')
+    if (hours<8.0):
+        frappe.set_value(self.doctype, self.name, "one_day_hours",  hours)
+    if (hours>8.0):
+        day_ot=hours - 8.0
+        frappe.set_value(self.doctype, self.name, "ot_hours",  day_ot)
+        frappe.set_value(self.doctype, self.name, "one_day_hours",  '8.0')
+        frappe.set_value(self.doctype, self.name, "full_day_workings",  '1')
