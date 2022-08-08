@@ -53,8 +53,19 @@ def create_salary_slips_for_employees(posting_date,start_date,end_date,employees
         doc=sum(frappe.get_all('Attendance', filters={"employee":emp, "attendance_date":[
 				"between",(st_date, ed_date)],"docstatus":1},pluck='working_hours'))
         
+        doc1=sum(frappe.get_all('Attendance', filters={"employee":emp, "attendance_date":[
+				"between",(st_date, ed_date)],"docstatus":1},pluck='ot_hours'))
+       
+        doc2=sum(frappe.get_all('Attendance', filters={"employee":emp, "attendance_date":[
+				"between",(st_date, ed_date)],"docstatus":1},pluck='full_day_working'))
+        
+        doc3=sum(frappe.get_all('Attendance', filters={"employee":emp, "attendance_date":[
+				"between",(st_date, ed_date)],"docstatus":1},pluck='one_day_hours'))
+       
+        
+        
         if emp not in salary_slips_exists_for:
-            args.update({"doctype": "Salary Slip", "total_time_of_food_taken": food_count[index], 'total_working_hour':doc})
+            args.update({"doctype": "Salary Slip", "total_time_of_food_taken": food_count[index], 'total_working_hour':doc, 'total_ot_hours':doc1, 'full_day_working_hours':doc3, 'numbers_of_full_days':doc2}) 
             args.update({"doctype": "Salary Slip", "employee": emp})
             employee=frappe.get_doc('Employee',emp)
             if(employee.designation=='Job Worker'):
