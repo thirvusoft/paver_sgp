@@ -12,21 +12,6 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
                 }
             })
         }
-        cur_frm.set_query('department', function(){
-            return {
-                filters: {
-                    'designation': cur_frm.doc.designation,
-                    'company': cur_frm.doc.company
-                }
-            }
-        })
-        cur_frm.set_query('department', 'employee_detail', function(){
-            return {
-                filters: {
-                    'designation': cur_frm.doc.designation
-                }
-            }
-        })
     },
     onload_post_render: async function(frm){
         let table = (cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:[])
@@ -57,9 +42,6 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
                 }
             }
         }
-    },
-    department:function(frm, cdt, cdn){
-        get_data(frm, cdt, cdn)
     },
     designation:function(frm, cdt, cdn){
         get_data(frm, cdt, cdn)
@@ -163,7 +145,6 @@ function get_data(frm, cdt, cdn){
         method:"ganapathy_pavers.custom.py.employee_atten_tool.employee_finder_attendance",
         args:{
             designation: cur_frm.doc.designation,
-            department: cur_frm.doc.department,
             location: cur_frm.doc.location,
             branch: cur_frm.doc.branch,
             company: cur_frm.doc.company
@@ -176,7 +157,7 @@ function get_data(frm, cdt, cdn){
                 frappe.model.set_value(child.doctype, child.name, "check_in", cur_frm.doc.date)
                 frappe.model.set_value(child.doctype, child.name, "check_out", cur_frm.doc.checkout_time)
                 frappe.model.set_value(child.doctype, child.name, "employee_name", r.message[i]["employee_name"])
-                frappe.model.set_value(child.doctype, child.name, "department", r.message[i]["department"])
+                frappe.model.set_value(child.doctype, child.name, "location", r.message[i]["location"])
                 if (frm.doc.designation == "Labour Worker"){
                     frappe.model.set_value(child.doctype, child.name, "payment_method",'Deduct from Salary')
                 }
@@ -232,7 +213,7 @@ async function change_checkin(frm,cdt,cdn, logtype){
 
 async function not_permitted(frm, cdt, cdn){
     let row = locals[cdt][cdn]
-    let emp_name=row.employee, employee_name=row.employee_name, checkin=row.check_in, checkout=row.check_out, department=row.department;
+    let emp_name=row.employee, employee_name=row.employee_name, checkin=row.check_in, checkout=row.check_out, location=row.location;
     let idx= row.idx
     if(row.employee && !cur_frm.is_new()){
         await frappe.call({
@@ -253,7 +234,7 @@ async function not_permitted(frm, cdt, cdn){
                             new_row.employee_name=employee_name
                             new_row.check_in=checkin
                             new_row.check_out=checkout
-                            new_row.department=department
+                            new_row.location=location
                         })
                     }
                 }
@@ -273,11 +254,11 @@ frappe.ui.form.on('TS Employee Details', {
         let data=locals[cdt][cdn]
         if(data.employee){
             frappe.db.get_doc('Employee', data.employee).then((doc) => {
-                frappe.model.set_value(cdt, cdn, 'department', doc.department)
+                frappe.model.set_value(cdt, cdn, 'location', doc.location)
             })
         }
         else{
-            frappe.model.set_value(cdt, cdn, 'department', '')
+            frappe.model.set_value(cdt, cdn, 'location', '')
         }
     },
     before_employee_detail_remove: async function(frm, cdt, cdn) {
