@@ -28,6 +28,7 @@
   "total_no_of_chips",
   "chips_item_name",
   "cement_item",
+  "setting_oil_item_name",
   "column_break_4",
   "average_of_raw_material",
   "average_of_cement",
@@ -36,6 +37,8 @@
   "average_of_chips",
   "dust_item_name",
   "ggbs_item",
+  "setting_oil_qty",
+  "total_setting_oil_qty",
   "items_section",
   "items",
   "section_break_16",
@@ -749,6 +752,24 @@
    "fieldname": "strapping_cost_per_sqft",
    "fieldtype": "Float",
    "label": "Strapping Cost Per Sqft"
+  },
+  {
+   "fieldname": "setting_oil_item_name",
+   "fieldtype": "Link",
+   "label": "Setting Oil Item Name",
+   "options": "Item"
+  },
+  {
+   "description": "per Batch in ml",
+   "fieldname": "setting_oil_qty",
+   "fieldtype": "Float",
+   "label": "Setting Oil Qty"
+  },
+  {
+   "description": "in kg",
+   "fieldname": "total_setting_oil_qty",
+   "fieldtype": "Float",
+   "label": "Total Setting Oil Qty"
   }
  ],
  "index_web_pages_for_search": 1,
