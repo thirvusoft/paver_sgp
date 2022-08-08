@@ -15,11 +15,18 @@
   "location",
   "date",
   "checkout_time",
+  "update_empty_fields",
   "help_session_section",
   "employee",
   "column_break_12",
   "updated_checkout",
   "update",
+  "update_selected_fields_section",
+  "checkin",
+  "update_selected_checkins",
+  "column_break_18",
+  "checkout",
+  "update_selected_checkouts",
   "ts_employee_details_section",
   "employee_detail",
   "employee_chekin_cancle_details_section",
@@ -31,8 +38,7 @@
    "fieldname": "date",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Checkin Time",
-   "set_only_once": 1
+   "label": "Checkin Time"
   },
   {
    "fieldname": "department",
@@ -91,8 +97,7 @@
    "fieldname": "checkout_time",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Checkout Time",
-   "set_only_once": 1
+   "label": "Checkout Time"
   },
   {
    "fieldname": "employee_chekin_cancle_details_section",
@@ -139,12 +144,47 @@
    "options": "Location",
    "reqd": 1,
    "set_only_once": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "update_empty_fields",
+   "fieldtype": "Check",
+   "label": "Update empty fields only"
+  },
+  {
+   "fieldname": "update_selected_fields_section",
+   "fieldtype": "Section Break",
+   "label": "Update Selected Fields"
+  },
+  {
+   "fieldname": "checkin",
+   "fieldtype": "Datetime",
+   "label": "Checkin Time"
+  },
+  {
+   "fieldname": "update_selected_checkins",
+   "fieldtype": "Button",
+   "label": "Update selected checkins"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "checkout",
+   "fieldtype": "Datetime",
+   "label": "Checkout Time"
+  },
+  {
+   "fieldname": "update_selected_checkouts",
+   "fieldtype": "Button",
+   "label": "Update selected checkouts"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-05 21:46:40.348212",
+ "modified": "2022-08-08 17:58:11.712754",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Attendance Tool",
