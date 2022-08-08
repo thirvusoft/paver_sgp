@@ -103,6 +103,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value('labour_cost', (frm.doc.rate_per_hrs * frm.doc.total_hrs)/frm.doc.no_of_division)
 	},
 	refresh: function(frm){
+		if(frm.doc.docstatus == 0){
 		if(frm.doc.ts_total_hours > 0 && frm.doc.docstatus == 0){
 			frappe.call({
 				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_expense",
@@ -157,6 +158,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value('rack_shifting_total_expense_per_sqft', (frm.doc.rack_shifting_total_expense)/frm.doc.production_sqft);
 		cur_frm.set_value('labour_cost_per_sqft', frm.doc.labour_cost/frm.doc.production_sqft);
 		cur_frm.set_value('item_price', frm.doc.total_expense_per_sqft+frm.doc.rack_shifting_total_expense_per_sqft+frm.doc.labour_cost_per_sqft+frm.doc.shot_blast_per_sqft);
+		}
 	},
 	bom_no: function(frm){
 		item_adding(frm)
@@ -381,7 +383,7 @@ function std_item(frm){
 				}
 				for (const d of r.message){
 					for(const i of frm.doc.items){
-						if(i.item_code == d.item_code){
+						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse){
 							item1.indexOf(d.item_code) !== -1 && item1.splice(item1.indexOf(d.item_code), 1)
 						}
 					}
