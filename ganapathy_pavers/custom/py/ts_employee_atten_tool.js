@@ -119,12 +119,42 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
    
     date:function(frm, cdt,cdn){
         for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
+            let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
+            if(cur_frm.doc.update_empty_fields && data.check_in){
+                continue
+            }
            frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_in", cur_frm.doc.date)
     }},
     checkout_time:function(frm, cdt,cdn){
         for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
+            let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
+            if(cur_frm.doc.update_empty_fields && data.check_out){
+                continue
+            }
            frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_out", cur_frm.doc.checkout_time)
-    }}
+    }},
+    update_selected_checkins: function(frm, cdt, cdn){
+        if(cur_frm.doc.checkin){
+            let employees = cur_frm.fields_dict.employee_detail.grid.get_selected_children()
+            employees = employees?employees:[]
+            let row = 0
+            for(row = 0; row<employees.length; row++){
+                frappe.model.set_value(employees[row].doctype, employees[row].name, 'check_in', cur_frm.doc.checkin)
+            }
+             frappe.show_alert({message: `Updated ${row} Checkins`})
+        }
+    },
+    update_selected_checkouts: function(frm, cdt, cdn){
+        if(cur_frm.doc.checkout){
+            let employees = cur_frm.fields_dict.employee_detail.grid.get_selected_children()
+            employees = employees?employees:[]
+            let row = 0
+            for(row = 0; row<employees.length; row++){
+                frappe.model.set_value(employees[row].doctype, employees[row].name, 'check_out', cur_frm.doc.checkout)
+            }
+             frappe.show_alert({message: `Updated ${row} Checkouts`})
+        }
+    }
 })
 
 
