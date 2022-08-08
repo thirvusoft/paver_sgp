@@ -203,7 +203,7 @@ async function change_checkin(frm,cdt,cdn, logtype){
         async:false,
         async callback(r){
             if (validate && !frm.is_new() && r.message){
-                validate=false
+                // validate=false
                 await frappe.confirm(
                     `Are you sure to change the employee check${logtype.toLocaleLowerCase()} time?`,
                     function(){
