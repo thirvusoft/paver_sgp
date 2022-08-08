@@ -10,14 +10,14 @@ frappe.ui.form.on("Workstation",{
             })
         }
     },
-    validate:function(frm){
-        for(var i=0;i<frm.doc.ts_operator_table.length;i++){
-            if(frm.doc.ts_operator_table[i].ts_division_operator == 0){
-                frappe.throw("Zero is not allowed kindly give above zero in division factors")}
-        }
-    },
+    // validate:function(frm){
+    //     for(var i=0;i<frm.doc.ts_operator_table.length;i++){
+    //         if(frm.doc.ts_operator_table[i].ts_division_operator == 0){
+    //             frappe.throw("Zero is not allowed kindly give above zero in division factors")}
+    //     }
+    // },
     refresh:function(frm){
-            frm.set_query('ts_operator_name','ts_operator_table',function(frm){
+            frm.set_query('ts_operator_name','ts_operators_table',function(frm){
                 return {
                     filters:{
                         "designation":"Operator",
