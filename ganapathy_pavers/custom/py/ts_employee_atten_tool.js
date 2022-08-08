@@ -1,5 +1,12 @@
+var change_value=1, delete_value=1;
 frappe.ui.form.on('TS Employee Attendance Tool',{
-    onload: function(frm){
+    onload: async function(frm){
+        await frappe.db.get_single_value('Attendance Tool Settings', 'change_confirm').then( async value => {
+            change_value = value;
+        })
+        await frappe.db.get_single_value('Attendance Tool Settings', 'delete_confirm').then( async value => {
+            delete_value = value;
+        })
         if(cur_frm.is_new()){
             frappe.db.exists('Location', 'Unit1').then(res => {
                 if(res){
@@ -185,26 +192,29 @@ async function change_checkin(frm,cdt,cdn, logtype){
         async callback(r){
             if (validate && !frm.is_new() && r.message){
                 // validate=false
-                await frappe.confirm(
-                    `Are you sure to change the employee check${logtype.toLocaleLowerCase()} time?`,
-                    function(){
-                        validate=true
-                    },
-                    function(){
-                        validate=true
-                        frappe.call({
-                            method:"ganapathy_pavers.custom.py.employee_atten_tool.get_check_in",
-                            args:{
-                                employee: row.employee,
-                                name: cur_frm.doc.name,
-                                logtype: logtype
-                            },
-                            callback(r){
-                                frappe.model.set_value(cdt, cdn, `check_${logtype.toLocaleLowerCase()}`, r.message)
-                            }
-                        })  
-                    }
-                )
+                if(change_value){
+                    await frappe.confirm(
+                        `Are you sure to change the employee check${logtype.toLocaleLowerCase()} time?`,
+                        function(){
+                            validate=true
+                        },
+                        function(){
+                            validate=true
+                            frappe.call({
+                                method:"ganapathy_pavers.custom.py.employee_atten_tool.get_check_in",
+                                args:{
+                                    employee: row.employee,
+                                    name: cur_frm.doc.name,
+                                    logtype: logtype
+                                },
+                                callback(r){
+                                    frappe.model.set_value(cdt, cdn, `check_${logtype.toLocaleLowerCase()}`, r.message)
+                                }
+                            })  
+                        }
+                    )
+                }
+                    
             }
         }
         
@@ -222,20 +232,22 @@ async function not_permitted(frm, cdt, cdn){
                     employee: row.employee,
                     name: cur_frm.doc.name
                 }, 
-                callback: function (r) {
+                callback: async function (r) {
                     if(r.message) {
-                        frappe.confirm(`Checkin log is created for this employee: ${row.employee}\nAre you want to delete the checikn?`, 
-                        function(){
+                        if(delete_value){
+                            frappe.confirm(`Checkin log is created for this employee: ${row.employee}\nAre you want to delete the checikn?`, 
+                            function(){
 
-                        }, 
-                        async function(){
-                            let new_row=cur_frm.fields_dict.employee_detail.grid.add_new_row(idx)
-                            new_row.employee=emp_name
-                            new_row.employee_name=employee_name
-                            new_row.check_in=checkin
-                            new_row.check_out=checkout
-                            new_row.location=location
-                        })
+                            }, 
+                            async function(){
+                                let new_row=cur_frm.fields_dict.employee_detail.grid.add_new_row(idx)
+                                new_row.employee=emp_name
+                                new_row.employee_name=employee_name
+                                new_row.check_in=checkin
+                                new_row.check_out=checkout
+                                new_row.location=location
+                            })
+                        }
                     }
                 }
         })

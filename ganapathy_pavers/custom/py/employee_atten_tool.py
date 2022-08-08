@@ -249,16 +249,18 @@ def validate_empty_field(employee_detail):
 def day_wise_department(self, event):
 	if(self.date):
 		date=datetime.strptime(str(self.date), "%Y-%m-%d %H:%M:%S").date()
-		filters={'date': ['between', [date, date]], 'docstatus':1}
+		filters={'date': ['between', [date, date]], 'docstatus':['!=', 2]}
+		if(self.name in frappe.get_all(self.doctype, pluck = 'name')):
+			filters['name'] = ['!=', self.name]
 		if(self.designation):
 			filters['designation']=self.designation
 		if(self.branch):
 			filters['branch']=self.branch
 		if(self.location):
 			filters['location']=self.location
-		docs=frappe.get_all('TS Employee Attendance Tool', filters)
+		docs=frappe.get_all('TS Employee Attendance Tool', filters ,pluck='name')
 		if(docs):
-			frappe.throw(f'Attendance tool already exist for this date for{(" "+frappe.bold(self.designation)) if self.designation else ""}{(" "+frappe.bold(self.branch)) if self.branch else ""}{(" "+frappe.bold(self.location)) if self.location else ""}')
+			frappe.throw(f'Attendance tool already exist for this date {frappe.utils.csvutils.getlink("TS Employee Attendance Tool", docs[0])} for{(" "+frappe.bold(self.designation)) if self.designation else ""}{(" "+frappe.bold(self.branch)) if self.branch else ""}{(" "+frappe.bold(self.location)) if self.location else ""}')
 
 
 def doc_cancel(self, event):
