@@ -101,6 +101,12 @@ def std_item(doc):
         row['qty']=doc.get('total_no_of_dust')
         row['amount']=doc.get('total_no_of_dust')*row['rate']
         items.append(row)
+    if doc.get('setting_oil_item_name') and doc.get('total_setting_oil_qty'):
+        row={}
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['setting_oil_item_name'],['item_code','stock_uom','stock_uom','valuation_rate'])
+        row['qty']=doc.get('total_setting_oil_qty')
+        row['amount']=doc.get('total_no_of_dust')*row['rate']
+        items.append(row)
     return items
 
 @frappe.whitelist()
