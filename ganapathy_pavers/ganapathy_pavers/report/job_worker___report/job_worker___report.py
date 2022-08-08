@@ -44,11 +44,11 @@ def execute(filters=None):
                 final_data.append(data[i])
                 total = [" " for i in range(8)]
                 total[2] = "<b style=color:orange;>""Total""</b>"
-                total[3] = sum(data[i][3] for i in range(start,i+1))
-                total[4] = sum(data[i][4] for i in range(start,i+1))
-                total[5] = sum(data[i][5] for i in range(start,i+1))
+                total[3] = sum((data[i][3] or 0) for i in range(start,i+1))
+                total[4] = sum((data[i][4] or 0) for i in range(start,i+1))
+                total[5] = sum((data[i][5] or 0) for i in range(start,i+1))
                 total[6] = adv
-                total[7] = sum(data[i][7] for i in range(start,i+1))
+                total[7] = sum((data[i][7] or 0) for i in range(start,i+1))
                 final_data.append(total)
                 start = i+1	
                 c=0
@@ -62,11 +62,11 @@ def execute(filters=None):
         final_data.append(data[-1])
         total = [" " for i in range(8)]
         total[2] = "<b style=color:orange;>""Total""</b>"
-        total[3] = sum(data[i][3] for i in range(start,len(data)))
-        total[4] = sum(data[i][4] for i in range(start,len(data)))
-        total[5] = sum(data[i][5] for i in range(start,len(data)))
+        total[3] = sum((data[i][3] or 0) for i in range(start,len(data)))
+        total[4] = sum((data[i][4] or 0) for i in range(start,len(data)))
+        total[5] = sum((data[i][5] or 0) for i in range(start,len(data)))
         total[6] = adv
-        total[7] = sum(data[i][7] for i in range(start,len(data)))
+        total[7] = sum((data[i][7] or 0) for i in range(start,len(data)))
         final_data.append(total)
     columns = get_columns()
     return columns, final_data
