@@ -17,7 +17,6 @@ def emp_hrs(diff_hrs, employee):
     if (diff_hrs<=24):
         doc=frappe.get_last_doc('Attendance', {'employee':employee})
         frappe.db.set_value(doc.doctype, doc.name, "working_hours",  diff_hrs)
-<<<<<<< HEAD
         if diff_hrs==8.0:
             frappe.set_value(doc.doctype, doc.name, "one_day_hours",  '8.0')
             frappe.set_value(doc.doctype, doc.name, "full_day_working",  '1')
@@ -28,5 +27,3 @@ def emp_hrs(diff_hrs, employee):
             frappe.set_value(doc.doctype, doc.name, "ot_hours",  day_ot)
             frappe.set_value(doc.doctype, doc.name, "one_day_hours",  '8.0')
             frappe.set_value(doc.doctype, doc.name, "full_day_working",  '1')
-=======
->>>>>>> master

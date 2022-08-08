@@ -243,11 +243,10 @@ doctype_js = {
 								"/custom/js/vehicle_log_service.js"
 								],
 				"Work Order" : "/utils/js/workorder.js",
-<<<<<<< HEAD
-				"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
-=======
-				"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"]
->>>>>>> master
+
+	     		"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
+
+
 			 }
 # Scheduled Tasks
 # ---------------
