@@ -19,8 +19,10 @@
   "items",
   "section_break_4",
   "total_bundle",
+  "total_damage_sqft",
   "column_break_6",
   "total_sqft",
+  "avg_damage_sqft",
   "section_break_7",
   "from_time",
   "additional_cost",
@@ -185,12 +187,24 @@
    "fieldtype": "Link",
    "label": "Source Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "total_damage_sqft",
+   "fieldtype": "Float",
+   "label": "Total Damage Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "avg_damage_sqft",
+   "fieldtype": "Float",
+   "label": "Avg Damage Sqft",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-08 19:42:36.802310",
+ "modified": "2022-08-09 13:00:14.520305",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Costing",
