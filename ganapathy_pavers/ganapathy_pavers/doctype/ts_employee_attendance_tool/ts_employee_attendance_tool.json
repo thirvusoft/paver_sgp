@@ -10,10 +10,13 @@
   "company",
   "designation",
   "location",
+  "machine",
   "column_break_3",
   "branch",
   "date",
+  "update_checkin",
   "checkout_time",
+  "update_checkout",
   "update_empty_fields",
   "help_session_section",
   "employee",
@@ -47,14 +50,16 @@
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
-   "options": "Branch"
+   "options": "Branch",
+   "set_only_once": 1
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company",
-   "reqd": 1
+   "reqd": 1,
+   "set_only_once": 1
   },
   {
    "fieldname": "amended_from",
@@ -169,12 +174,29 @@
    "fieldname": "update_selected_checkouts",
    "fieldtype": "Button",
    "label": "Update selected checkouts"
+  },
+  {
+   "fieldname": "machine",
+   "fieldtype": "Link",
+   "label": "Machine",
+   "options": "Machine",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "update_checkin",
+   "fieldtype": "Button",
+   "label": "Update Checkin"
+  },
+  {
+   "fieldname": "update_checkout",
+   "fieldtype": "Button",
+   "label": "Update Checkout"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-08 18:35:45.694698",
+ "modified": "2022-08-09 15:53:28.548310",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Attendance Tool",

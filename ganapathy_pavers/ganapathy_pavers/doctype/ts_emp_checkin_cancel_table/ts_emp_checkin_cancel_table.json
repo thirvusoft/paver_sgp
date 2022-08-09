@@ -11,7 +11,8 @@
   "check_out",
   "attendance",
   "working_hrs",
-  "location"
+  "location",
+  "machine"
  ],
  "fields": [
   {
@@ -56,22 +57,34 @@
    "fieldname": "working_hrs",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Working Hrs"
+   "label": "Working Hrs",
+   "read_only": 1
   },
   {
    "allow_on_submit": 1,
-   "columns": 2,
+   "columns": 1,
    "fieldname": "location",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Location",
-   "options": "Location"
+   "options": "Location",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "machine",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Machine",
+   "options": "Machine",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-08-08 18:41:38.552495",
+ "modified": "2022-08-09 11:45:03.822633",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS EMP Checkin Cancel table",
