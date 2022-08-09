@@ -60,9 +60,15 @@ def total_hrs(from_time = None,to = None):
         time_in_mins = time_diff_in_hours(to,from_time)
         return time_in_mins-1
 @frappe.whitelist()
-def total_expense(workstation):
+def total_expense(workstation,operators_cost,labour_cost,tot_work_hrs,tot_hrs = None):
     sum_of_wages, hour_rate=frappe.get_value("Workstation",workstation,["sum_of_wages_per_hours","hour_rate"])
-    return sum_of_wages+hour_rate
+    amount_split = operators_cost
+    if tot_hrs:
+        tot_mins = float(tot_hrs)*60
+        tot_work_mins = float(tot_work_hrs)*60
+        shared_mins = (tot_work_mins/tot_mins)*100
+        amount_split = (float(operators_cost)/100)*shared_mins
+    return hour_rate+float(labour_cost),float(amount_split)
 @frappe.whitelist()
 def add_item(bom_no,doc):
     items=[]

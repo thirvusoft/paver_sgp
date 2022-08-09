@@ -81,11 +81,14 @@ frappe.ui.form.on('Material Manufacturing', {
 	production_qty: function(frm){
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
 		frappe.db.get_value("Item", {"name": frm.doc.item_to_manufacture},"pavers_per_sqft", (sqft) => {
-			cur_frm.set_value('production_sqft', frm.doc.production_qty / sqft.pavers_per_sqft)		
+			cur_frm.set_value('production_sqft', frm.doc.total_completed_qty / sqft.pavers_per_sqft)		
 		}); 
 	},
 	damage_qty: function(frm){
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
+		frappe.db.get_value("Item", {"name": frm.doc.item_to_manufacture},"pavers_per_sqft", (sqft) => {
+			cur_frm.set_value('production_sqft', frm.doc.total_completed_qty / sqft.pavers_per_sqft)		
+		});
 	},
 	curing_damaged_qty: function(frm){
 		cur_frm.set_value('no_of_bundle', frm.doc.no_of_bundle - frm.doc.curing_damaged_qty) 
@@ -109,9 +112,13 @@ frappe.ui.form.on('Material Manufacturing', {
 				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_expense",
 				args:{
 					workstation:frm.doc.work_station,
+					operators_cost : frm.doc.operators_cost_in_manufacture,
+					labour_cost : frm.doc.labour_cost_in_manufacture,
+					tot_work_hrs: frm.doc.ts_total_hours,
+					tot_hrs : frm.doc.total_working_hrs,
 				},
 				callback(r){
-					cur_frm.set_value('total_manufacturing_expense', r.message*frm.doc.ts_total_hours);
+					cur_frm.set_value('total_manufacturing_expense', (r.message[0]*frm.doc.ts_total_hours)+r.message[1]);
 					cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense);
 				}
 			})
@@ -121,9 +128,13 @@ frappe.ui.form.on('Material Manufacturing', {
 				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_expense",
 				args:{
 					workstation:frm.doc.workstation,
+					operators_cost : frm.doc.operators_cost_in_manufacture,
+					labour_cost : frm.doc.labour_cost_in_manufacture,
+					tot_work_hrs: frm.doc.total_hours_rack,
+					tot_hrs : frm.doc.total_working_hrs,
 				},
 				callback(r){
-					cur_frm.set_value('total_rack_shift_expense', r.message*frm.doc.total_hours_rack);
+					cur_frm.set_value('total_rack_shift_expense', (r.message[0]*frm.doc.total_hours_rack)+r.message[1]);
 					cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost);
 				}
 			})

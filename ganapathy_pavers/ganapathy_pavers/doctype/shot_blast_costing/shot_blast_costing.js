@@ -67,7 +67,7 @@ frappe.ui.form.on('Shot Blast Items', {
 			frappe.db.get_value("Item", {"name": r.item_to_manufacture},"pavers_per_sqft", (sqft) => {
 				frappe.model.set_value(cdt,cdn,"damages_in_sqft",row.damages_in_nos/sqft.pavers_per_sqft)                
 			});                
-		});           
+		});         
 	},
 	bundle_taken: function(frm,cdt,cdn){
 		var row= locals[cdt][cdn]   
@@ -82,8 +82,15 @@ frappe.ui.form.on('Shot Blast Items', {
 		var row= locals[cdt][cdn]   
 		total(frm) 
 	},
-	
-
+	damages_in_sqft: function(frm,cdt,cdn){
+		var total_damage_sqft = 0
+		for(var i=0;i<frm.doc.items.length;i++){
+			total_damage_sqft += frm.doc.items[i].damages_in_sqft
+			console.log(frm.doc.items[i].damages_in_sqft)
+		}
+		cur_frm.set_value("total_damage_sqft",total_damage_sqft)
+		cur_frm.set_value("avg_damage_sqft",total_damage_sqft/frm.doc.items.length)
+	},
 });
 function total(frm){
 	var total_bundle = 0

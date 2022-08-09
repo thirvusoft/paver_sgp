@@ -13,8 +13,10 @@
   "company",
   "status1",
   "section_break_1",
-  "bom_no",
+  "no_of_item_in_process",
+  "total_working_hrs",
   "cb_1",
+  "bom_no",
   "operation",
   "cb_2",
   "work_station",
@@ -48,9 +50,11 @@
   "column_break_20",
   "ts_total_hours",
   "section_break_30",
-  "additional_cost",
+  "operators_cost_in_manufacture",
+  "labour_cost_in_manufacture",
   "column_break_26",
   "total_manufacturing_expense",
+  "additional_cost",
   "column_break_28",
   "total_expense",
   "total_expense_per_sqft",
@@ -73,19 +77,21 @@
   "total_no_of_bundle",
   "rack_shift_damage_qty",
   "remaining_qty",
+  "operators_cost_in_rack_shift",
   "create_rack_shiftingstock_entry",
   "column_break_53",
   "from_time_rack",
   "to_time_rack",
   "total_hours_rack",
   "rack_shifting_total_expense",
-  "rack_shifting_total_expense_per_sqft",
+  "labour_cost_in_rack_shift",
   "cb52",
   "workstation",
   "total_rack_shift_expense",
   "rack_shifting_additional_cost",
   "strapping_cost_per_sqft",
   "strapping_cost",
+  "rack_shifting_total_expense_per_sqft",
   "rack_shift_ware_section",
   "rack_shift_source_warehouse",
   "column_break_65",
@@ -204,9 +210,9 @@
   {
    "fieldname": "operation",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": " Operation",
-   "options": "Operation",
-   "reqd": 1
+   "options": "Operation"
   },
   {
    "fieldname": "section_break_1",
@@ -768,12 +774,52 @@
    "fieldname": "total_setting_oil_qty",
    "fieldtype": "Float",
    "label": "Total Setting Oil Qty"
+  },
+  {
+   "default": "1",
+   "fieldname": "no_of_item_in_process",
+   "fieldtype": "Int",
+   "label": "No of Item in Process"
+  },
+  {
+   "depends_on": "eval:doc.no_of_item_in_process > 1",
+   "description": "Total Hours ",
+   "fieldname": "total_working_hrs",
+   "fieldtype": "Float",
+   "label": "Total Working Hrs",
+   "mandatory_depends_on": "eval:doc.no_of_item_in_process > 1"
+  },
+  {
+   "fetch_from": "work_station.ts_sum_of_operator_wages",
+   "fieldname": "operators_cost_in_manufacture",
+   "fieldtype": "Float",
+   "label": "Operators Cost"
+  },
+  {
+   "fetch_from": "work_station.cal_wages1",
+   "fieldname": "labour_cost_in_manufacture",
+   "fieldtype": "Float",
+   "label": "Labour Cost"
+  },
+  {
+   "fetch_from": "workstation.ts_sum_of_operator_wages",
+   "fieldname": "operators_cost_in_rack_shift",
+   "fieldtype": "Float",
+   "label": "Operators Cost",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "workstation.cal_wages1",
+   "fieldname": "labour_cost_in_rack_shift",
+   "fieldtype": "Float",
+   "label": "Labour Cost",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-08 19:40:40.597597",
+ "modified": "2022-08-09 16:28:18.270377",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
