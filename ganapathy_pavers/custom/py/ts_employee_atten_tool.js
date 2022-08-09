@@ -123,7 +123,7 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
             } 
     },
    
-    date:function(frm, cdt,cdn){
+    update_checkin:function(frm, cdt,cdn){
         for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
             let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
             if(cur_frm.doc.update_empty_fields && data.check_in){
@@ -131,7 +131,7 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
             }
            frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_in", cur_frm.doc.date)
     }},
-    checkout_time:function(frm, cdt,cdn){
+    update_checkout:function(frm, cdt,cdn){
         for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
             let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
             if(cur_frm.doc.update_empty_fields && data.check_out){

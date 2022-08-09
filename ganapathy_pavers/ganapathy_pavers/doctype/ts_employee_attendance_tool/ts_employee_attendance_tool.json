@@ -14,7 +14,9 @@
   "column_break_3",
   "branch",
   "date",
+  "update_checkin",
   "checkout_time",
+  "update_checkout",
   "update_empty_fields",
   "help_session_section",
   "employee",
@@ -177,12 +179,22 @@
    "label": "Machine",
    "options": "Machine",
    "set_only_once": 1
+  },
+  {
+   "fieldname": "update_checkin",
+   "fieldtype": "Button",
+   "label": "Update Checkin"
+  },
+  {
+   "fieldname": "update_checkout",
+   "fieldtype": "Button",
+   "label": "Update Checkout"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-09 11:47:05.757631",
+ "modified": "2022-08-09 15:39:00.914955",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Attendance Tool",
