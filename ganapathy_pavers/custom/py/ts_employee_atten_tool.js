@@ -1,6 +1,16 @@
 var change_value=1, delete_value=1;
 frappe.ui.form.on('TS Employee Attendance Tool',{
     onload: async function(frm){
+        frappe.realtime.on('ts_clear_dialogs', async function(){
+            while(cur_dialog){
+                if(cur_dialog.title == "Confirm" && cur_frm.doctype == 'TS Employee Attendance Tool'){
+                    await cur_dialog.hide()
+                }
+                else{
+                    break
+                }
+            }
+        })
         await frappe.db.get_single_value('Attendance Tool Settings', 'change_confirm').then( async value => {
             change_value = value;
         })
