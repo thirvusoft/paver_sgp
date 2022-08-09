@@ -239,6 +239,7 @@ doctype_js = {
 				"Purchase Receipt":"/custom/js/purchase_receipt.js",
 				"Workstation":["/custom/js/workstation.js","/custom/js/ts_operator.js"],
 				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
+				"Employee":"/custom/js/employee.js",
 				"Delivery Note":"/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
 				"Vehicle Log":[

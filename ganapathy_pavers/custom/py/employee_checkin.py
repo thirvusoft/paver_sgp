@@ -1,5 +1,4 @@
 import frappe
-from frappe.utils import date_diff
 from frappe.utils.data import time_diff_in_hours
 def check_in_out(self, event):
     emp_checkin_hours=frappe.get_all('Employee Checkin', 
@@ -25,13 +24,7 @@ def check_in_out(self, event):
     return ot_hours_cal(self, float(hours))
 
 def ot_hours_cal(self, hours):
-    if hours==8.0:
-        frappe.set_value(self.doctype, self.name, "one_day_hours",  '8.0')
-        frappe.set_value(self.doctype, self.name,"full_day_workings",  '1')
-    if (hours<8.0):
-        frappe.set_value(self.doctype, self.name, "one_day_hours",  hours)
-    if (hours>8.0):
-        day_ot=hours - 8.0
-        frappe.set_value(self.doctype, self.name, "ot_hours",  day_ot)
-        frappe.set_value(self.doctype, self.name, "one_day_hours",  '8.0')
-        frappe.set_value(self.doctype, self.name, "full_day_workings",  '1')
+    day_ot=hours % 8.0
+    frappe.db.set_value(self.doctype, self.name, "ot_hours",  day_ot)
+    frappe.db.set_value(self.doctype, self.name, "one_day_hours",  (hours//8)*8)
+    frappe.db.set_value(self.doctype, self.name, "full_day_workings",  hours//8)

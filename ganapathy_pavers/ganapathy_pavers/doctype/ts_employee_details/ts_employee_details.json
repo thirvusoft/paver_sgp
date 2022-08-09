@@ -9,11 +9,13 @@
   "employee",
   "employee_name",
   "location",
+  "machine",
   "check_in",
   "check_out"
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "employee",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -22,6 +24,7 @@
    "options": "Employee"
   },
   {
+   "columns": 1,
    "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
@@ -31,29 +34,40 @@
    "read_only": 1
   },
   {
+   "columns": 2,
    "fieldname": "check_in",
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Check In"
   },
   {
+   "columns": 2,
    "fieldname": "check_out",
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Check Out"
   },
   {
+   "columns": 1,
    "fieldname": "location",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Location",
    "options": "Location"
+  },
+  {
+   "columns": 1,
+   "fieldname": "machine",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Machine",
+   "options": "Machine"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-08-08 19:07:08.710001",
+ "modified": "2022-08-09 12:28:27.922428",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Details",

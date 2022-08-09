@@ -19,6 +19,20 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
                 }
             })
         }
+        frm.set_query('machine', function(frm){
+            return {
+                filters: {
+                    'location': cur_frm.doc.location
+                }
+            }
+        })
+        frm.set_query('machine', 'employee_detail', function(frm, cdt, cdn){
+            return {
+                filters: {
+                    'location': locals[cdt][cdn].location
+                }
+            }
+        })
     },
     onload_post_render: async function(frm){
         let table = (cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:[])
@@ -60,6 +74,9 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
         get_data(frm, cdt, cdn)
     },
     company:function(frm, cdt, cdn){
+        get_data(frm, cdt, cdn)
+    },
+    machine:function(frm, cdt, cdn){
         get_data(frm, cdt, cdn)
     },
     before_submit: async function(){
@@ -153,6 +170,7 @@ function get_data(frm, cdt, cdn){
         args:{
             designation: cur_frm.doc.designation,
             location: cur_frm.doc.location,
+            machine: cur_frm.doc.machine,
             branch: cur_frm.doc.branch,
             company: cur_frm.doc.company
         },
@@ -165,6 +183,7 @@ function get_data(frm, cdt, cdn){
                 frappe.model.set_value(child.doctype, child.name, "check_out", cur_frm.doc.checkout_time)
                 frappe.model.set_value(child.doctype, child.name, "employee_name", r.message[i]["employee_name"])
                 frappe.model.set_value(child.doctype, child.name, "location", r.message[i]["location"])
+                frappe.model.set_value(child.doctype, child.name, "machine", r.message[i]["machine"])
                 if (frm.doc.designation == "Labour Worker"){
                     frappe.model.set_value(child.doctype, child.name, "payment_method",'Deduct from Salary')
                 }
@@ -223,7 +242,7 @@ async function change_checkin(frm,cdt,cdn, logtype){
 
 async function not_permitted(frm, cdt, cdn){
     let row = locals[cdt][cdn]
-    let emp_name=row.employee, employee_name=row.employee_name, checkin=row.check_in, checkout=row.check_out, location=row.location;
+    let emp_name=row.employee, employee_name=row.employee_name, checkin=row.check_in, checkout=row.check_out, location=row.location, machine=row.machine;
     let idx= row.idx
     if(row.employee && !cur_frm.is_new()){
         await frappe.call({
@@ -246,6 +265,7 @@ async function not_permitted(frm, cdt, cdn){
                                 new_row.check_in=checkin
                                 new_row.check_out=checkout
                                 new_row.location=location
+                                new_row.machine=machine
                             })
                         }
                     }
@@ -267,6 +287,7 @@ frappe.ui.form.on('TS Employee Details', {
         if(data.employee){
             frappe.db.get_doc('Employee', data.employee).then((doc) => {
                 frappe.model.set_value(cdt, cdn, 'location', doc.location)
+                frappe.model.set_value(cdt, cdn, 'machine', doc.machine)
             })
         }
         else{

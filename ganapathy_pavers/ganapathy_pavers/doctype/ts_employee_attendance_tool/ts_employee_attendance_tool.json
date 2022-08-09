@@ -10,6 +10,7 @@
   "company",
   "designation",
   "location",
+  "machine",
   "column_break_3",
   "branch",
   "date",
@@ -169,12 +170,19 @@
    "fieldname": "update_selected_checkouts",
    "fieldtype": "Button",
    "label": "Update selected checkouts"
+  },
+  {
+   "fieldname": "machine",
+   "fieldtype": "Link",
+   "label": "Machine",
+   "options": "Machine",
+   "set_only_once": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-08 18:35:45.694698",
+ "modified": "2022-08-09 11:47:05.757631",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Attendance Tool",
