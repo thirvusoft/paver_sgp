@@ -22,14 +22,19 @@ frappe.ui.form.on('Material Manufacturing', {
 		}
 	},
 	item_to_manufacture: function(frm){
-		const find = frm.doc.item_to_manufacture.split("-");
-		if(find[1] == "SHOT BLAST"){
-			cur_frm.set_value("is_shot_blasting",1)
-		}
-		else{
-			cur_frm.set_value("is_shot_blasting",0)
-		}
-	},
+         const find = frm.doc.item_to_manufacture.split("-");
+         if(find[1] == "SHOT BLAST"){
+             cur_frm.set_value("is_shot_blasting",1)
+         }
+         else{
+             cur_frm.set_value("is_shot_blasting",0)
+         }
+         frappe.db.get_list("BOM", {filters:{"item":frm.doc.item_to_manufacture,"is_default":1,"docstatus":1,"is_active":1},fields:["name"]}).then((r)=>{ 
+			if(r.length != 0){
+                 cur_frm.set_value("bom_no",r[0].name)
+             }
+         })
+    },
 	is_shot_blasting: function(frm){
 		if(frm.doc.is_shot_blasting == 1){
 			default_value("default_curing_target_warehouse_for_setting","curing_target_warehouse")
@@ -159,6 +164,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		std_item(frm)
 		item_adding(frm)
 		var total_bundle = 0
+		if(frm.doc.items)
 		for(var i=0;i<frm.doc.items.length;i++){
 			total_bundle += frm.doc.items[i].amount
 			if(frm.doc.items[i].amount == 0){
@@ -298,7 +304,7 @@ frappe.ui.form.on('Material Manufacturing', {
 			return {
 				"filters": {
 					item:frm.doc.item_to_manufacture,
-					is_default:1
+					is_active:1
 				}
 			}
 		})
