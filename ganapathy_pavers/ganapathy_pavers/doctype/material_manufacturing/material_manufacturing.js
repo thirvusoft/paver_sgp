@@ -117,6 +117,7 @@ frappe.ui.form.on('Material Manufacturing', {
 					operators_cost : frm.doc.operators_cost_in_manufacture,
 					labour_cost : frm.doc.labour_cost_in_manufacture,
 					tot_work_hrs: frm.doc.ts_total_hours,
+					tot_item: frm.doc.no_of_item_in_process,
 					tot_hrs : frm.doc.total_working_hrs,
 				},
 				callback(r){
@@ -133,6 +134,7 @@ frappe.ui.form.on('Material Manufacturing', {
 					operators_cost : frm.doc.operators_cost_in_manufacture,
 					labour_cost : frm.doc.labour_cost_in_manufacture,
 					tot_work_hrs: frm.doc.total_hours_rack,
+					tot_item: frm.doc.no_of_item_in_process,
 					tot_hrs : frm.doc.total_working_hrs,
 				},
 				callback(r){
