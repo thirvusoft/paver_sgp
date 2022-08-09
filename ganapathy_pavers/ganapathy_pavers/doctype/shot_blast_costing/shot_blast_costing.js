@@ -92,7 +92,6 @@ frappe.ui.form.on('Shot Blast Items', {
 		var total_damage_sqft = 0
 		for(var i=0;i<frm.doc.items.length;i++){
 			total_damage_sqft += frm.doc.items[i].damages_in_sqft
-			console.log(frm.doc.items[i].damages_in_sqft)
 		}
 		cur_frm.set_value("total_damage_sqft",total_damage_sqft)
 		cur_frm.set_value("avg_damage_sqft",total_damage_sqft/frm.doc.items.length)
