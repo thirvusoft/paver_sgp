@@ -16,14 +16,21 @@ frappe.ui.form.on('Shot Blast Costing', {
 		make_stock_entry(frm)
 	},
 	setup: function(frm){
-		frappe.db.get_single_value("USB Setting","default_curing_target_warehouse").then(value =>{
+		if(cur_frm.is_new() == 1){
+			console.log("hii")
+			frappe.db.get_single_value("USB Setting","default_curing_target_warehouse").then(value =>{
 			cur_frm.set_value("warehouse", value) 
-		})
-		cur_frm.refresh_field("warehouse");
-		frappe.db.get_single_value("USB Setting","default_curing_target_warehouse_for_setting").then(value =>{
-			cur_frm.set_value("source_warehouse", value) 
-		})
-		cur_frm.refresh_field("source_warehouse");
+			})
+			cur_frm.refresh_field("warehouse");
+			frappe.db.get_single_value("USB Setting","default_curing_target_warehouse_for_setting").then(value =>{
+				cur_frm.set_value("source_warehouse", value) 
+			})
+			cur_frm.refresh_field("source_warehouse");
+			frappe.db.get_single_value("USB Setting","default_shot_blast_workstation").then(value =>{
+				cur_frm.set_value("workstation", value) 
+			})
+			cur_frm.refresh_field("workstation");
+		}
 	},
 	validate: function(frm){	   
 		total(frm) 

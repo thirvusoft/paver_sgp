@@ -4,20 +4,22 @@ var uom_nos = 0
 var uom_bundle = 0
 frappe.ui.form.on('Material Manufacturing', {
 	setup: function(frm){
-		default_value("default_manufacture_operation","operation")
-		default_value("default_rack_shift_workstation","workstation")
-		default_value("default_manufacture_workstation","work_station")
-		default_value("default_manufacture_source_warehouse","source_warehouse")
-		default_value("default_manufacture_target_warehouse","target_warehouse")
-		default_value("default_rack_shift_source_warehouse","rack_shift_source_warehouse")
-		default_value("default_rack_shift_target_warehouse","rack_shift_target_warehouse")
-		default_value("default_curing_source_warehouse","curing_source_warehouse")
-		default_value("default_curing_target_warehouse","curing_target_warehouse")
-		default_value("cement","cement_item")
-		default_value("ggbs","ggbs_item")
-		default_value("chips","chips_item_name")
-		default_value("dust","dust_item_name")
-		default_value("setting_oil","setting_oil_item_name")
+		if(cur_frm.is_new() == 1){
+			default_value("default_manufacture_operation","operation")
+			default_value("default_rack_shift_workstation","workstation")
+			default_value("default_manufacture_workstation","work_station")
+			default_value("default_manufacture_source_warehouse","source_warehouse")
+			default_value("default_manufacture_target_warehouse","target_warehouse")
+			default_value("default_rack_shift_source_warehouse","rack_shift_source_warehouse")
+			default_value("default_rack_shift_target_warehouse","rack_shift_target_warehouse")
+			default_value("default_curing_source_warehouse","curing_source_warehouse")
+			default_value("default_curing_target_warehouse","curing_target_warehouse")
+			default_value("cement","cement_item")
+			default_value("ggbs","ggbs_item")
+			default_value("chips","chips_item_name")
+			default_value("dust","dust_item_name")
+			default_value("setting_oil","setting_oil_item_name")
+		}
 	},
 	item_to_manufacture: function(frm){
 		const find = frm.doc.item_to_manufacture.split("-");

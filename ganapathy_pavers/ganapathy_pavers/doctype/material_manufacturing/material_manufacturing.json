@@ -58,20 +58,21 @@
   "column_break_28",
   "total_expense",
   "total_expense_per_sqft",
+  "section_break_42",
+  "production_qty",
+  "create_stock_entry",
+  "column_break_44",
+  "total_completed_qty",
+  "column_break_46",
+  "damage_qty",
+  "cb_47",
+  "production_sqft",
   "section_break_17",
   "source_warehouse",
   "column_break_32",
   "target_warehouse",
   "column_break_34",
   "stock_entry_type",
-  "section_break_42",
-  "production_qty",
-  "production_sqft",
-  "create_stock_entry",
-  "column_break_44",
-  "total_completed_qty",
-  "column_break_46",
-  "damage_qty",
   "rack_shifting_section",
   "total_no_of_produced_qty",
   "total_no_of_bundle",
@@ -83,14 +84,14 @@
   "from_time_rack",
   "to_time_rack",
   "total_hours_rack",
-  "rack_shifting_total_expense",
+  "total_rack_shift_expense",
   "labour_cost_in_rack_shift",
   "cb52",
   "workstation",
-  "total_rack_shift_expense",
   "rack_shifting_additional_cost",
   "strapping_cost_per_sqft",
   "strapping_cost",
+  "rack_shifting_total_expense",
   "rack_shifting_total_expense_per_sqft",
   "rack_shift_ware_section",
   "rack_shift_source_warehouse",
@@ -100,13 +101,11 @@
   "stock_entry_rack_shift",
   "section_break_51",
   "no_of_bundle",
-  "shot_blasted_bundle",
   "curing_stock_entry",
   "column_break_80",
   "from_time_curing",
   "curing_damaged_qty",
   "to_time_curing",
-  "shot_blast_per_sqft",
   "column_break_82",
   "rate_per_hrs",
   "total_hrs",
@@ -120,6 +119,10 @@
   "curing_target_warehouse",
   "column_break_86",
   "curing_stock_entry_type",
+  "shot_blast_section",
+  "shot_blasted_bundle",
+  "column_break_115",
+  "shot_blast_per_sqft",
   "section_break_98",
   "item_price",
   "section_break_105",
@@ -151,8 +154,10 @@
    "read_only": 1
   },
   {
+   "collapsible": 1,
    "fieldname": "section_break_2",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Raw Materials"
   },
   {
    "fieldname": "column_break_4",
@@ -221,7 +226,8 @@
   {
    "collapsible": 1,
    "fieldname": "section_break_15",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Raw Material Consumption Table"
   },
   {
    "fieldname": "cb_1",
@@ -234,7 +240,6 @@
    "label": "Stock Entry Manufacture"
   },
   {
-   "collapsible": 1,
    "fieldname": "section_break_16",
    "fieldtype": "Section Break",
    "label": "Wroking Time "
@@ -434,7 +439,6 @@
    "label": "Create Stock Entry For Rack Shifting"
   },
   {
-   "collapsible": 1,
    "fieldname": "section_break_51",
    "fieldtype": "Section Break",
    "label": "Curing"
@@ -506,11 +510,10 @@
   {
    "fieldname": "rack_shifting_total_expense",
    "fieldtype": "Data",
-   "label": "Rack Shifting Total Expense",
+   "label": "Total Expense",
    "read_only": 1
   },
   {
-   "collapsible": 1,
    "fieldname": "section_break_30",
    "fieldtype": "Section Break",
    "label": "Total Amount"
@@ -686,18 +689,21 @@
   {
    "fieldname": "batch_no_manufacture",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Batch no Manufacture",
    "options": "Batch"
   },
   {
    "fieldname": "batch_no_rack_shifting",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Batch no Rack Shifting",
    "options": "Batch"
   },
   {
    "fieldname": "batch_no_curing",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Batch no Curing",
    "options": "Batch"
   },
@@ -814,12 +820,25 @@
    "fieldtype": "Float",
    "label": "Labour Cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "cb_47",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shot_blast_section",
+   "fieldtype": "Section Break",
+   "label": "Shot Blast"
+  },
+  {
+   "fieldname": "column_break_115",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-09 16:28:18.270377",
+ "modified": "2022-08-09 17:12:09.369627",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
