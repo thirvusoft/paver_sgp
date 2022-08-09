@@ -143,7 +143,9 @@ doc_events = {
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields",
-		"validate":"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw"
+		"validate":"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
+		"on_update_after_submit": ["ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
+									"ganapathy_pavers.custom.py.sales_order.update_site"]
 	},
 	"Job Card":{
 		"on_submit":"afterganapathy_pavers.ganapathy_pavers.utils.py.jobcard.workstation"
@@ -207,7 +209,8 @@ doc_events = {
 	},
 	"Attendance": {
 		"on_submit": ["ganapathy_pavers.custom.py.employee_checkin.check_in_out",
-                  "ganapathy_pavers.custom.py.employee_atten_tool.update_attendance_to_checkin"],
+                  "ganapathy_pavers.custom.py.employee_atten_tool.update_attendance_to_checkin"
+				],
 		"before_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_attn_cancel_detail"
 	},
 	"TS Employee Attendance Tool": {
@@ -243,7 +246,10 @@ doctype_js = {
 								"/custom/js/vehicle_log_service.js"
 								],
 				"Work Order" : "/utils/js/workorder.js",
-				"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"]
+
+	     		"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
+
+
 			 }
 # Scheduled Tasks
 # ---------------

@@ -13,7 +13,7 @@
  "is_standard": 1,
  "label": "Sales Cycle",
  "links": [],
- "modified": "2022-07-28 16:39:41.478702",
+ "modified": "2022-08-08 10:43:08.794648",
  "modified_by": "admin@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "Sales Cycle",
@@ -55,6 +55,18 @@
    "doc_view": "List",
    "label": "Customer Receivable Summary",
    "link_to": "TS Customer Receivable Summary",
+   "type": "Report"
+  },
+  {
+   "doc_view": "List",
+   "label": "Site Work Completion - Report",
+   "link_to": "Site Work Completion - Report",
+   "type": "Report"
+  },
+  {
+   "doc_view": "List",
+   "label": "Job Worker - Report",
+   "link_to": "Job Worker - Report",
    "type": "Report"
   }
  ],

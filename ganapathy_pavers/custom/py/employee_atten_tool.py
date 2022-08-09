@@ -6,20 +6,18 @@ from datetime import datetime
 
 
 @frappe.whitelist()
-def employee_finder_attendance(designation='', department='', location='', branch='', company=''):
+def employee_finder_attendance(designation='', location='', branch='', company=''):
 	employee_names=[]
 	filters={}
 	if(designation):
 		filters["designation"]=designation
-	if(department):
-		filters['department']=department
 	if(location):
 		filters['location']=location
 	if(branch):
 		filters['branch']=branch
 	if(company):
 		filters['company']=company
-	a=frappe.db.get_all("Employee",filters=filters,fields=["name", "employee_name", 'department'], order_by='employee_name')
+	a=frappe.db.get_all("Employee",filters=filters,fields=["name", "employee_name", 'location'], order_by='employee_name')
 	for name in a:
 		employee_names.append(name)
 	return employee_names
@@ -55,8 +53,8 @@ def check_in(table_list, ts_name):
 	table_list=json.loads(table_list)
 	for i in table_list:
 		if(i.get('check_in') and i.get('employee')):
-			if(i.get('department')):
-				update_dept(i.get('employee'), i.get('department'))
+			if(i.get('location')):
+				update_dept(i.get('employee'), i.get('location'))
 			if(frappe.get_all("Employee Checkin",filters={'employee':i.get("employee"),'time':i.get('check_in'), 'ts_emp_att_tool_name':ts_name})):
 				pass
 			else:
@@ -84,8 +82,8 @@ def check_in(table_list, ts_name):
 					doc.save()
 		
 		if(i.get('check_out') and i.get('employee')):
-			if(i.get('department')):
-				update_dept(i.get('employee'), i.get('department'))
+			if(i.get('location')):
+				update_dept(i.get('employee'), i.get('location'))
 			if(frappe.get_all("Employee Checkin",filters={'employee':i.get("employee"),'time':i.get('check_out'), 'ts_emp_att_tool_name':ts_name})):
 				pass
 			else:
@@ -133,6 +131,7 @@ def attendance(table_list, company, ts_name):
 				'employee':i.get("employee"),
 				'status':"Present",
 				'attendance_date': i.get('check_in'),
+				'location': i.get('location'),
 				'company': company if(company) else doc1.default_company,
 				'ts_employee_attendance_tool': ts_name
 			})
@@ -184,11 +183,11 @@ def fill_attn_cancel_detail(self, event):
 			if i.employee_name ==self.employee:
 				i.attendance=self.name
 				i.working_hrs=self.working_hours
-				i.department=self.department
+				i.location=self.location
 				emp=True
 			cancel_list.append(i)
 		if(not emp):
-			cancel_list.append({'employee_name':self.employee, 'attendance': self.name, 'working_hrs': self.working_hours, 'department': self.department})
+			cancel_list.append({'employee_name':self.employee, 'attendance': self.name, 'working_hrs': self.working_hours, 'location': self.location})
 		doc.update({
 			'ts_emp_checkin':cancel_list
 		})
@@ -216,11 +215,11 @@ def row_delete(employee, name):
         return 1
 
 
-def update_dept(employee, dept):
+def update_dept(employee, location):
 	emp_doc=frappe.get_doc('Employee', employee)
-	if(emp_doc.department!=dept):
+	if(emp_doc.location!=location):
 		emp_doc.update({
-			'department': dept
+			'location': location
 		})
 		emp_doc.flags.ignore_mandatory=True
 		emp_doc.save()
@@ -250,18 +249,18 @@ def validate_empty_field(employee_detail):
 def day_wise_department(self, event):
 	if(self.date):
 		date=datetime.strptime(str(self.date), "%Y-%m-%d %H:%M:%S").date()
-		filters={'date': ['between', [date, date]], 'docstatus':1}
-		if(self.department):
-			filters['department']=self.department
+		filters={'date': ['between', [date, date]], 'docstatus':['!=', 2]}
+		if(self.name in frappe.get_all(self.doctype, pluck = 'name')):
+			filters['name'] = ['!=', self.name]
 		if(self.designation):
 			filters['designation']=self.designation
 		if(self.branch):
 			filters['branch']=self.branch
 		if(self.location):
 			filters['location']=self.location
-		docs=frappe.get_all('TS Employee Attendance Tool', filters)
+		docs=frappe.get_all('TS Employee Attendance Tool', filters ,pluck='name')
 		if(docs):
-			frappe.throw(f'Attendance tool already exist for this date for{(" "+frappe.bold(self.department)) if self.department else ""}{(" "+frappe.bold(self.designation)) if self.designation else ""}{(" "+frappe.bold(self.branch)) if self.branch else ""}{(" "+frappe.bold(self.location)) if self.location else ""}')
+			frappe.throw(f'Attendance tool already exist for this date {frappe.utils.csvutils.getlink("TS Employee Attendance Tool", docs[0])} for{(" "+frappe.bold(self.designation)) if self.designation else ""}{(" "+frappe.bold(self.branch)) if self.branch else ""}{(" "+frappe.bold(self.location)) if self.location else ""}')
 
 
 def doc_cancel(self, event):

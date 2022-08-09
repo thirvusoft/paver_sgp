@@ -680,21 +680,18 @@
   {
    "fieldname": "batch_no_manufacture",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Batch no Manufacture",
    "options": "Batch"
   },
   {
    "fieldname": "batch_no_rack_shifting",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Batch no Rack Shifting",
    "options": "Batch"
   },
   {
    "fieldname": "batch_no_curing",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Batch no Curing",
    "options": "Batch"
   },
@@ -760,6 +757,7 @@
    "options": "Item"
   },
   {
+   "default": "300",
    "description": "per Batch in ml",
    "fieldname": "setting_oil_qty",
    "fieldtype": "Float",
@@ -775,7 +773,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-07 10:16:32.670725",
+ "modified": "2022-08-08 19:40:40.597597",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

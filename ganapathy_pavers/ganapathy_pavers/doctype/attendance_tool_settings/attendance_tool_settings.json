@@ -1,0 +1,48 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-08-08 20:13:17.277039",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "change_confirm",
+  "delete_confirm"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "change_confirm",
+   "fieldtype": "Check",
+   "label": "Show confirm message on changing time"
+  },
+  {
+   "default": "1",
+   "fieldname": "delete_confirm",
+   "fieldtype": "Check",
+   "label": "Show confirm message on deleting row"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-08-08 20:13:35.632673",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Attendance Tool Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
