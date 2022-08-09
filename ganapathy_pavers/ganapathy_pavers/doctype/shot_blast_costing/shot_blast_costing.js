@@ -17,7 +17,6 @@ frappe.ui.form.on('Shot Blast Costing', {
 	},
 	setup: function(frm){
 		if(cur_frm.is_new() == 1){
-			console.log("hii")
 			frappe.db.get_single_value("USB Setting","default_curing_target_warehouse").then(value =>{
 			cur_frm.set_value("warehouse", value) 
 			})
