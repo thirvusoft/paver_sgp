@@ -43,6 +43,7 @@
   "total_setting_oil_qty",
   "items_section",
   "items",
+  "total_raw_material",
   "section_break_16",
   "from_time",
   "column_break_18",
@@ -833,12 +834,17 @@
   {
    "fieldname": "column_break_115",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_raw_material",
+   "fieldtype": "Float",
+   "label": "Total Raw Material"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-09 17:12:09.369627",
+ "modified": "2022-08-09 17:33:43.651472",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

@@ -163,6 +163,7 @@ frappe.ui.form.on('Material Manufacturing', {
 				frappe.throw("Kindly Enter Rate in Item Table")
 			}
 		}
+		cur_frm.set_value('total_raw_material', total_bundle);
 		if(frm.doc.setting_oil_item_name){
 			cur_frm.set_value('total_setting_oil_qty',(frm.doc.raw_material_consumption.length*frm.doc.setting_oil_qty)/1000)
 		  }
