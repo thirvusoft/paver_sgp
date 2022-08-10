@@ -31,6 +31,8 @@
   "default_manufacture_workstation",
   "column_break_21",
   "default_rack_shift_workstation",
+  "column_break_26",
+  "default_shot_blast_workstation",
   "default_item_section",
   "chips",
   "dust",
@@ -140,6 +142,7 @@
   {
    "fieldname": "default_manufacture_operation",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Default Manufacture Operation",
    "options": "Operation"
   },
@@ -216,12 +219,22 @@
    "fieldtype": "Link",
    "label": "Setting Oil",
    "options": "Item"
+  },
+  {
+   "fieldname": "column_break_26",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_shot_blast_workstation",
+   "fieldtype": "Link",
+   "label": "Default Shot Blast Workstation",
+   "options": "Workstation"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-08-08 09:00:24.190446",
+ "modified": "2022-08-09 16:43:43.287255",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "USB Setting",

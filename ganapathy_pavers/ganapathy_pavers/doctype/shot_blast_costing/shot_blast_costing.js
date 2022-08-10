@@ -16,14 +16,20 @@ frappe.ui.form.on('Shot Blast Costing', {
 		make_stock_entry(frm)
 	},
 	setup: function(frm){
-		frappe.db.get_single_value("USB Setting","default_curing_target_warehouse").then(value =>{
+		if(cur_frm.is_new() == 1){
+			frappe.db.get_single_value("USB Setting","default_curing_target_warehouse").then(value =>{
 			cur_frm.set_value("warehouse", value) 
-		})
-		cur_frm.refresh_field("warehouse");
-		frappe.db.get_single_value("USB Setting","default_curing_target_warehouse_for_setting").then(value =>{
-			cur_frm.set_value("source_warehouse", value) 
-		})
-		cur_frm.refresh_field("source_warehouse");
+			})
+			cur_frm.refresh_field("warehouse");
+			frappe.db.get_single_value("USB Setting","default_curing_target_warehouse_for_setting").then(value =>{
+				cur_frm.set_value("source_warehouse", value) 
+			})
+			cur_frm.refresh_field("source_warehouse");
+			frappe.db.get_single_value("USB Setting","default_shot_blast_workstation").then(value =>{
+				cur_frm.set_value("workstation", value) 
+			})
+			cur_frm.refresh_field("workstation");
+		}
 	},
 	validate: function(frm){	   
 		total(frm) 
@@ -67,7 +73,7 @@ frappe.ui.form.on('Shot Blast Items', {
 			frappe.db.get_value("Item", {"name": r.item_to_manufacture},"pavers_per_sqft", (sqft) => {
 				frappe.model.set_value(cdt,cdn,"damages_in_sqft",row.damages_in_nos/sqft.pavers_per_sqft)                
 			});                
-		});           
+		});         
 	},
 	bundle_taken: function(frm,cdt,cdn){
 		var row= locals[cdt][cdn]   
@@ -82,8 +88,14 @@ frappe.ui.form.on('Shot Blast Items', {
 		var row= locals[cdt][cdn]   
 		total(frm) 
 	},
-	
-
+	damages_in_sqft: function(frm,cdt,cdn){
+		var total_damage_sqft = 0
+		for(var i=0;i<frm.doc.items.length;i++){
+			total_damage_sqft += frm.doc.items[i].damages_in_sqft
+		}
+		cur_frm.set_value("total_damage_sqft",total_damage_sqft)
+		cur_frm.set_value("avg_damage_sqft",total_damage_sqft/frm.doc.items.length)
+	},
 });
 function total(frm){
 	var total_bundle = 0
