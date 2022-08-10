@@ -9,5 +9,10 @@ frappe.ui.form.on('Attendance Tool Settings', {
 				frappe.show_alert({message: 'All Prompts are Cleared.'})
 			}
 		})
+	},
+	after_save: function(frm){
+		frappe.call({
+			method: "ganapathy_pavers.ganapathy_pavers.doctype.attendance_tool_settings.attendance_tool_settings.after_save",
+		})
 	}
 });

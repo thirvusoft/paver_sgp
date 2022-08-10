@@ -120,8 +120,9 @@ def std_item(doc):
 
 @frappe.whitelist()
 def item_data(item_code):
-    item_code,stock_uom,valuation_rate = frappe.get_value("Item",item_code,['item_code','stock_uom','valuation_rate'])
-    return item_code,stock_uom,valuation_rate
+    if(item_code):
+        item_code,stock_uom,valuation_rate = frappe.get_value("Item",item_code,['item_code','stock_uom','valuation_rate'])
+        return item_code,stock_uom,valuation_rate
 @frappe.whitelist()
 def make_stock_entry(doc,type):
     doc=json.loads(doc)
