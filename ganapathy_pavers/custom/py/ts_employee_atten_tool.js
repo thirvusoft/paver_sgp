@@ -11,6 +11,14 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
                 }
             }
         })
+        frappe.realtime.on('ts_update_settings', async function(){
+            await frappe.db.get_single_value('Attendance Tool Settings', 'change_confirm').then( async value => {
+                change_value = value;
+            })
+            await frappe.db.get_single_value('Attendance Tool Settings', 'delete_confirm').then( async value => {
+                delete_value = value;
+            })
+        })
         await frappe.db.get_single_value('Attendance Tool Settings', 'change_confirm').then( async value => {
             change_value = value;
         })

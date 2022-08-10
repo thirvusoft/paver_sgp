@@ -8,5 +8,9 @@ class AttendanceToolSettings(Document):
 	pass
 
 @frappe.whitelist()
+def after_save():
+	frappe.publish_realtime('ts_update_settings')
+
+@frappe.whitelist()
 def clear_dialogs():
 	frappe.publish_realtime('ts_clear_dialogs')

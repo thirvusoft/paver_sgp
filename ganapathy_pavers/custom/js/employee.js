@@ -3,7 +3,7 @@ frappe.ui.form.on('Employee', {
         frm.set_query('machine', function(frm){
             return {
                 filters: {
-                    'location': frm.doc.location
+                    'location': cur_frm.doc.location
                 }
             }
         })

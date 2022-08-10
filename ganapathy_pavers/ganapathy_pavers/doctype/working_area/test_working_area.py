@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestMachine(unittest.TestCase):
+class TestWorkingArea(unittest.TestCase):
 	pass
