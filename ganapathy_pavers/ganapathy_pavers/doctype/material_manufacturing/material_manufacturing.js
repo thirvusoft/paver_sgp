@@ -80,10 +80,10 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense) 
 	},
 	rack_shifting_additional_cost: function(frm){
-		cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost) 
+		cur_frm.set_value('rack_shifting_total_expense1', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost) 
 	},
 	strapping_cost: function(frm){
-		cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost) 
+		cur_frm.set_value('rack_shifting_total_expense1', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost) 
 	},
 	production_qty: function(frm){
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty) 
@@ -144,7 +144,7 @@ frappe.ui.form.on('Material Manufacturing', {
 				},
 				callback(r){
 					cur_frm.set_value('total_rack_shift_expense', (r.message[0]*frm.doc.total_hours_rack)+r.message[1]);
-					cur_frm.set_value('rack_shifting_total_expense', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost);
+					cur_frm.set_value('rack_shifting_total_expense1', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost);
 				}
 			})
 		}
@@ -177,9 +177,9 @@ frappe.ui.form.on('Material Manufacturing', {
 		  }
 		cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft*frm.doc.production_sqft);
 		cur_frm.set_value('total_expense_per_sqft', (total_bundle+frm.doc.total_expense)/frm.doc.production_sqft);
-		cur_frm.set_value('rack_shifting_total_expense_per_sqft', (frm.doc.rack_shifting_total_expense)/frm.doc.production_sqft);
+		cur_frm.set_value('rack_shifting_total_expense1_per_sqft', (frm.doc.rack_shifting_total_expense1)/frm.doc.production_sqft);
 		cur_frm.set_value('labour_cost_per_sqft', frm.doc.labour_cost/frm.doc.production_sqft);
-		cur_frm.set_value('item_price', frm.doc.total_expense_per_sqft+frm.doc.rack_shifting_total_expense_per_sqft+frm.doc.labour_cost_per_sqft+frm.doc.shot_blast_per_sqft);
+		cur_frm.set_value('item_price', frm.doc.total_expense_per_sqft+frm.doc.rack_shifting_total_expense1_per_sqft+frm.doc.labour_cost_per_sqft+frm.doc.shot_blast_per_sqft);
 		}
 	},
 	bom_no: function(frm){
