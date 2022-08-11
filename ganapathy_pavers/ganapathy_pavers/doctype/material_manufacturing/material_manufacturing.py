@@ -88,41 +88,41 @@ def std_item(doc):
     doc=json.loads(doc)
     if doc.get('cement_item') and doc.get('total_no_of_cement'):
         row={}
-        row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['cement_item'],['item_code','stock_uom','stock_uom','valuation_rate'])
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['cement_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_cement')
-        row['amount']=doc.get('total_no_of_cement')*row['rate']
+        row['amount']=doc.get('total_no_of_cement')*row['rate'] or row['validation_rate']
         items.append(row)
     if doc.get('ggbs_item') and doc.get('total_no_of_cement'):
         row={}
-        row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['ggbs_item'],['item_code','stock_uom','stock_uom','valuation_rate'])
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['ggbs_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_ggbs2')
-        row['amount']=doc.get('total_no_of_cement')*row['rate']
+        row['amount']=doc.get('total_no_of_cement')*row['rate'] or row['validation_rate']
         items.append(row)
     if doc.get('chips_item_name') and doc.get('total_no_of_chips'):
         row={}
-        row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['chips_item_name'],['item_code','stock_uom','stock_uom','valuation_rate'])
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['chips_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_chips')
-        row['amount']=doc.get('total_no_of_chips')*row['rate']
+        row['amount']=doc.get('total_no_of_chips')*row['rate'] or row['validation_rate']
         items.append(row)
     if doc.get('dust_item_name') and doc.get('total_no_of_dust'):
         row={}
-        row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['dust_item_name'],['item_code','stock_uom','stock_uom','valuation_rate'])
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['dust_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_dust')
-        row['amount']=doc.get('total_no_of_dust')*row['rate']
+        row['amount']=doc.get('total_no_of_dust')*row['rate'] or row['validation_rate']
         items.append(row)
     if doc.get('setting_oil_item_name') and doc.get('total_setting_oil_qty'):
         row={}
-        row['item_code'],row['stock_uom'],row['uom'],row['rate'] = frappe.get_value("Item",doc['setting_oil_item_name'],['item_code','stock_uom','stock_uom','valuation_rate'])
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['setting_oil_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_setting_oil_qty')
-        row['amount']=doc.get('total_setting_oil_qty')*row['rate']
+        row['amount']=doc.get('total_setting_oil_qty')*row['rate'] or row['validation_rate']
         items.append(row)
     return items
 
 @frappe.whitelist()
 def item_data(item_code):
     if(item_code):
-        item_code,stock_uom,valuation_rate = frappe.get_value("Item",item_code,['item_code','stock_uom','valuation_rate'])
-        return item_code,stock_uom,valuation_rate
+        item_code,stock_uom,last_purchase_rate,valuation_rate = frappe.get_value("Item",item_code,['item_code','stock_uom','last_purchase_rate','valuation_rate'])
+        return item_code,stock_uom,last_purchase_rate or valuation_rate
 @frappe.whitelist()
 def make_stock_entry(doc,type):
     doc=json.loads(doc)

@@ -175,6 +175,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		if(frm.doc.setting_oil_item_name){
 			cur_frm.set_value('total_setting_oil_qty',(frm.doc.raw_material_consumption.length*frm.doc.setting_oil_qty)/1000)
 		  }
+		cur_frm.set_value('labour_cost_manufacture',frm.doc.labour_cost_in_manufacture*frm.doc.ts_total_hours)
 		cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft*frm.doc.production_sqft);
 		cur_frm.set_value('total_expense_per_sqft', (total_bundle+frm.doc.total_expense)/frm.doc.production_sqft);
 		cur_frm.set_value('rack_shifting_total_expense1_per_sqft', (frm.doc.rack_shifting_total_expense1)/frm.doc.production_sqft);
@@ -419,7 +420,12 @@ function std_item(frm){
 								row.qty = d.qty;
 								row.stock_uom = d.stock_uom;
 								row.uom = d.uom;
-								row.rate = d.rate;
+								if(d.rate == 0){
+									row.rate = d.validation_rate;
+								}
+								else{
+									row.rate = d.rate;
+								}
 								row.amount= d.amount
 							}
 						}

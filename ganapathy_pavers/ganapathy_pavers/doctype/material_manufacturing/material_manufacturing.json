@@ -53,6 +53,7 @@
   "section_break_30",
   "operators_cost_in_manufacture",
   "labour_cost_in_manufacture",
+  "labour_cost_manufacture",
   "column_break_26",
   "total_manufacturing_expense",
   "additional_cost",
@@ -287,7 +288,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fetch_from": "operation.workstation",
    "fieldname": "work_station",
    "fieldtype": "Link",
    "label": "Workstation",
@@ -805,6 +805,7 @@
    "fetch_from": "work_station.cal_wages1",
    "fieldname": "labour_cost_in_manufacture",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Labour Cost"
   },
   {
@@ -838,12 +839,17 @@
    "fieldname": "total_raw_material",
    "fieldtype": "Currency",
    "label": "Total Raw Material"
+  },
+  {
+   "fieldname": "labour_cost_manufacture",
+   "fieldtype": "Float",
+   "label": "Labour Cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-11 09:44:46.581651",
+ "modified": "2022-08-11 22:43:36.163799",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
