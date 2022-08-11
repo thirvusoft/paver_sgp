@@ -92,8 +92,8 @@
   "rack_shifting_additional_cost",
   "strapping_cost_per_sqft",
   "strapping_cost",
-  "rack_shifting_total_expense",
-  "rack_shifting_total_expense_per_sqft",
+  "rack_shifting_total_expense1",
+  "rack_shifting_total_expense1_per_sqft",
   "rack_shift_ware_section",
   "rack_shift_source_warehouse",
   "column_break_65",
@@ -216,8 +216,7 @@
   {
    "fieldname": "operation",
    "fieldtype": "Link",
-   "hidden": 1,
-   "label": " Operation",
+   "label": " Machine",
    "options": "Operation"
   },
   {
@@ -298,7 +297,7 @@
   {
    "fieldname": "ts_total_hours",
    "fieldtype": "Float",
-   "label": "Total Hours",
+   "label": "Manufacturing Hours",
    "read_only": 1
   },
   {
@@ -487,7 +486,7 @@
   {
    "fieldname": "total_hours_rack",
    "fieldtype": "Float",
-   "label": "Total Hours",
+   "label": "Rack Shifting Hours",
    "read_only": 1
   },
   {
@@ -509,7 +508,7 @@
    "label": "Rack Shifting Additional Cost"
   },
   {
-   "fieldname": "rack_shifting_total_expense",
+   "fieldname": "rack_shifting_total_expense1",
    "fieldtype": "Data",
    "label": "Total Expense",
    "read_only": 1
@@ -537,7 +536,7 @@
   },
   {
    "fieldname": "labour_cost",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Labour Cost"
   },
   {
@@ -662,7 +661,7 @@
   {
    "fieldname": "total_hrs",
    "fieldtype": "Float",
-   "label": "Total Hrs"
+   "label": "Curing Hrs"
   },
   {
    "fieldname": "column_break_80",
@@ -733,13 +732,13 @@
    "label": "Total Expense per Sqft"
   },
   {
-   "fieldname": "rack_shifting_total_expense_per_sqft",
+   "fieldname": "rack_shifting_total_expense1_per_sqft",
    "fieldtype": "Float",
    "label": "Total Expense per Sqft"
   },
   {
    "fieldname": "labour_cost_per_sqft",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Labour Cost per Sqft"
   },
   {
@@ -753,7 +752,7 @@
   },
   {
    "fieldname": "item_price",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Item Price"
   },
@@ -837,14 +836,14 @@
   },
   {
    "fieldname": "total_raw_material",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Total Raw Material"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-09 17:33:43.651472",
+ "modified": "2022-08-11 09:44:46.581651",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

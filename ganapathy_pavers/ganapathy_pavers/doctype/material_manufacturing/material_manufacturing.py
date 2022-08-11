@@ -199,7 +199,7 @@ def make_stock_entry(doc,type):
                 t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture"),qty = doc.get("rack_shift_damage_qty"),uom = default_nos,  is_process_loss = 1
                 ))
         stock_entry.append('additional_costs', dict(
-                expense_account	 = expenses_included_in_valuation, amount = doc.get("rack_shifting_total_expense"),description = "In This Labour Cost Added"
+                expense_account	 = expenses_included_in_valuation, amount = doc.get("rack_shifting_total_expense1"),description = "In This Labour Cost Added"
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
