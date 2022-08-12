@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["TS Customer Receivable Summary"] = {
+frappe.query_reports["Delivery Report"] = {
 	"filters": [
 		{
 			"fieldname":"company",
@@ -31,7 +31,8 @@ frappe.query_reports["TS Customer Receivable Summary"] = {
 			"fieldname":"finance_book",
 			"label": __("Finance Book"),
 			"fieldtype": "Link",
-			"options": "Finance Book"
+			"options": "Finance Book",
+			"hidden" : 1
 		},
 		{
 			"fieldname":"party",
@@ -67,7 +68,8 @@ frappe.query_reports["TS Customer Receivable Summary"] = {
 			"fieldname":"payment_terms_template",
 			"label": __("Payment Terms Template"),
 			"fieldtype": "Link",
-			"options": "Payment Terms Template"
+			"options": "Payment Terms Template",
+			"hidden" : 1
 		},
 		{
 			"fieldname":"territory",
@@ -79,13 +81,15 @@ frappe.query_reports["TS Customer Receivable Summary"] = {
 			"fieldname":"sales_partner",
 			"label": __("Sales Partner"),
 			"fieldtype": "Link",
-			"options": "Sales Partner"
+			"options": "Sales Partner",
+			"hidden" : 1
 		},
 		{
 			"fieldname":"sales_person",
 			"label": __("Sales Person"),
 			"fieldtype": "Link",
-			"options": "Sales Person"
+			"options": "Sales Person",
+			"hidden" : 1
 		},
 		{
 			"fieldname":"tax_id",

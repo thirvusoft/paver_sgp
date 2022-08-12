@@ -199,7 +199,7 @@ def update_site(doc, event):
                 completed_area+=item.sqft_allocated
             
             site_work.update({
-                'customer': (doc.customer or '') if(not doc.get('is_multi_customer')) else '',
+                'customer': (doc.zcustomer or '') if(not doc.get('is_multi_customer')) else '',
                 'supervisor': doc.get('supervisor') or '',
                 'supervisor_name': supervisor,
                 'item_details': (site_work.get('item_details') or []) +pavers,

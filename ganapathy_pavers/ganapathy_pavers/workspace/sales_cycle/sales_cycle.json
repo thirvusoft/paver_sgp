@@ -13,8 +13,8 @@
  "is_standard": 1,
  "label": "Sales Cycle",
  "links": [],
- "modified": "2022-08-08 10:43:08.794648",
- "modified_by": "admin@gmail.com",
+ "modified": "2022-08-12 10:13:14.018534",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Sales Cycle",
  "owner": "Administrator",
@@ -53,8 +53,8 @@
   },
   {
    "doc_view": "List",
-   "label": "Customer Receivable Summary",
-   "link_to": "TS Customer Receivable Summary",
+   "label": "Delivery Report",
+   "link_to": "Delivery Report",
    "type": "Report"
   },
   {

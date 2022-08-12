@@ -1,4 +1,57 @@
-make_delivery_note(delivery_dates) {
+if(flt(doc.per_billed)<100) {
+    this.frm.add_custom_button(__('Payment Request'), () => this.make_payment_request(), __('Create'));
+    this.frm.add_custom_button(__('Payment'), () => {
+
+        
+
+        var me = this
+        if(this.frm.doc.is_multi_customer){
+        this.frm.call({
+            method:"ganapathy_pavers.custom.py.sales_order.get_customer_list",
+            args:{
+                'sales_order':me.frm.doc.name
+            },
+            callback: function(r){
+                var dialog = new frappe.ui.Dialog({
+                    title: __('Select a Customer for Delivery Note'),
+                    fields: [{
+                        fieldtype: 'Select',
+                        fieldname: 'customer',
+                        label: __('Customer'),
+                        options: r.message,
+                        reqd:1
+                    }],
+                    primary_action: function() {
+                        me.frm.call({
+                            method: 'ganapathy_pavers.custom.py.sales_order.update_temporary_customer',
+                            args: {
+                                customer: dialog.fields_dict.customer.value,
+                                sales_order: me.frm.doc.name
+                            },
+                            freeze: true,
+                            callback: function(r) {
+                                dialog.hide();
+                                me.make_payment_entry()
+                            }.bind(this)
+                        });
+                    },
+                    primary_action_label: __('Create')
+                });
+                dialog.show();
+            }
+        })
+    }
+    else{
+        this.make_payment_entry()
+    }
+    }, __('Create'));
+}
+
+
+
+
+
+function make_delivery_note(delivery_dates) {
     var me = this
     if(this.frm.doc.is_multi_customer){
     this.frm.call({
@@ -51,9 +104,9 @@ else{
         }
     })
 }
-},
+}
 
- make_sales_invoice() {
+ function make_sales_invoice() {
     var me = this
     if(this.frm.doc.is_multi_customer){
     this.frm.call({
@@ -100,4 +153,4 @@ else{
         frm: this.frm
     })
 }
-},
+}

@@ -73,17 +73,11 @@ class PartyLedgerSummaryReport(object):
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
+				"hidden" : 1
 			},
 			{
 				"label": _("Delivered Amount"),
 				"fieldname": "out_delivery_amount",
-				"fieldtype": "Currency",
-				"options": "currency",
-				"width": 120,
-			},
-			{
-				"label": _("Invoiced Amount"),
-				"fieldname": "invoiced_amount",
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
@@ -103,11 +97,19 @@ class PartyLedgerSummaryReport(object):
 				"width": 120,
 			},
 			{
+				"label": _("Invoiced Amount"),
+				"fieldname": "invoiced_amount",
+				"fieldtype": "Currency",
+				"options": "currency",
+				"width": 120,
+			},
+			{
 				"label": _(credit_or_debit_note),
 				"fieldname": "return_amount",
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
+				"hidden" : 1
 			},
 
 		]
@@ -121,6 +123,7 @@ class PartyLedgerSummaryReport(object):
 					"options": "currency",
 					"width": 120,
 					"is_adjustment": 1,
+					"hidden" : 1
 				}
 			)
 
@@ -131,6 +134,7 @@ class PartyLedgerSummaryReport(object):
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
+				"hidden" : 1
 			},
 			{
 				"label": _("Currency"),
@@ -138,6 +142,7 @@ class PartyLedgerSummaryReport(object):
 				"fieldtype": "Link",
 				"options": "Currency",
 				"width": 50,
+				"hidden" : 1
 			},
 
 		]
@@ -227,13 +232,8 @@ class PartyLedgerSummaryReport(object):
 			delivery_amount = sum(frappe.get_all('Delivery Note', filters, pluck='rounded_total'))
 			delivered=delivery_amount
 			customer['out_delivery_amount']=delivery_amount
-			if (customer['opening_balance'] < 0):
-				cus=customer['opening_balance']
-				paid=((-cus)+customer['paid_amount'])
-				customer['outstanding_amount']=(delivered-paid)
-			if (customer['opening_balance'] >= 0):
-				bls=(delivered-customer['paid_amount'])
-				customer['outstanding_amount']=bls+customer['opening_balance']
+			bls=(delivered-customer['paid_amount'])
+			customer['outstanding_amount']=bls
 			out.append(customer)
 		return out
  

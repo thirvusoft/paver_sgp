@@ -254,7 +254,7 @@
    "creation": "2022-04-27 15:55:07.011651",
    "default": null,
    "depends_on": null,
-   "description": "Enabling this allow you to assign multiple customer to a Sales Order.",
+   "description": "Enabling this allow you to assign multiple customers to a Sales Order.",
    "docstatus": 0,
    "dt": "Sales Order",
    "fetch_from": null,
