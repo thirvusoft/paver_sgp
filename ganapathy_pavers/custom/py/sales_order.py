@@ -199,7 +199,8 @@ def update_site(doc, event):
                 completed_area+=item.sqft_allocated
             
             site_work.update({
-                'customer': (doc.zcustomer or '') if(not doc.get('is_multi_customer')) else '',
+				'is_multi_customer': doc.get('is_multi_customer') or 0,
+                'customer': (doc.customer or '') if(not doc.get('is_multi_customer')) else '',
                 'supervisor': doc.get('supervisor') or '',
                 'supervisor_name': supervisor,
                 'item_details': (site_work.get('item_details') or []) +pavers,
@@ -329,4 +330,50 @@ def item_table_pa_cw(self, event):
         elif (types=="Compound Wall" and (i.item_group)=="Pavers"):
             frappe.throw(f"You can't select both {frappe.bold('Pavers')} and {frappe.bold('Compound Walls')}. Please remove the item: "+frappe.bold(i.item_code))
 
+@frappe.whitelist()
+def update_multicustomer(customers_name, sales_order):
+	doc=frappe.new_doc('Property Setter')
+	doc.update({
+		"doctype_or_field": "DocField",
+		"doc_type":"Sales Order",
+		"field_name":"customers_name",
+		"property":"allow_on_submit",
+		"value":"1"
+	})
+	doc.save()
+	doc1=frappe.new_doc('Property Setter')
+	doc1.update({
+		"doctype_or_field": "DocField",
+		"doc_type":"Sales Order",
+		"field_name":"customer",
+		"property":"allow_on_submit",
+		"value":"1"
+	})
+	doc1.save()
+	doc2=frappe.new_doc('Property Setter')
+	doc2.update({
+		"doctype_or_field": "DocField",
+		"doc_type":"Sales Order",
+		"field_name":"is_multi_customer",
+		"property":"allow_on_submit",
+		"value":"1"
+	})
+	doc2.save()
+	customers_name = [ {
+		'customer': cus['customer'], 
+		'doctype': 'TS Customer'
+		} for cus in json.loads(customers_name)]
+	self = frappe.get_doc('Sales Order', sales_order)
+	self.is_multi_customer = 1
+	if(frappe.db.exists('Customer', 'MultiCustomer')):
+		self.update({
+			'customer': 'MultiCustomer'
+		})
+	self.update({
+		'customers_name' : customers_name
+	})
+	self.save('update')
 
+	frappe.delete_doc('Property Setter', doc.name)
+	frappe.delete_doc('Property Setter', doc1.name)
+	frappe.delete_doc('Property Setter', doc2.name)
