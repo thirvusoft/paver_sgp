@@ -163,24 +163,6 @@ frappe.ui.form.on('Material Manufacturing', {
 		})
 		std_item(frm)
 		item_adding(frm)
-		var total_bundle = 0
-		if(frm.doc.items)
-		for(var i=0;i<frm.doc.items.length;i++){
-			total_bundle += frm.doc.items[i].amount
-			if(frm.doc.items[i].amount == 0){
-				frappe.throw("Kindly Enter Rate in Item Table")
-			}
-		}
-		cur_frm.set_value('total_raw_material', total_bundle);
-		if(frm.doc.setting_oil_item_name){
-			cur_frm.set_value('total_setting_oil_qty',(frm.doc.raw_material_consumption.length*frm.doc.setting_oil_qty)/1000)
-		  }
-		cur_frm.set_value('labour_cost_manufacture',frm.doc.labour_cost_in_manufacture*frm.doc.ts_total_hours)
-		cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft*frm.doc.production_sqft);
-		cur_frm.set_value('total_expense_per_sqft', (total_bundle+frm.doc.total_expense)/frm.doc.production_sqft);
-		cur_frm.set_value('rack_shifting_total_expense1_per_sqft', (frm.doc.rack_shifting_total_expense1)/frm.doc.production_sqft);
-		cur_frm.set_value('labour_cost_per_sqft', frm.doc.labour_cost/frm.doc.production_sqft);
-		cur_frm.set_value('item_price', frm.doc.total_expense_per_sqft+frm.doc.rack_shifting_total_expense1_per_sqft+frm.doc.labour_cost_per_sqft+frm.doc.shot_blast_per_sqft);
 		}
 	},
 	bom_no: function(frm){
@@ -318,6 +300,9 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	curing_stock_entry: function(frm){
 		make_stock_entry(frm,"curing_stock_entry")
+	},
+	validate: function(frm){
+		cur_frm.set_value('total_no_of_batches', (cur_frm.doc.raw_material_consumption?cur_frm.doc.raw_material_consumption:[]).length)
 	}
 });
 function make_stock_entry(frm,type1){
@@ -349,6 +334,27 @@ function total_hrs(frm,field,from,to){
 		}
 	})
 }
+
+function add_total_raw_material(frm){
+	let total_bundle = 0
+	if(frm.doc.items)
+	for(var i=0;i<frm.doc.items.length;i++){
+		total_bundle += frm.doc.items[i].amount?frm.doc.items[i].amount:0
+		if(frm.doc.items[i].amount == 0){
+			frappe.throw("Kindly Enter Rate in Item Table")
+		}
+	}
+	cur_frm.set_value('total_raw_material', total_bundle);
+	if(frm.doc.setting_oil_item_name){
+		cur_frm.set_value('total_setting_oil_qty',(frm.doc.raw_material_consumption.length*frm.doc.setting_oil_qty)/1000)
+		}
+	cur_frm.set_value('labour_cost_manufacture',frm.doc.labour_cost_in_manufacture*frm.doc.ts_total_hours)
+	cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft*frm.doc.production_sqft);
+	cur_frm.set_value('total_expense_per_sqft', (total_bundle+frm.doc.total_expense)/frm.doc.production_sqft);
+	cur_frm.set_value('rack_shifting_total_expense1_per_sqft', (frm.doc.rack_shifting_total_expense1)/frm.doc.production_sqft);
+	cur_frm.set_value('labour_cost_per_sqft', frm.doc.labour_cost/frm.doc.production_sqft);
+	cur_frm.set_value('item_price', frm.doc.total_expense_per_sqft+frm.doc.rack_shifting_total_expense1_per_sqft+frm.doc.labour_cost_per_sqft+frm.doc.shot_blast_per_sqft);
+}
 function item_adding(frm){
 	if(frm.doc.bom_no){
 		frappe.call({
@@ -376,20 +382,22 @@ function item_adding(frm){
 							if(d.item_code == item1[i]){
 								var row = frm.add_child('items');
 								row.item_code = d.item_code;
-								row.qty = d.qty;
+								row.qty = d.qty * cur_frm.doc.total_no_of_batches;
 								row.stock_uom = d.stock_uom;
 								row.uom = d.uom;
 								row.rate = d.rate;
-								row.amount= d.amount
+								row.amount= d.amount * cur_frm.doc.total_no_of_batches;
 								row.source_warehouse= d.source_warehouse
 							}
 						}
 					}
 				}
 				refresh_field("items");
+				add_total_raw_material(cur_frm)
 			}
 		})
 	}
+	
 }
 function std_item(frm){
 	if(frm.doc.bom_no){
@@ -432,9 +440,11 @@ function std_item(frm){
 					}
 				}
 				refresh_field("items");
+				add_total_raw_material(cur_frm)
 			}
 		})
 	}
+	
 }
 function default_value(usb_field,set_field){
 	frappe.db.get_single_value("USB Setting",usb_field).then(value =>{
@@ -487,3 +497,12 @@ document.querySelectorAll("[data-fieldname='create_rack_shiftingstock_entry']")[
 document.querySelectorAll("[data-fieldname='create_rack_shiftingstock_entry']")[1].style.fontWeight = 'bold'
 document.querySelectorAll("[data-fieldname='create_rack_shiftingstock_entry']")[1].style.backgroundColor = '#3399ff'
 }
+
+frappe.ui.form.on('Raw Material Consumption', {
+	raw_material_consumption_add: function(frm, cdt, cdn){
+		cur_frm.set_value('total_no_of_batches', (cur_frm.doc.raw_material_consumption?cur_frm.doc.raw_material_consumption:[]).length)
+	},
+	raw_material_consumption_remove: function(frm, cdt, cdn){
+		cur_frm.set_value('total_no_of_batches', (cur_frm.doc.raw_material_consumption?cur_frm.doc.raw_material_consumption:[]).length)
+	}
+})

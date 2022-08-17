@@ -31,6 +31,7 @@
   "chips_item_name",
   "cement_item",
   "setting_oil_item_name",
+  "total_no_of_batches",
   "column_break_4",
   "average_of_raw_material",
   "average_of_cement",
@@ -844,12 +845,18 @@
    "fieldname": "labour_cost_manufacture",
    "fieldtype": "Float",
    "label": "Labour Cost"
+  },
+  {
+   "fieldname": "total_no_of_batches",
+   "fieldtype": "Int",
+   "label": "Total no of Batches",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-11 22:43:36.163799",
+ "modified": "2022-08-17 10:27:38.378916",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
