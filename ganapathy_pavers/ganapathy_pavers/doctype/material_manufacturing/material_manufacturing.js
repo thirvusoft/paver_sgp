@@ -112,7 +112,7 @@ frappe.ui.form.on('Material Manufacturing', {
 	no_of_division: function(frm){
 		cur_frm.set_value('labour_cost', (frm.doc.rate_per_hrs * frm.doc.total_hrs)/frm.doc.no_of_division)
 	},
-	refresh: function(frm){
+	before_save: function(frm){
 		if(frm.doc.docstatus == 0){
 		if(frm.doc.ts_total_hours > 0 && frm.doc.docstatus == 0){
 			frappe.call({
@@ -320,12 +320,12 @@ frappe.ui.form.on('Material Manufacturing', {
 		make_stock_entry(frm,"curing_stock_entry")
 	}
 });
-function make_stock_entry(frm,type){
+function make_stock_entry(frm,type1){
 	frappe.call({
 		method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.make_stock_entry",
 		args:{
 			doc:frm.doc,
-			type:type
+			type1:type1
 		},
 		callback: function(r){
 			if(r.message){

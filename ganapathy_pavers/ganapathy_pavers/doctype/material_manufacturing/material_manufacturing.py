@@ -90,31 +90,31 @@ def std_item(doc):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['cement_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_cement')
-        row['amount']=doc.get('total_no_of_cement')*row['rate'] or row['validation_rate']
+        row['amount']=doc.get('total_no_of_cement')*(row['rate'] or row['validation_rate'])
         items.append(row)
     if doc.get('ggbs_item') and doc.get('total_no_of_cement'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['ggbs_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_ggbs2')
-        row['amount']=doc.get('total_no_of_cement')*row['rate'] or row['validation_rate']
+        row['amount']=doc.get('total_no_of_cement')*(row['rate'] or row['validation_rate'])
         items.append(row)
     if doc.get('chips_item_name') and doc.get('total_no_of_chips'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['chips_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_chips')
-        row['amount']=doc.get('total_no_of_chips')*row['rate'] or row['validation_rate']
+        row['amount']=doc.get('total_no_of_chips')*(row['rate'] or row['validation_rate'])
         items.append(row)
     if doc.get('dust_item_name') and doc.get('total_no_of_dust'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['dust_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_dust')
-        row['amount']=doc.get('total_no_of_dust')*row['rate'] or row['validation_rate']
+        row['amount']=doc.get('total_no_of_dust')*(row['rate'] or row['validation_rate'])
         items.append(row)
     if doc.get('setting_oil_item_name') and doc.get('total_setting_oil_qty'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['setting_oil_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_setting_oil_qty')
-        row['amount']=doc.get('total_setting_oil_qty')*row['rate'] or row['validation_rate']
+        row['amount']=doc.get('total_setting_oil_qty')*(row['rate'] or row['validation_rate'])
         items.append(row)
     return items
 
@@ -124,7 +124,7 @@ def item_data(item_code):
         item_code,stock_uom,last_purchase_rate,valuation_rate = frappe.get_value("Item",item_code,['item_code','stock_uom','last_purchase_rate','valuation_rate'])
         return item_code,stock_uom,last_purchase_rate or valuation_rate
 @frappe.whitelist()
-def make_stock_entry(doc,type):
+def make_stock_entry(doc,type1):
     doc=json.loads(doc)
     if doc.get("total_completed_qty") == 0 or doc.get("cement_item") == '' or doc.get("ggbs_item") == '' or doc.get("total_expense") == 0:
             frappe.throw("Please Enter the Produced Qty and From Time - To Time in Manufacture Section and Save This Form")
@@ -137,7 +137,7 @@ def make_stock_entry(doc,type):
     stock_entry.usb = doc.get("name")
     default_nos = frappe.db.get_singles_value("USB Setting", "default_manufacture_uom")
     default_bundle = frappe.db.get_singles_value("USB Setting", "default_rack_shift_uom")
-    if doc.get("stock_entry_type")=="Manufacture" and type == "create_stock_entry":
+    if doc.get("stock_entry_type")=="Manufacture" and type1 == "create_stock_entry":
         valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture","docstatus":["!=",2]},pluck="name")
         stock_entry.set_posting_time = 1
         stock_entry.posting_date = frappe.utils.formatdate(doc.get("to"), "yyyy-MM-dd")
@@ -169,7 +169,7 @@ def make_stock_entry(doc,type):
         stock_entry.save()
         stock_entry.submit()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
-    elif doc.get("stock_entry_rack_shift")=="Repack" and type == "create_rack_shiftingstock_entry":
+    elif doc.get("stock_entry_rack_shift")=="Repack" and type1 == "create_rack_shiftingstock_entry":
         if doc.get("total_rack_shift_expense") == 0:
             frappe.throw("Please Enter From Time - To Time in Rack Shifting Section and Save This Form")
         valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Repack","docstatus":["!=",2]},pluck="name")
@@ -205,7 +205,7 @@ def make_stock_entry(doc,type):
         stock_entry.save()
         stock_entry.submit()
         frappe.msgprint("New Stock Entry Created "+stock_entry.name)
-    elif doc.get("curing_stock_entry_type")=="Material Transfer" and type == "curing_stock_entry":
+    elif doc.get("curing_stock_entry_type")=="Material Transfer" and type1 == "curing_stock_entry":
         valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer","docstatus":["!=",2]},pluck="name")
         if len(valid) >= 1:
             frappe.throw("Already Stock Entry("+valid[0]+") Created For Material Transfer")

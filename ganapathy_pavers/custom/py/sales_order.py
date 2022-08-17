@@ -360,9 +360,9 @@ def update_multicustomer(customers_name, sales_order):
 	})
 	doc2.save()
 	customers_name = [ {
-		'customer': cus['customer'], 
+		'customer': cus.get('customer'), 
 		'doctype': 'TS Customer'
-		} for cus in json.loads(customers_name)]
+		} for cus in json.loads(customers_name) if(cus.get('customer'))]
 	self = frappe.get_doc('Sales Order', sales_order)
 	self.is_multi_customer = 1
 	if(frappe.db.exists('Customer', 'MultiCustomer')):
