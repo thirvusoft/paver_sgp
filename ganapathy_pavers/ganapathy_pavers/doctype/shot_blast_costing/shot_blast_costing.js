@@ -2,12 +2,27 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Shot Blast Costing', {
-	onload: function(frm) {
+	onload: async function(frm) {
 		frm.set_query("material_manufacturing","items",function(){
 			return {
 				"filters": {
 					is_shot_blasting:1,
 					docstatus:0
+				}
+			}
+		})
+		var mm_items = [];
+		await frappe.db.get_list('Material Manufacturing', {filters : {is_shot_blasting:1, docstatus:0}, fields : ['item_to_manufacture']}).then((value) => {
+			for(let i=0; i<value.length; i++){
+				if(!(mm_items.includes(value[i].item_to_manufacture))){
+					mm_items.push(value[i].item_to_manufacture)
+				}
+			}
+		})
+		frm.set_query("item_name","items", function(){
+			return {
+				filters: {
+					item_code: ['in', mm_items]
 				}
 			}
 		})

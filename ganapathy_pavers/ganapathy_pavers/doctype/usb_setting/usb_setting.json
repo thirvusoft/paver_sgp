@@ -39,7 +39,10 @@
   "setting_oil",
   "column_break_28",
   "cement",
-  "ggbs"
+  "ggbs",
+  "labour_costing_details_section",
+  "labour_cost_per_sqft",
+  "strapping_cost_per_sqft"
  ],
  "fields": [
   {
@@ -229,12 +232,27 @@
    "fieldtype": "Link",
    "label": "Default Shot Blast Workstation",
    "options": "Workstation"
+  },
+  {
+   "fieldname": "labour_costing_details_section",
+   "fieldtype": "Section Break",
+   "label": "Costing Details"
+  },
+  {
+   "fieldname": "labour_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Curing cost for labour per sqft"
+  },
+  {
+   "fieldname": "strapping_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Strapping Cost Per Sqft"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-08-09 16:43:43.287255",
+ "modified": "2022-08-18 17:23:20.943431",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "USB Setting",

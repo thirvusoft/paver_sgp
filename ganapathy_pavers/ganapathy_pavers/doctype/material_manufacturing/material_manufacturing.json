@@ -89,6 +89,7 @@
   "rack_shift_damage_qty",
   "remaining_qty",
   "operators_cost_in_rack_shift",
+  "operator_cost_rack_shift",
   "create_rack_shiftingstock_entry",
   "column_break_53",
   "from_time_rack",
@@ -119,12 +120,14 @@
   "curing_damaged_qty",
   "to_time_curing",
   "column_break_82",
+  "labour_cost_per_sqft",
+  "labour_expense",
   "rate_per_hrs",
   "total_hrs",
+  "section_break_118",
   "cb4",
   "no_of_division",
   "labour_cost",
-  "labour_cost_per_sqft",
   "section_break_72",
   "curing_source_warehouse",
   "column_break_84",
@@ -546,6 +549,7 @@
   {
    "fieldname": "labour_cost",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Labour Cost"
   },
   {
@@ -649,12 +653,14 @@
   {
    "fieldname": "rate_per_hrs",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Rate Per Hrs"
   },
   {
    "default": "3",
    "fieldname": "no_of_division",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "No. of Division"
   },
   {
@@ -670,6 +676,7 @@
   {
    "fieldname": "total_hrs",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Curing Hrs"
   },
   {
@@ -682,7 +689,8 @@
   },
   {
    "fieldname": "cb4",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "hidden": 1
   },
   {
    "fieldname": "strapping_cost",
@@ -766,7 +774,6 @@
    "label": "Item Price"
   },
   {
-   "default": "0.75",
    "fieldname": "strapping_cost_per_sqft",
    "fieldtype": "Float",
    "label": "Strapping Cost Per Sqft"
@@ -817,7 +824,6 @@
    "label": "Labour Cost"
   },
   {
-   "fetch_from": "workstation.ts_sum_of_operator_wages",
    "fieldname": "operators_cost_in_rack_shift",
    "fieldtype": "Float",
    "label": "Operators Cost",
@@ -903,12 +909,29 @@
    "fieldname": "no_of_labours2",
    "fieldtype": "Int",
    "label": "No of Labours"
+  },
+  {
+   "fetch_from": "workstation.ts_sum_of_operator_wages",
+   "fieldname": "operator_cost_rack_shift",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Operator Cost Rack Shift",
+   "read_only": 1
+  },
+  {
+   "fieldname": "labour_expense",
+   "fieldtype": "Currency",
+   "label": "Labour Expense"
+  },
+  {
+   "fieldname": "section_break_118",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-18 15:46:54.724351",
+ "modified": "2022-08-18 17:22:57.265807",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
@@ -927,6 +950,7 @@
    "write": 1
   }
  ],
+ "search_fields": "item_to_manufacture",
  "sort_field": "modified",
  "sort_order": "DESC"
 }

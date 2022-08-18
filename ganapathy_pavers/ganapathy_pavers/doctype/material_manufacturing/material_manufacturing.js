@@ -5,6 +5,8 @@ var uom_bundle = 0
 frappe.ui.form.on('Material Manufacturing', {
 	setup: function(frm){
 		if(cur_frm.is_new() == 1){
+			default_value("labour_cost_per_sqft","labour_cost_per_sqft")
+			default_value("strapping_cost_per_sqft","strapping_cost_per_sqft")
 			default_value("default_manufacture_operation","operation")
 			default_value("default_rack_shift_workstation","workstation")
 			default_value("default_manufacture_workstation","work_station")
@@ -125,21 +127,8 @@ frappe.ui.form.on('Material Manufacturing', {
 				cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense + frm.doc.total_raw_material);
 			}
 			if(frm.doc.total_hours_rack > 0 && frm.doc.docstatus == 0){
-				frappe.call({
-					method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_expense",
-					args:{
-						workstation:frm.doc.workstation,
-						operators_cost : frm.doc.operators_cost_in_rack_shift,
-						labour_cost : frm.doc.labour_cost_in_rack_shift,
-						tot_work_hrs: frm.doc.total_hours_rack,
-						tot_item: frm.doc.no_of_item_in_process,
-						tot_hrs : frm.doc.total_working_hrs,
-					},
-					callback(r){
-						cur_frm.set_value('total_rack_shift_expense', r.message[0]+r.message[1]);
-						cur_frm.set_value('rack_shifting_total_expense1', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost);
-					}
-				})
+				cur_frm.set_value('total_rack_shift_expense',frm.doc.labour_cost_in_rack_shift+frm.doc.operators_cost_in_rack_shift);
+				cur_frm.set_value('rack_shifting_total_expense1', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost);
 			}
 			frappe.call({
 				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.find_batch",
@@ -328,6 +317,15 @@ frappe.ui.form.on('Material Manufacturing', {
 		else{
 			cur_frm.set_value('no_of_labours', 0)
 		}
+	},
+	operator_cost_rack_shift: function(frm){
+		cur_frm.set_value('operators_cost_in_rack_shift',(frm.doc.operator_cost_rack_shift/((frm.doc.no_of_item_in_process>1)?(frm.doc.total_working_hrs?frm.doc.total_working_hrs:1):1)*frm.doc.total_hours_rack))
+	},
+	operators_cost_in_rack_shift: function(frm){
+		cur_frm.set_value('total_rack_shift_expense',frm.doc.labour_cost_in_rack_shift+frm.doc.operators_cost_in_rack_shift);
+	},
+	labour_cost_in_rack_shift: function(frm){
+		cur_frm.set_value('total_rack_shift_expense',frm.doc.labour_cost_in_rack_shift+frm.doc.operators_cost_in_rack_shift);
 	}
 });
 function make_stock_entry(frm,type1){
@@ -390,7 +388,7 @@ function add_total_raw_material(frm){
 	cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft*frm.doc.production_sqft);
 	cur_frm.set_value('total_expense_per_sqft', (frm.doc.total_expense)/frm.doc.production_sqft);
 	cur_frm.set_value('rack_shifting_total_expense1_per_sqft', (frm.doc.rack_shifting_total_expense1)/frm.doc.production_sqft);
-	cur_frm.set_value('labour_cost_per_sqft', frm.doc.labour_cost/frm.doc.production_sqft);
+	cur_frm.set_value('labour_expense', parseFloat(frm.doc.labour_cost_per_sqft)*parseFloat(frm.doc.production_sqft));
 	cur_frm.set_value('item_price', frm.doc.total_expense_per_sqft+frm.doc.rack_shifting_total_expense1_per_sqft+frm.doc.labour_cost_per_sqft+frm.doc.shot_blast_per_sqft);
 }
 function item_adding(frm){
