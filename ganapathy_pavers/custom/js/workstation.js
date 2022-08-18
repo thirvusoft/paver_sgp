@@ -70,17 +70,19 @@ frappe.ui.form.on("Ts Operators",{
 frappe.ui.form.on("Workstation",{
     cost_per_hours:function(frm){
         cur_frm.set_value("cal_wages1",(frm.doc.cost_per_hours*frm.doc.no_of_labours)/frm.doc.division_factors1) 
+        cur_frm.set_value("ts_wages1",frm.doc.cost_per_hours/frm.doc.division_factors1) 
     },
     no_of_labours:function(frm){
         cur_frm.set_value("cal_wages1",(frm.doc.cost_per_hours*frm.doc.no_of_labours)/frm.doc.division_factors1) 
+        cur_frm.set_value("ts_wages1",frm.doc.cost_per_hours/frm.doc.division_factors1) 
     },
     division_factors1:function(frm){
         if(frm.doc.division_factors1==0){
             cur_frm.set_value("cal_wages1",frm.doc.division_factors1)
+            cur_frm.set_value("ts_wages1",frm.doc.cost_per_hours/frm.doc.division_factors1) 
             frappe.throw("Zero is not allowed kindly give above zero in division factors")}
         else
             cur_frm.set_value("cal_wages1",(frm.doc.cost_per_hours*frm.doc.no_of_labours)/frm.doc.division_factors1)
-       
-            
+            cur_frm.set_value("ts_wages1",frm.doc.cost_per_hours/frm.doc.division_factors1) 
     }
 })

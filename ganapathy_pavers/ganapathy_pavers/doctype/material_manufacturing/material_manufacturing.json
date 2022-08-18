@@ -20,6 +20,7 @@
   "operation",
   "cb_2",
   "work_station",
+  "no_of_labours",
   "section_break_15",
   "raw_material_consumption",
   "section_break_2",
@@ -44,7 +45,12 @@
   "total_setting_oil_qty",
   "items_section",
   "items",
+  "section_break_38",
   "total_raw_material",
+  "column_break_40",
+  "top_layer_cost",
+  "column_break_42",
+  "bottom_layer_cost",
   "section_break_16",
   "from_time",
   "column_break_18",
@@ -53,6 +59,7 @@
   "ts_total_hours",
   "section_break_30",
   "operators_cost_in_manufacture",
+  "operator_cost_workstation",
   "labour_cost_in_manufacture",
   "labour_cost_manufacture",
   "column_break_26",
@@ -89,8 +96,10 @@
   "total_hours_rack",
   "total_rack_shift_expense",
   "labour_cost_in_rack_shift",
+  "labour_ws_cost",
   "cb52",
   "workstation",
+  "no_of_labours2",
   "rack_shifting_additional_cost",
   "strapping_cost_per_sqft",
   "strapping_cost",
@@ -244,7 +253,7 @@
   {
    "fieldname": "section_break_16",
    "fieldtype": "Section Break",
-   "label": "Wroking Time "
+   "label": "Working Time "
   },
   {
    "fieldname": "total_expense",
@@ -270,7 +279,7 @@
   {
    "fieldname": "total_manufacturing_expense",
    "fieldtype": "Float",
-   "label": "Total Manufacturing Expense",
+   "label": "Labour and Operators Expense",
    "read_only": 1
   },
   {
@@ -351,7 +360,6 @@
    "reqd": 1
   },
   {
-   "collapsible": 1,
    "fieldname": "items_section",
    "fieldtype": "Section Break",
    "label": "Items"
@@ -797,13 +805,12 @@
    "mandatory_depends_on": "eval:doc.no_of_item_in_process > 1"
   },
   {
-   "fetch_from": "work_station.ts_sum_of_operator_wages",
    "fieldname": "operators_cost_in_manufacture",
    "fieldtype": "Float",
    "label": "Operators Cost"
   },
   {
-   "fetch_from": "work_station.cal_wages1",
+   "fetch_from": "work_station.ts_wages1",
    "fieldname": "labour_cost_in_manufacture",
    "fieldtype": "Float",
    "hidden": 1,
@@ -817,7 +824,6 @@
    "read_only": 1
   },
   {
-   "fetch_from": "workstation.cal_wages1",
    "fieldname": "labour_cost_in_rack_shift",
    "fieldtype": "Float",
    "label": "Labour Cost",
@@ -849,14 +855,60 @@
   {
    "fieldname": "total_no_of_batches",
    "fieldtype": "Int",
-   "label": "Total no of Batches",
+   "label": "Total no of Batches"
+  },
+  {
+   "fetch_from": "work_station.ts_sum_of_operator_wages",
+   "fieldname": "operator_cost_workstation",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Operator Cost"
+  },
+  {
+   "fieldname": "section_break_38",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_40",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "top_layer_cost",
+   "fieldtype": "Currency",
+   "label": "Top Layer Cost"
+  },
+  {
+   "fieldname": "column_break_42",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bottom_layer_cost",
+   "fieldtype": "Currency",
+   "label": "Bottom Layer Cost"
+  },
+  {
+   "fieldname": "no_of_labours",
+   "fieldtype": "Int",
+   "label": "No of Labours"
+  },
+  {
+   "fetch_from": "workstation.ts_wages1",
+   "fieldname": "labour_ws_cost",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "labour_ws_cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "no_of_labours2",
+   "fieldtype": "Int",
+   "label": "No of Labours"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-17 10:27:38.378916",
+ "modified": "2022-08-18 15:46:54.724351",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

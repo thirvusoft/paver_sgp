@@ -80,6 +80,7 @@ def add_item(bom_no,doc):
     fields = ['item_code','qty', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']
     for i in bom_doc.items:
         row = {field:i.__dict__[field] for field in fields}
+        row['ts_qty'] = row.get('qty') or 0
         items.append(row)
     return items
 @frappe.whitelist()
