@@ -136,8 +136,8 @@ frappe.ui.form.on('Material Manufacturing', {
 				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_expense",
 				args:{
 					workstation:frm.doc.workstation,
-					operators_cost : frm.doc.operators_cost_in_manufacture,
-					labour_cost : frm.doc.labour_cost_in_manufacture,
+					operators_cost : frm.doc.operators_cost_in_rack_shift,
+					labour_cost : frm.doc.labour_cost_in_rack_shift,
 					tot_work_hrs: frm.doc.total_hours_rack,
 					tot_item: frm.doc.no_of_item_in_process,
 					tot_hrs : frm.doc.total_working_hrs,
@@ -455,24 +455,26 @@ function default_value(usb_field,set_field){
 frappe.ui.form.on('BOM Item', {
 	rate: function(frm, cdt, cdn) {
 		total_amount(frm, cdt, cdn)
-		frappe.model.set_value(cdt,cdn,"item_tax_template",r.message)
+		// frappe.model.set_value(cdt,cdn,"item_tax_template",r.message)
 	},
 	qty: function(frm, cdt, cdn){
 		total_amount(frm, cdt, cdn)
 	},
 	item_code: function(frm, cdt, cdn){
 		var d = locals[cdt][cdn];
-		frappe.call({
-			method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.item_data",
-			args:{
-				item_code:d.item_code,
-			},
-			callback(r){
-				frappe.model.set_value(cdt,cdn,"rate",r.message[2])
-				frappe.model.set_value(cdt,cdn,"uom",r.message[1])
-				frappe.model.set_value(cdt,cdn,"stock_uom",r.message[1])
-			}
-		})
+		if(d.item_code){
+			frappe.call({
+				method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.item_data",
+				args:{
+					item_code:d.item_code,
+				},
+				callback(r){
+					frappe.model.set_value(cdt,cdn,"rate",r.message[2])
+					frappe.model.set_value(cdt,cdn,"uom",r.message[1])
+					frappe.model.set_value(cdt,cdn,"stock_uom",r.message[1])
+				}
+			})
+		}
 		total_amount(frm, cdt, cdn)
 	},
 });
