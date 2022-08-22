@@ -3,7 +3,7 @@
 var uom_nos = 0
 var uom_bundle = 0
 frappe.ui.form.on('Material Manufacturing', {
-	setup: function(frm){
+	refresh: function(frm){
 		if(cur_frm.is_new() == 1){
 			default_value("labour_cost_per_sqft","labour_cost_per_sqft")
 			default_value("strapping_cost_per_sqft","strapping_cost_per_sqft")
@@ -22,6 +22,7 @@ frappe.ui.form.on('Material Manufacturing', {
 			default_value("dust","dust_item_name")
 			default_value("setting_oil","setting_oil_item_name")
 		}
+		set_css(frm);
 	},
 	item_to_manufacture: function(frm){
          const find = frm.doc.item_to_manufacture.split("-");
@@ -120,10 +121,11 @@ frappe.ui.form.on('Material Manufacturing', {
 	before_save: function(frm){
 		
 		std_item(frm)
+		
 		item_adding(frm)
 		if(frm.doc.docstatus == 0){
 			if(frm.doc.ts_total_hours > 0 && frm.doc.docstatus == 0){
-				cur_frm.set_value('total_manufacturing_expense', (frm.doc.labour_cost_in_manufacture*frm.doc.ts_total_hours)+frm.doc.operators_cost_in_manufacture);
+				cur_frm.set_value('total_manufacturing_expense', frm.doc.labour_cost_manufacture+frm.doc.operators_cost_in_manufacture);
 				cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense + frm.doc.total_raw_material);
 			}
 			if(frm.doc.total_hours_rack > 0 && frm.doc.docstatus == 0){
@@ -380,7 +382,7 @@ function add_total_raw_material(frm){
 		cur_frm.set_value('total_setting_oil_qty',(frm.doc.raw_material_consumption.length*frm.doc.setting_oil_qty)/1000)
 		}
 	if(frm.doc.ts_total_hours > 0 && frm.doc.docstatus == 0){
-		cur_frm.set_value('total_manufacturing_expense', (frm.doc.labour_cost_in_manufacture*frm.doc.ts_total_hours)+frm.doc.operators_cost_in_manufacture);
+		cur_frm.set_value('total_manufacturing_expense', frm.doc.labour_cost_manufacture+frm.doc.operators_cost_in_manufacture);
 		cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense + frm.doc.total_raw_material);
 	}
 	cur_frm.set_value('labour_cost_manufacture',frm.doc.labour_cost_in_manufacture*frm.doc.ts_total_hours*frm.doc.no_of_labours)
@@ -403,12 +405,13 @@ function item_adding(frm){
 				// cur_frm.set_value('items',r.message)
 				var item1=[]
 				for (const d of r.message){
+					// if(!item1.includes(d.item_code))
 					item1.push(d.item_code)
 				}
 				for (const d of r.message){
 					for(const i of frm.doc.items){
-						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse){
-							item1.indexOf(d.item_code) !== -1 && item1.splice(item1.indexOf(d.item_code), 1)
+						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type==i.layer_type && item1.includes(d.item_code)){
+							item1.splice(item1.indexOf(d.item_code), 1)
 						}
 					}
 				}
@@ -418,6 +421,7 @@ function item_adding(frm){
 							if(d.item_code == item1[i]){
 								var row = frm.add_child('items');
 								row.item_code = d.item_code;
+								row.layer_type = d.layer_type
 								row.qty = d.qty * cur_frm.doc.total_no_of_batches;
 								row.ts_qty = d.ts_qty
 								row.stock_uom = d.stock_uom;
@@ -447,12 +451,13 @@ function std_item(frm){
 				// cur_frm.set_value('items',r.message)
 				var item1=[]
 				for (const d of r.message){
+					// if(!item1.includes(d.item_code))
 					item1.push(d.item_code)
 				}
 				for (const d of r.message){
 					for(const i of frm.doc.items){
-						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse){
-							item1.indexOf(d.item_code) !== -1 && item1.splice(item1.indexOf(d.item_code), 1)
+						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type==i.layer_type && item1.includes(d.item_code)){
+							item1.splice(item1.indexOf(d.item_code), 1)
 						}
 					}
 				}
@@ -463,6 +468,7 @@ function std_item(frm){
 								var row = frm.add_child('items');
 								row.item_code = d.item_code;
 								row.qty = d.qty;
+								row.layer_type = 'Bottom Layer'
 								row.ts_qty = d.qty
 								row.stock_uom = d.stock_uom;
 								row.uom = d.uom;
@@ -520,11 +526,7 @@ function total_amount(frm, cdt, cdn){
 	var d = locals[cdt][cdn];
 	frappe.model.set_value(cdt,cdn,"amount",d.qty*d.rate)
 }
-frappe.ui.form.on('Material Manufacturing', {
-	refresh : function(frm){
-		set_css(frm);
-	}
-});
+
 
 function set_css(frm){
 document.querySelectorAll("[data-fieldname='curing_stock_entry']")[1].style.color = 'white'

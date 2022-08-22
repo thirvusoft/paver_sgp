@@ -49,6 +49,18 @@ frappe.ui.form.on('Shot Blast Costing', {
 	validate: function(frm){	   
 		total(frm) 
 	},
+	no_of_labour: function(frm){
+		total_cost(frm)
+	},
+	workstation: function(frm){
+		if(cur_frm.doc.workstation){
+			frappe.db.get_value('Workstation', cur_frm.doc.workstation, 'no_of_labours').then( value => {
+				cur_frm.set_value('no_of_labour', value.message.no_of_labours)
+			})
+		}else{
+			cur_frm.set_value('no_of_labour', 0)
+		}
+	},
 	total_cost: function(frm){
 		cur_frm.set_value("total_cost_per_sqft", frm.doc.total_cost/frm.doc.total_sqft) 
 	},
@@ -61,9 +73,6 @@ frappe.ui.form.on('Shot Blast Costing', {
 		total_hrs(frm,field,frm.doc.from_time,frm.doc.to_time)
 	},
 	total_hrs: function(frm){
-		total_cost(frm)
-	},
-	refresh: function(frm){
 		total_cost(frm)
 	},
 	additional_cost: function(frm){
@@ -138,17 +147,9 @@ function total_hrs(frm,field,from,to){
 	})
 }
 function total_cost(frm){
-	if(frm.doc.total_hrs > 0 && frm.doc.docstatus == 0){
-		frappe.call({
-			method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_expense",
-			args:{
-				workstation:frm.doc.workstation,
-			},
-			callback(r){
-				cur_frm.set_value('labour_cost', r.message*frm.doc.total_hrs);
-				cur_frm.set_value('total_cost', frm.doc.additional_cost + frm.doc.labour_cost);
-			}
-		})
+	if(frm.doc.total_hrs && frm.doc.docstatus == 0){
+		cur_frm.set_value('labour_cost', frm.doc.labour_cost_in_workstation*frm.doc.total_hrs*frm.doc.no_of_labour);
+		cur_frm.set_value('total_cost', frm.doc.additional_cost + frm.doc.labour_cost);
 	}
 }
 frappe.ui.form.on('Shot Blast Costing', {

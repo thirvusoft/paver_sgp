@@ -259,8 +259,9 @@
    "label": "Working Time "
   },
   {
+   "description": "It includes labours cost, operators cost, additional cost and raw materials cost.",
    "fieldname": "total_expense",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Total Expense",
    "read_only": 1
   },
@@ -787,6 +788,7 @@
   {
    "default": "300",
    "description": "per Batch in ml",
+   "fetch_from": "bom_no.setting_oil_qty",
    "fieldname": "setting_oil_qty",
    "fieldtype": "Float",
    "label": "Setting Oil Qty"
@@ -861,7 +863,7 @@
   {
    "fieldname": "total_no_of_batches",
    "fieldtype": "Int",
-   "label": "Total no of Batches"
+   "label": "Total no of Batches for Top Layer"
   },
   {
    "fetch_from": "work_station.ts_sum_of_operator_wages",
@@ -931,7 +933,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-18 17:22:57.265807",
+ "modified": "2022-08-22 16:40:04.762425",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

@@ -11,6 +11,7 @@
   "company",
   "column_break_2",
   "workstation",
+  "no_of_labour",
   "column_break_4",
   "source_warehouse",
   "column_break_7",
@@ -30,6 +31,7 @@
   "column_break_12",
   "to_time",
   "labour_cost",
+  "labour_cost_in_workstation",
   "create_stock_entry",
   "column_break_14",
   "total_hrs",
@@ -199,12 +201,25 @@
    "fieldtype": "Float",
    "label": "Avg Damage Sqft",
    "read_only": 1
+  },
+  {
+   "fetch_from": "workstation.cost_per_hours",
+   "fieldname": "labour_cost_in_workstation",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "labour_cost_in_workstation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "no_of_labour",
+   "fieldtype": "Int",
+   "label": "No of Labour"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-09 13:00:14.520305",
+ "modified": "2022-08-22 16:14:41.831759",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Costing",
