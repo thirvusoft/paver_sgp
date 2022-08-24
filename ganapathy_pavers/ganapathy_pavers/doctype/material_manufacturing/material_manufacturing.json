@@ -8,6 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "item_to_manufacture",
+  "per_rack",
+  "per_plate",
   "is_shot_blasting",
   "column_break_2",
   "company",
@@ -56,6 +58,8 @@
   "column_break_18",
   "to",
   "column_break_20",
+  "hours_to_reduce_manufacture",
+  "cb_ts_0001",
   "ts_total_hours",
   "section_break_30",
   "operators_cost_in_manufacture",
@@ -69,13 +73,14 @@
   "total_expense",
   "total_expense_per_sqft",
   "section_break_42",
-  "production_qty",
+  "no_of_racks",
+  "no_of_plates1",
   "create_stock_entry",
-  "column_break_44",
+  "column_break_66",
+  "production_qty",
   "total_completed_qty",
-  "column_break_46",
+  "column_break_44",
   "damage_qty",
-  "cb_47",
   "production_sqft",
   "section_break_17",
   "source_warehouse",
@@ -94,6 +99,7 @@
   "column_break_53",
   "from_time_rack",
   "to_time_rack",
+  "hours_to_reduce_rack",
   "total_hours_rack",
   "total_rack_shift_expense",
   "labour_cost_in_rack_shift",
@@ -115,7 +121,6 @@
   "section_break_51",
   "no_of_bundle",
   "curing_stock_entry",
-  "column_break_80",
   "from_time_curing",
   "curing_damaged_qty",
   "to_time_curing",
@@ -408,10 +413,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_46",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "create_stock_entry",
    "fieldtype": "Button",
    "label": "Create Stock Entry For Manufacturing"
@@ -667,11 +668,13 @@
   {
    "fieldname": "from_time_curing",
    "fieldtype": "Datetime",
+   "hidden": 1,
    "label": "From Time"
   },
   {
    "fieldname": "to_time_curing",
    "fieldtype": "Datetime",
+   "hidden": 1,
    "label": "To Time"
   },
   {
@@ -679,10 +682,6 @@
    "fieldtype": "Float",
    "hidden": 1,
    "label": "Curing Hrs"
-  },
-  {
-   "fieldname": "column_break_80",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "column_break_82",
@@ -838,10 +837,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "cb_47",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "shot_blast_section",
    "fieldtype": "Section Break",
    "label": "Shot Blast"
@@ -862,7 +857,7 @@
   },
   {
    "fieldname": "total_no_of_batches",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Total no of Batches for Top Layer"
   },
   {
@@ -892,7 +887,7 @@
   {
    "fieldname": "bottom_layer_cost",
    "fieldtype": "Currency",
-   "label": "Bottom Layer Cost"
+   "label": "Panmix Cost"
   },
   {
    "fieldname": "no_of_labours",
@@ -928,12 +923,54 @@
   {
    "fieldname": "section_break_118",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "no_of_racks",
+   "fieldtype": "Float",
+   "label": "No of Racks"
+  },
+  {
+   "fieldname": "no_of_plates1",
+   "fieldtype": "Float",
+   "label": "No of Plates"
+  },
+  {
+   "fetch_from": "item_to_manufacture.per_rack",
+   "fieldname": "per_rack",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "per rack"
+  },
+  {
+   "fetch_from": "item_to_manufacture.per_plate",
+   "fieldname": "per_plate",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "per plate"
+  },
+  {
+   "fieldname": "column_break_66",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_ts_0001",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hours_to_reduce_manufacture",
+   "fieldtype": "Float",
+   "label": "Hours to Reduce"
+  },
+  {
+   "fieldname": "hours_to_reduce_rack",
+   "fieldtype": "Float",
+   "label": "Hours to Reduce"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-22 16:40:04.762425",
+ "modified": "2022-08-24 12:12:43.747278",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

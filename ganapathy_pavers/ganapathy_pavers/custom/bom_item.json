@@ -41,7 +41,7 @@
    "name": "BOM Item-layer_type",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "\nTop Layer\nBottom Layer",
+   "options": "\nTop Layer\nPanmix",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,

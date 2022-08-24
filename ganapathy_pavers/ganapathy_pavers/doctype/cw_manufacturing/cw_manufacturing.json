@@ -1,0 +1,211 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-08-23 10:10:11.416273",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "amended_from",
+  "item_to_manufacture",
+  "column_break_3",
+  "company",
+  "status1",
+  "section_break_6",
+  "no_of_item_in_process",
+  "total_working_hrs",
+  "column_break_9",
+  "bom",
+  "machine",
+  "column_break_12",
+  "work_station",
+  "no_of_labours",
+  "section_break_15",
+  "raw_material_consumption",
+  "raw_materials_section",
+  "total_no_of_raw_material",
+  "items_section",
+  "items",
+  "section_break_21",
+  "raw_material_cost",
+  "column_break_23",
+  "top_layer_cost",
+  "column_break_25",
+  "panmix_cost",
+  "section_break_27"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_to_manufacture",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item to Manufacture",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "CW Manufacturing",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status1",
+   "fieldtype": "Select",
+   "label": "Process",
+   "options": "Molding\nUnmolding\nCuring\nCompleted"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "no_of_item_in_process",
+   "fieldtype": "Int",
+   "label": "No of Item in Process"
+  },
+  {
+   "depends_on": "eval: doc.no_of_item_in_process>1",
+   "fieldname": "total_working_hrs",
+   "fieldtype": "Float",
+   "label": "Total Working Hrs"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bom",
+   "fieldtype": "Link",
+   "label": "BOM",
+   "options": "BOM"
+  },
+  {
+   "fieldname": "machine",
+   "fieldtype": "Link",
+   "label": "Machine",
+   "options": "Operation"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "work_station",
+   "fieldtype": "Link",
+   "label": "Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "no_of_labours",
+   "fieldtype": "Int",
+   "label": "No of Labours"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break",
+   "label": "Raw Material Consumption Table"
+  },
+  {
+   "allow_bulk_edit": 1,
+   "fieldname": "raw_material_consumption",
+   "fieldtype": "Table",
+   "label": "Raw Material Consumption",
+   "options": "Raw Material Consumption"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "raw_materials_section",
+   "fieldtype": "Section Break",
+   "label": "Raw Materials"
+  },
+  {
+   "fieldname": "total_no_of_raw_material",
+   "fieldtype": "Int",
+   "label": "Total No of Raw Material"
+  },
+  {
+   "fieldname": "items_section",
+   "fieldtype": "Section Break",
+   "label": "Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "BOM Item"
+  },
+  {
+   "fieldname": "section_break_21",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "raw_material_cost",
+   "fieldtype": "Currency",
+   "label": "Raw Material Cost"
+  },
+  {
+   "fieldname": "column_break_23",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "top_layer_cost",
+   "fieldtype": "Currency",
+   "label": "Top Layer Cost"
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "panmix_cost",
+   "fieldtype": "Currency",
+   "label": "Panmix Cost"
+  },
+  {
+   "fieldname": "section_break_27",
+   "fieldtype": "Section Break",
+   "label": "Manufacturing"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-08-24 12:33:51.179835",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "CW Manufacturing",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

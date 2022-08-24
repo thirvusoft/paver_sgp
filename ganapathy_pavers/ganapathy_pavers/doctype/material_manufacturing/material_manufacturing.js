@@ -25,18 +25,19 @@ frappe.ui.form.on('Material Manufacturing', {
 		set_css(frm);
 	},
 	item_to_manufacture: function(frm){
-         const find = frm.doc.item_to_manufacture.split("-");
-         if(find[1] == "SHOT BLAST"){
-             cur_frm.set_value("is_shot_blasting",1)
-         }
-         else{
-             cur_frm.set_value("is_shot_blasting",0)
-         }
-         frappe.db.get_list("BOM", {filters:{"item":frm.doc.item_to_manufacture,"is_default":1,"docstatus":1,"is_active":1},fields:["name"]}).then((r)=>{ 
-			if(r.length != 0){
-                 cur_frm.set_value("bom_no",r[0].name)
-             }
-         })
+		if(frm.doc.item_to_manufacture){
+		if(frm.doc.item_to_manufacture.includes("SHOT BLAST")){
+			cur_frm.set_value("is_shot_blasting",1)
+		}
+		else{
+			cur_frm.set_value("is_shot_blasting",0)
+		}
+		}
+		frappe.db.get_list("BOM", {filters:{"item":frm.doc.item_to_manufacture,"is_default":1,"docstatus":1,"is_active":1},fields:["name"]}).then((r)=>{ 
+		if(r.length != 0){
+				cur_frm.set_value("bom_no",r[0].name)
+			}
+		})
     },
 	is_shot_blasting: function(frm){
 		if(frm.doc.is_shot_blasting == 1){
@@ -48,27 +49,35 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	from_time: function(frm) {
 		var field="ts_total_hours"
-		total_hrs(frm,field,frm.doc.from_time,frm.doc.to)
+		total_hrs(frm,field,frm.doc.from_time,frm.doc.to, cur_frm.doc.hours_to_reduce_manufacture)
 	},
 	to: function(frm){
 		var field="ts_total_hours"
-		total_hrs(frm,field,frm.doc.from_time,frm.doc.to)
+		total_hrs(frm,field,frm.doc.from_time,frm.doc.to, cur_frm.doc.hours_to_reduce_manufacture)
+	},
+	hours_to_reduce_manufacture: function(frm){
+		var field="ts_total_hours"
+		total_hrs(frm,field,frm.doc.from_time,frm.doc.to, cur_frm.doc.hours_to_reduce_manufacture)
 	},
 	from_time_rack: function(frm) {
 		var field="total_hours_rack"
-		total_hrs(frm,field,frm.doc.from_time_rack,frm.doc.to_time_rack)
+		total_hrs(frm,field,frm.doc.from_time_rack,frm.doc.to_time_rack, cur_frm.doc.hours_to_reduce_rack)
 	},
 	to_time_rack: function(frm){
 		var field="total_hours_rack"
-		total_hrs(frm,field,frm.doc.from_time_rack,frm.doc.to_time_rack)
+		total_hrs(frm,field,frm.doc.from_time_rack,frm.doc.to_time_rack, cur_frm.doc.hours_to_reduce_rack)
+	},
+	hours_to_reduce_rack: function(frm){
+		var field="total_hours_rack"
+		total_hrs(frm,field,frm.doc.from_time_rack,frm.doc.to_time_rack, cur_frm.doc.hours_to_reduce_rack)
 	},
 	from_time_curing: function(frm) {
 		var field="total_hrs"
-		total_hrs(frm,field,frm.doc.from_time_curing,frm.doc.to_time_curing)
+		total_hrs(frm,field,frm.doc.from_time_curing,frm.doc.to_time_curing, 0)
 	},
 	to_time_curing: function(frm){
 		var field="total_hrs"
-		total_hrs(frm,field,frm.doc.from_time_curing,frm.doc.to_time_curing)
+		total_hrs(frm,field,frm.doc.from_time_curing,frm.doc.to_time_curing, 0)
 	},
 	no_of_bundle: function(frm){
 		cur_frm.set_value("shot_blasted_bundle",frm.doc.no_of_bundle)
@@ -262,7 +271,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		frm.set_query("item_to_manufacture",function(){
 			return {
 					filters: [
-						['Item', 'item_group', '!=', 'Raw Material']
+						['Item', 'item_group', '=', 'Pavers']
 					]
 			}
 		})
@@ -328,8 +337,19 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	labour_cost_in_rack_shift: function(frm){
 		cur_frm.set_value('total_rack_shift_expense',frm.doc.labour_cost_in_rack_shift+frm.doc.operators_cost_in_rack_shift);
+	},
+	no_of_racks: function(frm){
+		production_qty_calc(frm)
+	},
+	no_of_plates1: function(frm){
+		production_qty_calc(frm)
 	}
 });
+
+function production_qty_calc(frm){
+	cur_frm.set_value('production_qty', (cur_frm.doc.no_of_racks?cur_frm.doc.no_of_racks:0)*(cur_frm.doc.per_rack?cur_frm.doc.per_rack:0) + (cur_frm.doc.no_of_plates1?cur_frm.doc.no_of_plates1:0)*(cur_frm.doc.per_plate?cur_frm.doc.per_plate:0))
+}
+
 function make_stock_entry(frm,type1){
 	frappe.call({
 		method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.make_stock_entry",
@@ -347,7 +367,7 @@ function make_stock_entry(frm,type1){
 		 }
 	})
 }
-function total_hrs(frm,field,from,to){
+function total_hrs(frm,field,from,to, red){
 	frappe.call({
 		method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.total_hrs",
         args:{
@@ -355,7 +375,7 @@ function total_hrs(frm,field,from,to){
 			to:to
 		},
 		callback(r){
-			cur_frm.set_value(field, r.message);
+			cur_frm.set_value(field, r.message?r.message-red:0-red);
 		}
 	})
 }
@@ -363,17 +383,17 @@ function total_hrs(frm,field,from,to){
 function add_total_raw_material(frm){
 	let total_bundle = 0, top_layer = 0, bottom_layer = 0;
 	if(frm.doc.items)
-	for(var i=0;i<frm.doc.items.length;i++){
+	for(var i=0;i<(frm.doc.items?frm.doc.items.length:0);i++){
 		total_bundle += frm.doc.items[i].amount?frm.doc.items[i].amount:0
 		if(frm.doc.items[i].layer_type == "Top Layer"){
 			top_layer += frm.doc.items[i].amount?frm.doc.items[i].amount:0
 		}
-		if(frm.doc.items[i].layer_type == "Bottom Layer"){
+		if(frm.doc.items[i].layer_type == "Panmix"){
 			bottom_layer += frm.doc.items[i].amount?frm.doc.items[i].amount:0
 		}
-		if(frm.doc.items[i].amount == 0){
-			frappe.throw("Kindly Enter Rate in Item Table")
-		}
+		// if(frm.doc.items[i].amount == 0){
+		// 	frappe.throw("Kindly Enter Rate in Item Table")
+		// }
 	}
 	cur_frm.set_value('total_raw_material', total_bundle);
 	cur_frm.set_value('top_layer_cost', top_layer);
@@ -386,7 +406,7 @@ function add_total_raw_material(frm){
 		cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense + frm.doc.total_raw_material);
 	}
 	cur_frm.set_value('labour_cost_manufacture',frm.doc.labour_cost_in_manufacture*frm.doc.ts_total_hours*frm.doc.no_of_labours)
-	cur_frm.set_value('operators_cost_in_manufacture',(frm.doc.operator_cost_workstation/((frm.doc.no_of_item_in_process>1)?(frm.doc.total_working_hrs?frm.doc.total_working_hrs:1):1)*frm.doc.ts_total_hours))
+	cur_frm.set_value('operators_cost_in_manufacture',(frm.doc.operator_cost_workstation/((frm.doc.no_of_item_in_process>1)?(frm.doc.total_working_hrs?frm.doc.total_working_hrs:1):frm.doc.ts_total_hours)*frm.doc.ts_total_hours))
 	cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft*frm.doc.production_sqft);
 	cur_frm.set_value('total_expense_per_sqft', (frm.doc.total_expense)/frm.doc.production_sqft);
 	cur_frm.set_value('rack_shifting_total_expense1_per_sqft', (frm.doc.rack_shifting_total_expense1)/frm.doc.production_sqft);
@@ -406,31 +426,31 @@ function item_adding(frm){
 				var item1=[]
 				for (const d of r.message){
 					// if(!item1.includes(d.item_code))
-					item1.push(d.item_code)
+					item1.push('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))
 				}
 				for (const d of r.message){
-					for(const i of frm.doc.items){
-						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type==i.layer_type && item1.includes(d.item_code)){
-							item1.splice(item1.indexOf(d.item_code), 1)
+					for(const i of frm.doc.items?frm.doc.items:[]){
+						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type==i.layer_type && item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))){
+							item1.splice(item1.indexOf('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:'')), 1)
 						}
 					}
 				}
 				if(item1){
-					for(var i=0;i<item1.length;i++){		
+					// for(var i=0;i<item1.length;i++){		
 						for (const d of r.message){
-							if(d.item_code == item1[i]){
+							if(item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:'') )){
 								var row = frm.add_child('items');
 								row.item_code = d.item_code;
 								row.layer_type = d.layer_type
-								row.qty = d.qty * cur_frm.doc.total_no_of_batches;
+								row.qty = (d.layer_type=='Top Layer'?d.qty * (cur_frm.doc.total_no_of_batches?cur_frm.doc.total_no_of_batches:0):d.qty);
 								row.ts_qty = d.ts_qty
 								row.stock_uom = d.stock_uom;
 								row.uom = d.uom;
 								row.rate = d.rate;
-								row.amount= d.amount * cur_frm.doc.total_no_of_batches;
+								row.amount= d.layer_type=='Top Layer'?d.amount * (cur_frm.doc.total_no_of_batches?cur_frm.doc.total_no_of_batches:0):d.amount;
 								row.source_warehouse= d.source_warehouse
 							}
-						}
+						// }
 					}
 				}
 				refresh_field("items");
@@ -452,23 +472,23 @@ function std_item(frm){
 				var item1=[]
 				for (const d of r.message){
 					// if(!item1.includes(d.item_code))
-					item1.push(d.item_code)
+					item1.push('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))
 				}
 				for (const d of r.message){
-					for(const i of frm.doc.items){
-						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type==i.layer_type && item1.includes(d.item_code)){
-							item1.splice(item1.indexOf(d.item_code), 1)
+					for(const i of frm.doc.items?frm.doc.items:[]){
+						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type==i.layer_type && item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))){
+							item1.splice(item1.indexOf('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:'')), 1)
 						}
 					}
 				}
 				if(item1){
-					for(var i=0;i<item1.length;i++){		
+					// for(var i=0;i<item1.length;i++){		
 						for (const d of r.message){
-							if(d.item_code == item1[i]){
+							if(item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))){
 								var row = frm.add_child('items');
 								row.item_code = d.item_code;
 								row.qty = d.qty;
-								row.layer_type = 'Bottom Layer'
+								row.layer_type = 'Panmix'
 								row.ts_qty = d.qty
 								row.stock_uom = d.stock_uom;
 								row.uom = d.uom;
@@ -480,7 +500,7 @@ function std_item(frm){
 								}
 								row.amount= d.amount
 							}
-						}
+						// }
 					}
 				}
 				refresh_field("items");
