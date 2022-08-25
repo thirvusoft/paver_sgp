@@ -283,6 +283,20 @@ frappe.ui.form.on('Material Manufacturing', {
 				}
 			}
 		})
+		frm.set_query("machine_operator",function(){
+			return {
+				"filters": {
+					designation:'Operator',
+				}
+			}
+		})
+		frm.set_query("panmix_operator",function(){
+			return {
+				"filters": {
+					designation:'Operator'
+				}
+			}
+		})
 	},
 	create_stock_entry: function(frm){
 		make_stock_entry(frm,"create_stock_entry")
