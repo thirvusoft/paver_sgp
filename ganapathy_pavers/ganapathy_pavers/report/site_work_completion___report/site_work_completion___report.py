@@ -25,7 +25,7 @@ def execute(filters=None):
 									left outer join `tabTS Job Worker Details` as jwd
 										on site.name = jwd.parent 
 									{0}
-									group by site.name,jwd.name1,jwd.sqft_allocated
+									order by site.name, jwd.start_date
 									""".format(conditions))
 
 	data = [list(i) for i in report_data]
