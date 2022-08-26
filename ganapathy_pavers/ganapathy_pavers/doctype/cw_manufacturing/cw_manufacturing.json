@@ -9,6 +9,8 @@
  "field_order": [
   "amended_from",
   "item_to_manufacture",
+  "type",
+  "molding_date",
   "column_break_3",
   "company",
   "status1",
@@ -21,7 +23,18 @@
   "section_break_15",
   "raw_material_consumption",
   "raw_materials_section",
-  "total_no_of_raw_material",
+  "post_chips",
+  "slab_chips_item_name",
+  "cement_item_name",
+  "m_sand_item_name",
+  "ggbs_item_name",
+  "total_no_of_batches",
+  "column_break_20",
+  "post_chips_qty",
+  "slab_chips_qty",
+  "cement_qty",
+  "m_sand_qty",
+  "ggbs_qty",
   "items_section",
   "items",
   "raw_material_cost",
@@ -40,6 +53,7 @@
   "additional_cost",
   "column_break_40",
   "total_expense_per_sqft",
+  "total_expense",
   "total_qty_section",
   "production_qty",
   "create_stock_entry_for_molding",
@@ -125,18 +139,13 @@
    "fieldname": "raw_material_consumption",
    "fieldtype": "Table",
    "label": "Raw Material Consumption",
-   "options": "Raw Material Consumption"
+   "options": "CW Raw Material Consumption"
   },
   {
    "collapsible": 1,
    "fieldname": "raw_materials_section",
    "fieldtype": "Section Break",
    "label": "Raw Materials"
-  },
-  {
-   "fieldname": "total_no_of_raw_material",
-   "fieldtype": "Int",
-   "label": "Total No of Raw Material"
   },
   {
    "fieldname": "items_section",
@@ -284,12 +293,98 @@
    "hidden": 1,
    "label": "Avg Labour Wages",
    "read_only": 1
+  },
+  {
+   "fieldname": "cement_item_name",
+   "fieldtype": "Link",
+   "label": "Cement Item Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "m_sand_item_name",
+   "fieldtype": "Link",
+   "label": "M Sand Item Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "ggbs_item_name",
+   "fieldtype": "Link",
+   "label": "GGBS Item Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cement_qty",
+   "fieldtype": "Float",
+   "label": "Cement Qty"
+  },
+  {
+   "fieldname": "m_sand_qty",
+   "fieldtype": "Float",
+   "label": "M Sand Qty"
+  },
+  {
+   "fieldname": "ggbs_qty",
+   "fieldtype": "Float",
+   "label": "GGBS Qty"
+  },
+  {
+   "fieldname": "post_chips",
+   "fieldtype": "Link",
+   "label": "Post Chips Item Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "slab_chips_item_name",
+   "fieldtype": "Link",
+   "label": "Slab Chips Item Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "slab_chips_qty",
+   "fieldtype": "Float",
+   "label": "Slab Chips Qty"
+  },
+  {
+   "fieldname": "post_chips_qty",
+   "fieldtype": "Float",
+   "label": "Post Chips Qty"
+  },
+  {
+   "fieldname": "total_no_of_batches",
+   "fieldtype": "Float",
+   "label": "Total No of Batches"
+  },
+  {
+   "description": "It includes labours cost, operators cost, additional cost and raw materials cost.",
+   "fieldname": "total_expense",
+   "fieldtype": "Float",
+   "label": "Total Expense for Molding",
+   "read_only": 1
+  },
+  {
+   "fieldname": "molding_date",
+   "fieldtype": "Date",
+   "label": "Molding Date",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "item_to_manufacture.compound_wall_type",
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Type",
+   "options": "\nPost\nSlab",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-25 15:55:56.188179",
+ "modified": "2022-08-26 20:16:12.430384",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

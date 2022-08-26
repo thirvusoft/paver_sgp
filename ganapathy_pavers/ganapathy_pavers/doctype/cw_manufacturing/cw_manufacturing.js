@@ -3,6 +3,13 @@
 
 frappe.ui.form.on("CW Manufacturing", {
     refresh: function (frm) {
+        if (frm.is_new()) {
+            default_value("chips_for_post", "post_chips");
+            default_value("chips_for_slab", "slab_chips_item_name");
+            default_value("m_sand", "m_sand_item_name");
+            default_value("cement", "cement_item_name");
+            default_value("ggbs", "ggbs_item_name");
+        }
         frm.set_query("item_to_manufacture", function () {
             return {
                 filters: {
@@ -18,7 +25,6 @@ frappe.ui.form.on("CW Manufacturing", {
             };
         });
     },
-    setup: function (frm) {},
     item_to_manufacture: function (frm) {
         if (frm.doc.item_to_manufacture) {
             bom_fetch(frm);
@@ -27,7 +33,29 @@ frappe.ui.form.on("CW Manufacturing", {
         }
     },
     before_save: function (frm) {
+        let post_chips = 0,
+            slab_chips = 0,
+            cement = 0,
+            m_sand = 0,
+            ggbs = 0;
+        let rm_consmp = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption : [];
+        for (let i = 0; i < rm_consmp.length; i++) {
+            post_chips += rm_consmp[i].bin1 ? rm_consmp[i].bin1 : 0;
+            slab_chips += rm_consmp[i].bin2 ? rm_consmp[i].bin2 : 0;
+            cement += rm_consmp[i].bin3 ? rm_consmp[i].bin3 : 0;
+            m_sand += rm_consmp[i].bin4 ? rm_consmp[i].bin4 : 0;
+            ggbs += rm_consmp[i].bin5 ? rm_consmp[i].bin5 : 0;
+        }
+        frm.set_value("post_chips_qty", post_chips ? post_chips : 0);
+        frm.set_value("slab_chips_qty", slab_chips ? slab_chips : 0);
+        frm.set_value("cement_qty", cement ? cement : 0);
+        frm.set_value("m_sand_qty", m_sand ? m_sand : 0);
+        frm.set_value("ggbs_qty", ggbs ? ggbs : 0);
+        std_item(frm);
+        item_adding(frm);
         item_details_total(frm);
+        raw_material_cost(frm);
+        total_expense_per_sqft(frm);
     },
     avg_labour_wages: function (frm) {
         frm.set_value("labour_cost", (frm.doc.avg_labour_wages ? frm.doc.avg_labour_wages : 0) * (frm.doc.no_of_labours ? frm.doc.no_of_labours : 0));
@@ -49,6 +77,35 @@ frappe.ui.form.on("CW Manufacturing", {
     },
     raw_material_cost: function (frm) {
         total_expense_per_sqft(frm);
+    },
+    create_stock_entry_for_molding: async function (frm) {
+        if (cur_frm.is_dirty()) {
+            frappe.show_alert({ message: "Please save this form before doing this operation.", indicator: "red" });
+        } else {
+            frappe.call({
+                method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.make_stock_entry_for_molding",
+                args: {
+                    doc: frm.doc,
+                },
+                callback: function (r) {
+                    if (r.message) {
+                        frm.set_value("status1", r.message);
+                        frm.save();
+                    }
+                },
+            });
+        }
+    },
+    total_no_of_batches: function (frm) {
+        for (let row = 0; row < (frm.doc.items ? frm.doc.items.length : 0); row++) {
+            let cdt = frm.doc.items[row].doctype,
+                cdn = frm.doc.items[row].name;
+            let data = locals[cdt][cdn];
+            if (data.from_bom == 1) {
+                frappe.model.set_value(cdt, cdn, "qty", (data.ts_qty ? data.ts_qty : 0) * (frm.doc.total_no_of_batches ? frm.doc.total_no_of_batches : 0));
+            }
+        }
+        refresh_field("items");
     },
 });
 
@@ -131,16 +188,106 @@ function total_expense_per_sqft(frm) {
     total_cost += frm.doc.labour_cost ? frm.doc.labour_cost : 0;
     total_cost += frm.doc.additional_cost ? frm.doc.additional_cost : 0;
     total_cost += frm.doc.raw_material_cost ? frm.doc.raw_material_cost : 0;
+    frm.set_value("total_expense", total_cost);
     frm.set_value("total_expense_per_sqft", frm.doc.production_sqft ? (total_cost ? total_cost : 0) / frm.doc.production_sqft : 0);
 }
 
 function raw_material_cost(frm) {
     let items = frm.doc.items,
         total_raw_material_cost = 0;
-    for (let i = 0; i < frm.doc.items; i++) {
+    for (let i = 0; i < items.length; i++) {
         total_raw_material_cost += items[i].amount ? items[i].amount : 0;
     }
     frm.set_value("raw_material_cost", total_raw_material_cost);
+}
+
+function std_item(frm) {
+    if (frm.doc.bom) {
+        frappe.call({
+            method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.std_item",
+            args: {
+                doc: frm.doc,
+            },
+            callback(r) {
+                var item1 = [];
+                for (const d of r.message) {
+                    item1.push(d.item_code ? d.item_code : "");
+                }
+                for (const d of r.message) {
+                    for (const i of frm.doc.items ? frm.doc.items : []) {
+                        if (i.item_code == d.item_code && i.from_usb == 1 && item1.includes(d.item_code ? d.item_code : "")) {
+                            item1.splice(item1.indexOf(d.item_code ? d.item_code : ""), 1);
+                        }
+                    }
+                }
+                if (item1) {
+                    for (const d of r.message) {
+                        if (item1.includes(d.item_code ? d.item_code : "")) {
+                            var row = frm.add_child("items");
+                            row.item_code = d.item_code;
+                            row.qty = d.qty;
+                            row.ts_qty = d.qty;
+                            row.from_usb = 1;
+                            row.stock_uom = d.stock_uom;
+                            row.uom = d.uom;
+                            if (d.rate == 0) {
+                                row.rate = d.validation_rate;
+                            } else {
+                                row.rate = d.rate;
+                            }
+                            row.amount = d.amount;
+                        }
+                    }
+                }
+                refresh_field("items");
+                raw_material_cost(frm);
+            },
+        });
+    }
+}
+
+function item_adding(frm) {
+    if (frm.doc.bom) {
+        frappe.call({
+            method: "ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.add_item",
+            args: {
+                bom_no: frm.doc.bom,
+                doc: frm.doc,
+            },
+            callback(r) {
+                var item1 = [];
+                for (const d of r.message) {
+                    item1.push(d.item_code ? d.item_code : "");
+                }
+                for (const d of r.message) {
+                    for (const i of frm.doc.items ? frm.doc.items : []) {
+                        if (i.item_code == d.item_code && i.from_bom == 1 && item1.includes(d.item_code ? d.item_code : "")) {
+                            item1.splice(item1.indexOf(d.item_code ? d.item_code : ""), 1);
+                        }
+                    }
+                }
+                if (item1) {
+                    for (const d of r.message) {
+                        if (item1.includes(d.item_code ? d.item_code : "")) {
+                            var row = frm.add_child("items");
+                            row.item_code = d.item_code;
+                            // row.layer_type = d.layer_type;
+                            row.qty = d.qty * (frm.doc.total_no_of_batches ? frm.doc.total_no_of_batches : 0);
+                            row.ts_qty = d.ts_qty;
+                            row.stock_uom = d.stock_uom;
+                            row.from_bom = 1;
+                            row.uom = d.uom;
+                            row.rate = d.rate;
+                            row.amount = d.amount * (frm.doc.total_no_of_batches ? frm.doc.total_no_of_batches : 0);
+                            row.source_warehouse = d.source_warehouse;
+                        }
+                    }
+                }
+                refresh_field("items");
+                raw_material_cost(frm);
+            },
+        });
+    }
 }
 
 frappe.ui.form.on("CW Items", {
@@ -182,10 +329,21 @@ frappe.ui.form.on("CW Items", {
     },
 });
 
+function default_value(usb_field, set_field) {
+    frappe.db.get_single_value("CW Settings", usb_field).then((value) => {
+        frm.set_value(set_field, value);
+    });
+    frm.refresh_field(set_field);
+}
+
+function total_amount(frm, cdt, cdn) {
+    var d = locals[cdt][cdn];
+    frappe.model.set_value(cdt, cdn, "amount", d.qty * d.rate);
+}
+
 frappe.ui.form.on("BOM Item", {
     rate: function (frm, cdt, cdn) {
         total_amount(frm, cdt, cdn);
-        // frappe.model.set_value(cdt,cdn,"item_tax_template",r.message)
     },
     qty: function (frm, cdt, cdn) {
         total_amount(frm, cdt, cdn);
@@ -208,7 +366,3 @@ frappe.ui.form.on("BOM Item", {
         total_amount(frm, cdt, cdn);
     },
 });
-function total_amount(frm, cdt, cdn) {
-    var d = locals[cdt][cdn];
-    frappe.model.set_value(cdt, cdn, "amount", d.qty * d.rate);
-}
