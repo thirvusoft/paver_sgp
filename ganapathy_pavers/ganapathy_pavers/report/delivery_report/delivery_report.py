@@ -51,7 +51,14 @@ class PartyLedgerSummaryReport(object):
 				"fieldname": "project",
 				"options": "Project",
 				"width": 150,
-			}
+			},
+			{
+				"fieldname":"type",
+				"label": _("Type"),
+				"fieldtype": "Select",
+				"options": "\nPavers\ncompound Walls",
+				"width":150
+			},
 		]
 
 		if self.party_naming_by == "Naming Series":
@@ -167,12 +174,13 @@ class PartyLedgerSummaryReport(object):
 		self.party_data = frappe._dict({})
 		for gle in self.gl_entries:
 			self.party_data.setdefault(
-				gle.party+(gle.project or ''),
+				gle.party+(gle.project or '')+(gle.type or ''),
 				frappe._dict(
 					{
 						"party": gle.party,
 						"party_name": gle.party_name,
 						"project": gle.project,
+						"type":gle.type,
 						"opening_balance":0,
 						"invoiced_amount":0,
 						"paid_amount":0,
@@ -186,17 +194,17 @@ class PartyLedgerSummaryReport(object):
 			)
 
 			amount = gle.get(invoice_dr_or_cr) - gle.get(reverse_dr_or_cr)
-			self.party_data[gle.party+(gle.project or '')].closing_balance += amount
+			self.party_data[gle.party+(gle.project or '')+(gle.type or '')].closing_balance += amount
 
 			if gle.posting_date < self.filters.from_date or gle.is_opening == "Yes":
-				self.party_data[gle.party+(gle.project or '')].opening_balance += amount
+				self.party_data[gle.party+(gle.project or '')+(gle.type or '')].opening_balance += amount
 			else:
 				if amount > 0:
-					self.party_data[gle.party+(gle.project or '')].invoiced_amount += amount
+					self.party_data[gle.party+(gle.project or '')+(gle.type or '')].invoiced_amount += amount
 				elif gle.voucher_no in self.return_invoices:
-					self.party_data[gle.party+(gle.project or '')].return_amount -= amount
+					self.party_data[gle.party+(gle.project or '')+(gle.type or '')].return_amount -= amount
 				else:
-					self.party_data[gle.party+(gle.project or '')].paid_amount -= amount
+					self.party_data[gle.party+(gle.project or '')+(gle.type or '')].paid_amount -= amount
 
 		out = []
 		for party, row in iteritems(self.party_data):
@@ -227,6 +235,7 @@ class PartyLedgerSummaryReport(object):
 		for customer in data:
 			filters={'customer': customer.party, 'docstatus':1}
 			filters['project'] = (customer.get('project') or '')
+			filters['type'] = (customer.get('type') or '')
 			filters["posting_date"] = ["between", [self.filters.from_date, self.filters.to_date]]
 
 			delivery_amount = sum(frappe.get_all('Delivery Note', filters, pluck='rounded_total'))
@@ -251,7 +260,7 @@ class PartyLedgerSummaryReport(object):
 		self.gl_entries = frappe.db.sql(
 			"""
 			select
-				gle.posting_date, gle.party, gle.project, gle.voucher_type, gle.voucher_no, gle.against_voucher_type,
+				gle.posting_date, gle.party, gle.project, gle.type, gle.voucher_type, gle.voucher_no, gle.against_voucher_type,
 				gle.against_voucher, gle.debit, gle.credit, gle.is_opening {join_field}
 			from `tabGL Entry` gle
 			{join}
@@ -273,6 +282,9 @@ class PartyLedgerSummaryReport(object):
 
 		if self.filters.get('project'):
 			conditions.append(f"gle.project='{self.filters.get('project')}'")
+		
+		if self.filters.get('type'):
+			conditions.append(f"gle.type='{self.filters.get('type')}'")
 
 		if self.filters.finance_book:
 			conditions.append("ifnull(finance_book,'') in (%(finance_book)s, '')")
