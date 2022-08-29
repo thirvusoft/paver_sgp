@@ -72,7 +72,7 @@ def get_columns():
        _("Document Name") + ":Link/Delivery Note:100",
        _("Customer Name") + ":Link/Customer:200",
        _("Sales Type") + ":Data:150",
-       _("Site Name") + ":link/Project:150",
+       _("Site Name") + ":Link/Project:150",
        _("Item Name") + ":Link/Item:150",
        _("Qty") + ":Int:80",
        _("Rate") + ":Currency:100",
