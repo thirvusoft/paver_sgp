@@ -16,7 +16,6 @@
   "status1",
   "section_break_6",
   "bom",
-  "machine",
   "column_break_12",
   "labour_cost_in_molding",
   "no_of_labours",
@@ -42,13 +41,13 @@
   "item_details",
   "section_break_21",
   "manufacturing_hrs",
+  "avg_labour_wages",
   "column_break_23",
   "total_no_of_operators",
   "total_amount_section",
   "operator_cost",
   "column_break_37",
   "labour_cost",
-  "avg_labour_wages",
   "column_break_38",
   "additional_cost",
   "column_break_40",
@@ -62,7 +61,59 @@
   "column_break_46",
   "damaged_qty",
   "column_break_48",
-  "production_sqft"
+  "production_sqft",
+  "unmolding_and_bundling_section",
+  "no_of_labours_unmould",
+  "column_break_59",
+  "unmolding_date",
+  "section_break_61",
+  "unmolding_details",
+  "section_break_66",
+  "total_unmolding_hrs",
+  "column_break_62",
+  "total_no_of_operators_unmold",
+  "total_amount_for_unmolding_section",
+  "operator_cost_unmold",
+  "column_break_66",
+  "labour_cost_unmold",
+  "avg_labour_wages_unmold",
+  "column_break_68",
+  "additional_cost_unmold",
+  "strapping_cost_per_sqft_unmold",
+  "column_break_70",
+  "total_expense_per_sqft_unmold",
+  "total_expense_for_unmolding",
+  "section_break_63",
+  "produced_qty_unmold",
+  "create_stock_entry_for_bundling",
+  "column_break_63",
+  "damaged_qty_at_bundling",
+  "column_break_61",
+  "actual_bundle_qty",
+  "remaining_qty_from_bundles",
+  "column_break_79",
+  "production_sqft_unmold",
+  "no_of_bundle_unmold",
+  "curing_section",
+  "curing_date",
+  "bundled_sqft_curing",
+  "no_of_bundle_curing",
+  "create_stock_entry_for_curing",
+  "column_break_88",
+  "labour_cost_per_sqft_curing",
+  "labour_expense_for_curing",
+  "abstract_section",
+  "labour_cost_per_sqft",
+  "operator_cost_per_sqft",
+  "strapping_cost_per_sqft",
+  "column_break_97",
+  "additional_cost_per_sqft",
+  "raw_material_cost_per_sqft",
+  "total_cost_per_sqft",
+  "batch_details_section",
+  "molding_batch",
+  "unmolding_batch",
+  "curing_batch"
  ],
  "fields": [
   {
@@ -114,12 +165,6 @@
    "options": "BOM"
   },
   {
-   "fieldname": "machine",
-   "fieldtype": "Link",
-   "label": "Machine",
-   "options": "Operation"
-  },
-  {
    "fieldname": "column_break_12",
    "fieldtype": "Column Break"
   },
@@ -166,7 +211,7 @@
   {
    "fieldname": "total_amount_section",
    "fieldtype": "Section Break",
-   "label": "Total Amount"
+   "label": "Total Amount for Molding"
   },
   {
    "fieldname": "operator_cost",
@@ -202,7 +247,7 @@
   {
    "fieldname": "total_qty_section",
    "fieldtype": "Section Break",
-   "label": "Total Qty"
+   "label": "Total Qty for Molding"
   },
   {
    "fieldname": "production_qty",
@@ -260,7 +305,7 @@
   {
    "fieldname": "manufacturing_items",
    "fieldtype": "Section Break",
-   "label": "Manufacturing Details"
+   "label": "Workstation / Unit Details"
   },
   {
    "fieldname": "item_details",
@@ -274,7 +319,7 @@
   {
    "fieldname": "manufacturing_hrs",
    "fieldtype": "Float",
-   "label": "Total Manufacturing hrs",
+   "label": "Total Molding hrs",
    "read_only": 1
   },
   {
@@ -290,8 +335,7 @@
   {
    "fieldname": "avg_labour_wages",
    "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Avg Labour Wages",
+   "label": "Avg Labour Wages Per Hour",
    "read_only": 1
   },
   {
@@ -379,12 +423,298 @@
    "label": "Type",
    "options": "\nPost\nSlab",
    "read_only": 1
+  },
+  {
+   "fieldname": "unmolding_and_bundling_section",
+   "fieldtype": "Section Break",
+   "label": "Unmolding and Bundling"
+  },
+  {
+   "fieldname": "produced_qty_unmold",
+   "fieldtype": "Float",
+   "label": "Bundled Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "production_sqft_unmold",
+   "fieldtype": "Float",
+   "label": "Bundled Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "no_of_bundle_unmold",
+   "fieldtype": "Float",
+   "label": "Total No of Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_61",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "no_of_labours_unmould",
+   "fieldtype": "Int",
+   "label": "No of Labours"
+  },
+  {
+   "fieldname": "section_break_63",
+   "fieldtype": "Section Break",
+   "label": "Total Qty for Unmolding"
+  },
+  {
+   "fieldname": "unmolding_details",
+   "fieldtype": "Table",
+   "options": "CW Unmolding"
+  },
+  {
+   "fieldname": "column_break_62",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_66",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_unmolding_hrs",
+   "fieldtype": "Float",
+   "label": "Total Unmolding Hrs",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_no_of_operators_unmold",
+   "fieldtype": "Int",
+   "label": "Total No of Operators",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_63",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_amount_for_unmolding_section",
+   "fieldtype": "Section Break",
+   "label": "Total Amount for Unmolding"
+  },
+  {
+   "fieldname": "operator_cost_unmold",
+   "fieldtype": "Currency",
+   "label": "Operator Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_66",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "labour_cost_unmold",
+   "fieldtype": "Currency",
+   "label": "Labour Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_68",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "additional_cost_unmold",
+   "fieldtype": "Currency",
+   "label": "Additional Cost"
+  },
+  {
+   "fieldname": "column_break_70",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_expense_per_sqft_unmold",
+   "fieldtype": "Currency",
+   "label": "Total Expense Per Sqft",
+   "read_only": 1
+  },
+  {
+   "description": "It includes labours cost, operators cost and additional cost.",
+   "fieldname": "total_expense_for_unmolding",
+   "fieldtype": "Currency",
+   "label": "Total Expense for Unmolding",
+   "read_only": 1
+  },
+  {
+   "fieldname": "damaged_qty_at_bundling",
+   "fieldtype": "Float",
+   "label": "Damaged Qty at Bundling",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_79",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "actual_bundle_qty",
+   "fieldtype": "Float",
+   "label": "Actual Bundle Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "create_stock_entry_for_bundling",
+   "fieldtype": "Button",
+   "label": "Create Stock Entry for Bundling"
+  },
+  {
+   "fieldname": "avg_labour_wages_unmold",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Average Labour Wages for Unmolding",
+   "read_only": 1
+  },
+  {
+   "fieldname": "strapping_cost_per_sqft_unmold",
+   "fieldtype": "Currency",
+   "label": "Strapping Cost Per Sqft"
+  },
+  {
+   "fieldname": "curing_section",
+   "fieldtype": "Section Break",
+   "label": "Curing"
+  },
+  {
+   "fieldname": "bundled_sqft_curing",
+   "fieldtype": "Float",
+   "label": "Bundled Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "no_of_bundle_curing",
+   "fieldtype": "Float",
+   "label": "No of Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_88",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "labour_cost_per_sqft_curing",
+   "fieldtype": "Currency",
+   "label": "Labour Cost Per Sqft for Curing"
+  },
+  {
+   "fieldname": "labour_expense_for_curing",
+   "fieldtype": "Currency",
+   "label": "Labour Expense for Curing"
+  },
+  {
+   "fieldname": "create_stock_entry_for_curing",
+   "fieldtype": "Button",
+   "label": "Create Stock Entry for Curing"
+  },
+  {
+   "fieldname": "remaining_qty_from_bundles",
+   "fieldtype": "Float",
+   "label": "Remaining Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "abstract_section",
+   "fieldtype": "Section Break",
+   "label": "Abstract"
+  },
+  {
+   "fieldname": "labour_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Labour Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "operator_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Operator Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "strapping_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Strapping Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "additional_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Additional Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "raw_material_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Raw Material Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Total Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_97",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_59",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "unmolding_date",
+   "fieldtype": "Date",
+   "label": "Unmolding Date"
+  },
+  {
+   "fieldname": "section_break_61",
+   "fieldtype": "Section Break",
+   "label": " Workstation / Unit Details "
+  },
+  {
+   "fieldname": "batch_details_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Batch Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "molding_batch",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Molding Batch",
+   "no_copy": 1,
+   "options": "Batch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "unmolding_batch",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Unmolding Batch",
+   "no_copy": 1,
+   "options": "Batch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "curing_batch",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Curing Batch",
+   "no_copy": 1,
+   "options": "Batch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "curing_date",
+   "fieldtype": "Date",
+   "label": "Curing Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-26 20:16:12.430384",
+ "modified": "2022-08-29 11:20:12.965296",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",
