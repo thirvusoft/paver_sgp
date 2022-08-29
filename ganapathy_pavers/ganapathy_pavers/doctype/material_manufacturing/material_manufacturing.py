@@ -142,7 +142,7 @@ def make_stock_entry(doc,type1):
     expenses_included_in_valuation = frappe.get_cached_value("Company", doc.get("company"), "expenses_included_in_valuation")
     stock_entry = frappe.new_doc("Stock Entry")
     stock_entry.company = doc.get("company")
-    stock_entry.form_bom = 1
+    stock_entry.from_bom = 1
     stock_entry.bom_no = doc.get("bom_no")
     stock_entry.usb = doc.get("name")
     default_nos = frappe.db.get_singles_value("USB Setting", "default_manufacture_uom")
