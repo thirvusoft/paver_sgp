@@ -11,9 +11,11 @@
   "per_rack",
   "per_plate",
   "is_shot_blasting",
+  "machine_operator",
   "column_break_2",
   "company",
   "status1",
+  "panmix_operator",
   "section_break_1",
   "no_of_item_in_process",
   "total_working_hrs",
@@ -965,12 +967,24 @@
    "fieldname": "hours_to_reduce_rack",
    "fieldtype": "Float",
    "label": "Hours to Reduce"
+  },
+  {
+   "fieldname": "machine_operator",
+   "fieldtype": "Link",
+   "label": "Machine Operator",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "panmix_operator",
+   "fieldtype": "Link",
+   "label": "Panmix Operator",
+   "options": "Employee"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-24 12:12:43.747278",
+ "modified": "2022-08-25 11:31:48.909782",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
