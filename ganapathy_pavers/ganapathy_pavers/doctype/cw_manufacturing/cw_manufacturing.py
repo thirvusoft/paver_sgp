@@ -9,7 +9,14 @@ from frappe.model.document import Document
 
 
 class CWManufacturing(Document):
-    pass
+    def before_submit(doc):
+        manufacture = frappe.get_all("Stock Entry",filters={"cw_usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
+        repack = frappe.get_all("Stock Entry",filters={"cw_usb":doc.get("name"),"stock_entry_type":"Repack"},pluck="name")
+        material = frappe.get_all("Stock Entry",filters={"cw_usb":doc.get("name"),"stock_entry_type":"Material Transfer"},pluck="name")
+        if len(manufacture) == 0 or len(repack) == 0 or len(material) == 0:
+            frappe.throw("Process Incomplete. Create Stock Entry To Submit")
+        if(doc.status1 != "Completed"):
+            frappe.throw(f"Please change the status to {frappe.bold('Completed')} before submitting.")
 
 
 def throw_error(field, doctype = "Cw Settings"):
