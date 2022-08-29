@@ -309,6 +309,9 @@ frappe.ui.form.on('Material Manufacturing', {
 	no_of_labours2: function(frm){
 		cur_frm.set_value('labour_cost_in_rack_shift',frm.doc.labour_ws_cost*frm.doc.total_hours_rack*frm.doc.no_of_labours2)
 	},
+	total_hours_rack: function(frm){
+		cur_frm.set_value('labour_cost_in_rack_shift',frm.doc.labour_ws_cost*frm.doc.total_hours_rack*frm.doc.no_of_labours2)
+	},
 	workstation: async function(frm){
 		if(frm.doc.workstation){
 			await frappe.db.get_value('Workstation', frm.doc.workstation, 'no_of_labours').then((value) => {
