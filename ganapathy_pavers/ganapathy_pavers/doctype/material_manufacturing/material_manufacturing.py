@@ -87,22 +87,6 @@ def add_item(bom_no,doc):
 def std_item(doc):
     items=[]
     doc=json.loads(doc)
-    if doc.get('cement_item') and doc.get('total_no_of_cement'):
-        row={}
-        row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['cement_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
-        row['qty']=doc.get('total_no_of_cement')
-        row['average_consumption'] = doc.get('average_of_cement')
-        row['layer_type'] = 'Panmix'
-        row['amount']=doc.get('total_no_of_cement')*(row['rate'] or row['validation_rate'])
-        items.append(row)
-    if doc.get('ggbs_item') and doc.get('total_no_of_ggbs2'):
-        row={}
-        row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['ggbs_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
-        row['qty']=doc.get('total_no_of_ggbs2')
-        row['average_consumption'] = doc.get('average_of__ggbs2')
-        row['layer_type'] = 'Panmix'
-        row['amount']=doc.get('total_no_of_ggbs2')*(row['rate'] or row['validation_rate'])
-        items.append(row)
     if doc.get('chips_item_name') and doc.get('total_no_of_chips'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['chips_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
@@ -119,6 +103,22 @@ def std_item(doc):
         row['layer_type'] = 'Panmix'
         row['amount']=doc.get('total_no_of_dust')*(row['rate'] or row['validation_rate'])
         items.append(row)
+    if doc.get('cement_item') and doc.get('total_no_of_cement'):
+        row={}
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['cement_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
+        row['qty']=doc.get('total_no_of_cement')
+        row['average_consumption'] = doc.get('average_of_cement')
+        row['layer_type'] = 'Panmix'
+        row['amount']=doc.get('total_no_of_cement')*(row['rate'] or row['validation_rate'])
+        items.append(row)
+    if doc.get('ggbs_item') and doc.get('total_no_of_ggbs2'):
+        row={}
+        row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['ggbs_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
+        row['qty']=doc.get('total_no_of_ggbs2')
+        row['average_consumption'] = doc.get('average_of__ggbs2')
+        row['layer_type'] = 'Panmix'
+        row['amount']=doc.get('total_no_of_ggbs2')*(row['rate'] or row['validation_rate'])
+        items.append(row)
     if doc.get('setting_oil_item_name') and doc.get('total_setting_oil_qty'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['setting_oil_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
@@ -127,7 +127,16 @@ def std_item(doc):
         row['layer_type'] = 'Panmix'
         row['amount']=doc.get('total_setting_oil_qty')*(row['rate'] or row['validation_rate'])
         items.append(row)
-    return items
+    bom_qty = {}
+    if(doc.get('bom_no')):
+        bom_doc = frappe.get_doc('BOM', doc.get('bom_no'))
+        for row in bom_doc.items:
+            if(row.layer_type == 'Panmix'):
+                if(row.item_code not in bom_qty):
+                    bom_qty[row.item_code] = 0
+                bom_qty[row.item_code] += row.qty
+
+    return {'items': items, 'bom_qty': bom_qty}
 
 @frappe.whitelist()
 def item_data(item_code):

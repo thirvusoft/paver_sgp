@@ -313,6 +313,7 @@ frappe.ui.form.on('Material Manufacturing', {
 			let data = locals[cdt][cdn]
 			if(data.layer_type == "Top Layer"){
 				frappe.model.set_value(cdt, cdn, 'qty', (data.ts_qty?data.ts_qty:0)*(frm.doc.total_no_of_batches?frm.doc.total_no_of_batches:0))
+				frappe.model.set_value(cdt, cdn, 'no_of_batches', (frm.doc.total_no_of_batches?frm.doc.total_no_of_batches:0))
 			}
 		}
 		refresh_field("items")
@@ -461,6 +462,7 @@ function item_adding(frm){
 								row.layer_type = d.layer_type
 								row.qty = (d.layer_type=='Top Layer'?d.qty * (cur_frm.doc.total_no_of_batches?cur_frm.doc.total_no_of_batches:0):d.qty);
 								row.ts_qty = d.ts_qty;
+								row.bom_qty = d.ts_qty;
 								row.average_consumption = d.ts_qty;
 								row.no_of_batches = frm.doc.total_no_of_batches
 								row.stock_uom = d.stock_uom;
@@ -490,11 +492,11 @@ function std_item(frm){
 			callback(r){
 				// cur_frm.set_value('items',r.message)
 				var item1=[]
-				for (const d of r.message){
+				for (const d of r.message['items']){
 					// if(!item1.includes(d.item_code))
 					item1.push('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))
 				}
-				for (const d of r.message){
+				for (const d of r.message['items']){
 					for(const i of frm.doc.items?frm.doc.items:[]){
 						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type==i.layer_type && item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))){
 							item1.splice(item1.indexOf('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:'')), 1)
@@ -503,7 +505,7 @@ function std_item(frm){
 				}
 				if(item1){
 					// for(var i=0;i<item1.length;i++){		
-						for (const d of r.message){
+						for (const d of r.message['items']){
 							if(item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))){
 								var row = frm.add_child('items');
 								row.item_code = d.item_code;
@@ -511,6 +513,7 @@ function std_item(frm){
 								row.layer_type = 'Panmix'
 								row.no_of_batches = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0;
 								row.ts_qty = d.qty;
+								row.bom_qty = r.message['bom_qty'][d.item_code];
 								row.average_consumption = d.average_consumption;
 								row.stock_uom = d.stock_uom;
 								row.from_usb = 1;
