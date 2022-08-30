@@ -70,13 +70,13 @@
   "unmolding_details",
   "section_break_66",
   "total_unmolding_hrs",
+  "avg_labour_wages_unmold",
   "column_break_62",
   "total_no_of_operators_unmold",
   "total_amount_for_unmolding_section",
   "operator_cost_unmold",
   "column_break_66",
   "labour_cost_unmold",
-  "avg_labour_wages_unmold",
   "column_break_68",
   "additional_cost_unmold",
   "strapping_cost_per_sqft_unmold",
@@ -419,7 +419,6 @@
    "fetch_from": "item_to_manufacture.compound_wall_type",
    "fieldname": "type",
    "fieldtype": "Select",
-   "hidden": 1,
    "label": "Type",
    "options": "\nPost\nSlab",
    "read_only": 1
@@ -531,7 +530,7 @@
    "read_only": 1
   },
   {
-   "description": "It includes labours cost, operators cost and additional cost.",
+   "description": "It includes labours cost, operators cost, strapping cost and additional cost.",
    "fieldname": "total_expense_for_unmolding",
    "fieldtype": "Currency",
    "label": "Total Expense for Unmolding",
@@ -561,7 +560,6 @@
   {
    "fieldname": "avg_labour_wages_unmold",
    "fieldtype": "Currency",
-   "hidden": 1,
    "label": "Average Labour Wages for Unmolding",
    "read_only": 1
   },
@@ -714,7 +712,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-29 11:20:12.965296",
+ "modified": "2022-08-29 16:39:40.348734",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

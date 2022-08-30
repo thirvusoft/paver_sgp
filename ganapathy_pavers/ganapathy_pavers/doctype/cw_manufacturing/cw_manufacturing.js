@@ -67,6 +67,7 @@ frappe.ui.form.on("CW Manufacturing", {
     before_save: async function (frm) {
       await frm.trigger("ts_before_save").then( async (ret) => {
         abstract_calc(frm);
+        no_of_batches_count(frm);
         if (!frm.is_new()) {
           await frappe.call({
             method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.find_batch",
@@ -151,8 +152,7 @@ frappe.ui.form.on("CW Manufacturing", {
               for (let row = 0; row < workstation.length; row++) {
                 let new_row = frm.add_child("unmolding_details");
                 new_row.workstation = workstation[row].workstation;
-                new_row.production_qty = workstation[row].production_qty;
-                new_row.damaged_qty = workstation[row].damaged_qty;
+                new_row.production_qty = workstation[row].produced_qty;
                 new_row.produced_qty = workstation[row].produced_qty;
                 new_row.production_sqft = workstation[row].production_sqft;
                 if (frm.doc.item_to_manufacture) {
@@ -237,6 +237,22 @@ frappe.ui.form.on("CW Manufacturing", {
     frm.set_value("labour_expense_for_curing", (frm.doc.bundled_sqft_curing ? frm.doc.bundled_sqft_curing : 0) * (frm.doc.labour_cost_per_sqft_curing ? frm.doc.labour_cost_per_sqft_curing : 0));
   }
   
+  function no_of_batches_count(frm) {
+    let raw_material = frm.doc.items ? frm.doc.items : [];
+    let usb_count = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0;
+    let total_batches = frm.doc.total_no_of_batches ? frm.doc.total_no_of_batches : 0;
+    for (let row = 0; row < raw_material.length; row++) {
+      let cdt = raw_material[row].doctype, cdn = raw_material[row].name;
+      let data = locals[cdt][cdn];
+      if(data.from_usb == 1){
+        frappe.model.set_value(cdt, cdn, 'no_of_batches', usb_count)
+      }
+      if(data.from_bom == 1){
+        frappe.model.set_value(cdt, cdn, 'no_of_batches', total_batches)
+      }
+    }
+  }
+
   function bom_fetch(frm) {
     frappe.db
       .get_list("BOM", {
@@ -364,6 +380,7 @@ frappe.ui.form.on("CW Manufacturing", {
               if (item1.includes(d.item_code ? d.item_code : "")) {
                 var row = frm.add_child("items");
                 row.item_code = d.item_code;
+                row.no_of_batches = (frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0);
                 row.qty = d.qty;
                 row.ts_qty = d.qty;
                 row.from_usb = 1;
@@ -410,7 +427,7 @@ frappe.ui.form.on("CW Manufacturing", {
               if (item1.includes(d.item_code ? d.item_code : "")) {
                 var row = frm.add_child("items");
                 row.item_code = d.item_code;
-                // row.layer_type = d.layer_type;
+                row.no_of_batches = (frm.doc.total_no_of_batches ? frm.doc.total_no_of_batches : 0);
                 row.qty = d.qty * (frm.doc.total_no_of_batches ? frm.doc.total_no_of_batches : 0);
                 row.ts_qty = d.ts_qty;
                 row.stock_uom = d.stock_uom;

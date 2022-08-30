@@ -91,13 +91,15 @@ def std_item(doc):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['cement_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_cement')
+        row['average_consumption'] = doc.get('average_of_cement')
         row['layer_type'] = 'Panmix'
         row['amount']=doc.get('total_no_of_cement')*(row['rate'] or row['validation_rate'])
         items.append(row)
-    if doc.get('ggbs_item') and doc.get('total_no_of_cement'):
+    if doc.get('ggbs_item') and doc.get('total_no_of_ggbs2'):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['ggbs_item'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_ggbs2')
+        row['average_consumption'] = doc.get('average_of__ggbs2')
         row['layer_type'] = 'Panmix'
         row['amount']=doc.get('total_no_of_ggbs2')*(row['rate'] or row['validation_rate'])
         items.append(row)
@@ -105,6 +107,7 @@ def std_item(doc):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['chips_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_chips')
+        row['average_consumption'] = doc.get('average_of_chips')
         row['layer_type'] = 'Panmix'
         row['amount']=doc.get('total_no_of_chips')*(row['rate'] or row['validation_rate'])
         items.append(row)
@@ -112,6 +115,7 @@ def std_item(doc):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['dust_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_no_of_dust')
+        row['average_consumption'] = doc.get('average_of_dust')
         row['layer_type'] = 'Panmix'
         row['amount']=doc.get('total_no_of_dust')*(row['rate'] or row['validation_rate'])
         items.append(row)
@@ -119,6 +123,7 @@ def std_item(doc):
         row={}
         row['item_code'],row['stock_uom'],row['uom'],row['rate'],row['validation_rate'] = frappe.get_value("Item",doc['setting_oil_item_name'],['item_code','stock_uom','stock_uom','last_purchase_rate','valuation_rate'])
         row['qty']=doc.get('total_setting_oil_qty')
+        row['average_consumption'] = (doc.get('setting_oil_qty') or 0)/1000
         row['layer_type'] = 'Panmix'
         row['amount']=doc.get('total_setting_oil_qty')*(row['rate'] or row['validation_rate'])
         items.append(row)

@@ -13,7 +13,7 @@
  "is_standard": 1,
  "label": "TS Manufacturing",
  "links": [],
- "modified": "2022-08-08 08:08:41.579735",
+ "modified": "2022-08-29 16:42:06.745119",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Manufacturing",
@@ -23,7 +23,7 @@
  "shortcuts": [
   {
    "doc_view": "List",
-   "label": "USB Setting",
+   "label": "USB Settings",
    "link_to": "USB Setting",
    "type": "DocType"
   },
@@ -37,6 +37,18 @@
    "doc_view": "List",
    "label": "Shot Blast Costing",
    "link_to": "Shot Blast Costing",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "",
+   "label": "CW Settings",
+   "link_to": "CW Settings",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "",
+   "label": "CW Manufacturing",
+   "link_to": "CW Manufacturing",
    "type": "DocType"
   },
   {

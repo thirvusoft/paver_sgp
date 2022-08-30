@@ -12,10 +12,12 @@
   "per_plate",
   "is_shot_blasting",
   "machine_operator",
+  "machine_operator_name",
   "column_break_2",
   "company",
   "status1",
   "panmix_operator",
+  "panmix_operator_name",
   "section_break_1",
   "no_of_item_in_process",
   "total_working_hrs",
@@ -979,12 +981,26 @@
    "fieldtype": "Link",
    "label": "Panmix Operator",
    "options": "Employee"
+  },
+  {
+   "fetch_from": "machine_operator.employee_name",
+   "fieldname": "machine_operator_name",
+   "fieldtype": "Data",
+   "label": "Machine Operator Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "panmix_operator.employee_name",
+   "fieldname": "panmix_operator_name",
+   "fieldtype": "Data",
+   "label": "Panmix Operator Name",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-25 11:31:48.909782",
+ "modified": "2022-08-29 13:14:20.225712",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

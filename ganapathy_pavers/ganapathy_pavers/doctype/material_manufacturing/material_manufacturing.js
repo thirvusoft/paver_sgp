@@ -460,8 +460,11 @@ function item_adding(frm){
 								row.item_code = d.item_code;
 								row.layer_type = d.layer_type
 								row.qty = (d.layer_type=='Top Layer'?d.qty * (cur_frm.doc.total_no_of_batches?cur_frm.doc.total_no_of_batches:0):d.qty);
-								row.ts_qty = d.ts_qty
+								row.ts_qty = d.ts_qty;
+								row.average_consumption = d.ts_qty;
+								row.no_of_batches = frm.doc.total_no_of_batches
 								row.stock_uom = d.stock_uom;
+								row.from_bom = 1;
 								row.uom = d.uom;
 								row.rate = d.rate;
 								row.amount= d.layer_type=='Top Layer'?d.amount * (cur_frm.doc.total_no_of_batches?cur_frm.doc.total_no_of_batches:0):d.amount;
@@ -506,8 +509,11 @@ function std_item(frm){
 								row.item_code = d.item_code;
 								row.qty = d.qty;
 								row.layer_type = 'Panmix'
-								row.ts_qty = d.qty
+								row.no_of_batches = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0;
+								row.ts_qty = d.qty;
+								row.average_consumption = d.average_consumption;
 								row.stock_uom = d.stock_uom;
+								row.from_usb = 1;
 								row.uom = d.uom;
 								if(d.rate == 0){
 									row.rate = d.validation_rate;
