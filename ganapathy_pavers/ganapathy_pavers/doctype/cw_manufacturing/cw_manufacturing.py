@@ -23,7 +23,7 @@ def throw_error(field, doctype = "Cw Settings"):
     frappe.throw(f"Please enter value for {frappe.bold(field)} in {frappe.bold(doctype)}")
 
 @frappe.whitelist()
-def make_stock_entry_for_molding(doc):
+def make_stock_entry_for_moulding(doc):
     doc = json.loads(doc)
     if (doc.get("item_to_manufacture")):
         if (not frappe.get_value('Item', doc.get("item_to_manufacture"), 'has_batch_no')):
@@ -35,23 +35,23 @@ def make_stock_entry_for_molding(doc):
     expenses_included_in_valuation = frappe.get_cached_value(
         "Company", doc.get("company"), "expenses_included_in_valuation") or throw_error('Expenses Included In Valuation', doc.get('company'))
     source_warehouse = frappe.db.get_singles_value(
-        "CW Settings", "default_molding_source_warehouse") or throw_error('Molding Source Warehouse')
+        "CW Settings", "default_moulding_source_warehouse") or throw_error('moulding Source Warehouse')
     target_warehouse = frappe.db.get_singles_value(
-        "CW Settings", "default_molding_target_warehouse") or throw_error('Molding Target Warehouse')
+        "CW Settings", "default_moulding_target_warehouse") or throw_error('moulding Target Warehouse')
     stock_entry = frappe.new_doc("Stock Entry")
     stock_entry.company = doc.get("company")
     stock_entry.from_bom = 1
     stock_entry.bom_no = doc.get("bom")
     stock_entry.cw_usb = doc.get("name")
     default_nos = frappe.db.get_singles_value(
-        "CW Settings", "default_molding_uom") or throw_error('Molding UOM')
+        "CW Settings", "default_moulding_uom") or throw_error('moulding UOM')
     valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
         "name"), "stock_entry_type": "Manufacture", "docstatus": ["!=", 2]}, pluck="name")
     stock_entry.set_posting_time = 1
-    stock_entry.posting_date = doc.get('molding_date')
+    stock_entry.posting_date = doc.get('moulding_date')
     if len(valid) >= 1:
         frappe.throw(
-            "Already Stock Entry ("+valid[0]+") Created For Molding")
+            "Already Stock Entry ("+valid[0]+") Created For moulding")
     stock_entry.stock_entry_type = "Manufacture"
     if (doc.get("items")):
         for i in doc.get("items"):
@@ -78,7 +78,7 @@ def make_stock_entry_for_molding(doc):
     stock_entry.save()
     stock_entry.submit()
     frappe.msgprint("New Stock Entry Created "+stock_entry.name)
-    return "Unmolding"
+    return "Unmoulding"
 
 @frappe.whitelist()
 def make_stock_entry_for_bundling(doc):
@@ -95,28 +95,28 @@ def make_stock_entry_for_bundling(doc):
     expenses_included_in_valuation = frappe.get_cached_value(
         "Company", doc.get("company"), "expenses_included_in_valuation") or throw_error('Expenses Included In Valuation', doc.get('company'))
     source_warehouse = frappe.db.get_singles_value(
-        "CW Settings", "default_unmolding_source_warehouse") or throw_error('Unmolding Source Warehouse')
+        "CW Settings", "default_unmoulding_source_warehouse") or throw_error('Unmoulding Source Warehouse')
     target_warehouse = frappe.db.get_singles_value(
-        "CW Settings", "default_unmolding_target_warehouse") or throw_error('Unmolding Target Warehouse')
+        "CW Settings", "default_unmoulding_target_warehouse") or throw_error('Unmoulding Target Warehouse')
     stock_entry = frappe.new_doc("Stock Entry")
     stock_entry.company = doc.get("company")
     stock_entry.cw_usb = doc.get("name")
     stock_entry.stock_entry_type = "Repack"
     default_nos = frappe.db.get_singles_value(
-        "CW Settings", "default_unmolding_and_bundling_uom") or throw_error('Default Unmolding and Bundling UOM')
+        "CW Settings", "default_unmoulding_and_bundling_uom") or throw_error('Default Unmoulding and Bundling UOM')
     manufacture_uom = frappe.db.get_singles_value(
-        "CW Settings", "default_molding_uom") or throw_error('Molding UOM')
+        "CW Settings", "default_moulding_uom") or throw_error('moulding UOM')
     valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
         "name"), "stock_entry_type": "Repack", "docstatus": 1}, pluck="name")
     if len(valid) >= 1:
             frappe.throw("Already Stock Entry ("+valid[0]+") Created For Repack.")
     stock_entry.set_posting_time = 1
-    stock_entry.posting_date = doc.get("unmolding_date")
-    manufacture_qty = (doc.get('no_of_bundle_unmold') + (rem_qty or 0)) * (frappe.get_value('Item', doc.get('item_to_manufacture'), 'pavers_per_bundle') or throw_error('Pieces Per Bundle', doc.get('item_to_manufacture')))
+    stock_entry.posting_date = doc.get("unmoulding_date")
+    manufacture_qty = (doc.get('no_of_bundle_unmould') + (rem_qty or 0)) * (frappe.get_value('Item', doc.get('item_to_manufacture'), 'pavers_per_bundle') or throw_error('Pieces Per Bundle', doc.get('item_to_manufacture')))
     manufacture_qty = uom_conversion(doc.get('item_to_manufacture'), 'Nos', manufacture_qty, manufacture_uom)
     converted_qty = uom_conversion(doc.get('item_to_manufacture'), manufacture_uom, manufacture_qty, default_nos)
     stock_entry.append('items', dict(
-        s_warehouse = source_warehouse, item_code = doc.get("item_to_manufacture"),qty = manufacture_qty ,uom = manufacture_uom ,batch_no = doc.get("molding_batch")
+        s_warehouse = source_warehouse, item_code = doc.get("item_to_manufacture"),qty = manufacture_qty ,uom = manufacture_uom ,batch_no = doc.get("moulding_batch")
         )) 
     stock_entry.append('items', dict(
         t_warehouse = target_warehouse, item_code = doc.get("item_to_manufacture"),qty = converted_qty,uom = default_nos
@@ -127,7 +127,7 @@ def make_stock_entry_for_bundling(doc):
             t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture"),qty =  scrap_qty ,uom = default_nos,  is_process_loss = 1
             ))
     stock_entry.append('additional_costs', dict(
-            expense_account	 = expenses_included_in_valuation, amount = doc.get("total_expense_for_unmolding"),description = "It includes labours cost, operators cost and additional cost."
+            expense_account	 = expenses_included_in_valuation, amount = doc.get("total_expense_for_unmoulding"),description = "It includes labours cost, operators cost and additional cost."
         ))
     stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
     stock_entry.save()
@@ -158,7 +158,7 @@ def make_stock_entry_for_curing(doc):
     stock_entry.set_posting_time = 1
     stock_entry.posting_date = doc.get("curing_date")
     default_nos = frappe.db.get_singles_value(
-        "CW Settings", "default_unmolding_and_bundling_uom") or throw_error('Default Unmolding and Bundling UOM')
+        "CW Settings", "default_unmoulding_and_bundling_uom") or throw_error('Default Unmoulding and Bundling UOM')
     valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
         "name"), "stock_entry_type": "Material Transfer", "docstatus": 1}, pluck="name")
     if len(valid) >= 1:
@@ -166,7 +166,7 @@ def make_stock_entry_for_curing(doc):
     manufacture_qty = doc.get('no_of_bundle_curing')  * (frappe.get_value('Item', doc.get('item_to_manufacture'), 'pavers_per_bundle') or throw_error('Pieces Per Bundle', doc.get('item_to_manufacture')))
     manufacture_qty = uom_conversion(doc.get('item_to_manufacture'), 'Nos', manufacture_qty, default_nos)
     stock_entry.append('items', dict(
-        s_warehouse = source_warehouse, item_code = doc.get("item_to_manufacture"),qty = manufacture_qty ,uom = default_nos ,batch_no = doc.get("unmolding_batch"),
+        s_warehouse = source_warehouse, item_code = doc.get("item_to_manufacture"),qty = manufacture_qty ,uom = default_nos ,batch_no = doc.get("unmoulding_batch"),
         t_warehouse = target_warehouse, 
         ))
     stock_entry.append('additional_costs', dict(

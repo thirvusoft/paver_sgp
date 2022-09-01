@@ -8,27 +8,27 @@
     "field_order": [
      "company",
      "section_break_2",
-     "no_of_labours_for_molding",
+     "no_of_labours_for_moulding",
      "column",
-     "no_of_labours_for_unmolding",
+     "no_of_labours_for_unmoulding",
      "default_warehouse_section",
-     "default_stock_entry_molding",
-     "default_molding_source_warehouse",
-     "default_molding_target_warehouse",
+     "default_stock_entry_moulding",
+     "default_moulding_source_warehouse",
+     "default_moulding_target_warehouse",
      "default_scrap_warehouse",
      "scrap_warehouse",
      "column_break_4",
-     "default_stock_entry_unmolding",
-     "default_unmolding_source_warehouse",
-     "default_unmolding_target_warehouse",
+     "default_stock_entry_unmoulding",
+     "default_unmoulding_source_warehouse",
+     "default_unmoulding_target_warehouse",
      "column_break_8",
      "default_stock_entry_curing",
      "default_curing_source_warehouse",
      "default_curing_target_warehouse",
      "default_stock_uom_section",
-     "default_molding_uom",
+     "default_moulding_uom",
      "column_break_22",
-     "default_unmolding_and_bundling_uom",
+     "default_unmoulding_and_bundling_uom",
      "default_item_section",
      "chips_for_post",
      "chips_for_slab",
@@ -130,43 +130,43 @@
       "label": "Strapping Cost Per Sqft"
      },
      {
-      "fieldname": "default_stock_entry_molding",
+      "fieldname": "default_stock_entry_moulding",
       "fieldtype": "Heading",
-      "label": "Default Molding Warehouse "
+      "label": "Default moulding Warehouse "
      },
      {
-      "fieldname": "default_molding_source_warehouse",
+      "fieldname": "default_moulding_source_warehouse",
       "fieldtype": "Link",
-      "label": "Default Molding Source Warehouse",
+      "label": "Default moulding Source Warehouse",
       "options": "Warehouse"
      },
      {
-      "fieldname": "default_molding_target_warehouse",
+      "fieldname": "default_moulding_target_warehouse",
       "fieldtype": "Link",
-      "label": "Default Molding Target Warehouse",
+      "label": "Default moulding Target Warehouse",
       "options": "Warehouse"
      },
      {
-      "fieldname": "default_stock_entry_unmolding",
+      "fieldname": "default_stock_entry_unmoulding",
       "fieldtype": "Heading",
-      "label": "Default Unmolding Warehouse"
+      "label": "Default Unmoulding Warehouse"
      },
      {
-      "fieldname": "default_unmolding_source_warehouse",
+      "fieldname": "default_unmoulding_source_warehouse",
       "fieldtype": "Link",
-      "label": "Default Unmolding Source Warehouse",
+      "label": "Default Unmoulding Source Warehouse",
       "options": "Warehouse"
      },
      {
-      "fieldname": "default_unmolding_target_warehouse",
+      "fieldname": "default_unmoulding_target_warehouse",
       "fieldtype": "Link",
-      "label": "Default Unmolding Target Warehouse",
+      "label": "Default Unmoulding Target Warehouse",
       "options": "Warehouse"
      },
      {
-      "fieldname": "default_molding_uom",
+      "fieldname": "default_moulding_uom",
       "fieldtype": "Link",
-      "label": "Default Molding UOM",
+      "label": "Default moulding UOM",
       "options": "UOM"
      },
      {
@@ -192,27 +192,27 @@
       "fieldtype": "Section Break"
      },
      {
-      "fieldname": "no_of_labours_for_molding",
+      "fieldname": "no_of_labours_for_moulding",
       "fieldtype": "Int",
-      "label": "No of Labours for Molding"
+      "label": "No of Labours for moulding"
      },
      {
       "fieldname": "column",
       "fieldtype": "Column Break"
      },
      {
-      "fieldname": "no_of_labours_for_unmolding",
+      "fieldname": "no_of_labours_for_unmoulding",
       "fieldtype": "Int",
-      "label": "No of Labours for Unmolding"
+      "label": "No of Labours for Unmoulding"
      },
      {
       "fieldname": "column_break_22",
       "fieldtype": "Column Break"
      },
      {
-      "fieldname": "default_unmolding_and_bundling_uom",
+      "fieldname": "default_unmoulding_and_bundling_uom",
       "fieldtype": "Link",
-      "label": "Default Unmolding and Bundling UOM",
+      "label": "Default Unmoulding and Bundling UOM",
       "options": "UOM"
      }
     ],
