@@ -51,6 +51,13 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
                 }
             }
         })
+        frm.set_query('employee', 'employee_detail', function(frm, cdt, cdn){
+            return {
+                filters: {
+                    'status': 'Active'
+                }
+            }
+        })
     },
     onload_post_render: async function(frm){
         let table = (cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:[])

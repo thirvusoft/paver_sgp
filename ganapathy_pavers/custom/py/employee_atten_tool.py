@@ -8,7 +8,7 @@ from datetime import datetime
 @frappe.whitelist()
 def employee_finder_attendance(designation='', location='', machine='', branch='', company=''):
 	employee_names=[]
-	filters={}
+	filters={'status':"Active"}
 	if(designation):
 		filters["designation"]=designation
 	if(location):
