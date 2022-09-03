@@ -50,6 +50,11 @@ def employee_update(doc,action):
 #         #     value = 10- net_pay
 #         #     frappe.db.set_value('Salary Slip',doc.name,'rounded_total',round(doc.net_pay)+value)
 #         #     frappe.db.set_value('Salary Slip',doc.name,'net_pay',round(doc.net_pay)+value)
+def validate_salaryslip(self, event):
+    set_net_pay(self, event)
+    validate_salary_slip(self, event)
+    validate_contrator_welfare(self, event)
+
 
 def set_net_pay(self,event):
     earnings=self.earnings
@@ -81,3 +86,89 @@ def set_net_pay(self,event):
         SalarySlip.compute_month_to_date(self)
         SalarySlip.compute_component_wise_year_to_date(self)
         SalarySlip.set_net_total_in_words(self)
+def validate_salary_slip(self, event):
+    if self.designation=="Labour Worker":
+        ssa=frappe.get_all("Salary Structure Assignment", filters={'employee':self.employee, 'docstatus':1,'designation':"Labour Worker"}, pluck="base")
+        employee=frappe.get_value("Employee",self.employee,'reports_to')
+        ccr=frappe.get_all("Contractor Commission Rate", filters={'docstatus':1,'name':employee},fields=['contractor','commission_rate'])
+        commission=ssa[0]-ccr[0]['commission_rate']
+        basic=commission*self.total_working_hour
+        if len(self.earnings)==0:
+            self.update({'earnings':[{'salary_component':'Basic'}]})
+        earning_total=0
+        for i in self.earnings:
+            if i.salary_component=='Basic':
+                i.amount=basic
+            earning_total=earning_total+i.amount
+        self.gross_pay=earning_total
+        if self.gross_pay:
+            net_pay=(round(self.gross_pay) - round(self.total_deduction))%10
+            if(net_pay<=2):
+                self.rounded_total=round(self.gross_pay - round(self.total_deduction))-net_pay
+                self.net_pay=round(self.gross_pay - round(self.total_deduction))-net_pay
+            
+            elif(net_pay>2):
+                value = 10- net_pay
+                self.rounded_total=round(self.gross_pay - round(self.total_deduction))+value
+                self.net_pay=round(self.gross_pay - round(self.total_deduction))+value
+        #Calculation of year to date
+        SalarySlip.compute_year_to_date(self)
+        
+        #Calculation of Month to date
+        SalarySlip.compute_month_to_date(self)
+        SalarySlip.compute_component_wise_year_to_date(self)
+        SalarySlip.set_net_total_in_words(self)
+
+        
+
+def validate_contrator_welfare(self, event):
+    if self.designation=="Operator":
+        emp=frappe.get_all("Employee",filters={'status':"Active",'reports_to':self.employee},pluck='name')
+        ccr=frappe.get_all("Contractor Commission Rate", filters={'docstatus':1,'name':self.employee},fields=['contractor','commission_rate'])
+        start_date=self.start_date
+        end_date=self.end_date
+        cond=""
+        if(len(emp)==1):
+            cond += f"employee='{emp[0]}'"
+        elif(len(emp) > 1):
+            cond += f"employee in {tuple(emp)}"
+        total_working_hour = frappe.db.sql(
+                    f""" select time_to_sec(sum(timediff(check_out, check_in)))/(60*60) as time from `tabTS Employee Details` where {cond} and check_in BETWEEN '{self.start_date}' AND '{self.end_date}' and docstatus=1""",
+                    as_dict=1,
+                )
+
+        if len(total_working_hour):
+            total_working_hour=total_working_hour[0]['time']
+        else:
+            total_working_hour=0
+        total_commission_rate=total_working_hour*ccr[0]['commission_rate']
+
+        earning_total=0
+        for i in self.earnings:
+            if i.salary_component=='Contractor Welfare':
+                pass
+            else:
+                self.append('earnings',dict(salary_component='Contractor Welfare', amount=round(total_commission_rate)))
+            earning_total=earning_total+i.amount
+            self.gross_pay=earning_total
+        if self.gross_pay:
+            net_pay=(round(self.gross_pay) - round(self.total_deduction))%10
+            if(net_pay<=2):
+                self.rounded_total=round(self.gross_pay - round(self.total_deduction))-net_pay
+                self.net_pay=round(self.gross_pay - round(self.total_deduction))-net_pay
+            
+            elif(net_pay>2):
+                value = 10- net_pay
+                self.rounded_total=round(self.gross_pay - round(self.total_deduction))+value
+                self.net_pay=round(self.gross_pay - round(self.total_deduction))+value
+        #Calculation of year to date
+        SalarySlip.compute_year_to_date(self)
+        
+        #Calculation of Month to date
+        SalarySlip.compute_month_to_date(self)
+        SalarySlip.compute_component_wise_year_to_date(self)
+        SalarySlip.set_net_total_in_words(self)
+
+
+
+            
