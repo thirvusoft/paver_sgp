@@ -7,5 +7,12 @@ frappe.ui.form.on('Employee', {
                 }
             }
         })
+        frm.set_query('reports_to', function(frm){
+            return {
+                filters:{
+                    'designation': 'Operator'
+                }
+            }
+        });   
     }
 })
