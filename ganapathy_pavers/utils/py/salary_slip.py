@@ -133,7 +133,7 @@ def validate_contrator_welfare(self, event):
         elif(len(emp) > 1):
             cond += f"employee in {tuple(emp)}"
         total_working_hour = frappe.db.sql(
-                    f""" select time_to_sec(sum(timediff(check_out, check_in)))/(60*60) as time from `tabTS Employee Details` where {cond} and check_in BETWEEN '{self.start_date}' AND '{self.end_date}' and docstatus=1""",
+                    f""" select sum(time_to_sec(timediff(check_out, check_in)))/(60*60) as time, parent from `tabTS Employee Details` where {cond} and check_in BETWEEN '{self.start_date}' AND '{self.end_date}' and docstatus=1""",
                     as_dict=1,
                 )
 
