@@ -34,16 +34,39 @@
   "cement_qty",
   "m_sand_qty",
   "ggbs_qty",
-  "items_section",
-  "items",
   "raw_material_cost",
   "manufacturing_items",
   "item_details",
   "section_break_21",
+  "total_production_qty",
+  "total_production_sqft",
+  "total_no_of_batche",
   "manufacturing_hrs",
   "avg_labour_wages",
   "column_break_23",
+  "total_damaged_qty",
+  "total_produced_qty",
   "total_no_of_operators",
+  "items_section",
+  "items",
+  "working_hrs_section",
+  "total_working_hrs",
+  "column_break_45",
+  "manually_total_working_hrs",
+  "operator_details_section",
+  "get_operators",
+  "operator_details",
+  "weges_details_section",
+  "no_of_labour",
+  "no_of_operators",
+  "total_expence",
+  "column_break_54",
+  "labour_salary_per_hrs",
+  "total_operator_wages",
+  "total_expence_per_sqft",
+  "column_break_58",
+  "total_labour_wages",
+  "additional_cost_in_wages",
   "total_amount_section",
   "operator_cost",
   "column_break_37",
@@ -119,11 +142,11 @@
   {
    "fieldname": "item_to_manufacture",
    "fieldtype": "Link",
+   "hidden": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Item to Manufacture",
-   "options": "Item",
-   "reqd": 1
+   "options": "Item"
   },
   {
    "fieldname": "amended_from",
@@ -161,6 +184,7 @@
   {
    "fieldname": "bom",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "BOM",
    "options": "BOM"
   },
@@ -319,6 +343,7 @@
   {
    "fieldname": "manufacturing_hrs",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Total Molding hrs",
    "read_only": 1
   },
@@ -329,12 +354,14 @@
   {
    "fieldname": "total_no_of_operators",
    "fieldtype": "Int",
+   "hidden": 1,
    "label": "Total No of Operators",
    "read_only": 1
   },
   {
    "fieldname": "avg_labour_wages",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Avg Labour Wages Per Hour",
    "read_only": 1
   },
@@ -707,12 +734,126 @@
    "fieldname": "curing_date",
    "fieldtype": "Date",
    "label": "Curing Date"
+  },
+  {
+   "fieldname": "total_production_qty",
+   "fieldtype": "Float",
+   "label": "Total Production Qty"
+  },
+  {
+   "fieldname": "total_production_sqft",
+   "fieldtype": "Float",
+   "label": "Total Production Sqft"
+  },
+  {
+   "fieldname": "total_no_of_batche",
+   "fieldtype": "Float",
+   "label": "Total No. Of Batche"
+  },
+  {
+   "fieldname": "total_damaged_qty",
+   "fieldtype": "Float",
+   "label": "Total Damaged Qty"
+  },
+  {
+   "fieldname": "total_produced_qty",
+   "fieldtype": "Float",
+   "label": "Total Produced Qty"
+  },
+  {
+   "fieldname": "working_hrs_section",
+   "fieldtype": "Section Break",
+   "label": "Working Hrs"
+  },
+  {
+   "fieldname": "total_working_hrs",
+   "fieldtype": "Float",
+   "label": "Total Working Hrs",
+   "read_only": 1
+  },
+  {
+   "fieldname": "manually_total_working_hrs",
+   "fieldtype": "Float",
+   "label": "Total Working Hrs"
+  },
+  {
+   "fieldname": "column_break_45",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "operator_details_section",
+   "fieldtype": "Section Break",
+   "label": "Operator Details"
+  },
+  {
+   "fieldname": "get_operators",
+   "fieldtype": "Button",
+   "label": "Get Operators"
+  },
+  {
+   "fieldname": "operator_details",
+   "fieldtype": "Table",
+   "label": "Operator Details",
+   "options": "CW Operator Details"
+  },
+  {
+   "fieldname": "weges_details_section",
+   "fieldtype": "Section Break",
+   "label": "Weges Details"
+  },
+  {
+   "fieldname": "no_of_labour",
+   "fieldtype": "Float",
+   "label": "No. Of Labours"
+  },
+  {
+   "fieldname": "no_of_operators",
+   "fieldtype": "Float",
+   "label": "No. Of Operators"
+  },
+  {
+   "fieldname": "total_expence",
+   "fieldtype": "Float",
+   "label": "Total Expence"
+  },
+  {
+   "fieldname": "column_break_54",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "labour_salary_per_hrs",
+   "fieldtype": "Float",
+   "label": "Labour Salary per Hrs"
+  },
+  {
+   "fieldname": "total_operator_wages",
+   "fieldtype": "Float",
+   "label": "Total Operator Wages"
+  },
+  {
+   "fieldname": "total_expence_per_sqft",
+   "fieldtype": "Float",
+   "label": "Total Expence per SQFT"
+  },
+  {
+   "fieldname": "column_break_58",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_labour_wages",
+   "fieldtype": "Float",
+   "label": "Total Labour Wages"
+  },
+  {
+   "fieldname": "additional_cost_in_wages",
+   "fieldtype": "Float",
+   "label": "Additional Cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-29 16:39:40.348734",
+ "modified": "2022-09-05 19:16:48.452054",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

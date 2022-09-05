@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
 
+from traceback import print_tb
 from erpnext.stock.doctype import manufacturer
 import frappe
 import json
@@ -290,3 +291,36 @@ def uom_conversion(item, from_uom, from_qty, to_uom):
         throw_error(to_conv + " Bundle Conversion", 'Item')
     
     return (float(from_qty) * from_conv) / to_conv
+
+@frappe.whitelist()
+def get_operators(doc):
+    doc = json.loads(doc)
+    op_table=[]
+    op_list=[]
+    if(len(doc)>0):
+        for i in doc:
+            op_cost= frappe.get_doc("Workstation",i.get('workstation'))
+            for j in op_cost.ts_operators_table:
+                if(j.ts_operator_name not in op_list):
+                    op_list.append(j.ts_operator_name)
+                    op_table.append({"employee":j.ts_operator_name,"operator_name":j.ts_operator_full_name,"division_salary":j.ts_operator_wages})
+                else:
+                    for k in op_table:
+                        if k['employee'] == j.ts_operator_name:
+                            k['division_salary'] = k['division_salary'] +j.ts_operator_wages
+    return(op_table)
+@frappe.whitelist()
+def add_item(doc):
+    items=[]
+    doc=json.loads(doc)
+    if(len(doc)>0):
+        for k in doc:
+            bom_doc = frappe.get_doc("BOM",k.get('bom'))
+            fields = ['item_code','qty', 'layer_type', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']
+            for i in bom_doc.items:
+                row = {field:i.__dict__[field] for field in fields}
+                row['ts_qty'] = row.get('qty') or 0
+                row['total_no_of_batches'] = k.get('no_of_batches')
+                items.append(row)
+    return items
+           
