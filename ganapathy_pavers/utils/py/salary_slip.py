@@ -124,7 +124,7 @@ def validate_salary_slip(self, event):
 def validate_contrator_welfare(self, event):
     if self.designation=="Operator":
         emp=frappe.get_all("Employee",filters={'status':"Active",'reports_to':self.employee},pluck='name')
-        ccr=frappe.get_all("Contractor Commission Rate", filters={'docstatus':1,'name':self.employee},fields=['contractor','commission_rate'])
+        ccr=frappe.get_all("Contractor Commission Rate", filters={'name':self.employee},fields=['contractor','commission_rate'])
         start_date=self.start_date
         end_date=self.end_date
         cond=""
