@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:{contractor}-{###}",
+ "autoname": "field:contractor",
  "creation": "2022-09-02 17:31:17.385035",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -16,7 +16,8 @@
    "fieldname": "contractor",
    "fieldtype": "Link",
    "label": "Contractor",
-   "options": "Employee"
+   "options": "Employee",
+   "unique": 1
   },
   {
    "fieldname": "commission_rate",
@@ -35,7 +36,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-03 19:08:13.470385",
+ "modified": "2022-09-05 14:52:28.503046",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Contractor Commission Rate",
