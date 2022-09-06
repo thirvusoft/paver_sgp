@@ -309,18 +309,27 @@ def get_operators(doc):
                         if k['employee'] == j.ts_operator_name:
                             k['division_salary'] = k['division_salary'] +j.ts_operator_wages
     return(op_table)
+
+    
 @frappe.whitelist()
 def add_item(doc):
-    items=[]
+    items={}
     doc=json.loads(doc)
     if(len(doc)>0):
         for k in doc:
-            bom_doc = frappe.get_doc("BOM",k.get('bom'))
-            fields = ['item_code','qty', 'layer_type', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']
-            for i in bom_doc.items:
-                row = {field:i.__dict__[field] for field in fields}
-                row['ts_qty'] = row.get('qty') or 0
-                row['total_no_of_batches'] = k.get('no_of_batches')
-                items.append(row)
-    return items
+            if(k.get('bom')):
+                bom_doc = frappe.get_doc("BOM",k.get('bom'))
+                fields = ['item_code','qty', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']
+                for i in bom_doc.items:
+                    if(i.is_usb_item == 0):
+                        if(i.item_code not in items):
+                            row = {field:i.__dict__[field] for field in fields}
+                            row['qty'] *= (k.get('no_of_batches') or 0)
+                            row['amount'] *= (k.get('no_of_batches') or 0)
+                            items.update({i.item_code: row})
+                        else:
+                            items[i.item_code]['qty'] += ((k.get('no_of_batches') or 0) * i.qty)
+                            items[i.item_code]['amount'] += ((k.get('no_of_batches') or 0) * i.amount)               
+        
+    return list(items.values())
            

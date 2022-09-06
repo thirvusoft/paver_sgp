@@ -1,0 +1,51 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-09-06 19:15:57.466211",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "manufacturing_batch",
+  "unmolding_batch",
+  "curing_batch"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Code"
+  },
+  {
+   "fieldname": "manufacturing_batch",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Manufacturing Batch"
+  },
+  {
+   "fieldname": "unmolding_batch",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Unmolding Batch"
+  },
+  {
+   "fieldname": "curing_batch",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Curing Batch"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-09-06 19:15:57.466211",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "CW Batch Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

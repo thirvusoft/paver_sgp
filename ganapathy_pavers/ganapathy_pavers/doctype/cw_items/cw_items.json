@@ -9,21 +9,12 @@
   "workstation",
   "item",
   "bom",
-  "division",
-  "total_hrs",
-  "this_hrs",
-  "no_of_operators",
+  "no_of_batches",
   "column_break_5",
   "production_qty",
   "damaged_qty",
   "produced_qty",
-  "production_sqft",
-  "no_of_batches",
-  "expense_section",
-  "operator_cost",
-  "hidden_details_section",
-  "operator_cost_per_day",
-  "labour_cost_per_hour"
+  "production_sqft"
  ],
  "fields": [
   {
@@ -36,30 +27,12 @@
    "reqd": 1
   },
   {
-   "fieldname": "division",
-   "fieldtype": "Int",
-   "hidden": 1,
-   "label": "Division"
-  },
-  {
-   "depends_on": "eval: doc.division > 1",
-   "fieldname": "total_hrs",
-   "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Total Hrs"
-  },
-  {
-   "fieldname": "this_hrs",
-   "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Manufacturing hrs for this item "
-  },
-  {
    "columns": 1,
    "fieldname": "production_qty",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Production Qty"
+   "label": "Production Qty",
+   "reqd": 1
   },
   {
    "columns": 1,
@@ -73,52 +46,20 @@
    "fieldname": "produced_qty",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Produced Qty"
+   "label": "Produced Qty",
+   "reqd": 1
   },
   {
    "columns": 2,
    "fieldname": "production_sqft",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Production Sqft"
-  },
-  {
-   "fieldname": "operator_cost",
-   "fieldtype": "Currency",
-   "label": "Operator Cost"
+   "label": "Production Sqft",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_5",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "expense_section",
-   "fieldtype": "Section Break",
-   "label": "Expense"
-  },
-  {
-   "columns": 1,
-   "fieldname": "no_of_operators",
-   "fieldtype": "Int",
-   "label": "No of Operators"
-  },
-  {
-   "fieldname": "hidden_details_section",
-   "fieldtype": "Section Break",
-   "label": "Other details"
-  },
-  {
-   "fieldname": "operator_cost_per_day",
-   "fieldtype": "Currency",
-   "label": "Single Operator Cost Per day",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "workstation.ts_wages1",
-   "fieldname": "labour_cost_per_hour",
-   "fieldtype": "Currency",
-   "label": "Single Labour Cost Per Hour",
-   "read_only": 1
   },
   {
    "columns": 1,
@@ -135,7 +76,8 @@
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "No. Of Batches",
-   "non_negative": 1
+   "non_negative": 1,
+   "reqd": 1
   },
   {
    "columns": 1,
@@ -143,13 +85,14 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "BOM",
-   "options": "BOM"
+   "options": "BOM",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-09-05 12:15:22.313667",
+ "modified": "2022-09-06 14:21:01.515970",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Items",
