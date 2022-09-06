@@ -64,6 +64,8 @@
   "total_expence_per_sqft",
   "unmolding_and_bundling_section",
   "unmolding_date",
+  "cbxx",
+  "total_production_sqft",
   "total_amount_for_unmolding_section",
   "strapping_cost_per_sqft_unmold",
   "column_break_68",
@@ -73,11 +75,8 @@
   "column_break_66",
   "total_expense_for_unmolding",
   "section_break_63",
+  "cw_item_bundle_details",
   "create_stock_entry_for_bundling",
-  "remaining_qty_from_bundles",
-  "column_break_79",
-  "production_sqft_unmold",
-  "no_of_bundle_unmold",
   "curing_section",
   "curing_date",
   "bundled_sqft_curing",
@@ -87,13 +86,7 @@
   "labour_cost_per_sqft_curing",
   "labour_expense_for_curing",
   "abstract_section",
-  "labour_cost_per_sqft",
-  "operator_cost_per_sqft",
-  "strapping_cost_per_sqft",
-  "column_break_97",
-  "additional_cost_per_sqft",
-  "raw_material_cost_per_sqft",
-  "total_cost_per_sqft",
+  "cw_abstract",
   "batch_details_section",
   "cw_batch_details"
  ],
@@ -293,18 +286,6 @@
    "label": "Unmolding and Bundling"
   },
   {
-   "fieldname": "production_sqft_unmold",
-   "fieldtype": "Float",
-   "label": "Bundled Sqft",
-   "read_only": 1
-  },
-  {
-   "fieldname": "no_of_bundle_unmold",
-   "fieldtype": "Float",
-   "label": "Total No of Bundle",
-   "read_only": 1
-  },
-  {
    "fieldname": "section_break_63",
    "fieldtype": "Section Break",
    "label": "Total Qty for Unmolding"
@@ -342,10 +323,6 @@
    "fieldtype": "Currency",
    "label": "Total Expense for Unmolding",
    "read_only": 1
-  },
-  {
-   "fieldname": "column_break_79",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "create_stock_entry_for_bundling",
@@ -394,55 +371,9 @@
    "label": "Create Stock Entry for Curing"
   },
   {
-   "fieldname": "remaining_qty_from_bundles",
-   "fieldtype": "Float",
-   "label": "Remaining Qty",
-   "read_only": 1
-  },
-  {
    "fieldname": "abstract_section",
    "fieldtype": "Section Break",
    "label": "Abstract"
-  },
-  {
-   "fieldname": "labour_cost_per_sqft",
-   "fieldtype": "Currency",
-   "label": "Labour Cost Per Sqft",
-   "read_only": 1
-  },
-  {
-   "fieldname": "operator_cost_per_sqft",
-   "fieldtype": "Currency",
-   "label": "Operator Cost Per Sqft",
-   "read_only": 1
-  },
-  {
-   "fieldname": "strapping_cost_per_sqft",
-   "fieldtype": "Currency",
-   "label": "Strapping Cost Per Sqft",
-   "read_only": 1
-  },
-  {
-   "fieldname": "additional_cost_per_sqft",
-   "fieldtype": "Currency",
-   "label": "Additional Cost Per Sqft",
-   "read_only": 1
-  },
-  {
-   "fieldname": "raw_material_cost_per_sqft",
-   "fieldtype": "Currency",
-   "label": "Raw Material Cost Per Sqft",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_cost_per_sqft",
-   "fieldtype": "Currency",
-   "label": "Total Cost Per Sqft",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_97",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "unmolding_date",
@@ -587,12 +518,34 @@
    "hidden": 1,
    "options": "CW Batch Details",
    "read_only": 1
+  },
+  {
+   "fieldname": "cw_item_bundle_details",
+   "fieldtype": "Table",
+   "options": "CW Item Bundle Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cbxx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_production_sqft",
+   "fieldtype": "Float",
+   "label": "Total Production Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cw_abstract",
+   "fieldtype": "Table",
+   "options": "CW Abstract",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-06 19:37:56.665509",
+ "modified": "2022-09-06 19:58:46.866612",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

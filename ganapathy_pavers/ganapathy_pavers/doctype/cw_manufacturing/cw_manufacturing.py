@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
 
+import re
 from traceback import print_tb
 from erpnext.stock.doctype import manufacturer
 import frappe
@@ -23,14 +24,18 @@ class CWManufacturing(Document):
 def throw_error(field, doctype = "Cw Settings"):
     frappe.throw(f"Please enter value for {frappe.bold(field)} in {frappe.bold(doctype)}")
 
+
 @frappe.whitelist()
 def make_stock_entry_for_molding(doc):
     doc = json.loads(doc)
-    if (doc.get("item_to_manufacture")):
-        if (not frappe.get_value('Item', doc.get("item_to_manufacture"), 'has_batch_no')):
-            frappe.throw(
-                f'Please choose {frappe.bold("Has Batch No")} for an item {doc.get("item_to_manufacture")}')
+    
+    valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
+            "name"), "stock_entry_type": "Manufacture", "docstatus": ["!=", 2]}, pluck="name")
+        
+    if len(valid) >= 1:
+        frappe.throw("Already Stock Entry Created For Manufacturing" + frappe.bold(', '.join(valid)))
 
+    stock_entries = []
     default_scrap_warehouse = frappe.db.get_singles_value(
         "CW Settings", "scrap_warehouse") or throw_error("Scrap Warehouse")
     expenses_included_in_valuation = frappe.get_cached_value(
@@ -39,46 +44,56 @@ def make_stock_entry_for_molding(doc):
         "CW Settings", "default_molding_source_warehouse") or throw_error('Molding Source Warehouse')
     target_warehouse = frappe.db.get_singles_value(
         "CW Settings", "default_molding_target_warehouse") or throw_error('Molding Target Warehouse')
-    stock_entry = frappe.new_doc("Stock Entry")
-    stock_entry.company = doc.get("company")
-    stock_entry.from_bom = 1
-    stock_entry.bom_no = doc.get("bom")
-    stock_entry.cw_usb = doc.get("name")
+    
+    
+    
     default_nos = frappe.db.get_singles_value(
         "CW Settings", "default_molding_uom") or throw_error('Molding UOM')
-    valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
-        "name"), "stock_entry_type": "Manufacture", "docstatus": ["!=", 2]}, pluck="name")
-    stock_entry.set_posting_time = 1
-    stock_entry.posting_date = doc.get('molding_date')
-    if len(valid) >= 1:
-        frappe.throw(
-            "Already Stock Entry ("+valid[0]+") Created For Molding")
-    stock_entry.stock_entry_type = "Manufacture"
-    if (doc.get("items")):
-        for i in doc.get("items"):
-            stock_entry.append('items', dict(
-                s_warehouse=(doc.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"], uom=i["uom"],
-                basic_rate=i["rate"]
-            ))
-    else:
-        frappe.throw("Kindly Enter Raw Materials")
-    manufactue_qty = uom_conversion(doc.get('item_to_manufacture'), 'Nos', doc.get("produced_qty"), default_nos)
+
+
+    for item in doc.get("item_details") or []:
+        stock_entry = frappe.new_doc("Stock Entry")
+        stock_entry.company = doc.get("company")
+        stock_entry.from_bom = 1
+        
+        stock_entry.cw_usb = doc.get("name")
+        stock_entry.set_posting_time = 1
+        stock_entry.posting_date = doc.get('molding_date')
+        stock_entry.stock_entry_type = "Manufacture"
+        stock_entry.bom_no = item.get("bom")
+
+        if (item.get("item")):
+            if (not frappe.get_value('Item', item.get("item"), 'has_batch_no')):
+                frappe.throw(
+                    f'Please choose {frappe.bold("Has Batch No")} for an item {item.get("item")}')
+        
     
-    stock_entry.append('items', dict(
-        t_warehouse = target_warehouse, item_code=doc.get("item_to_manufacture"), qty= manufactue_qty, uom=default_nos, is_finished_item=1
-    ))
-    if doc.get("damaged_qty") > 0:
-        scrap_qty = uom_conversion(doc.get('item_to_manufacture'), 'Nos', doc.get("damaged_qty"), default_nos)
+        if (doc.get("items")):
+            for i in doc.get("items"):
+                stock_entry.append('items', dict(
+                    s_warehouse=(doc.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"]*(item.get("production_sqft")/doc.get("production_sqft")), uom=i["uom"],
+                    basic_rate=i["rate"]
+                ))
+        else:
+            frappe.throw("Kindly Enter Raw Materials")
+        manufactue_qty = uom_conversion(item.get("item"), 'Nos', item.get("produced_qty"), default_nos)
+        
         stock_entry.append('items', dict(
-            t_warehouse=default_scrap_warehouse, item_code=doc.get("item_to_manufacture"), qty=scrap_qty, uom=default_nos, is_process_loss=1
+            t_warehouse = target_warehouse, item_code=item.get("item"), qty= manufactue_qty, uom=default_nos, is_finished_item=1
         ))
-    stock_entry.append('additional_costs', dict(
-        expense_account=expenses_included_in_valuation, amount=doc.get("total_expense"), description="It includes labours cost, operators cost and additional cost."
-    ))
-    stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
-    stock_entry.save()
-    stock_entry.submit()
-    frappe.msgprint("New Stock Entry Created "+stock_entry.name)
+        if doc.get("damaged_qty") > 0:
+            scrap_qty = uom_conversion(item.get("item"), 'Nos', item.get("damaged_qty"), default_nos)
+            stock_entry.append('items', dict(
+                t_warehouse=default_scrap_warehouse, item_code=item.get("item"), qty=scrap_qty, uom=default_nos, is_process_loss=1
+            ))
+        stock_entry.append('additional_costs', dict(
+            expense_account=expenses_included_in_valuation, amount=doc.get("total_expence")*(item.get("production_sqft")/doc.get("production_sqft")), description="It includes labours cost, operators cost and additional cost."
+        ))
+        stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
+        stock_entry.save()
+        stock_entry.submit()
+        stock_entries.append(stock_entry.name)
+    frappe.msgprint("New Stock Entry Created "+frappe.bold(', '.join(stock_entries)))
     return "Unmolding"
 
 @frappe.whitelist()

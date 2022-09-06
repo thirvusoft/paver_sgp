@@ -1,0 +1,59 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-09-06 19:50:13.497099",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "produced_qty",
+  "production_sqft",
+  "no_of_bundle",
+  "remaining_qty_from_bundle"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "produced_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Produced Qty"
+  },
+  {
+   "fieldname": "production_sqft",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Production Sqft"
+  },
+  {
+   "fieldname": "no_of_bundle",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "No of Bundle"
+  },
+  {
+   "fieldname": "remaining_qty_from_bundle",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Remaining Qty from Bundle"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-09-06 19:51:42.413592",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "CW Item Bundle Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

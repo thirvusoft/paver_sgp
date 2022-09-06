@@ -64,7 +64,6 @@ frappe.ui.form.on("CW Manufacturing", {
         frm.set_value("m_sand_qty", m_sand ? m_sand : 0);
         frm.set_value("ggbs_qty", ggbs ? ggbs : 0);
         item_details_total(frm);
-        item_details_total_unmold(frm);
         raw_material_cost(frm);
         total_expense_per_sqft(frm);
         total_expense_per_sqft_unmold(frm);
@@ -181,27 +180,6 @@ frappe.ui.form.on("CW Manufacturing", {
                 callback: async function (r) {
                     if (r.message) {
                         frm.set_value("status1", r.message);
-                        frm.clear_table("unmolding_details");
-                        refresh_field("unmolding_details");
-                        let workstation = frm.doc.item_details ? frm.doc.item_details : [];
-                        for (let row = 0; row < workstation.length; row++) {
-                            let new_row = frm.add_child("unmolding_details");
-                            new_row.workstation = workstation[row].workstation;
-                            new_row.production_qty = workstation[row].produced_qty;
-                            new_row.produced_qty = workstation[row].produced_qty;
-                            new_row.production_sqft = workstation[row].production_sqft;
-                            if (frm.doc.item_to_manufacture) {
-                                await frappe.db.get_value("Item", frm.doc.item_to_manufacture, "bundle_per_sqr_ft", (doc) => {
-                                    new_row.no_of_bundles = doc.bundle_per_sqr_ft ? (workstation[row].production_sqft ? workstation[row].production_sqft : 0) / doc.bundle_per_sqr_ft : show_alert(frm.doc.item_to_manufacture, "Sqft Per Bundle");
-                                });
-                            }
-                            if (workstation[row].workstation) {
-                                await frappe.db.get_doc("Workstation", workstation[row].workstation).then((value) => {
-                                    let operator_cost = value.ts_no_of_operator ? (value.ts_sum_of_operator_wages ? value.ts_sum_of_operator_wages : 0) / value.ts_no_of_operator : value.ts_sum_of_operator_wages ? value.ts_sum_of_operator_wages : 0;
-                                    new_row.operator_cost_per_day = operator_cost;
-                                });
-                            }
-                        }
                         frm.save();
                     }
                 },
@@ -594,50 +572,6 @@ frappe.ui.form.on("BOM Item", {
 });
 
 
-
-async function item_details_total_unmold(frm) {
-    let item_details = frm.doc.unmolding_details ? frm.doc.unmolding_details : [];
-    let total_hrs = 0,
-        total_operators = 0,
-        total_opr_cost = 0,
-        production_qty = 0,
-        damage_qty = 0,
-        produced_qty = 0,
-        production_sqft = 0,
-        total_labour_wages = 0,
-        total_bundles = 0,
-        remaining_qty_from_bundles = 0,
-        table_length = 0;
-    for (let i = 0; i < item_details.length; i++) {
-        total_hrs += item_details[i].this_hrs ? item_details[i].this_hrs : 0;
-        total_operators += item_details[i].no_of_operators ? item_details[i].no_of_operators : 0;
-        total_opr_cost += item_details[i].operator_cost ? item_details[i].operator_cost : 0;
-        production_qty += item_details[i].production_qty ? item_details[i].production_qty : 0;
-        damage_qty += item_details[i].damaged_qty ? item_details[i].damaged_qty : 0;
-        produced_qty += item_details[i].produced_qty ? item_details[i].produced_qty : 0;
-        production_sqft += item_details[i].production_sqft ? item_details[i].production_sqft : 0;
-        total_bundles += item_details[i].no_of_bundles ? item_details[i].no_of_bundles : 0;
-        total_labour_wages += item_details[i].labour_cost_per_hour ? item_details[i].labour_cost_per_hour : 0;
-        if (item_details[i].workstation) {
-            table_length += 1;
-        }
-    }
-    if (frm.doc.item_to_manufacture) {
-        await frappe.db.get_doc("Item", frm.doc.item_to_manufacture).then((value) => {
-            remaining_qty_from_bundles = (total_bundles - parseInt(total_bundles)) * (value.pavers_per_bundle ? value.pavers_per_bundle : 0);
-            total_bundles = parseInt(total_bundles);
-            production_sqft -= remaining_qty_from_bundles / (value.pavers_per_sqft ? value.pavers_per_sqft : 0);
-        });
-    }
-    frm.set_value("total_unmolding_hrs", total_hrs);
-    frm.set_value("operator_cost_unmold", total_opr_cost);
-    frm.set_value("produced_qty_unmold", production_qty);
-    frm.set_value("actual_bundle_qty", produced_qty);
-    frm.set_value("damaged_qty_at_bundling", damage_qty);
-    frm.set_value("production_sqft_unmold", production_sqft);
-    frm.set_value("no_of_bundle_unmold", total_bundles);
-    frm.set_value("remaining_qty_from_bundles", remaining_qty_from_bundles);
-}
 
 function total_expense_per_sqft_unmold(frm) {
     let total_cost = frm.doc.operator_cost_unmold ? frm.doc.operator_cost_unmold : 0;
