@@ -8,7 +8,12 @@
  "engine": "InnoDB",
  "field_order": [
   "machine_name",
-  "location"
+  "location",
+  "lft",
+  "rgt",
+  "is_group",
+  "old_parent",
+  "parent_working_area"
  ],
  "fields": [
   {
@@ -26,14 +31,49 @@
    "label": "Location",
    "options": "Location",
    "reqd": 1
+  },
+  {
+   "fieldname": "lft",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Left",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Right",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group"
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Link",
+   "label": "Old Parent",
+   "options": "Working Area"
+  },
+  {
+   "fieldname": "parent_working_area",
+   "fieldtype": "Link",
+   "label": "Parent Working Area",
+   "options": "Working Area"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-09 11:50:07.626031",
+ "modified": "2022-09-01 18:22:48.696522",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Working Area",
+ "nsm_parent_field": "parent_working_area",
  "owner": "Administrator",
  "permissions": [
   {
