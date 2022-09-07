@@ -35,6 +35,7 @@
   "column_break_34",
   "damaged_qty",
   "production_sqft",
+  "ts_production_sqft",
   "items_section",
   "get_bom_items",
   "items",
@@ -46,6 +47,7 @@
   "manually_total_working_hrs",
   "operator_details_section",
   "get_operators",
+  "item_count",
   "operator_details",
   "weges_details_section",
   "no_of_labour",
@@ -257,7 +259,7 @@
   {
    "fieldname": "molding_date",
    "fieldtype": "Date",
-   "label": "Molding Date",
+   "label": "Manufacturing Date",
    "reqd": 1
   },
   {
@@ -362,8 +364,7 @@
   {
    "fieldname": "total_no_of_batche",
    "fieldtype": "Float",
-   "label": "Total No. Of Batches",
-   "read_only": 1
+   "label": "Total No. Of Batches"
   },
   {
    "fieldname": "working_hrs_section",
@@ -515,12 +516,23 @@
    "hidden": 1,
    "options": "CW Curing Batch Details",
    "read_only": 1
+  },
+  {
+   "fieldname": "item_count",
+   "fieldtype": "Int",
+   "label": "Item Count"
+  },
+  {
+   "fieldname": "ts_production_sqft",
+   "fieldtype": "Float",
+   "label": "TS Production Sqft",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-07 17:26:15.442596",
+ "modified": "2022-09-07 19:24:02.392870",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",
