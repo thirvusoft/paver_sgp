@@ -18,7 +18,7 @@ frappe.ui.form.on("CW Manufacturing", {
             default_value(frm, "cement", "cement_item_name");
             default_value(frm, "ggbs", "ggbs_item_name");
         }
-        
+
         frm.set_query("item", "item_details", function () {
             return {
                 filters: {
@@ -44,8 +44,8 @@ frappe.ui.form.on("CW Manufacturing", {
         let rm_consmp = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption : [];
         for (let i = 0; i < rm_consmp.length; i++) {
             post_chips += rm_consmp[i].bin1 ? rm_consmp[i].bin1 : 0;
-            slab_chips += rm_consmp[i].bin2 ? rm_consmp[i].bin2 : 0;
-            m_sand += rm_consmp[i].bin3 ? rm_consmp[i].bin3 : 0;
+            m_sand += rm_consmp[i].bin2 ? rm_consmp[i].bin2 : 0;
+            slab_chips += rm_consmp[i].bin3 ? rm_consmp[i].bin3 : 0;
             cement += rm_consmp[i].cement ? rm_consmp[i].cement : 0;
             ggbs += rm_consmp[i].ggbs ? rm_consmp[i].ggbs : 0;
         }
@@ -94,7 +94,7 @@ frappe.ui.form.on("CW Manufacturing", {
         frm.set_value("total_expence", frm.doc.total_labour_wages + frm.doc.total_operator_wages + frm.doc.additional_cost_in_wages + frm.doc.raw_material_cost);
     },
     total_expence: function (frm) {
-        frm.set_value("total_expence_per_sqft", frm.doc.total_expence / frm.doc.production_sqft);
+        frm.set_value("total_expence_per_sqft", frm.doc.total_expence / frm.doc.ts_production_sqft);
     },
     molding_date: function (frm) {
         working_hrs(frm);
@@ -106,7 +106,8 @@ frappe.ui.form.on("CW Manufacturing", {
         frappe.call({
             method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.get_operators",
             args: {
-                doc: frm.doc.item_details,
+                doc: frm.doc.item_details ? frm.doc.item_details : [],
+                item_count: frm.doc.item_count ? frm.doc.item_count : 1,
             },
             callback: function (r) {
                 frm.set_value("operator_details", r.message);
@@ -118,6 +119,19 @@ frappe.ui.form.on("CW Manufacturing", {
                 frm.set_value("total_operator_wages", total_operator_wages);
             },
         });
+    },
+    item_count: function (frm) {
+        let operator_details = frm.doc.operator_details ? frm.doc.operator_details : [],
+            total_operator_wages = 0;
+        for (let row = 0; row < operator_details.length; row++) {
+            let cdt = operator_details[row].doctype,
+                cdn = operator_details[row].name;
+            let data = locals[cdt][cdn];
+            let wages = (data.salary ? data.salary : 0) / (frm.doc.item_count ? frm.doc.item_count : 1);
+            frappe.model.set_value(cdt, cdn, "division_salary", wages);
+            total_operator_wages += wages;
+        }
+        frm.set_value("total_operator_wages", total_operator_wages);
     },
     get_bom_items: function (frm) {
         frm.clear_table("items");
@@ -241,8 +255,10 @@ function working_hrs(frm) {
                             tot_hrs += value[i].working_hours ? parseFloat(value[i].working_hours) : 0;
                         }
                         frm.set_value("total_working_hrs", tot_hrs);
+                        frm.set_value("no_of_labour", value.length);
                     } else {
                         frm.set_value("total_working_hrs", 0);
+                        frm.set_value("no_of_labour", 0);
                     }
                 });
         });
@@ -288,11 +304,10 @@ function production_qty_calc(frm, cdt, cdn) {
     if (data.item) {
         frappe.db.get_value("Item", data.item, "pavers_per_sqft", (doc) => {
             frappe.model.set_value(cdt, cdn, "production_sqft", doc.pavers_per_sqft ? (data.produced_qty ? data.produced_qty : 0) / doc.pavers_per_sqft : show_alert(data.item, "Pieces Per Sqft"));
+            frappe.model.set_value(cdt, cdn, "ts_production_sqft", doc.pavers_per_sqft ? (data.production_qty ? data.production_qty : 0) / doc.pavers_per_sqft : show_alert(data.item, "Pieces Per Sqft"));
         });
     }
 }
-
-
 
 function show_alert(doc, field) {
     frappe.show_alert({
@@ -306,18 +321,20 @@ function item_details_total(frm) {
     let production_qty = 0,
         damage_qty = 0,
         produced_qty = 0,
-        production_sqft = 0;
+        production_sqft = 0,
+        ts_production_sqft = 0;
     for (let i = 0; i < item_details.length; i++) {
         production_qty += item_details[i].production_qty ? item_details[i].production_qty : 0;
         damage_qty += item_details[i].damaged_qty ? item_details[i].damaged_qty : 0;
         produced_qty += item_details[i].produced_qty ? item_details[i].produced_qty : 0;
         production_sqft += item_details[i].production_sqft ? item_details[i].production_sqft : 0;
-        
+        ts_production_sqft += item_details[i].ts_production_sqft ? item_details[i].ts_production_sqft : 0;
     }
     frm.set_value("production_qty", production_qty);
     frm.set_value("produced_qty", produced_qty);
     frm.set_value("damaged_qty", damage_qty);
     frm.set_value("production_sqft", production_sqft);
+    frm.set_value("ts_production_sqft", ts_production_sqft);
 }
 
 function total_expense_per_sqft(frm) {
@@ -326,7 +343,7 @@ function total_expense_per_sqft(frm) {
     total_cost += frm.doc.additional_cost_in_wages ? frm.doc.additional_cost_in_wages : 0;
     total_cost += frm.doc.raw_material_cost ? frm.doc.raw_material_cost : 0;
     frm.set_value("total_expence", total_cost);
-    frm.set_value("total_expence_per_sqft", frm.doc.production_sqft ? (total_cost ? total_cost : 0) / frm.doc.production_sqft : 0);
+    frm.set_value("total_expence_per_sqft", frm.doc.ts_production_sqft ? (total_cost ? total_cost : 0) / frm.doc.ts_production_sqft : 0);
 }
 
 function raw_material_cost(frm) {
@@ -390,6 +407,7 @@ function item_adding(frm) {
             method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.add_item",
             args: {
                 doc: frm.doc.item_details ? frm.doc.item_details : [],
+                batches: frm.doc.total_no_of_batche ? frm.doc.total_no_of_batche : 0,
             },
             callback(r) {
                 var item1 = [];
@@ -425,6 +443,22 @@ function item_adding(frm) {
     }
 }
 
+async function get_production_capacity(frm, cdt, cdn) {
+    let data = locals[cdt][cdn],
+        production_capacity = 0;
+    if (data.workstation && data.item) {
+        await frappe.db.get_doc("Workstation", data.workstation).then((doc) => {
+            let item_details = doc.item_wise_production_capacity ? doc.item_wise_production_capacity : [];
+            for (let row = 0; row < item_details.length; row++) {
+                if (item_details[row].item_code == data.item) {
+                    production_capacity += item_details[row].production_capacity;
+                }
+            }
+        });
+    }
+    frappe.model.set_value(cdt, cdn, "production_qty", production_capacity)
+}
+
 frappe.ui.form.on("CW Items", {
     workstation: function (frm, cdt, cdn) {
         let data = locals[cdt][cdn];
@@ -434,7 +468,7 @@ frappe.ui.form.on("CW Items", {
                 let operator_cost = value.ts_no_of_operator ? (value.ts_sum_of_operator_wages ? value.ts_sum_of_operator_wages : 0) / value.ts_no_of_operator : value.ts_sum_of_operator_wages ? value.ts_sum_of_operator_wages : 0;
                 frappe.model.set_value(cdt, cdn, "operator_cost_per_day", operator_cost);
                 frappe.model.set_value(cdt, cdn, "no_of_operators", value.ts_no_of_operator ? value.ts_no_of_operator : 0);
-                frappe.model.set_value(cdt, cdn, "production_qty", value.production_capacity ? value.production_capacity : 0);
+                get_production_capacity(frm, cdt, cdn);
             });
         } else {
             frappe.model.set_value(cdt, cdn, "operator_cost_per_day", 0);
@@ -449,6 +483,7 @@ frappe.ui.form.on("CW Items", {
             frappe.model.set_value(cdt, cdn, "bom", "");
         }
         production_qty_calc(frm, cdt, cdn);
+        get_production_capacity(frm, cdt, cdn);
     },
     item_details_add: function (frm, cdt, cdn) {
         total_qty(frm, frm.doc.item_details);
@@ -480,17 +515,20 @@ function total_qty(frm, table_name) {
     var total_produced_qty = 0;
     var total_no_of_batche = 0;
     var total_production_sqft = 0;
+    var ts_production_sqft = 0;
     for (var i = 0; i < table_name.length; i++) {
         total_production_qty += table_name[i].production_qty ? table_name[i].production_qty : 0;
         total_dam_qty += table_name[i].damaged_qty ? table_name[i].damaged_qty : 0;
         total_produced_qty += table_name[i].produced_qty ? table_name[i].produced_qty : 0;
         total_no_of_batche += table_name[i].no_of_batches ? table_name[i].no_of_batches : 0;
         total_production_sqft += table_name[i].production_sqft ? table_name[i].production_sqft : 0;
+        ts_production_sqft += table_name[i].ts_production_sqft ? table_name[i].ts_production_sqft : 0;
     }
     frm.set_value("production_qty", total_production_qty);
     frm.set_value("produced_qty", total_produced_qty);
     frm.set_value("damaged_qty", total_dam_qty);
     frm.set_value("production_sqft", total_production_sqft);
+    frm.set_value("ts_production_sqft", ts_production_sqft);
     frm.set_value("total_no_of_batche", total_no_of_batche);
 }
 function default_value(frm, usb_field, set_field) {
@@ -535,6 +573,5 @@ function total_expense_per_sqft_unmold(frm) {
     let total_cost = frm.doc.additional_cost_unmold ? frm.doc.additional_cost_unmold : 0;
     total_cost += (frm.doc.strapping_cost_per_sqft_unmold ? frm.doc.strapping_cost_per_sqft_unmold : 0) * (frm.doc.total_production_sqft ? frm.doc.total_production_sqft : 0);
     frm.set_value("total_expense_for_unmolding", total_cost);
-    frm.set_value("total_expense_per_sqft_unmold", frm.doc.total_production_sqft ? (total_cost ? total_cost : 0) / frm.doc.total_production_sqft : 0);
+    frm.set_value("total_expense_per_sqft_unmold", frm.doc.ts_production_sqft ? (total_cost ? total_cost : 0) / frm.doc.ts_production_sqft : 0);
 }
-

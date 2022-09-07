@@ -17,13 +17,20 @@ frappe.ui.form.on("Workstation",{
     //     }
     // },
     refresh:function(frm){
-            frm.set_query('ts_operator_name','ts_operators_table',function(frm){
-                return {
-                    filters:{
-                        "designation":"Operator",
-                    }
+        frm.set_query('ts_operator_name','ts_operators_table',function(frm){
+            return {
+                filters:{
+                    "designation":"Operator",
                 }
-            })
+            }
+        })
+        frm.set_query('item_code','item_wise_production_capacity',function(frm){
+            return {
+                filters:{
+                    "item_group":["!=", 'Raw Material'],
+                }
+            }
+        })
         frm.set_query('ts_machine_operator',function(frm){
             return {
                 filters:{

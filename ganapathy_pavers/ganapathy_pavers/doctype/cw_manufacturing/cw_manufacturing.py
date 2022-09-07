@@ -69,7 +69,7 @@ def make_stock_entry_for_molding(doc):
         if (doc.get("items")):
             for i in doc.get("items"):
                 stock_entry.append('items', dict(
-                    s_warehouse=(doc.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"]*(item.get("production_sqft")/doc.get("production_sqft")), uom=i["uom"],
+                    s_warehouse=(doc.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"]*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), uom=i["uom"],
                     basic_rate=i["rate"]
                 ))
         else:
@@ -85,7 +85,7 @@ def make_stock_entry_for_molding(doc):
                 t_warehouse=default_scrap_warehouse, item_code=item.get("item"), qty=scrap_qty, uom=default_nos, is_process_loss=1
             ))
         stock_entry.append('additional_costs', dict(
-            expense_account=expenses_included_in_valuation, amount=doc.get("total_expence")*(item.get("production_sqft")/doc.get("production_sqft")), description="It includes labours cost, operators cost and additional cost."
+            expense_account=expenses_included_in_valuation, amount=doc.get("total_expence")*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), description="It includes labours cost, operators cost and additional cost."
         ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
@@ -143,7 +143,7 @@ def make_stock_entry_for_bundling(doc):
             t_warehouse = target_warehouse, item_code = item.get('item_code'), qty = converted_qty,uom = default_nos
             ))
         stock_entry.append('additional_costs', dict(
-                expense_account	 = expenses_included_in_valuation, amount = doc.get("total_expense_for_unmolding") * (sqft_qty/doc.get("production_sqft")), description = "It includes strapping cost and additional cost."
+                expense_account	 = expenses_included_in_valuation, amount = doc.get("total_expense_for_unmolding") * (sqft_qty/doc.get("ts_production_sqft")), description = "It includes strapping cost and additional cost."
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
@@ -191,7 +191,7 @@ def make_stock_entry_for_curing(doc):
             t_warehouse = target_warehouse, 
             ))
         stock_entry.append('additional_costs', dict(
-                expense_account	 = expenses_included_in_valuation, amount = doc.get("labour_expense_for_curing") * (sqft_qty/doc.get("production_sqft")),description = "It includes labours cost."
+                expense_account	 = expenses_included_in_valuation, amount = doc.get("labour_expense_for_curing") * (sqft_qty/doc.get("ts_production_sqft")),description = "It includes labours cost."
             ))
         stock_entry.insert(ignore_mandatory=True, ignore_permissions=True)
         stock_entry.save()
@@ -291,7 +291,8 @@ def uom_conversion(item, from_uom, from_qty, to_uom):
     return (float(from_qty) * from_conv) / to_conv
 
 @frappe.whitelist()
-def get_operators(doc):
+def get_operators(doc, item_count=1):
+    item_count = int(item_count)
     doc = json.loads(doc)
     op_table=[]
     op_list=[]
@@ -301,20 +302,35 @@ def get_operators(doc):
             for j in op_cost.ts_operators_table:
                 if(j.ts_operator_name not in op_list):
                     op_list.append(j.ts_operator_name)
-                    op_table.append({"employee":j.ts_operator_name,"operator_name":j.ts_operator_full_name,"division_salary":j.ts_operator_wages})
+                    op_table.append({"employee":j.ts_operator_name,"operator_name":j.ts_operator_full_name,"salary":j.ts_operator_wages, "division_salary":(j.ts_operator_wages/item_count)})
                 else:
                     for k in op_table:
                         if k['employee'] == j.ts_operator_name:
-                            k['division_salary'] = k['division_salary'] +j.ts_operator_wages
+                            k['salary'] = k['salary'] +j.ts_operator_wages
+                            k["division_salary"] += (j.ts_operator_wages/item_count)
     return(op_table)
 
     
 @frappe.whitelist()
-def add_item(doc):
+def add_item(doc, batches = 1):
     items={}
+    type1=[]
     doc=json.loads(doc)
+    item_table_len = 0
     if(len(doc)>0):
+        for row in doc:
+            if(row.get('bom')):
+                item_table_len += 1
+            if(row.get('item')):
+                cw_type = frappe.get_value("Item", row.get('item'), 'compound_wall_type')
+                if(cw_type):
+                    type1.append(cw_type)
+        if(len(list(set(type1))) != 1):
+            frappe.throw('Please enter either Post or Slab.')
+        else:
+            type1 = type1[0]
         for k in doc:
+            no_of_batches = (k.get('no_of_batches') or 0) if(type1 == 'Post') else float(batches)/item_table_len
             if(k.get('bom')):
                 bom_doc = frappe.get_doc("BOM",k.get('bom'))
                 fields = ['item_code','qty', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']
@@ -322,12 +338,13 @@ def add_item(doc):
                     if(i.is_usb_item == 0):
                         if(i.item_code not in items):
                             row = {field:i.__dict__[field] for field in fields}
-                            row['qty'] *= (k.get('no_of_batches') or 0)
-                            row['amount'] *= (k.get('no_of_batches') or 0)
+                            row['qty'] *= no_of_batches
+                            row['amount'] *= no_of_batches
                             items.update({i.item_code: row})
                         else:
-                            items[i.item_code]['qty'] += ((k.get('no_of_batches') or 0) * i.qty)
-                            items[i.item_code]['amount'] += ((k.get('no_of_batches') or 0) * i.amount)               
+                            items[i.item_code]['qty'] += (no_of_batches * i.qty)
+                            items[i.item_code]['amount'] += (no_of_batches * i.amount)
+                           
         
     return list(items.values())
            

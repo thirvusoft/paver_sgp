@@ -8,6 +8,7 @@
  "field_order": [
   "employee",
   "operator_name",
+  "salary",
   "division_salary"
  ],
  "fields": [
@@ -28,12 +29,18 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Division Salary"
+  },
+  {
+   "fieldname": "salary",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Employee Salary"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-09-05 16:27:09.497689",
+ "modified": "2022-09-07 18:34:32.382128",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Operator Details",
