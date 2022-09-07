@@ -14,8 +14,8 @@
  "is_standard": 1,
  "label": "Sales Cycle",
  "links": [],
- "modified": "2022-09-02 16:57:47.814447",
- "modified_by": "admin@gpy.com",
+ "modified": "2022-09-07 13:02:55.194961",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Sales Cycle",
  "owner": "Administrator",
@@ -68,6 +68,12 @@
    "doc_view": "List",
    "label": "Job Worker - Report",
    "link_to": "Job Worker - Report",
+   "type": "Report"
+  },
+  {
+   "doc_view": "List",
+   "label": "Site Work Wise Delivery Report",
+   "link_to": "Site Work Wise Delivery Report",
    "type": "Report"
   }
  ],
