@@ -38,6 +38,14 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 			"fieldtype": "Link",
 			"options": "Customer",
 			"width": "100"
+		},
+		{
+			"fieldname":"group_by",
+			"label": __("Group By"),
+			"fieldtype": "Select",
+			"options": "Date\nItem Wise",
+			"default": "Date",
+			"width": "100"
 		}
 	]
  };
