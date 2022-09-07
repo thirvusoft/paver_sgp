@@ -8,7 +8,6 @@ function throw_error(doc, field) {
 frappe.ui.form.on("CW Manufacturing", {
     refresh: function (frm) {
         if (frm.is_new()) {
-            default_value(frm, "no_of_labours_for_molding", "no_of_labour");
             default_value(frm, "labour_cost_per_hrs", "labour_salary_per_hrs");
             default_value(frm, "strapping_cost_per_sqft", "strapping_cost_per_sqft_unmold");
             default_value(frm, "labour_cost_per_sqft", "labour_cost_per_sqft_curing");

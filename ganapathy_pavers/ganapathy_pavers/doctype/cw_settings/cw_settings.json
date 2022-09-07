@@ -9,8 +9,6 @@
   "company",
   "column_break_2",
   "working_area",
-  "section_break_2",
-  "no_of_labours_for_molding",
   "default_warehouse_section",
   "default_stock_entry_molding",
   "default_molding_source_warehouse",
@@ -207,16 +205,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "section_break_2",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "no_of_labours_for_molding",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "No of Labours for Molding"
-  },
-  {
    "fieldname": "column_break_22",
    "fieldtype": "Column Break"
   },
@@ -254,7 +242,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-09-06 12:28:52.755301",
+ "modified": "2022-09-07 19:56:35.896273",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Settings",
