@@ -90,7 +90,7 @@ def validate_salary_slip(self, event):
     if self.designation=="Labour Worker":
         ssa=frappe.get_all("Salary Structure Assignment", filters={'employee':self.employee, 'docstatus':1,'designation':"Labour Worker"}, pluck="base")
         employee=frappe.get_value("Employee",self.employee,'reports_to')
-        ccr=frappe.get_all("Contractor Commission Rate", filters={'docstatus':1,'name':employee},fields=['contractor','commission_rate'])
+        ccr=frappe.get_all("Contractor Commission Rate", filters={'name':employee},fields=['contractor','commission_rate'])
         commission=ssa[0]-ccr[0]['commission_rate']
         basic=commission*self.total_working_hour
         if len(self.earnings)==0:
@@ -124,7 +124,7 @@ def validate_salary_slip(self, event):
 def validate_contrator_welfare(self, event):
     if self.designation=="Operator":
         emp=frappe.get_all("Employee",filters={'status':"Active",'reports_to':self.employee},pluck='name')
-        ccr=frappe.get_all("Contractor Commission Rate", filters={'docstatus':1,'name':self.employee},fields=['contractor','commission_rate'])
+        ccr=frappe.get_all("Contractor Commission Rate", filters={'name':self.employee},fields=['contractor','commission_rate'])
         start_date=self.start_date
         end_date=self.end_date
         cond=""
@@ -133,10 +133,9 @@ def validate_contrator_welfare(self, event):
         elif(len(emp) > 1):
             cond += f"employee in {tuple(emp)}"
         total_working_hour = frappe.db.sql(
-                    f""" select time_to_sec(sum(timediff(check_out, check_in)))/(60*60) as time from `tabTS Employee Details` where {cond} and check_in BETWEEN '{self.start_date}' AND '{self.end_date}' and docstatus=1""",
+                    f""" select sum(time_to_sec(timediff(check_out, check_in)))/(60*60) as time, parent from `tabTS Employee Details` where {cond} and check_in BETWEEN '{self.start_date}' AND '{self.end_date}' and docstatus=1""",
                     as_dict=1,
                 )
-
         if len(total_working_hour):
             total_working_hour=total_working_hour[0]['time']
         else:
