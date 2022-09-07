@@ -98,6 +98,7 @@
   {
    "fieldname": "ts_production_sqft",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "TS Production Sqft",
    "read_only": 1
   }
@@ -105,7 +106,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-09-07 19:25:18.402580",
+ "modified": "2022-09-07 19:58:59.202074",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Items",

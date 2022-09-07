@@ -97,6 +97,11 @@ def make_stock_entry_for_molding(doc):
 @frappe.whitelist()
 def make_stock_entry_for_bundling(doc):
     doc = json.loads(doc)
+    valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
+            "name"), "stock_entry_type": "Manufacture", "docstatus": ["!=", 2]}, pluck="name")
+        
+    if len(valid) < 1:
+        frappe.throw("Please Create Stock Entry For Manufacturing before Unmolding.")
     if(not doc.get('unmolding_date')):
         frappe.throw("Please Enter Unmolding Date")
     valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
@@ -156,6 +161,11 @@ def make_stock_entry_for_bundling(doc):
 @frappe.whitelist()
 def make_stock_entry_for_curing(doc):
     doc = json.loads(doc)
+    valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
+            "name"), "stock_entry_type": "Repack", "docstatus": ["!=", 2]}, pluck="name")
+        
+    if len(valid) < 1:
+        frappe.throw("Please Create Stock Entry For Unmolding before Curing.")
     if(not doc.get('curing_date')):
         frappe.throw("Please Enter Curing Date")
     valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
