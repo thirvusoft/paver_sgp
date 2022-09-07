@@ -18,13 +18,7 @@ frappe.ui.form.on("CW Manufacturing", {
             default_value(frm, "cement", "cement_item_name");
             default_value(frm, "ggbs", "ggbs_item_name");
         }
-        frm.set_query("item_to_manufacture", function () {
-            return {
-                filters: {
-                    item_group: "Compound Walls",
-                },
-            };
-        });
+        
         frm.set_query("item", "item_details", function () {
             return {
                 filters: {
@@ -40,13 +34,6 @@ frappe.ui.form.on("CW Manufacturing", {
                 },
             };
         });
-    },
-    item_to_manufacture: function (frm) {
-        if (frm.doc.item_to_manufacture) {
-            bom_fetch(frm, frm.doc.item_to_manufacture);
-        } else {
-            frm.set_value("bom", "");
-        }
     },
     ts_before_save: function (frm) {
         let post_chips = 0,

@@ -57,7 +57,7 @@ def create_salary_slips_for_employees(posting_date,start_date,end_date,employees
 				"between",(st_date, ed_date)],"docstatus":1},pluck='ot_hours'))
        
         doc2=sum(frappe.get_all('Attendance', filters={"employee":emp, "attendance_date":[
-				"between",(st_date, ed_date)],"docstatus":1},pluck='full_day_working'))
+				"between",(st_date, ed_date)],"docstatus":1},pluck='full_day_workings'))
         
         doc3=sum(frappe.get_all('Attendance', filters={"employee":emp, "attendance_date":[
 				"between",(st_date, ed_date)],"docstatus":1},pluck='one_day_hours'))
