@@ -4,5 +4,5 @@
 # import frappe
 from frappe.model.document import Document
 
-class CWRemainingQtyDetails(Document):
+class CWUnmoldingBatchDetails(Document):
 	pass

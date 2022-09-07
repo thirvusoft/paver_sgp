@@ -13,6 +13,7 @@
   "column_break_5",
   "production_qty",
   "damaged_qty",
+  "description_for_damaged_qty",
   "produced_qty",
   "production_sqft"
  ],
@@ -87,12 +88,18 @@
    "label": "BOM",
    "options": "BOM",
    "reqd": 1
+  },
+  {
+   "fieldname": "description_for_damaged_qty",
+   "fieldtype": "Link",
+   "label": "Description for Damaged Qty",
+   "options": "Description for Damaged Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-09-06 14:21:01.515970",
+ "modified": "2022-09-07 12:46:00.623624",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Items",

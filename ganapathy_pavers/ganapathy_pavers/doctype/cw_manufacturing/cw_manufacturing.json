@@ -68,19 +68,16 @@
   "total_production_sqft",
   "total_amount_for_unmolding_section",
   "strapping_cost_per_sqft_unmold",
+  "create_stock_entry_for_bundling",
   "column_break_68",
   "additional_cost_unmold",
   "column_break_70",
   "total_expense_per_sqft_unmold",
   "column_break_66",
   "total_expense_for_unmolding",
-  "section_break_63",
-  "cw_item_bundle_details",
-  "create_stock_entry_for_bundling",
   "curing_section",
   "curing_date",
   "bundled_sqft_curing",
-  "no_of_bundle_curing",
   "create_stock_entry_for_curing",
   "column_break_88",
   "labour_cost_per_sqft_curing",
@@ -88,7 +85,9 @@
   "abstract_section",
   "cw_abstract",
   "batch_details_section",
-  "cw_batch_details"
+  "cw_manufacturing_batch_details",
+  "cw_unmolding_batch_details",
+  "cw_curing_batch_details"
  ],
  "fields": [
   {
@@ -127,7 +126,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Process",
-   "options": "Molding\nUnmolding\nCuring\nCompleted"
+   "options": "Manufacturing\nUnmolding\nCuring\nCompleted"
   },
   {
    "collapsible": 1,
@@ -191,7 +190,7 @@
   {
    "fieldname": "create_stock_entry_for_molding",
    "fieldtype": "Button",
-   "label": "Create Stock Entry for Molding"
+   "label": "Create Stock Entry for Manufacturing"
   },
   {
    "fieldname": "manufacturing_items",
@@ -286,11 +285,6 @@
    "label": "Unmolding and Bundling"
   },
   {
-   "fieldname": "section_break_63",
-   "fieldtype": "Section Break",
-   "label": "Total Qty for Unmolding"
-  },
-  {
    "fieldname": "total_amount_for_unmolding_section",
    "fieldtype": "Section Break",
    "label": "Total Amount for Unmolding"
@@ -346,12 +340,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "no_of_bundle_curing",
-   "fieldtype": "Float",
-   "label": "No of Bundle",
-   "read_only": 1
-  },
-  {
    "fieldname": "column_break_88",
    "fieldtype": "Column Break"
   },
@@ -383,9 +371,7 @@
   {
    "fieldname": "batch_details_section",
    "fieldtype": "Section Break",
-   "hidden": 1,
-   "label": "Batch Details",
-   "read_only": 1
+   "label": "Batch Details"
   },
   {
    "fieldname": "curing_date",
@@ -513,19 +499,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "cw_batch_details",
-   "fieldtype": "Table",
-   "hidden": 1,
-   "options": "CW Batch Details",
-   "read_only": 1
-  },
-  {
-   "fieldname": "cw_item_bundle_details",
-   "fieldtype": "Table",
-   "options": "CW Item Bundle Details",
-   "read_only": 1
-  },
-  {
    "fieldname": "cbxx",
    "fieldtype": "Column Break"
   },
@@ -540,12 +513,33 @@
    "fieldtype": "Table",
    "options": "CW Abstract",
    "read_only": 1
+  },
+  {
+   "fieldname": "cw_manufacturing_batch_details",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "options": "CW Manufacturing Batch Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cw_unmolding_batch_details",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "options": "CW Unmolding Batch Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cw_curing_batch_details",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "options": "CW Curing Batch Details",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-06 19:58:46.866612",
+ "modified": "2022-09-07 16:41:54.656148",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

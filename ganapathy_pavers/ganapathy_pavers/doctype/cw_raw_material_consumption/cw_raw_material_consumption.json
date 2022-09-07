@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "date",
+  "time",
   "batch",
   "bin1",
   "bin2",
@@ -81,6 +82,12 @@
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "GGBS"
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "TIME"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -88,7 +95,7 @@
  "istable": 1,
  "links": [],
  "max_attachments": 10,
- "modified": "2022-09-05 10:33:05.270950",
+ "modified": "2022-09-07 12:23:46.700740",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Raw Material Consumption",

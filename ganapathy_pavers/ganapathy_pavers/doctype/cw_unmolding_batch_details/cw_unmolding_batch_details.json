@@ -1,49 +1,51 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-09-06 19:15:57.466211",
+ "creation": "2022-09-07 10:57:27.866553",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "item_code",
-  "manufacturing_batch",
-  "unmolding_batch",
-  "curing_batch"
+  "batch",
+  "qty",
+  "uom"
  ],
  "fields": [
   {
    "fieldname": "item_code",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Item Code"
+   "label": "Item Code",
+   "options": "Item"
   },
   {
-   "fieldname": "manufacturing_batch",
+   "fieldname": "batch",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Manufacturing Batch"
+   "label": "Batch"
   },
   {
-   "fieldname": "unmolding_batch",
-   "fieldtype": "Data",
+   "fieldname": "qty",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Unmolding Batch"
+   "label": "Qty"
   },
   {
-   "fieldname": "curing_batch",
-   "fieldtype": "Data",
+   "fieldname": "uom",
+   "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Curing Batch"
+   "label": "UOM",
+   "options": "UOM"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-09-06 19:15:57.466211",
+ "modified": "2022-09-07 14:57:19.881976",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "CW Batch Details",
+ "name": "CW Unmolding Batch Details",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
