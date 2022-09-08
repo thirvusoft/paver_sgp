@@ -12,7 +12,7 @@ def execute(filters=None):
     sales_type = filters.get("sales_type")
     group_by = filters.get("group_by")
     conditions = ""
-    if from_date or to_date or customer or site_name or sales_type:
+    if from_date or to_date or customer or site_name or sales_type or group_by:
         conditions = " where 1 = 1"
         if from_date and to_date:
             conditions += "  and doc.posting_date between '{0}' and '{1}' ".format(from_date, to_date)
