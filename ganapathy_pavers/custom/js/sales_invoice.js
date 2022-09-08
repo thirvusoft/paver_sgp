@@ -75,8 +75,6 @@ frappe.ui.form.on('Sales Invoice', {
                 })
             
                 
-               
-                if(row.item_group=='Pavers'){
                     let total_qty=row.qty
                     await frappe.model.set_value(cdt, cdn, 'ts_qty', parseInt(row.qty/conv1))
                     await frappe.model.set_value(cdt, cdn, 'pieces', 0)
@@ -86,7 +84,6 @@ frappe.ui.form.on('Sales Invoice', {
                     let rate=row.rate
                     frappe.model.set_value(cdt, cdn, 'rate', 0)
                     frappe.model.set_value(cdt, cdn, 'rate', rate)
-                }    
                 }
             }
             let items = cur_frm.doc.items || [];
