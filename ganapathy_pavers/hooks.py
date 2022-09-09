@@ -263,14 +263,17 @@ scheduler_events = {
 
 	"cron": {
 		"0 2 * * *": [
-			"ganapathy_pavers.custom.py.vehicle_log.days"
+			"ganapathy_pavers.custom.py.vehicle_log.days",
+		],
+		"* 23 * * *": [
+			"ganapathy_pavers.custom.py.employee_checkin.mark_attendance",
 		]
 	},
 
 	"daily":
 		[
 		"ganapathy_pavers.custom.py.purchase_order.purchasenotification"
-		]
+		],
 
 	
 # 	"all": [

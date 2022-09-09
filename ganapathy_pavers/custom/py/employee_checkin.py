@@ -1,5 +1,15 @@
 import frappe
 from frappe.utils.data import time_diff_in_hours
+from datetime import date, timedelta, datetime
+
+from erpnext.hr.doctype.shift_type.shift_type import process_auto_attendance_for_all_shifts
+def mark_attendance():
+    get_shift_type=frappe.db.get_all("Shift Type" ,pluck="name")
+    for i in get_shift_type:
+        frappe.db.set_value("Shift Type", i, "process_attendance_after",datetime.today())
+        frappe.db.set_value("Shift Type", i, "last_sync_of_checkin",datetime.now()+timedelta(1))
+    process_auto_attendance_for_all_shifts()
+    
 def check_in_out(self, event):
     emp_checkin_hours=frappe.get_all('Employee Checkin', 
     {'employee': self.employee, 'time': ['between',[self.attendance_date,self.attendance_date]]},
