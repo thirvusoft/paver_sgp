@@ -33,6 +33,10 @@ frappe.ui.form.on("CW Manufacturing", {
                 },
             };
         });
+        set_css(frm);
+    },
+    onload: function (frm) {
+        
     },
     ts_before_save: function (frm) {
         let post_chips = 0,
@@ -581,4 +585,16 @@ function total_expense_per_sqft_unmold(frm) {
     total_cost += (frm.doc.strapping_cost_per_sqft_unmold ? frm.doc.strapping_cost_per_sqft_unmold : 0) * (frm.doc.total_production_sqft ? frm.doc.total_production_sqft : 0);
     frm.set_value("total_expense_for_unmolding", total_cost);
     frm.set_value("total_expense_per_sqft_unmold", frm.doc.ts_production_sqft ? (total_cost ? total_cost : 0) / frm.doc.ts_production_sqft : 0);
+}
+
+function set_css(frm) {
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_molding']")[1].style.color = "white";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_molding']")[1].style.fontWeight = "bold";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_molding']")[1].style.backgroundColor = "#3399ff";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_bundling']")[1].style.color = "white";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_bundling']")[1].style.fontWeight = "bold";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_bundling']")[1].style.backgroundColor = "#3399ff";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_curing']")[1].style.color = "white";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_curing']")[1].style.fontWeight = "bold";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_curing']")[1].style.backgroundColor = "#3399ff";
 }
