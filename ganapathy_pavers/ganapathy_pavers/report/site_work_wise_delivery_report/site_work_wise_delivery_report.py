@@ -82,7 +82,7 @@ def execute(filters=None):
             data[i+1][4]=None
         else:
             matched_item=""
-    final_data = group_total(filters, data) or []
+    final_data = (group_total(filters, data) or []) if(data) else []
     return columns, final_data
  
 def get_columns():
