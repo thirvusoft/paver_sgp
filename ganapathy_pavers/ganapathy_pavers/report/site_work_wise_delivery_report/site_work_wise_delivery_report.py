@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
  
+from unittest.result import failfast
 import frappe
 from frappe import _
  
@@ -11,8 +12,9 @@ def execute(filters=None):
     site_name = filters.get("site_name")
     sales_type = filters.get("sales_type")
     group_by = filters.get("group_by")
+    item_code = filters.get("item_code")
     conditions = ""
-    if from_date or to_date or customer or site_name or sales_type or group_by:
+    if from_date or to_date or customer or site_name or sales_type or group_by or item_code:
         conditions = " where 1 = 1"
         if from_date and to_date:
             conditions += "  and doc.posting_date between '{0}' and '{1}' ".format(from_date, to_date)
@@ -22,11 +24,9 @@ def execute(filters=None):
             conditions += " and doc.site_work = '{0}' ".format(site_name)
         if sales_type:
             conditions += " and doc.type = '{0}' ".format(sales_type)
-        if group_by == "Date":
-            order_by = "doc.posting_date,doc.name"
-        else:
-            order_by = "child.item_code"
-            
+        if item_code:
+            conditions += " and child.item_code ='{0}' ".format(item_code)
+        
     report_data = frappe.db.sql(""" select
                                 doc.posting_date,
                                 doc.name,
@@ -44,34 +44,43 @@ def execute(filters=None):
                                 from `tabDelivery Note` as doc
                                 left outer join `tabDelivery Note Item` as child
                                     on doc.name = child.parent
-                                {0}
-                                order by {1}
-                                """.format(conditions,order_by))
- 
+                                """.format(conditions))
+    
     data = [list(i) for i in report_data]
     #    order by doc.posting_date,doc.name
     matched_item=""
     for i in range (0,len(data)-1,1):
         if data[i][1] == data[i+1][1]:
             matched_item = data[i][1]
-            data[i+1][0]=""
-            data[i+1][1]=""
-            data[i+1][2]=""
-            data[i+1][3]=""
-            data[i+1][4]=""
-            data[i+1][9]=""
-    
+            data[i+1][12]=None
         elif matched_item == data[i+1][1]:
-            data[i+1][0]=""
-            data[i+1][1]=""
-            data[i+1][2]=""
-            data[i+1][3]=""
-            data[i+1][4]=""
-            data[i+1][9]=""
+            data[i+1][12]=None
         else:
             matched_item=""
+
     
     columns = get_columns()
+    data.sort(key = lambda x: (x[1] if(group_by == "Date") else (x[5]), x[0]))
+    matched_item=""
+    
+    for i in range (0,len(data)-1,1):
+        if data[i][1] == data[i+1][1]:
+            matched_item = data[i][1]
+            data[i+1][0]=None
+            data[i+1][1]=None
+            data[i+1][2]=None
+            data[i+1][3]=None
+            data[i+1][4]=None
+                
+    
+        elif matched_item == data[i+1][1]:
+            data[i+1][0]=None
+            data[i+1][1]=None
+            data[i+1][2]=None
+            data[i+1][3]=None
+            data[i+1][4]=None
+        else:
+            matched_item=""
     return columns, data
  
 def get_columns():
