@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
  
+from operator import add
 from unittest.result import failfast
 import frappe
 from frappe import _
@@ -44,6 +45,7 @@ def execute(filters=None):
                                 from `tabDelivery Note` as doc
                                 left outer join `tabDelivery Note Item` as child
                                     on doc.name = child.parent
+                                {0}
                                 """.format(conditions))
     
     data = [list(i) for i in report_data]
@@ -62,7 +64,6 @@ def execute(filters=None):
     columns = get_columns()
     data.sort(key = lambda x: (x[1] if(group_by == "Date") else (x[5]), x[0]))
     matched_item=""
-    
     for i in range (0,len(data)-1,1):
         if data[i][1] == data[i+1][1]:
             matched_item = data[i][1]
@@ -81,7 +82,8 @@ def execute(filters=None):
             data[i+1][4]=None
         else:
             matched_item=""
-    return columns, data
+    final_data = group_total(filters, data) or []
+    return columns, final_data
  
 def get_columns():
     columns = [
@@ -90,14 +92,63 @@ def get_columns():
         _("Customer Name") + ":Link/Customer:200",
         _("Sales Type") + ":Data:100",
         _("Site Name") + ":Link/Project:150",
-        _("Item Name") + ":Link/Item:150",
-        _("Qty") + ":Int:80",
+        _("Item Name") + ":Link/Item:350",
+        _("Qty") + ":Data:80",
         _("UOM") + ":Link/UOM:100",
-        _("Bundle") + ":Int:80",
-        _("Pieces") + ":Int:80",
-        _("Rate") + ":Currency:100",
-        _("Amount") + ":Currency:150",
-        _("Grand Total") + ":Currency:150"
+        _("Bundle") + ":Data:80",
+        _("Pieces") + ":Data:80",
+        _("Rate") + ":Data:100",
+        _("Amount") + ":Data:150",
+        _("Grand Total") + ":Data:150"
         ]
     
     return columns
+
+
+
+def group_total(filters = {}, data = []):
+    if(not filters.get("group_total")):
+        return data
+    else:
+        if(filters.get("group_by") == "Date"):
+            ret_list = []
+            total = [0] * 13
+            data.append([None]*13)
+            for row in range(len(data)):
+                if(data[row][0] and row!=0 or row == len(data)-1):
+                    total[3] = "Group Total"
+                    ret_list.append([frappe.bold(str(i)) if(i!=None) else '' for i in total])
+                    ret_list.append([None] * 13)
+                    ret_list.append(data[row])
+                    total = [0] * 13
+                    total = add_list(total, data[row])
+                else:
+                    ret_list.append(data[row])
+                    total = add_list(total, data[row])
+            return ret_list
+        
+        else:
+            ret_list = []
+            total = [0] * 13
+            data.append([None]*13)
+            for row in range(len(data)):
+                if( row!=0 and data[row][5]!=data[row-1][5]):
+                    total[3] = "Group Total"
+                    ret_list.append([frappe.bold(str(i)) if(i!=None) else '' for i in total])
+                    ret_list.append([None] * 13)
+                    ret_list.append(data[row])
+                    total = [0] * 13
+                    total = add_list(total, data[row])
+                else:
+                    ret_list.append(data[row])
+                    total = add_list(total, data[row])
+            return ret_list
+    
+def add_list(a, b):
+    ret_list1 = []
+    for i in range(len(a)):
+        if((isinstance(a[i], int) or isinstance(a[i], float)) and (isinstance(b[i], int) or isinstance(b[i], float))):
+            ret_list1.append(a[i] + b[i])
+        else:
+            ret_list1.append(None)
+    return ret_list1
