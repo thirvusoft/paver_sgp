@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestCWRemainingQtyDetails(unittest.TestCase):
+class TestDescriptionforDamagedQty(unittest.TestCase):
 	pass

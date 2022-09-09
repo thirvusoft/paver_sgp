@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "workstation",
+  "item",
   "division",
   "total_hrs",
   "this_hrs",
@@ -34,25 +35,23 @@
    "reqd": 1
   },
   {
-   "columns": 1,
    "fieldname": "division",
    "fieldtype": "Int",
-   "in_list_view": 1,
+   "hidden": 1,
    "label": "Division"
   },
   {
-   "columns": 1,
    "depends_on": "eval: doc.division > 1",
    "fieldname": "total_hrs",
    "fieldtype": "Float",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Total Hrs"
   },
   {
-   "columns": 1,
    "fieldname": "this_hrs",
    "fieldtype": "Float",
-   "in_list_view": 1,
+   "hidden": 1,
    "label": "Unmolding hrs for this item "
   },
   {
@@ -105,7 +104,6 @@
    "columns": 1,
    "fieldname": "operator_cost",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Operator Cost"
   },
   {
@@ -131,12 +129,21 @@
    "fieldtype": "Float",
    "label": "No of Bundles",
    "read_only": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Item",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-08-27 12:05:08.225930",
+ "modified": "2022-09-05 11:27:58.165260",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Unmolding",

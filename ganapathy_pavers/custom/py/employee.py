@@ -23,7 +23,7 @@ def emp_hrs(diff_hrs, employee):
         if diff_hrs<8.0:
             frappe.set_value(doc.doctype, doc.name, "ot_hours",  day_ot)
         if diff_hrs>8.0:
-            day_ot=8.0- diff_hrs
+            day_ot=8.0-diff_hrs
             frappe.set_value(doc.doctype, doc.name, "ot_hours",  day_ot)
             frappe.set_value(doc.doctype, doc.name, "one_day_hours",  '8.0')
             frappe.set_value(doc.doctype, doc.name, "full_day_working",  '1')

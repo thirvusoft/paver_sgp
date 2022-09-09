@@ -1,47 +1,49 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-08-27 15:59:17.883249",
+ "creation": "2022-09-05 16:25:58.793044",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "item",
-  "type",
-  "qty"
+  "employee",
+  "operator_name",
+  "salary",
+  "division_salary"
  ],
  "fields": [
   {
-   "fieldname": "item",
+   "fieldname": "employee",
    "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Item",
-   "options": "Item",
-   "read_only": 1
+   "label": "Employee",
+   "options": "Employee"
   },
   {
-   "fieldname": "qty",
+   "fieldname": "operator_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Operator Name"
+  },
+  {
+   "fieldname": "division_salary",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Qty",
-   "read_only": 1
+   "label": "Division Salary"
   },
   {
-   "fieldname": "type",
-   "fieldtype": "Select",
+   "fieldname": "salary",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Type",
-   "options": "Post\nSlab",
-   "read_only": 1
+   "label": "Employee Salary"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-08-27 16:00:59.662765",
+ "modified": "2022-09-07 18:34:32.382128",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "Compound Wall Remaining Qty",
+ "name": "CW Operator Details",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",

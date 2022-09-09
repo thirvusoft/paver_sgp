@@ -1,241 +1,264 @@
 {
-    "actions": [],
-    "allow_rename": 1,
-    "creation": "2022-08-26 10:50:39.222875",
-    "doctype": "DocType",
-    "editable_grid": 1,
-    "engine": "InnoDB",
-    "field_order": [
-     "company",
-     "section_break_2",
-     "no_of_labours_for_molding",
-     "column",
-     "no_of_labours_for_unmolding",
-     "default_warehouse_section",
-     "default_stock_entry_molding",
-     "default_molding_source_warehouse",
-     "default_molding_target_warehouse",
-     "default_scrap_warehouse",
-     "scrap_warehouse",
-     "column_break_4",
-     "default_stock_entry_unmolding",
-     "default_unmolding_source_warehouse",
-     "default_unmolding_target_warehouse",
-     "column_break_8",
-     "default_stock_entry_curing",
-     "default_curing_source_warehouse",
-     "default_curing_target_warehouse",
-     "default_stock_uom_section",
-     "default_molding_uom",
-     "column_break_22",
-     "default_unmolding_and_bundling_uom",
-     "default_item_section",
-     "chips_for_post",
-     "chips_for_slab",
-     "m_sand",
-     "column_break_28",
-     "cement",
-     "ggbs",
-     "labour_costing_details_section",
-     "labour_cost_per_sqft",
-     "strapping_cost_per_sqft"
-    ],
-    "fields": [
-     {
-      "fieldname": "company",
-      "fieldtype": "Link",
-      "label": "Company",
-      "options": "Company"
-     },
-     {
-      "fieldname": "default_warehouse_section",
-      "fieldtype": "Section Break",
-      "label": "Default Warehouse"
-     },
-     {
-      "fieldname": "default_scrap_warehouse",
-      "fieldtype": "Heading",
-      "label": "Default Scrap Warehouse"
-     },
-     {
-      "fieldname": "scrap_warehouse",
-      "fieldtype": "Link",
-      "label": "Scrap Warehouse",
-      "options": "Warehouse"
-     },
-     {
-      "fieldname": "column_break_4",
-      "fieldtype": "Column Break"
-     },
-     {
-      "fieldname": "column_break_8",
-      "fieldtype": "Column Break"
-     },
-     {
-      "fieldname": "default_stock_entry_curing",
-      "fieldtype": "Heading",
-      "label": "Default Curing Warehouse"
-     },
-     {
-      "fieldname": "default_curing_source_warehouse",
-      "fieldtype": "Link",
-      "label": "Default Curing Source Warehouse",
-      "options": "Warehouse"
-     },
-     {
-      "fieldname": "default_curing_target_warehouse",
-      "fieldtype": "Link",
-      "label": "Default Finished Target Warehouse",
-      "options": "Warehouse"
-     },
-     {
-      "fieldname": "default_stock_uom_section",
-      "fieldtype": "Section Break",
-      "label": "Default Stock UOM"
-     },
-     {
-      "fieldname": "default_item_section",
-      "fieldtype": "Section Break",
-      "label": "Default Item"
-     },
-     {
-      "fieldname": "column_break_28",
-      "fieldtype": "Column Break"
-     },
-     {
-      "fieldname": "cement",
-      "fieldtype": "Link",
-      "label": "Cement",
-      "options": "Item"
-     },
-     {
-      "fieldname": "ggbs",
-      "fieldtype": "Link",
-      "label": "GGBS",
-      "options": "Item"
-     },
-     {
-      "fieldname": "labour_costing_details_section",
-      "fieldtype": "Section Break",
-      "label": "Costing Details"
-     },
-     {
-      "fieldname": "labour_cost_per_sqft",
-      "fieldtype": "Currency",
-      "label": "Curing cost for labour per sqft"
-     },
-     {
-      "fieldname": "strapping_cost_per_sqft",
-      "fieldtype": "Currency",
-      "label": "Strapping Cost Per Sqft"
-     },
-     {
-      "fieldname": "default_stock_entry_molding",
-      "fieldtype": "Heading",
-      "label": "Default Molding Warehouse "
-     },
-     {
-      "fieldname": "default_molding_source_warehouse",
-      "fieldtype": "Link",
-      "label": "Default Molding Source Warehouse",
-      "options": "Warehouse"
-     },
-     {
-      "fieldname": "default_molding_target_warehouse",
-      "fieldtype": "Link",
-      "label": "Default Molding Target Warehouse",
-      "options": "Warehouse"
-     },
-     {
-      "fieldname": "default_stock_entry_unmolding",
-      "fieldtype": "Heading",
-      "label": "Default Unmolding Warehouse"
-     },
-     {
-      "fieldname": "default_unmolding_source_warehouse",
-      "fieldtype": "Link",
-      "label": "Default Unmolding Source Warehouse",
-      "options": "Warehouse"
-     },
-     {
-      "fieldname": "default_unmolding_target_warehouse",
-      "fieldtype": "Link",
-      "label": "Default Unmolding Target Warehouse",
-      "options": "Warehouse"
-     },
-     {
-      "fieldname": "default_molding_uom",
-      "fieldtype": "Link",
-      "label": "Default Molding UOM",
-      "options": "UOM"
-     },
-     {
-      "fieldname": "m_sand",
-      "fieldtype": "Link",
-      "label": "M Sand",
-      "options": "Item"
-     },
-     {
-      "fieldname": "chips_for_post",
-      "fieldtype": "Link",
-      "label": "Chips for Post",
-      "options": "Item"
-     },
-     {
-      "fieldname": "chips_for_slab",
-      "fieldtype": "Link",
-      "label": "Chips for Slab",
-      "options": "Item"
-     },
-     {
-      "fieldname": "section_break_2",
-      "fieldtype": "Section Break"
-     },
-     {
-      "fieldname": "no_of_labours_for_molding",
-      "fieldtype": "Int",
-      "label": "No of Labours for Molding"
-     },
-     {
-      "fieldname": "column",
-      "fieldtype": "Column Break"
-     },
-     {
-      "fieldname": "no_of_labours_for_unmolding",
-      "fieldtype": "Int",
-      "label": "No of Labours for Unmolding"
-     },
-     {
-      "fieldname": "column_break_22",
-      "fieldtype": "Column Break"
-     },
-     {
-      "fieldname": "default_unmolding_and_bundling_uom",
-      "fieldtype": "Link",
-      "label": "Default Unmolding and Bundling UOM",
-      "options": "UOM"
-     }
-    ],
-    "index_web_pages_for_search": 1,
-    "issingle": 1,
-    "links": [],
-    "modified": "2022-08-27 15:45:32.942929",
-    "modified_by": "Administrator",
-    "module": "Ganapathy Pavers",
-    "name": "CW Settings",
-    "owner": "Administrator",
-    "permissions": [
-     {
-      "create": 1,
-      "delete": 1,
-      "email": 1,
-      "print": 1,
-      "read": 1,
-      "role": "System Manager",
-      "share": 1,
-      "write": 1
-     }
-    ],
-    "sort_field": "modified",
-    "sort_order": "DESC"
-   }
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-08-26 10:50:39.222875",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "column_break_2",
+  "working_area",
+  "default_warehouse_section",
+  "default_stock_entry_molding",
+  "default_molding_source_warehouse",
+  "default_molding_target_warehouse",
+  "default_scrap_warehouse",
+  "scrap_warehouse",
+  "column_break_4",
+  "default_stock_entry_unmolding",
+  "default_unmolding_source_warehouse",
+  "default_unmolding_target_warehouse",
+  "column_break_8",
+  "default_stock_entry_curing",
+  "default_curing_source_warehouse",
+  "default_curing_target_warehouse",
+  "default_stock_uom_section",
+  "default_molding_uom",
+  "column_break_22",
+  "default_unmolding_and_bundling_uom",
+  "default_item_section",
+  "chips_for_post",
+  "chips_for_slab",
+  "m_sand",
+  "column_break_28",
+  "cement",
+  "ggbs",
+  "labour_costing_details_section",
+  "labour_cost_per_sqft",
+  "strapping_cost_per_sqft",
+  "column_break_34",
+  "labour_cost_per_hrs"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_warehouse_section",
+   "fieldtype": "Section Break",
+   "label": "Default Warehouse"
+  },
+  {
+   "fieldname": "default_scrap_warehouse",
+   "fieldtype": "Heading",
+   "label": "Default Scrap Warehouse"
+  },
+  {
+   "fieldname": "scrap_warehouse",
+   "fieldtype": "Link",
+   "label": "Scrap Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_stock_entry_curing",
+   "fieldtype": "Heading",
+   "label": "Default Curing Warehouse"
+  },
+  {
+   "fieldname": "default_curing_source_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Curing Source Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_curing_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Finished Target Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_stock_uom_section",
+   "fieldtype": "Section Break",
+   "label": "Default Stock UOM"
+  },
+  {
+   "fieldname": "default_item_section",
+   "fieldtype": "Section Break",
+   "label": "Default Items"
+  },
+  {
+   "fieldname": "column_break_28",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cement",
+   "fieldtype": "Link",
+   "label": "Cement",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ggbs",
+   "fieldtype": "Link",
+   "label": "GGBS",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "labour_costing_details_section",
+   "fieldtype": "Section Break",
+   "label": "Costing Details"
+  },
+  {
+   "fieldname": "labour_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Curing cost for labour per sqft",
+   "reqd": 1
+  },
+  {
+   "fieldname": "strapping_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Strapping Cost Per Sqft",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_stock_entry_molding",
+   "fieldtype": "Heading",
+   "label": "Default Molding Warehouse "
+  },
+  {
+   "fieldname": "default_molding_source_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Molding Source Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_molding_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Molding Target Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_stock_entry_unmolding",
+   "fieldtype": "Heading",
+   "label": "Default Unmolding Warehouse"
+  },
+  {
+   "fieldname": "default_unmolding_source_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Unmolding Source Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_unmolding_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Unmolding Target Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_molding_uom",
+   "fieldtype": "Link",
+   "label": "Default Molding UOM",
+   "options": "UOM",
+   "reqd": 1
+  },
+  {
+   "fieldname": "m_sand",
+   "fieldtype": "Link",
+   "label": "M Sand",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "chips_for_post",
+   "fieldtype": "Link",
+   "label": "Chips for Post",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "chips_for_slab",
+   "fieldtype": "Link",
+   "label": "Chips for Slab",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_unmolding_and_bundling_uom",
+   "fieldtype": "Link",
+   "label": "Default Unmolding and Bundling UOM",
+   "options": "UOM",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_34",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "working_area",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Working Area for Compound Wall",
+   "options": "Working Area",
+   "reqd": 1
+  },
+  {
+   "description": "per Hrs",
+   "fieldname": "labour_cost_per_hrs",
+   "fieldtype": "Float",
+   "label": "Labour Cost per Hrs",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-09-07 19:56:35.896273",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "CW Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
