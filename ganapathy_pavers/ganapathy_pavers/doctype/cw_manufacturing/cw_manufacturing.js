@@ -33,6 +33,10 @@ frappe.ui.form.on("CW Manufacturing", {
                 },
             };
         });
+        set_css(frm);
+    },
+    onload: function (frm) {
+        
     },
     ts_before_save: function (frm) {
         let post_chips = 0,
@@ -455,7 +459,7 @@ async function get_production_capacity(frm, cdt, cdn) {
             }
         });
     }
-    frappe.model.set_value(cdt, cdn, "production_qty", production_capacity)
+    frappe.model.set_value(cdt, cdn, "production_qty", production_capacity);
 }
 
 frappe.ui.form.on("CW Items", {
@@ -508,7 +512,7 @@ frappe.ui.form.on("CW Items", {
         total_qty(frm, frm.doc.item_details);
     },
 });
-function total_qty(frm, table_name) {
+async function total_qty(frm, table_name) {
     var total_production_qty = 0;
     var total_dam_qty = 0;
     var total_produced_qty = 0;
@@ -519,7 +523,13 @@ function total_qty(frm, table_name) {
         total_production_qty += table_name[i].production_qty ? table_name[i].production_qty : 0;
         total_dam_qty += table_name[i].damaged_qty ? table_name[i].damaged_qty : 0;
         total_produced_qty += table_name[i].produced_qty ? table_name[i].produced_qty : 0;
-        total_no_of_batche += table_name[i].no_of_batches ? table_name[i].no_of_batches : 0;
+        table_name[i].item
+            ? await frappe.db.get_value("Item", table_name[i].item, "compound_wall_type").then((value) => {
+                  if (value.message.compound_wall_type == "Post") {
+                      total_no_of_batche += table_name[i].no_of_batches ? table_name[i].no_of_batches : 0;
+                  }
+              })
+            : "";
         total_production_sqft += table_name[i].production_sqft ? table_name[i].production_sqft : 0;
         ts_production_sqft += table_name[i].ts_production_sqft ? table_name[i].ts_production_sqft : 0;
     }
@@ -528,7 +538,9 @@ function total_qty(frm, table_name) {
     frm.set_value("damaged_qty", total_dam_qty);
     frm.set_value("production_sqft", total_production_sqft);
     frm.set_value("ts_production_sqft", ts_production_sqft);
-    frm.set_value("total_no_of_batche", total_no_of_batche);
+    if (total_no_of_batche) {
+        frm.set_value("total_no_of_batche", total_no_of_batche);
+    }
 }
 function default_value(frm, usb_field, set_field) {
     frappe.db.get_single_value("CW Settings", usb_field).then((value) => {
@@ -573,4 +585,16 @@ function total_expense_per_sqft_unmold(frm) {
     total_cost += (frm.doc.strapping_cost_per_sqft_unmold ? frm.doc.strapping_cost_per_sqft_unmold : 0) * (frm.doc.total_production_sqft ? frm.doc.total_production_sqft : 0);
     frm.set_value("total_expense_for_unmolding", total_cost);
     frm.set_value("total_expense_per_sqft_unmold", frm.doc.ts_production_sqft ? (total_cost ? total_cost : 0) / frm.doc.ts_production_sqft : 0);
+}
+
+function set_css(frm) {
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_molding']")[1].style.color = "white";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_molding']")[1].style.fontWeight = "bold";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_molding']")[1].style.backgroundColor = "#3399ff";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_bundling']")[1].style.color = "white";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_bundling']")[1].style.fontWeight = "bold";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_bundling']")[1].style.backgroundColor = "#3399ff";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_curing']")[1].style.color = "white";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_curing']")[1].style.fontWeight = "bold";
+    document.querySelectorAll("[data-fieldname='create_stock_entry_for_curing']")[1].style.backgroundColor = "#3399ff";
 }
