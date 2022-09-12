@@ -1,4 +1,5 @@
 {
+ "cards_label": "Reports",
  "category": "Modules",
  "charts": [],
  "creation": "2022-03-25 14:28:48.848321",
@@ -13,8 +14,53 @@
  "is_default": 0,
  "is_standard": 1,
  "label": "Sales Cycle",
- "links": [],
- "modified": "2022-09-07 13:02:55.194961",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reports",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Delivery Report",
+   "link_to": "Delivery Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Site Work Completion - Report",
+   "link_to": "Site Work Completion - Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Job Worker - Report",
+   "link_to": "Job Worker - Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Site Work Wise Delivery Report",
+   "link_to": "Site Work Wise Delivery Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2022-09-12 12:05:32.979626",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Sales Cycle",
@@ -51,30 +97,6 @@
    "label": "Site Work",
    "link_to": "Project",
    "type": "DocType"
-  },
-  {
-   "doc_view": "List",
-   "label": "Delivery Report",
-   "link_to": "Delivery Report",
-   "type": "Report"
-  },
-  {
-   "doc_view": "List",
-   "label": "Site Work Completion - Report",
-   "link_to": "Site Work Completion - Report",
-   "type": "Report"
-  },
-  {
-   "doc_view": "List",
-   "label": "Job Worker - Report",
-   "link_to": "Job Worker - Report",
-   "type": "Report"
-  },
-  {
-   "doc_view": "List",
-   "label": "Site Work Wise Delivery Report",
-   "link_to": "Site Work Wise Delivery Report",
-   "type": "Report"
   }
  ],
  "shortcuts_label": "Sales Cycle"

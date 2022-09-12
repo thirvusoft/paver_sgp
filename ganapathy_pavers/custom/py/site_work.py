@@ -237,4 +237,8 @@ def update_delivery_detail(self, event):
                 self.delivery_detail[row].pending_qty__to_deliver = (to_delivered_qty[items] or 0) - (self.delivery_detail[row].delivered_stock_qty or 0)
                 catch = 1
         if(not catch):
-            self.delivery_detail.append({'item': items, 'qty_to_deliver': to_delivered_qty[items], 'pending_qty__to_deliver': (to_delivered_qty[items] or 0) - (self.delivery_detail[row].delivered_stock_qty or 0)})
+            delivery_detail = [{'item': items, 'qty_to_deliver': to_delivered_qty[items], 'pending_qty__to_deliver': (to_delivered_qty[items] or 0)}]
+            self.update({
+                'delivery_detail': (self.delivery_detail or []) + delivery_detail
+            })
+    
