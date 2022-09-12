@@ -30,6 +30,35 @@ class CWManufacturing(Document):
                 frappe.throw('Please enter either Post or Slab.')
             elif(type1[0] == "Slab"):
                 doc.total_no_of_batche = len(doc.raw_material_consumption)
+        doc.abstractcalc()
+    
+    def abstractcalc(doc):
+        labour_cost = float(doc.total_labour_wages or 0) + float(doc.labour_expense_for_curing or 0)
+        operator_cost = float(doc.total_operator_wages or 0)
+        additional_cost = float(doc.additional_cost_in_wages or 0) + float(doc.additional_cost_unmold or 0)
+
+        item_sqft = {}
+        for row in doc.item_details or []:
+            if(row.item not in item_sqft):
+                item_sqft[row.item] = 0
+            item_sqft[row.item]+=row.ts_production_sqft
+        
+        abstract = []
+        for item in item_sqft:
+            new_row = {}
+            new_row['item'] = item
+            new_row['labour_cost_per_sqft'] =  labour_cost / (item_sqft[item] or 1)
+            new_row['operator_cost_per_sqft'] =  operator_cost / (item_sqft[item] or 1)
+            new_row['strapping_cost_per_sqft'] =  (doc.strapping_cost_per_sqft_unmold or 0)
+
+            new_row['additional_cost_per_sqft'] =  additional_cost  / (item_sqft[item] or 1)
+            new_row['raw_material_cost_per_sqft'] =  (doc.raw_material_cost or 0)  / (item_sqft[item] or 1)
+            new_row['total_cost_per_sqft'] = new_row['labour_cost_per_sqft'] + new_row['operator_cost_per_sqft'] + new_row['strapping_cost_per_sqft'] + new_row['additional_cost_per_sqft'] + new_row['raw_material_cost_per_sqft']
+            abstract.append(new_row)
+        doc.update({
+            "cw_abstract" : abstract
+        })
+
 
 def throw_error(field, doctype = "Cw Settings"):
     frappe.throw(f"Please enter value for {frappe.bold(field)} in {frappe.bold(doctype)}")
