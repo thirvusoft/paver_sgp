@@ -83,19 +83,7 @@ def add_total_amount(items):
 
 
 def autoname(self, event):
-    if(not self.project_name):
-        frappe.throw('Please Enter Site Work Name')
-    else:
-        name= self.project_name
-    if(not self.is_multi_customer and not self.customer):
-        frappe.throw("Please Enter Customer's Name")
-    elif(not self.is_multi_customer):
-        name+= '-' + self.customer
-        self.project_name+='-'+self.customer
-    if(name):
-        self.name=name
-    else:
-        pass
+    self.name= self.project_name
         
 def create_status():
     print('Creating Property Setter for Site Work Status')
@@ -232,3 +220,21 @@ def rework_count(self,event):
         self.total_rework = self.total_rework + 1
     else:
         pass
+
+def update_delivery_detail(self, event):
+    item_details = self.item_details + self.item_details_compound_wall
+    to_delivered_qty = {}
+    for row in item_details:
+        if(row.item not in to_delivered_qty):
+            to_delivered_qty[row.item] = 0
+        to_delivered_qty[row.item] += row.stock_qty
+
+    for items in to_delivered_qty:
+        catch = 0
+        for row in range(len(self.delivery_detail)):
+            if(self.delivery_detail[row].item == items):
+                self.delivery_detail[row].qty_to_deliver = to_delivered_qty[items] 
+                self.delivery_detail[row].pending_qty__to_deliver = (to_delivered_qty[items] or 0) - (self.delivery_detail[row].delivered_stock_qty or 0)
+                catch = 1
+        if(not catch):
+            self.delivery_detail.append({'item': items, 'qty_to_deliver': to_delivered_qty[items], 'pending_qty__to_deliver': (to_delivered_qty[items] or 0) - (self.delivery_detail[row].delivered_stock_qty or 0)})
