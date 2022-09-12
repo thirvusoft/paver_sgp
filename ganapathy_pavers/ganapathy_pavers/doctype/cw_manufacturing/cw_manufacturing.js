@@ -243,27 +243,23 @@ function labour_expense_curing(frm) {
 function working_hrs(frm) {
     if (frm.doc.molding_date) {
         frappe.db.get_single_value("CW Settings", "working_area").then((value) => {
-            frappe.db
-                .get_list("Attendance", {
-                    filters: {
+            if(!value) {
+                frappe.throw({message: "Please choose Working Area for compound wall in CW Settings"})
+            }
+            if(!frm.doc.molding_date){
+                frappe.throw({message: "Please enter Manufacturing Date"})
+            }
+            frappe.call({
+                    method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.get_working_hrs",
+                    args: {
                         attendance_date: frm.doc.molding_date,
                         machine: value,
                     },
-                    fields: ["working_hours"],
-                })
-                .then((value) => {
-                    if (value.length > 0) {
-                        var tot_hrs = 0;
-                        for (var i = 0; i < value.length; i++) {
-                            tot_hrs += value[i].working_hours ? parseFloat(value[i].working_hours) : 0;
-                        }
-                        frm.set_value("total_working_hrs", tot_hrs);
-                        frm.set_value("no_of_labour", value.length);
-                    } else {
-                        frm.set_value("total_working_hrs", 0);
-                        frm.set_value("no_of_labour", 0);
+                    callback: function(r) {
+                        frm.set_value("total_working_hrs", r.message.hours ? r.message.hours : 0);
+                        frm.set_value("no_of_labour", r.message.labours ? r.message.labours : 0);
                     }
-                });
+                  })
         });
     }
 }

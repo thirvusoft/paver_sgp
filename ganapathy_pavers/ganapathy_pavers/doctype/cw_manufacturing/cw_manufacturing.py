@@ -17,6 +17,19 @@ class CWManufacturing(Document):
         if(doc.status1 != "Completed"):
             frappe.throw(f"Please change the status to {frappe.bold('Completed')} before submitting.")
 
+    def validate(doc):
+        items={}
+        type1=[]
+        if(len(doc.item_details)>0):
+            for row in doc.item_details:
+                if(row.get('item')):
+                    cw_type = frappe.get_value("Item", row.get('item'), 'compound_wall_type')
+                    if(cw_type):
+                        type1.append(cw_type)
+            if(len(list(set(type1))) != 1):
+                frappe.throw('Please enter either Post or Slab.')
+            elif(type1[0] == "Slab"):
+                doc.total_no_of_batche = len(doc.raw_material_consumption)
 
 def throw_error(field, doctype = "Cw Settings"):
     frappe.throw(f"Please enter value for {frappe.bold(field)} in {frappe.bold(doctype)}")
@@ -327,11 +340,19 @@ def get_operators(doc, item_count=1):
                 else:
                     for k in op_table:
                         if k['employee'] == j.ts_operator_name:
-                            k['salary'] = k['salary'] +j.ts_operator_wages
-                            k["division_salary"] += (j.ts_operator_wages/item_count)
+                            k['salary'] = j.ts_operator_wages
+                            k["division_salary"] = (j.ts_operator_wages/item_count)
     return(op_table)
 
-    
+
+@frappe.whitelist()
+def get_working_hrs(attendance_date, machine):
+    attn = frappe.get_all("Attendance", { "attendance_date": attendance_date, "machine": machine,
+                    }, pluck="working_hours")
+    attn = [float(att) if(att) else 0 for att in attn]
+    return {'hours':sum(attn), 'labours': len(attn)}
+
+
 @frappe.whitelist()
 def add_item(doc, batches = 1):
     items={}
@@ -369,3 +390,4 @@ def add_item(doc, batches = 1):
         
     return list(items.values())
            
+
