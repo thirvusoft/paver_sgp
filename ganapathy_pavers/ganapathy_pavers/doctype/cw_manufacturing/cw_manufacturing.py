@@ -92,7 +92,7 @@ def make_stock_entry_for_molding(doc):
         stock_entry.append('items', dict(
             t_warehouse = target_warehouse, item_code=item.get("item"), qty= manufactue_qty, uom=default_nos, is_finished_item=1
         ))
-        if doc.get("damaged_qty") > 0:
+        if item.get("damaged_qty") > 0:
             scrap_qty = uom_conversion(item.get("item"), 'Nos', item.get("damaged_qty"), default_nos)
             stock_entry.append('items', dict(
                 t_warehouse=default_scrap_warehouse, item_code=item.get("item"), qty=scrap_qty, uom=default_nos, is_process_loss=1
