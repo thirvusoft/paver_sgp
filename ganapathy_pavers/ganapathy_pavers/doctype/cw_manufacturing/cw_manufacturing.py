@@ -210,6 +210,17 @@ def make_stock_entry_for_curing(doc):
     frappe.msgprint("New Stock Entry Created: <ul>" + frappe.bold(''.join(["<li>"+frappe.utils.csvutils.getlink('Stock Entry', i)+"</li>" for i in stock_entries]))+ "</ul>")
     return "Completed"
 
+
+def get_valuation_rate(item_code):
+    warehouse =  frappe.db.get_singles_value(
+        "CW Settings", "default_molding_source_warehouse") or throw_error('Molding Source Warehouse')
+    rate = frappe.get_all('Bin', {'item_code': item_code, 'warehouse': warehouse}, pluck= 'valuation_rate')
+    if rate:
+        return rate[0]
+    else:
+        return 0
+
+
 @frappe.whitelist()
 def std_item(doc):
     items = []
@@ -219,40 +230,40 @@ def std_item(doc):
         row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
             "Item", doc['cement_item_name'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
         row['qty'] = doc.get('cement_qty')
-        row['amount'] = doc.get('cement_qty') * \
-            (row['rate'] or row['validation_rate'])
+        row['validation_rate'] = get_valuation_rate(row['item_code'])
+        row['amount'] = doc.get('cement_qty') * (row['rate'] or row['validation_rate'])
         items.append(row)
     if doc.get('ggbs_item_name') and doc.get('cement_qty'):
         row = {}
         row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
             "Item", doc['ggbs_item_name'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
         row['qty'] = doc.get('ggbs_qty')
-        row['amount'] = doc.get('ggbs_qty') * \
-            (row['rate'] or row['validation_rate'])
+        row['validation_rate'] = get_valuation_rate(row['item_code'])
+        row['amount'] = doc.get('ggbs_qty') * (row['rate'] or row['validation_rate'])
         items.append(row)
     if doc.get('post_chips') and doc.get('post_chips_qty'):
         row = {}
         row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
             "Item", doc['post_chips'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
         row['qty'] = doc.get('post_chips_qty')
-        row['amount'] = doc.get('post_chips_qty') * \
-            (row['rate'] or row['validation_rate'])
+        row['validation_rate'] = get_valuation_rate(row['item_code'])
+        row['amount'] = doc.get('post_chips_qty') * (row['rate'] or row['validation_rate'])
         items.append(row)
     if doc.get('slab_chips_item_name') and doc.get('slab_chips_qty'):
         row = {}
         row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
             "Item", doc['slab_chips_item_name'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
         row['qty'] = doc.get('slab_chips_qty')
-        row['amount'] = doc.get('slab_chips_qty') * \
-            (row['rate'] or row['validation_rate'])
+        row['validation_rate'] = get_valuation_rate(row['item_code'])
+        row['amount'] = doc.get('slab_chips_qty') * (row['rate'] or row['validation_rate'])
         items.append(row)
     if doc.get('m_sand_item_name') and doc.get('m_sand_qty'):
         row = {}
         row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
             "Item", doc['m_sand_item_name'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
         row['qty'] = doc.get('m_sand_qty')
-        row['amount'] = doc.get('m_sand_qty') * \
-            (row['rate'] or row['validation_rate'])
+        row['validation_rate'] = get_valuation_rate(row['item_code'])
+        row['amount'] = doc.get('m_sand_qty') * (row['rate'] or row['validation_rate'])
         items.append(row)
     return items
 

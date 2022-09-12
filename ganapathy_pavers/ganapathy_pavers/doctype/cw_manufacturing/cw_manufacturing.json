@@ -525,15 +525,14 @@
   {
    "fieldname": "ts_production_sqft",
    "fieldtype": "Float",
-   "hidden": 1,
-   "label": "TS Production Sqft",
+   "label": "Production Sqft(with damage)",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-07 19:58:42.046299",
+ "modified": "2022-09-12 10:35:01.489061",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

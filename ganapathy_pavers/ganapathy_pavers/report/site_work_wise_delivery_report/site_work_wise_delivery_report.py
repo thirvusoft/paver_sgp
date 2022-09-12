@@ -59,7 +59,7 @@ def execute(filters=None):
             data[i+1][2]=""
             data[i+1][3]=""
             data[i+1][4]=""
-            data[i+1][9]=""
+            data[i+1][12]=""
     
         elif matched_item == data[i+1][1]:
             data[i+1][0]=""
@@ -67,7 +67,7 @@ def execute(filters=None):
             data[i+1][2]=""
             data[i+1][3]=""
             data[i+1][4]=""
-            data[i+1][9]=""
+            data[i+1][12]=""
         else:
             matched_item=""
     

@@ -78,10 +78,10 @@ frappe.ui.form.on("CW Manufacturing", {
         });
     },
     labour_salary_per_hrs: function (frm) {
-        frm.set_value("total_labour_wages", frm.doc.labour_salary_per_hrs * frm.doc.no_of_labour);
+        frm.set_value("total_labour_wages", frm.doc.labour_salary_per_hrs * frm.doc.manually_total_working_hrs);
     },
-    no_of_labour: function (frm) {
-        frm.set_value("total_labour_wages", frm.doc.labour_salary_per_hrs * frm.doc.no_of_labour);
+    manually_total_working_hrs: function (frm) {
+        frm.set_value("total_labour_wages", frm.doc.labour_salary_per_hrs * frm.doc.manually_total_working_hrs);
     },
     total_labour_wages: function (frm) {
         frm.set_value("total_expence", frm.doc.total_labour_wages + frm.doc.total_operator_wages + frm.doc.additional_cost_in_wages + frm.doc.raw_material_cost);
