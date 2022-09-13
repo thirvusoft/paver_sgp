@@ -103,6 +103,7 @@ frappe.ui.form.on('Sales Invoice', {
         },
          // Thirvu_dual_Accounting
          company:function(frm){
+            if(frm.doc.company){
     
             frappe.call({
                 method:"ganapathy_pavers.custom.py.sales_order.branch_list",
@@ -120,7 +121,8 @@ frappe.ui.form.on('Sales Invoice', {
                 
                 })
                 }
-            })},
+            
+            })}},
         site_work: function(frm, cdt, cdn){
             cur_frm.set_value('project', cur_frm.doc.site_work)
         }
