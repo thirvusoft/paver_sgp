@@ -1,0 +1,32 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "CW Manufacturing",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2022-09-13 12:40:59.648297",
+   "default_value": null,
+   "doc_type": "CW Manufacturing",
+   "docstatus": 0,
+   "doctype_or_field": "DocType",
+   "field_name": null,
+   "idx": 0,
+   "modified": "2022-09-13 12:40:59.648297",
+   "modified_by": "Administrator",
+   "name": "CW Manufacturing-main-default_print_format",
+   "owner": "Administrator",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "default_print_format",
+   "property_type": "Data",
+   "row_name": null,
+   "value": "Compound Wall Manufacturing - Report"
+  }
+ ],
+ "sync_on_migrate": 1
+}
