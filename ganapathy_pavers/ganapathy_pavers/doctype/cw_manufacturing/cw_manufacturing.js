@@ -136,10 +136,10 @@ frappe.ui.form.on("CW Manufacturing", {
         }
         frm.set_value("total_operator_wages", total_operator_wages);
     },
-    get_bom_items: function (frm) {
+    get_bom_items: async function (frm) {
         frm.clear_table("items");
-        std_item(frm);
-        item_adding(frm);
+        await std_item(frm).then( (a) => item_adding(frm));
+        
         raw_material_cost(frm);
     },
     operator_cost: function (frm) {
@@ -249,6 +249,7 @@ function working_hrs(frm) {
             if(!frm.doc.molding_date){
                 frappe.throw({message: "Please enter Manufacturing Date"})
             }
+            frm.set_value("work_area", value ? value : '');
             frappe.call({
                     method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.get_working_hrs",
                     args: {
@@ -354,9 +355,9 @@ function raw_material_cost(frm) {
     frm.set_value("raw_material_cost", total_raw_material_cost);
 }
 
-function std_item(frm) {
+async function std_item(frm) {
     if (frm.doc.item_details) {
-        frappe.call({
+        await frappe.call({
             method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.std_item",
             args: {
                 doc: frm.doc,
@@ -380,7 +381,7 @@ function std_item(frm) {
                             row.item_code = d.item_code;
                             row.no_of_batches = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0;
                             row.qty = d.qty;
-                            row.ts_qty = d.qty;
+                            row.bom_qty = d.ts_qty;
                             row.from_usb = 1;
                             row.stock_uom = d.stock_uom;
                             row.uom = d.uom;
@@ -400,9 +401,9 @@ function std_item(frm) {
     }
 }
 
-function item_adding(frm) {
+async function item_adding(frm) {
     if (frm.doc.item_details) {
-        frappe.call({
+        await frappe.call({
             method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.add_item",
             args: {
                 doc: frm.doc.item_details ? frm.doc.item_details : [],
@@ -426,6 +427,7 @@ function item_adding(frm) {
                             var row = frm.add_child("items");
                             row.item_code = d.item_code;
                             row.qty = d.qty;
+                            row.bom_qty = d.ts_qty;
                             row.stock_uom = d.stock_uom;
                             row.from_bom = 1;
                             row.uom = d.uom;

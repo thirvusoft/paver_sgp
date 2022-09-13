@@ -44,6 +44,7 @@
   "get_working_hrs_for_compound_wall",
   "total_working_hrs",
   "column_break_45",
+  "work_area",
   "manually_total_working_hrs",
   "operator_details_section",
   "get_operators",
@@ -527,12 +528,19 @@
    "fieldtype": "Float",
    "label": "Production Sqft(with damage)",
    "read_only": 1
+  },
+  {
+   "fieldname": "work_area",
+   "fieldtype": "Link",
+   "label": "Work Area",
+   "options": "Working Area",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-12 10:35:01.489061",
+ "modified": "2022-09-13 12:03:31.650635",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",
