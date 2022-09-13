@@ -377,3 +377,20 @@ def update_multicustomer(customers_name, sales_order):
 	frappe.delete_doc('Property Setter', doc.name)
 	frappe.delete_doc('Property Setter', doc1.name)
 	frappe.delete_doc('Property Setter', doc2.name)
+
+
+
+
+
+@frappe.whitelist()
+def branch_list(company):
+    branch_filter=[]
+    branch_list=frappe.get_list(
+		"Accounting Dimension Detail",
+		filters={"parent":"Branch","company":company},
+        fields=["default_dimension"]
+    )
+    for rows in branch_list:
+        branch_filter.append(rows.default_dimension)
+   
+    return branch_filter

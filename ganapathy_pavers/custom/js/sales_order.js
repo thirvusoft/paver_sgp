@@ -46,6 +46,7 @@ frappe.ui.form.on('Sales Order', {
             }
         });
     },
+    
     refresh:function(frm){
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_df_property('customer','reqd',0);

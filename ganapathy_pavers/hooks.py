@@ -251,6 +251,7 @@ doctype_js = {
 				"Work Order" : "/utils/js/workorder.js",
 
 	     		"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
+				"Purchase Invoice":"/custom/js/purchase_invoice.js"
 
 
 			 }
