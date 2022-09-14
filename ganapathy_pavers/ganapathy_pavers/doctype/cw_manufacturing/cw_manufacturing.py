@@ -26,10 +26,11 @@ class CWManufacturing(Document):
                     cw_type = frappe.get_value("Item", row.get('item'), 'compound_wall_type')
                     if(cw_type):
                         type1.append(cw_type)
-            if(len(list(set(type1))) != 1):
-                frappe.throw('Please enter either Post or Slab.')
+            if(len(list(set(type1))) != 1 or type1[0] != doc.type):
+                frappe.throw(f'Please enter Item with Compound Wall Type as {frappe.bold(doc.type)}')
             elif(type1[0] == "Slab"):
                 doc.total_no_of_batche = len(doc.raw_material_consumption)
+                    
         doc.abstractcalc()
     
     def abstractcalc(doc):

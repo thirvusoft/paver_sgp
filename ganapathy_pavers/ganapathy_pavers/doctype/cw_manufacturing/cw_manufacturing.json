@@ -9,6 +9,7 @@
  "field_order": [
   "amended_from",
   "molding_date",
+  "type",
   "column_break_3",
   "company",
   "status1",
@@ -588,12 +589,18 @@
    "fieldtype": "Currency",
    "label": "Total Cost Per Sqft",
    "read_only": 1
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Post\nSlab"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-14 16:54:05.902564",
+ "modified": "2022-09-14 18:21:18.554829",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

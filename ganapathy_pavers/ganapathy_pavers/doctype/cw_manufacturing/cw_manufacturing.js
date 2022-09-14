@@ -33,6 +33,14 @@ frappe.ui.form.on("CW Manufacturing", {
                 },
             };
         });
+        frm.set_query("item", "item_details", function (frm1, cdt, cdn) {
+            return {
+                filters: {
+                    compound_wall_type: frm.doc.type,
+                    item_group: "Compound Walls"
+                },
+            };
+        });
         set_css(frm);
     },
     onload: function (frm) {
