@@ -84,6 +84,14 @@
   "labour_cost_per_sqft_curing",
   "labour_expense_for_curing",
   "abstract_section",
+  "labour_cost_per_sqft",
+  "operator_cost_per_sqft",
+  "strapping_cost_per_sqft",
+  "column_break_81",
+  "additional_cost_per_sqft",
+  "raw_material_cost_per_sqft",
+  "total_cost_per_sqft",
+  "section_break_84",
   "cw_abstract",
   "batch_details_section",
   "cw_manufacturing_batch_details",
@@ -494,6 +502,7 @@
   {
    "fieldname": "cw_abstract",
    "fieldtype": "Table",
+   "label": "Abstract",
    "options": "CW Abstract",
    "read_only": 1
   },
@@ -535,12 +544,56 @@
    "label": "Work Area",
    "options": "Working Area",
    "read_only": 1
+  },
+  {
+   "fieldname": "labour_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Labour Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "operator_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Operator Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "strapping_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Strapping Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_81",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "additional_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Additional Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "raw_material_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Raw Material Cost Per Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_84",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_cost_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Total Cost Per Sqft",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-13 12:03:31.650635",
+ "modified": "2022-09-14 16:54:05.902564",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

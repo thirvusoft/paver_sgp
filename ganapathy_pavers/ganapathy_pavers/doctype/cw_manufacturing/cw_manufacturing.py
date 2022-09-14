@@ -38,25 +38,27 @@ class CWManufacturing(Document):
         additional_cost = float(doc.additional_cost_in_wages or 0) + float(doc.additional_cost_unmold or 0)
 
         item_sqft = {}
+        total_sqft = 0
         for row in doc.item_details or []:
             if(row.item not in item_sqft):
                 item_sqft[row.item] = 0
             item_sqft[row.item]+=row.ts_production_sqft
+            total_sqft+=row.ts_production_sqft
         
         abstract = []
         for item in item_sqft:
             new_row = {}
             new_row['item'] = item
-            new_row['labour_cost_per_sqft'] =  labour_cost / (item_sqft[item] or 1)
-            new_row['operator_cost_per_sqft'] =  operator_cost / (item_sqft[item] or 1)
-            new_row['strapping_cost_per_sqft'] =  (doc.strapping_cost_per_sqft_unmold or 0)
-
-            new_row['additional_cost_per_sqft'] =  additional_cost  / (item_sqft[item] or 1)
-            new_row['raw_material_cost_per_sqft'] =  (doc.raw_material_cost or 0)  / (item_sqft[item] or 1)
-            new_row['total_cost_per_sqft'] = new_row['labour_cost_per_sqft'] + new_row['operator_cost_per_sqft'] + new_row['strapping_cost_per_sqft'] + new_row['additional_cost_per_sqft'] + new_row['raw_material_cost_per_sqft']
+            new_row['item_cost_per_piece'] = (labour_cost / (total_sqft or 1) + operator_cost / (total_sqft or 1) + (doc.strapping_cost_per_sqft_unmold or 0) + additional_cost  / (total_sqft or 1) + (doc.raw_material_cost or 0)  / (total_sqft or 1)) / ( frappe.get_value('Item', item, 'pavers_per_sqft') or throw_error('Pieces Per Sqft', 'Item'))
             abstract.append(new_row)
         doc.update({
-            "cw_abstract" : abstract
+            "cw_abstract" : abstract,
+            "labour_cost_per_sqft": labour_cost / (total_sqft or 1),
+            "operator_cost_per_sqft": operator_cost / (total_sqft or 1),
+            "strapping_cost_per_sqft": (doc.strapping_cost_per_sqft_unmold or 0),
+            "additional_cost_per_sqft": additional_cost  / (total_sqft or 1),
+            "raw_material_cost_per_sqft": (doc.raw_material_cost or 0)  / (total_sqft or 1),
+            "total_cost_per_sqft": labour_cost / (total_sqft or 1) + operator_cost / (total_sqft or 1) + (doc.strapping_cost_per_sqft_unmold or 0) + additional_cost  / (total_sqft or 1) + (doc.raw_material_cost or 0)  / (total_sqft or 1)
         })
 
 
@@ -385,8 +387,8 @@ def get_operators(doc, item_count=1):
 
 @frappe.whitelist()
 def get_working_hrs(attendance_date, machine):
-    attn = frappe.get_all("Attendance", { "attendance_date": attendance_date, "machine": machine,
-                    }, pluck="working_hours")
+    attn = frappe.get_all("Attendance", { "attendance_date": attendance_date, "machine": machine, "docstatus": 1},
+                     pluck="working_hours")
     attn = [float(att) if(att) else 0 for att in attn]
     return {'hours':sum(attn), 'labours': len(attn)}
 
