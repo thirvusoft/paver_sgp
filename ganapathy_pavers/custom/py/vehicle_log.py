@@ -40,6 +40,7 @@ def notification(owner, license_plate, service_item, kilometers_after_last_servi
     doc.update({
     'subject': f'{license_plate} - Service Alert for {service_item}',
     'for_user': user,
+    'send_email': 1,
     'type': 'Alert',
     'document_type': doctype,
     'document_name': name,

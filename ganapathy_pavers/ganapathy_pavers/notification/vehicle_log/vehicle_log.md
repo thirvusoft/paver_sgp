@@ -1,0 +1,1 @@
+{{ doc.email_content }}

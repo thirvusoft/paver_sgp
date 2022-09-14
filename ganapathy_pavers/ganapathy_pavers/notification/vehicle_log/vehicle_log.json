@@ -1,0 +1,30 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "condition": "doc.send_email==1",
+ "creation": "2022-09-14 13:10:17.059634",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Notification Log",
+ "enabled": 1,
+ "event": "New",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "{{ doc.email_content }}",
+ "modified": "2022-09-14 13:23:09.164020",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Vehicle Log",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "for_user"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "sender": "",
+ "sender_email": "",
+ "subject": "{{ doc.subject }}"
+}
