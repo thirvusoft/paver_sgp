@@ -179,7 +179,7 @@ function completed_bundle_calc(frm,cdt,cdn){
 	var item_bundle_per_sqft
 	let allocated_sqft
 	var item = data.item
-	if(bundle && item){
+	if(bundle && item && data.item_group == "Pavers"){
 		frappe.db.get_doc('Item',item).then(value => {
 			item_bundle_per_sqft = 0
 			for(let i=0; i<value.uoms.length; i++){
@@ -193,6 +193,8 @@ function completed_bundle_calc(frm,cdt,cdn){
 			allocated_sqft = bundle * item_bundle_per_sqft
 			frappe.model.set_value(cdt,cdn,"sqft_allocated",allocated_sqft?allocated_sqft:0)
 		})
+	} else if (data.item_group == "Compound Walls") {
+		frappe.model.set_value(cdt,cdn,"sqft_allocated",(data.compound_wall_height || 0) * (data.running_sqft || 0))
 	}
 }
 
@@ -208,10 +210,15 @@ frappe.ui.form.on('TS Job Worker Details',{
 	item:function(frm,cdt,cdn){
 		completed_bundle_calc(frm,cdt,cdn)
 	},
+	running_sqft: function(frm,cdt,cdn){
+		completed_bundle_calc(frm,cdt,cdn)
+	},
+	compound_wall_height:function(frm,cdt,cdn){
+		completed_bundle_calc(frm,cdt,cdn)
+	},
 	sqft_allocated: function(frm, cdt, cdn){
 		percent_complete(frm, cdt, cdn)
 		amount(frm, cdt, cdn)
-
 	},
 	job_worker_add: function(frm, cdt, cdn){
 		let work= cur_frm.doc.job_worker?cur_frm.doc.job_worker:[]
