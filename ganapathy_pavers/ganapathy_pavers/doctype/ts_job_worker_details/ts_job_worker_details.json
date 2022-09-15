@@ -7,16 +7,22 @@
  "engine": "InnoDB",
  "field_order": [
   "name1",
+  "item",
+  "item_group",
   "start_date",
   "end_date",
   "sqft_allocated",
+  "completed_bundle",
   "rate",
-  "amount"
+  "amount",
+  "column_break_10",
+  "compound_wall_height",
+  "running_sqft"
  ],
  "fields": [
   {
    "allow_on_submit": 1,
-   "columns": 2,
+   "columns": 1,
    "fieldname": "name1",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -25,7 +31,7 @@
   },
   {
    "allow_on_submit": 1,
-   "columns": 2,
+   "columns": 1,
    "fieldname": "start_date",
    "fieldtype": "Date",
    "in_list_view": 1,
@@ -33,7 +39,7 @@
   },
   {
    "allow_on_submit": 1,
-   "columns": 2,
+   "columns": 1,
    "fieldname": "end_date",
    "fieldtype": "Date",
    "in_list_view": 1,
@@ -49,7 +55,7 @@
   },
   {
    "allow_on_submit": 1,
-   "columns": 2,
+   "columns": 1,
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -58,16 +64,59 @@
   {
    "allow_on_submit": 1,
    "columns": 1,
+   "depends_on": "eval:doc.item_group==\"Pavers\"",
    "fieldname": "sqft_allocated",
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Completed Sqft"
+  },
+  {
+   "columns": 2,
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fetch_from": "item.item_group",
+   "fieldname": "item_group",
+   "fieldtype": "Data",
+   "label": "Item Group",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.item_group==\"Pavers\"",
+   "fieldname": "completed_bundle",
+   "fieldtype": "Float",
+   "label": "Completed Bundle"
+  },
+  {
+   "depends_on": "eval:doc.item_group==\"Compound Walls\"",
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "columns": 1,
+   "depends_on": "eval:doc.item_group==\"Compound Walls\"",
+   "fieldname": "compound_wall_height",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Compound Wall Height"
+  },
+  {
+   "columns": 1,
+   "depends_on": "eval:doc.item_group==\"Compound Walls\"",
+   "fieldname": "running_sqft",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Running Sqft"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-04-20 10:08:51.445425",
+ "modified": "2022-09-15 10:28:00.799751",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Job Worker Details",
