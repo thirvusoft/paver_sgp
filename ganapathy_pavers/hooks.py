@@ -236,6 +236,7 @@ doctype_js = {
 				"Payment Entry" : "/custom/js/payment_entry.js",
 				"Project": "/custom/js/site_work.js",
 				"Sales Order":"/custom/js/sales_order.js",
+				"Purchase Invoice":"/custom/js/purchase_invoice.js",
 				"Vehicle":"/custom/js/vehicle.js",
 				"Timesheet" : "utils/js/timesheet.js",
 				"Salary Slip":"utils/js/salary_slip.js",
@@ -245,6 +246,7 @@ doctype_js = {
 				"Employee":"/custom/js/employee.js",
 				"Delivery Note":"/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
+				"Journal Entry": "/custom/js/journal_entry.js",
 				"Vehicle Log":[
 								"/custom/js/vehicle_log.js", 
 								"/custom/js/vehicle_log_service.js"
