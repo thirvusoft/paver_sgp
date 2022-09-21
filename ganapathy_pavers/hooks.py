@@ -296,14 +296,10 @@ scheduler_events = {
 cron_time=""
 try:
 	time = str(frappe.db.get_single_value('Thirvu HR Settings', 'checkin_type_resetting_time'))
-	print(time)
 	time = time.split(':')
 	cron_time = f'{int(time[1])} {int(time[0])} * * *'
 	scheduler_events['cron'][cron_time] = ['thirvu_hr.thirvu_hr.doctype.employee_checkin_without_log_type.employee_checkin_without_log_type.create_employee_checkin']
-	print(cron_time)
 except:pass
-print(cron_time)
-# print(scheduler_events)
 
 # Testing
 # -------

@@ -710,23 +710,23 @@
   {
    "fieldname": "batch_no_manufacture",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Batch no Manufacture",
-   "options": "Batch"
+   "options": "Batch",
+   "read_only": 1
   },
   {
    "fieldname": "batch_no_rack_shifting",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Batch no Rack Shifting",
-   "options": "Batch"
+   "options": "Batch",
+   "read_only": 1
   },
   {
    "fieldname": "batch_no_curing",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Batch no Curing",
-   "options": "Batch"
+   "options": "Batch",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_98",
@@ -1000,7 +1000,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-05 16:51:47.725240",
+ "modified": "2022-09-21 12:07:29.076084",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
