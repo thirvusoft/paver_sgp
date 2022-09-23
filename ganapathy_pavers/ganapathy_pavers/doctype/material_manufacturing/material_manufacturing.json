@@ -271,7 +271,7 @@
    "description": "It includes labours cost, operators cost, additional cost and raw materials cost.",
    "fieldname": "total_expense",
    "fieldtype": "Currency",
-   "label": "Total Expense",
+   "label": "Manufacturing Expense",
    "read_only": 1
   },
   {
@@ -528,7 +528,7 @@
   {
    "fieldname": "rack_shifting_total_expense1",
    "fieldtype": "Data",
-   "label": "Total Expense",
+   "label": "Rack Shifting Expense",
    "read_only": 1
   },
   {
@@ -922,7 +922,7 @@
   {
    "fieldname": "labour_expense",
    "fieldtype": "Currency",
-   "label": "Labour Expense"
+   "label": "Labour Expense for Curing"
   },
   {
    "fieldname": "section_break_118",
@@ -1000,7 +1000,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-21 12:07:29.076084",
+ "modified": "2022-09-23 16:56:06.174815",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

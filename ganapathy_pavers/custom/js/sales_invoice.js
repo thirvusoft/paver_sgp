@@ -59,6 +59,7 @@ frappe.ui.form.on('Sales Invoice', {
                         frm.set_value("tax_category", "")
                     if(frm.doc.taxes)
                         frm.clear_table("taxes")
+                        refresh_field("taxes")
                 }
             })
         }

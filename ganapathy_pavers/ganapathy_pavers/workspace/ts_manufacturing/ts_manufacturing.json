@@ -1,9 +1,10 @@
 {
+ "cards_label": "Reports",
  "category": "Modules",
  "charts": [],
  "creation": "2022-07-26 18:30:11.272651",
  "developer_mode_only": 0,
- "disable_user_customization": 0,
+ "disable_user_customization": 1,
  "docstatus": 0,
  "doctype": "Workspace",
  "extends_another_page": 0,
@@ -13,9 +14,20 @@
  "is_default": 0,
  "is_standard": 1,
  "label": "TS Manufacturing",
- "links": [],
- "modified": "2022-09-02 17:00:32.100016",
- "modified_by": "admin@gpy.com",
+ "links": [
+  {
+   "dependencies": "Material Manufacturing",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Paver Manufacturing Report",
+   "link_to": "Paver Manufacturing Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2022-09-23 17:02:11.953498",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Manufacturing",
  "onboarding": "Manufacturing",

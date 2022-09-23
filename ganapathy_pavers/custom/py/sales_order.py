@@ -91,6 +91,7 @@ def create_site(doc):
             
             site_work.update({
                 'customer': (doc['customer'] or '') if(not doc.get('is_multi_customer')) else '',
+                'type': doc.get('type'),
                 'supervisor': doc.get('supervisor') if('supervisor' in doc) else '',
                 'supervisor_name': supervisor,
                 'item_details': (site_work.get('item_details') or []) +pavers,
