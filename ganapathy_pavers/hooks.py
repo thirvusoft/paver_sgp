@@ -73,7 +73,8 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.purchase_order.batch_customization",
 				 "ganapathy_pavers.utils.py.customer.create_multi_customer",
 				 "ganapathy_pavers.utils.py.item.batch_customization",
-				 "ganapathy_pavers.patches.location.execute"
+				 "ganapathy_pavers.patches.location.execute",
+				 "ganapathy_pavers.utils.py.quotation.batch_property_setter"
 				 ]
 				
 
@@ -225,7 +226,8 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
               "ganapathy_pavers.custom.py.property_setter.property_setter",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
-			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization"
+			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
+			  "ganapathy_pavers.utils.py.quotation.batch_property_setter"
 			  ]
 
 
