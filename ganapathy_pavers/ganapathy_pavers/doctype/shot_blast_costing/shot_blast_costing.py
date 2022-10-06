@@ -48,3 +48,30 @@ def make_stock_entry(doc):
     stock_entry.save()
     stock_entry.submit()
     frappe.msgprint("New Stock Entry Created "+stock_entry.name)
+
+@frappe.whitelist()
+def uom_conversion(item,batch='None',to_uom=None):
+    if batch:
+        batch_doc = frappe.get_doc('Batch',batch)
+        if batch_doc.stock_uom:
+            from_uom = batch_doc.stock_uom
+        if batch_doc.batch_qty:
+            from_qty = batch_doc.batch_qty
+        item_doc = frappe.get_doc('Item', item)
+        from_conv = 0
+        to_conv = 0
+        for row in item_doc.uoms:
+            if(row.uom == from_uom):
+                from_conv = row.conversion_factor
+            if(row.uom == to_uom):
+                to_conv = row.conversion_factor
+
+        if(not from_conv):
+            frappe.msgprint(f"Assign {from_uom} conversion factor for {item}")
+        if(not to_conv):
+            frappe.msgprint(f"Assign {to_uom} conversion factor for {item}")
+        
+        if from_conv and to_conv:
+            return (float(from_qty) * from_conv) / to_conv
+        else:
+            return 0
