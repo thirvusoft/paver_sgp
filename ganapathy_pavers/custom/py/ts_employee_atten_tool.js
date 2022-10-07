@@ -141,7 +141,10 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
                     },
                     callback(r){
                         if(r.message){
-                            frappe.model.set_value(r.message.cdt, r.message.cdn, 'check_out', cur_frm.doc.updated_checkout)
+                            frappe.confirm(__("Are you sure to change the employee checkin time?"), function () {
+                                cur_frm.doc.employee_detail[r.message.idx -1].check_out = cur_frm.doc.updated_checkout
+                                cur_frm.refresh_field('employee_detail')
+                            })
                         }
                     }
                 })
@@ -149,41 +152,92 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
     },
    
     update_checkin:function(frm, cdt,cdn){
-        for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
-            let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
-            if(cur_frm.doc.update_empty_fields && data.check_in){
-                continue
+        if (cur_frm.is_new()){
+            for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
+                let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
+                if(cur_frm.doc.update_empty_fields && data.check_in){
+                    continue
+                } 
+                frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_in", cur_frm.doc.date)
             }
-           frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_in", cur_frm.doc.date)
-    }},
+        }
+        else{
+            frappe.confirm(__("Are you sure to change all employee checkin time?"), function () {
+                for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
+                    let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
+                    if(cur_frm.doc.update_empty_fields && data.check_in){
+                        continue
+                    }
+                    cur_frm.doc.employee_detail[cur_frm.doc.employee_detail[i].idx -1].check_in = cur_frm.doc.date
+                    cur_frm.refresh_field('employee_detail')
+    
+                //    frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_in", cur_frm.doc.date)
+                }
+            })
+        }
+        
+    },
     update_checkout:function(frm, cdt,cdn){
-        for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
-            let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
-            if(cur_frm.doc.update_empty_fields && data.check_out){
-                continue
-            }
-           frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_out", cur_frm.doc.checkout_time)
-    }},
-    update_selected_checkins: function(frm, cdt, cdn){
+        if(cur_frm.is_new()){
+            for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
+                let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
+                if(cur_frm.doc.update_empty_fields && data.check_out){
+                    continue
+                }
+               frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_out", cur_frm.doc.checkout_time)
+        }
+    }
+        else{
+            frappe.confirm(__("Are you sure to change all employee checkout time?"), function () {
+                for (var i =0; i < cur_frm.doc.employee_detail.length; i++){
+                    let data = locals[cur_frm.doc.employee_detail[i].doctype][cur_frm.doc.employee_detail[i].name]
+                    if(cur_frm.doc.update_empty_fields && data.check_in){
+                        continue
+                    }
+                    cur_frm.doc.employee_detail[cur_frm.doc.employee_detail[i].idx -1].check_out = cur_frm.doc.checkout_time
+                    cur_frm.refresh_field('employee_detail')
+    
+                //    frappe.model.set_value(cur_frm.doc.employee_detail[i].doctype, cur_frm.doc.employee_detail[i].name, "check_in", cur_frm.doc.date)
+                }
+            })
+        }
+        
+},
+    update_selected_checkins:async function(frm, cdt, cdn){
         if(cur_frm.doc.checkin){
             let employees = cur_frm.fields_dict.employee_detail.grid.get_selected_children()
             employees = employees?employees:[]
             let row = 0
-            for(row = 0; row<employees.length; row++){
-                frappe.model.set_value(employees[row].doctype, employees[row].name, 'check_in', cur_frm.doc.checkin)
+            if (employees.length){
+                await frappe.confirm(__("Are you sure to change the employee checkin time?"), function () {
+                    for(row = 0; row<employees.length; row++){
+                        cur_frm.doc.employee_detail[employees[row].idx -1].check_in = cur_frm.doc.checkin
+                        // frappe.model.set_value(employees[row].doctype, employees[row].name, 'check_in', cur_frm.doc.checkin)
+                    }
+                    cur_frm.refresh_field('employee_detail')
+                    frappe.show_alert({message: `Updated ${row} Checkins`})
+                })
+
             }
-             frappe.show_alert({message: `Updated ${row} Checkins`})
         }
     },
-    update_selected_checkouts: function(frm, cdt, cdn){
+    update_selected_checkouts:async function(frm, cdt, cdn){
         if(cur_frm.doc.checkout){
             let employees = cur_frm.fields_dict.employee_detail.grid.get_selected_children()
             employees = employees?employees:[]
             let row = 0
-            for(row = 0; row<employees.length; row++){
-                frappe.model.set_value(employees[row].doctype, employees[row].name, 'check_out', cur_frm.doc.checkout)
+            if (employees.length){
+                await frappe.confirm(__("Are you sure to change the employee checkout time?"), function () {
+                    for(row = 0; row<employees.length; row++){
+                        cur_frm.doc.employee_detail[employees[row].idx -1].check_out = cur_frm.doc.checkout
+                        // frappe.model.set_value(employees[row].doctype, employees[row].name, 'check_out', cur_frm.doc.checkout)
+
+                    }
+                    cur_frm.refresh_field('employee_detail')
+                    frappe.show_alert({message: `Updated ${row} Checkouts`})
+                })
+
             }
-             frappe.show_alert({message: `Updated ${row} Checkouts`})
         }
     }
 })
