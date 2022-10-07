@@ -1,0 +1,34 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2022-10-07 09:57:15.227999",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{\"filters\":[[\"Attendance\",\"attendance_date\",\"Timespan\",\"today\",false],[\"Attendance\",\"status\",\"!=\",\"Absent\",false]],\"fields\":[[\"name\",\"Attendance\"],[\"employee_name\",\"Attendance\"],[\"machine\",\"Attendance\"],[\"working_hours\",\"Attendance\"],[\"one_day_hours\",\"Attendance\"],[\"ot_hours\",\"Attendance\"]],\"order_by\":\"`tabAttendance`.`modified` desc\",\"add_totals_row\":true,\"page_length\":20,\"column_widths\":{\"name\":163,\"employee_name\":183,\"machine\":154,\"working_hours\":135,\"one_day_hours\":124,\"ot_hours\":114},\"group_by\":null}",
+ "letter_head": "SGP Header 1",
+ "modified": "2022-10-07 09:58:16.321564",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Daily Working Area Wise Worked Hrs",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Attendance",
+ "report_name": "Daily Working Area Wise Worked Hrs",
+ "report_type": "Report Builder",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "HR User"
+  },
+  {
+   "role": "HR Manager"
+  }
+ ]
+}
