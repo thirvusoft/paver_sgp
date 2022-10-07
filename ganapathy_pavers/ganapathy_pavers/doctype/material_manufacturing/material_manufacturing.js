@@ -130,8 +130,6 @@ frappe.ui.form.on('Material Manufacturing', {
 	before_save: function(frm){
 		
 		std_item(frm)
-		
-		item_adding(frm)
 		if(frm.doc.docstatus == 0){
 			if(frm.doc.ts_total_hours > 0 && frm.doc.docstatus == 0){
 				cur_frm.set_value('total_manufacturing_expense', frm.doc.labour_cost_manufacture+frm.doc.operators_cost_in_manufacture);
@@ -156,9 +154,6 @@ frappe.ui.form.on('Material Manufacturing', {
 			})
 		
 		}
-	},
-	bom_no: function(frm){
-		item_adding(frm)
 	},
 	strapping_cost_per_sqft: function(frm){
 		cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft*frm.doc.production_sqft);
@@ -431,57 +426,6 @@ function add_total_raw_material(frm){
 	cur_frm.set_value('labour_expense', parseFloat(frm.doc.labour_cost_per_sqft)*parseFloat(frm.doc.production_sqft));
 	cur_frm.set_value('item_price', frm.doc.total_expense_per_sqft+frm.doc.rack_shifting_total_expense1_per_sqft+frm.doc.labour_cost_per_sqft+frm.doc.shot_blast_per_sqft);
 }
-function item_adding(frm){
-	if(frm.doc.bom_no){
-		frappe.call({
-			method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.add_item",
-			args:{
-				bom_no:frm.doc.bom_no,
-				doc:cur_frm.doc
-			},
-			callback(r){
-				// cur_frm.set_value('items',r.message)
-				var item1=[]
-				for (const d of r.message){
-					// if(!item1.includes(d.item_code))
-					item1.push('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))
-				}
-				for (const d of r.message){
-					for(const i of frm.doc.items?frm.doc.items:[]){
-						if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type==i.layer_type && item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))){
-							item1.splice(item1.indexOf('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:'')), 1)
-						}
-					}
-				}
-				if(item1){
-					// for(var i=0;i<item1.length;i++){		
-						for (const d of r.message){
-							if(item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:'') )){
-								var row = frm.add_child('items');
-								row.item_code = d.item_code;
-								row.layer_type = d.layer_type
-								row.qty = (d.layer_type=='Top Layer'?d.qty * (cur_frm.doc.total_no_of_batches?cur_frm.doc.total_no_of_batches:0):d.qty);
-								row.ts_qty = d.ts_qty;
-								row.bom_qty = d.ts_qty;
-								row.average_consumption = d.ts_qty;
-								row.no_of_batches = frm.doc.total_no_of_batches
-								row.stock_uom = d.stock_uom;
-								row.from_bom = 1;
-								row.uom = d.uom;
-								row.rate = d.rate;
-								row.amount= d.layer_type=='Top Layer'?d.amount * (cur_frm.doc.total_no_of_batches?cur_frm.doc.total_no_of_batches:0):d.amount;
-								row.source_warehouse= d.source_warehouse
-							}
-						// }
-					}
-				}
-				refresh_field("items");
-				add_total_raw_material(cur_frm)
-			}
-		})
-	}
-	
-}
 function std_item(frm){
 	if(frm.doc.bom_no){
 		frappe.call({
@@ -531,6 +475,52 @@ function std_item(frm){
 				}
 				refresh_field("items");
 				add_total_raw_material(cur_frm)
+				frappe.call({
+					method:"ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.add_item",
+					args:{
+						bom_no:frm.doc.bom_no,
+						doc:cur_frm.doc
+					},
+					callback(r){
+						// cur_frm.set_value('items',r.message)
+						var item1=[]
+						for (const d of r.message){
+							// if(!item1.includes(d.item_code))
+							item1.push('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))
+						}
+						for (const d of r.message){
+							for(const i of frm.doc.items?frm.doc.items:[]){
+								if(i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type==i.layer_type && item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:''))){
+									item1.splice(item1.indexOf('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:'')), 1)
+								}
+							}
+						}
+						if(item1){
+							// for(var i=0;i<item1.length;i++){		
+								for (const d of r.message){
+									if(item1.includes('item_code:'+(d.item_code?d.item_code:'')+'layer_type:'+(d.layer_type?d.layer_type:'') )){
+										var row = frm.add_child('items');
+										row.item_code = d.item_code;
+										row.layer_type = d.layer_type
+										row.qty = (d.layer_type=='Top Layer'?d.qty * (cur_frm.doc.total_no_of_batches?cur_frm.doc.total_no_of_batches:0):d.qty);
+										row.ts_qty = d.ts_qty;
+										row.bom_qty = d.ts_qty;
+										row.average_consumption = d.ts_qty;
+										row.no_of_batches = frm.doc.total_no_of_batches
+										row.stock_uom = d.stock_uom;
+										row.from_bom = 1;
+										row.uom = d.uom;
+										row.rate = d.rate;
+										row.amount= d.layer_type=='Top Layer'?d.amount * (cur_frm.doc.total_no_of_batches?cur_frm.doc.total_no_of_batches:0):d.amount;
+										row.source_warehouse= d.source_warehouse
+									}
+								// }
+							}
+						}
+						refresh_field("items");
+						add_total_raw_material(cur_frm)
+					}
+				})
 			}
 		})
 	}
