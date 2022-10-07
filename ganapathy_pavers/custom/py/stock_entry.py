@@ -78,3 +78,9 @@ class Tsstockentry(StockEntry):
                         i.basic_amount = rate * i.transfer_qty
                 return
             #End
+
+
+def basic_rate_validation(doc,event):
+    if(doc.usb or doc.cw_usb):
+        for item in doc.items:
+            item.basic_rate = item.basic_rate_hidden
