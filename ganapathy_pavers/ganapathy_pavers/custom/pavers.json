@@ -1,0 +1,32 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Pavers",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2022-10-07 11:31:07.963530",
+   "default_value": null,
+   "doc_type": "Pavers",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "stock_qty",
+   "idx": 0,
+   "modified": "2022-10-07 11:31:07.963530",
+   "modified_by": "Administrator",
+   "name": "Pavers-stock_qty-precision",
+   "owner": "Administrator",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "precision",
+   "property_type": "Select",
+   "row_name": null,
+   "value": "4"
+  }
+ ],
+ "sync_on_migrate": 1
+}
