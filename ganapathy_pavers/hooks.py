@@ -232,7 +232,7 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
 			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
-			  "ganapathy_pavers.utils.py.quotation.batch_property_setter"
+			  "ganapathy_pavers.utils.py.quotation.batch_property_setter",
 			  "ganapathy_pavers.utils.py.purchase_invoice.batch_property_setter"
 			  ]
 
