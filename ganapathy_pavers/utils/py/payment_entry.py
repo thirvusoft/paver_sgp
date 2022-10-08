@@ -1,4 +1,5 @@
 import frappe
+from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 def create_additional_salary(doc,action):
     for i in doc.references:
         if(i.reference_doctype=='Employee Advance'):
@@ -14,3 +15,8 @@ def create_additional_salary(doc,action):
                 add_doc.insert()
                 add_doc.submit()
                 frappe.db.commit()
+        
+def payment_entry_property_setter():                
+    make_property_setter("Payment Entry", "branch", "reqd",1, "Check")
+    make_property_setter("Payment Entry", "mode_of_payment", "reqd",1, "Check")
+    make_property_setter("Payment Entry", "type", "reqd",1, "Check")

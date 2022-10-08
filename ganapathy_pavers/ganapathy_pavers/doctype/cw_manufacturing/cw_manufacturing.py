@@ -115,7 +115,8 @@ def make_stock_entry_for_molding(doc):
             for i in doc.get("items"):
                 stock_entry.append('items', dict(
                     s_warehouse=(doc.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"]*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), uom=i["uom"],
-                    basic_rate=i["rate"]
+                    basic_rate=i["rate"],
+                    basic_rate_hidden=i["rate"]
                 ))
         else:
             frappe.throw("Kindly Enter Raw Materials")

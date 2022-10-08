@@ -214,6 +214,7 @@ def help_session(emp, emp_tabl):
 		if i['employee'] == emp:
 			res['cdt']=i.get('doctype')
 			res['cdn']=i.get('name')
+			res['idx']=i.get('idx')
 			break
 		
 	return res

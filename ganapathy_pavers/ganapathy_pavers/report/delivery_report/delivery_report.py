@@ -243,7 +243,8 @@ class PartyLedgerSummaryReport(object):
 			customer['out_delivery_amount']=delivery_amount
 			bls=(delivered-customer['paid_amount'])
 			customer['outstanding_amount']=bls
-			out.append(customer)
+			if customer.out_delivery_amount or customer.paid_amount or customer.outstanding_amount or customer.invoiced_amount:
+				out.append(customer)
 		return out
  
  

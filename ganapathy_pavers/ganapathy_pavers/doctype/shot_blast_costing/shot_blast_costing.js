@@ -11,6 +11,14 @@ frappe.ui.form.on('Shot Blast Costing', {
 				}
 			}
 		})
+		frm.set_query("batch","items",function(frm,cdt,cdn){
+			let row = locals[cdt][cdn]
+			return {
+				"filters": {
+					"item":row.item_name
+				}
+			}
+		})
 		var mm_items = [];
 		await frappe.db.get_list('Material Manufacturing', {filters : {is_shot_blasting:1, docstatus:0}, fields : ['item_to_manufacture']}).then((value) => {
 			for(let i=0; i<value.length; i++){
@@ -120,6 +128,25 @@ frappe.ui.form.on('Shot Blast Items', {
 		cur_frm.set_value("total_damage_sqft",total_damage_sqft)
 		cur_frm.set_value("avg_damage_sqft",total_damage_sqft/frm.doc.items.length)
 	},
+	batch:function(frm,cdt,cdn){
+		let row = locals[cdt][cdn]
+		frappe.call({
+			method:"ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.uom_conversion",
+			args:{
+				item:row.item_name,
+				batch:row.batch,
+				to_uom:"bundle"
+			},
+			callback(r){
+				if (r.message){
+					frappe.model.set_value(row.doctype,row.name,'bundle_taken', r.message);
+				}
+				cur_frm.refresh_field('items')
+
+			}
+		})
+
+	}
 });
 function total(frm){
 	var total_bundle = 0
