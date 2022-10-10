@@ -115,20 +115,25 @@ def make_stock_entry_for_molding(doc):
             for i in doc.get("items"):
                 stock_entry.append('items', dict(
                     s_warehouse=(doc.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"]*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), uom=i["uom"],
-                    basic_rate=i["rate"],
-                    basic_rate_hidden=i["rate"]
+                    basic_rate=i['rate'],
+                     basic_rate_hidden=i['rate'],
+                   
                 ))
         else:
             frappe.throw("Kindly Enter Raw Materials")
         manufactue_qty = uom_conversion(item.get("item"), 'Nos', item.get("produced_qty"), default_nos)
         
         stock_entry.append('items', dict(
-            t_warehouse = target_warehouse, item_code=item.get("item"), qty= manufactue_qty, uom=default_nos, is_finished_item=1
+            t_warehouse = target_warehouse, item_code=item.get("item"), qty= manufactue_qty, uom=default_nos, is_finished_item=1,
+                basic_rate=uom_conversion_for_rate(item.get("item"),"Square Foot",doc.get('total_cost_per_sqft'),default_nos),
+                basic_rate_hidden=uom_conversion_for_rate(item.get("item"),"Square Foot",doc.get('total_cost_per_sqft'),default_nos),
+ 
         ))
         if item.get("damaged_qty") > 0:
             scrap_qty = uom_conversion(item.get("item"), 'Nos', item.get("damaged_qty"), default_nos)
             stock_entry.append('items', dict(
-                t_warehouse=default_scrap_warehouse, item_code=item.get("item"), qty=scrap_qty, uom=default_nos, is_process_loss=1
+                t_warehouse=default_scrap_warehouse, item_code=item.get("item"), qty=scrap_qty, uom=default_nos, is_process_loss=1,
+
             ))
         stock_entry.append('additional_costs', dict(
             expense_account=expenses_included_in_valuation, amount=doc.get("total_expence")*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), description="It includes labours cost, operators cost and additional cost."
@@ -188,10 +193,14 @@ def make_stock_entry_for_bundling(doc):
         sqft_qty = uom_conversion(item.get('item_code'), item.get("uom"),  item.get('qty') , 'Square Foot')
 
         stock_entry.append('items', dict(
-            s_warehouse = source_warehouse, item_code = item.get('item_code'), qty = item.get('qty') ,uom = item.get('uom') ,batch_no = item.get("batch")
+            s_warehouse = source_warehouse, item_code = item.get('item_code'), qty = item.get('qty') ,uom = item.get('uom') ,batch_no = item.get("batch"),
+             basic_rate=uom_conversion_for_rate(item.get("item_code"),"Square Foot",doc.get('total_cost_per_sqft'), item.get('uom')),
+                  basic_rate_hidden=uom_conversion_for_rate(item.get("item_code"),"Square Foot",doc.get('total_cost_per_sqft'), item.get('uom')),
             )) 
         stock_entry.append('items', dict(
-            t_warehouse = target_warehouse, item_code = item.get('item_code'), qty = converted_qty,uom = default_nos
+            t_warehouse = target_warehouse, item_code = item.get('item_code'), qty = converted_qty,uom = default_nos,
+                  basic_rate=uom_conversion_for_rate(item.get("item_code"),"Square Foot",doc.get('total_cost_per_sqft'),default_nos),
+                  basic_rate_hidden=uom_conversion_for_rate(item.get("item_code"),"Square Foot",doc.get('total_cost_per_sqft'),default_nos),
             ))
         stock_entry.append('additional_costs', dict(
                 expense_account	 = expenses_included_in_valuation, amount = doc.get("total_expense_for_unmolding") * (sqft_qty/doc.get("ts_production_sqft")), description = "It includes strapping cost and additional cost."
@@ -244,7 +253,9 @@ def make_stock_entry_for_curing(doc):
         sqft_qty = uom_conversion(item.get('item_code'), item.get("uom"),  item.get('qty') , 'Square Foot')
         stock_entry.append('items', dict(
             s_warehouse = source_warehouse, item_code = item.get("item_code"),qty = item.get('qty') ,uom = item.get('uom') ,batch_no = item.get("batch"),
-            t_warehouse = target_warehouse, 
+            t_warehouse = target_warehouse,
+                   basic_rate=uom_conversion_for_rate(item.get("item_code"),"Square Foot",doc.get('total_cost_per_sqft'),item.get("uom")),
+                    basic_rate_hidden=uom_conversion_for_rate(item.get("item_code"),"Square Foot",doc.get('total_cost_per_sqft'),item.get("uom")),
             ))
         stock_entry.append('additional_costs', dict(
                 expense_account	 = expenses_included_in_valuation, amount = doc.get("labour_expense_for_curing") * (sqft_qty/doc.get("ts_production_sqft")),description = "It includes labours cost."
@@ -364,9 +375,26 @@ def uom_conversion(item, from_uom='', from_qty=0, to_uom=''):
     if(not from_conv):
         throw_error(from_uom + " Bundle Conversion", "Item")
     if(not to_conv):
-        throw_error(to_conv + " Bundle Conversion", 'Item')
+        throw_error(to_uom + " Bundle Conversion", 'Item')
     
     return (float(from_qty) * from_conv) / to_conv
+
+
+def uom_conversion_for_rate(item, from_uom, price, to_uom):
+    item_doc = frappe.get_doc('Item', item)
+    from_conv = 0
+    to_conv = 0
+    for row in item_doc.uoms:
+        if(row.uom == from_uom):
+            from_conv = row.conversion_factor
+        if(row.uom == to_uom):
+            to_conv = row.conversion_factor
+    if(not from_conv):
+        throw_error(from_uom + " Bundle Conversion", "Item")
+    if(not to_conv):
+        throw_error(to_uom + " Bundle Conversion", 'Item')
+ 
+    return (float(price) * from_conv) * to_conv
 
 @frappe.whitelist()
 def get_operators(doc, item_count=1):
