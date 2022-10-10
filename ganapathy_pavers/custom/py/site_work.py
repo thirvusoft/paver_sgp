@@ -4,7 +4,7 @@ from frappe.utils.csvutils import getlink
 from frappe.utils import nowdate
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import get_bank_cash_account
 from ganapathy_pavers.custom.py.sales_order import get_item_rate
-
+from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
 
 
 @frappe.whitelist()
@@ -183,7 +183,20 @@ def validate_jw_qty(self):
             wrong_items.append(frappe.bold(item))
     if(wrong_items):
         frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+', '.join(wrong_items))
+    
+    if(self.type == "Compound Wall"):
+        delivered_qty = 0
+        for row in self.delivery_detail:
+            if(row.item and frappe.get_value("Item", row.item, 'item_group') == "Compound Walls"):
+                delivered_qty += uom_conversion(row.item, '', float(row.delivered_stock_qty), 'Square Foot')
         
+        completed_qty = 0
+        for row in self.job_worker:
+            if((not row.item) or row.item_group == "Compound Walls"):
+                completed_qty += float(row.sqft_allocated or 0)
+
+        if(completed_qty > delivered_qty):
+            frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty.")
         
 def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, exchange_rate):
     doc=frappe.new_doc('Employee Advance')

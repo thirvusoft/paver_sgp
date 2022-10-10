@@ -1,6 +1,5 @@
 import frappe
-from frappe.utils import (add_days,nowdate,
-add_months)
+from frappe.utils import add_months, add_days, nowdate
 
 
 @frappe.whitelist()
@@ -174,3 +173,35 @@ def reference_date(doc,action):
         if (data.maintenance == "Green Tax"):
             if(data.to_date != ""):
                 doc.green_tax_expired_date = data.to_date
+
+
+
+def notification(remainder_type, owner, license_plate, maintenance_item, doctype):
+    emailid = frappe.get_single("Vehicle Settings").email_id_for_notification
+    for email in emailid:
+        doc=frappe.new_doc('Notification Log')
+        doc.update({
+        'subject': f'{license_plate} - Maintenance Alert for {maintenance_item}',
+        'for_user': email.email_id,
+        'send_email': 1,
+        'type': 'Alert',
+        'document_type': doctype,
+        'document_name': license_plate,
+        'from_user':owner,
+        'email_content': f'A {remainder_type} Remainder for a Maintenance item: {maintenance_item} in Vehicle: {license_plate}'
+        })
+        doc.flags.ignore_permissions=True
+        doc.save()
+
+
+def vehicle_maintenance_notification():
+    vehicle = frappe.get_all("Maintenance Details", {'parenttype': 'Vehicle'}, pluck='name')
+    for doc in vehicle:
+        doc=frappe.get_doc('Maintenance Details', doc)
+        if (doc.to_date):
+            if(doc.month_before and str(doc.to_date) == add_months(nowdate(), 1)):
+                notification("Month Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')
+            if(doc.week_before and str(doc.to_date) == add_days(nowdate(), 7)):
+                notification("Week Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')
+            if(doc.day_before and str(doc.to_date) == add_days(nowdate(), 1)):
+                notification("Day Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')

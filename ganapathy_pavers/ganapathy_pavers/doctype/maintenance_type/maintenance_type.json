@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:maintenance_type",
  "creation": "2022-10-06 16:57:23.550868",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -14,12 +15,13 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Maintenance Type",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-10-06 16:57:23.550868",
+ "modified": "2022-10-10 10:30:07.774443",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Maintenance type",
@@ -38,6 +40,7 @@
    "write": 1
   }
  ],
+ "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC"
 }

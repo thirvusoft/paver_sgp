@@ -139,7 +139,7 @@ frappe.ui.form.on('Shot Blast Items', {
 			},
 			callback(r){
 				if (r.message){
-					frappe.model.set_value(row.doctype,row.name,'bundle_taken', r.message);
+					frappe.model.set_value(row.doctype,row.name,'available_bundles1', r.message);
 				}
 				cur_frm.refresh_field('items')
 

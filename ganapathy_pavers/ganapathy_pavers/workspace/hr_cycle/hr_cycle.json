@@ -1,4 +1,5 @@
 {
+ "cards_label": "Report",
  "category": "Modules",
  "charts": [],
  "creation": "2022-04-20 14:59:09.716513",
@@ -13,8 +14,19 @@
  "is_default": 0,
  "is_standard": 1,
  "label": "HR Cycle",
- "links": [],
- "modified": "2022-10-07 15:33:37.583392",
+ "links": [
+  {
+   "dependencies": "Attendance",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Daily Working Area Wise Worked Hrs",
+   "link_to": "Attendance Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2022-10-10 10:51:32.548664",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "HR Cycle",
@@ -124,12 +136,6 @@
    "label": "TS Employee Attendance Tool",
    "link_to": "TS Employee Attendance Tool",
    "type": "DocType"
-  },
-  {
-   "doc_view": "Report Builder",
-   "label": "Daily Working Area Wise Worked Hrs",
-   "link_to": "Daily Working Area Wise Worked Hrs",
-   "type": "Report"
   }
  ]
 }

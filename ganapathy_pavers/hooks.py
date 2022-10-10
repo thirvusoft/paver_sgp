@@ -65,7 +65,6 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.custom.py.defaults.create_asset_category",
 				 "ganapathy_pavers.custom.py.defaults.create_role",
 				 "ganapathy_pavers.utils.py.vehicle.batch_customization",
-				 "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
 				 "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 				 "ganapathy_pavers.utils.py.assets.item_customization",
 				 "ganapathy_pavers.utils.py.gl_entry.gl_entry_customization",
@@ -229,10 +228,10 @@ doc_events = {
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
               "ganapathy_pavers.custom.py.property_setter.property_setter",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
-			  "ganapathy_pavers.utils.py.maintenance_details.batch_customization",
 			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 			  "ganapathy_pavers.utils.py.quotation.batch_property_setter",
-			  "ganapathy_pavers.utils.py.purchase_invoice.batch_property_setter"
+			  "ganapathy_pavers.utils.py.purchase_invoice.batch_property_setter",
+			  "ganapathy_pavers.utils.py.payment_entry.payment_entry_property_setter"
 			  ]
 
 
@@ -275,6 +274,7 @@ scheduler_events = {
 	"cron": {
 		"0 2 * * *": [
 			"ganapathy_pavers.custom.py.vehicle_log.days",
+			"ganapathy_pavers.custom.py.vehicle.vehicle_maintenance_notification",
 		],
 		"0 1 * * *": [
 			"ganapathy_pavers.custom.py.employee_checkin.mark_attendance",

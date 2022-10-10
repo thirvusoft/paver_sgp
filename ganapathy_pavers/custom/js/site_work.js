@@ -193,7 +193,7 @@ function completed_bundle_calc(frm,cdt,cdn){
 			allocated_sqft = bundle * item_bundle_per_sqft
 			frappe.model.set_value(cdt,cdn,"sqft_allocated",allocated_sqft?allocated_sqft:0)
 		})
-	} else if (data.item_group == "Compound Walls") {
+	} else if (frm.doc.type == "Compound Wall") {
 		frappe.model.set_value(cdt,cdn,"sqft_allocated",(data.compound_wall_height || 0) * (data.running_sqft || 0))
 	}
 }
