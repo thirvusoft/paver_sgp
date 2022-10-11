@@ -1,0 +1,64 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-09-22 14:29:55.673283",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "machine",
+  "plate",
+  "rack",
+  "sqft"
+ ],
+ "fields": [
+  {
+   "columns": 2,
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "columns": 2,
+   "fieldname": "machine",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Machine"
+  },
+  {
+   "columns": 2,
+   "fieldname": "plate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Plate"
+  },
+  {
+   "columns": 2,
+   "fieldname": "rack",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Rack"
+  },
+  {
+   "columns": 2,
+   "fieldname": "sqft",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Sqft"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-09-22 14:49:03.302205",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "DSM Production Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
