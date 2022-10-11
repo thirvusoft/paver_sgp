@@ -228,6 +228,10 @@ doc_events = {
 		"on_update": "ganapathy_pavers.custom.py.employee_atten_tool.create_and_delete_checkins",
 		"on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.doc_cancel",
 		"on_submit": "ganapathy_pavers.custom.py.employee_atten_tool.create_attendance"
+	},
+	"Batch": {
+		"autoname": "ganapathy_pavers.custom.py.batch.autoname",
+		"on_trash": "ganapathy_pavers.custom.py.batch.update_series"
 	}
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
