@@ -31,8 +31,13 @@ frappe.query_reports["Site Work Completion - Report"] = {
 			"fieldtype": "Link",
 			"options": "Employee",
 			"width": "100"
-		}
-
-
+		},
+		{
+			"fieldname": "group_by",
+			"label": __("Group By"),
+			"fieldtype": "Select",
+			"options": "Job Worker\nSite Name",
+			"default": "Job Worker"
+		},
 	]
 };
