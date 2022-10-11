@@ -104,31 +104,7 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
     machine:function(frm, cdt, cdn){
         get_data(frm, cdt, cdn)
     },
-    before_submit: async function(){
-        await frappe.call({
-            method:"ganapathy_pavers.custom.py.employee_atten_tool.attendance",
-            args:{
-                table_list: cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:'',
-                company: cur_frm.doc.company?cur_frm.doc.company:'',
-                ts_name: cur_frm.doc.name?cur_frm.doc.name:'',
-            }            
-        })
-    },
     after_save: async function(){
-        await frappe.call({
-            method:"ganapathy_pavers.custom.py.employee_atten_tool.check_in",
-            args:{
-                table_list: cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:'',
-                ts_name: cur_frm.doc.name?cur_frm.doc.name:'',
-            }
-        })
-        await frappe.call({
-            method:"ganapathy_pavers.custom.py.employee_atten_tool.delete_check_in",
-            args:{
-                table_list: cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:'',
-                ts_name: cur_frm.doc.name?cur_frm.doc.name:'',
-            }
-        })
         cur_frm.reload_doc()
     },
     update:function(frm,cdt,cdn){

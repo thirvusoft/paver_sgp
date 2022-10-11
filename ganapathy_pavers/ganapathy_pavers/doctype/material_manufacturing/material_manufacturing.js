@@ -373,9 +373,8 @@ function make_stock_entry(frm,type1){
 		callback: function(r){
 			if(r.message){
 				cur_frm.set_value("status1", r.message);
-				cur_frm.refresh()
-				frm.save()
 			}
+			cur_frm.save()
 			
 		 }
 	})

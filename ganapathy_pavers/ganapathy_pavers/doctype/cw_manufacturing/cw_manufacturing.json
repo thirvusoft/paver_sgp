@@ -511,18 +511,21 @@
   {
    "fieldname": "cw_manufacturing_batch_details",
    "fieldtype": "Table",
+   "no_copy": 1,
    "options": "CW Manufacturing Batch Details",
    "read_only": 1
   },
   {
    "fieldname": "cw_unmolding_batch_details",
    "fieldtype": "Table",
+   "no_copy": 1,
    "options": "CW Unmolding Batch Details",
    "read_only": 1
   },
   {
    "fieldname": "cw_curing_batch_details",
    "fieldtype": "Table",
+   "no_copy": 1,
    "options": "CW Curing Batch Details",
    "read_only": 1
   },
@@ -601,7 +604,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-22 15:45:05.894616",
+ "modified": "2022-10-11 09:27:28.550578",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

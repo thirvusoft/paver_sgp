@@ -196,7 +196,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-10 12:52:42.809151",
+ "modified": "2022-10-11 15:17:39.134189",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Attendance Tool",
@@ -228,6 +228,7 @@
    "write": 1
   },
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -237,6 +238,7 @@
    "report": 1,
    "role": "Admin",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

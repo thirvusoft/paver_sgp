@@ -361,6 +361,7 @@ def find_batch(name):
                         curing_batch_list.append({'item_code': j.item_code, 'batch': j.batch_no, 'qty': j.qty, 'uom': j.uom})
     return manufacture_batch_list, unmolding_batch_list, curing_batch_list
 
+@frappe.whitelist()
 def uom_conversion(item, from_uom='', from_qty=0, to_uom=''):
     if(not from_uom):
         from_uom = frappe.get_value('Item', item, 'stock_uom')

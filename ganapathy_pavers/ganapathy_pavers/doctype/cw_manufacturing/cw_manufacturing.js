@@ -37,15 +37,13 @@ frappe.ui.form.on("CW Manufacturing", {
             return {
                 filters: {
                     compound_wall_type: frm.doc.type,
-                    item_group: "Compound Walls"
+                    item_group: "Compound Walls",
                 },
             };
         });
         set_css(frm);
     },
-    onload: function (frm) {
-        
-    },
+    onload: function (frm) {},
     ts_before_save: function (frm) {
         let post_chips = 0,
             slab_chips = 0,
@@ -146,8 +144,8 @@ frappe.ui.form.on("CW Manufacturing", {
     },
     get_bom_items: async function (frm) {
         frm.clear_table("items");
-        await std_item(frm).then( (a) => item_adding(frm));
-        
+        await std_item(frm).then((a) => item_adding(frm));
+
         raw_material_cost(frm);
     },
     operator_cost: function (frm) {
@@ -251,24 +249,24 @@ function labour_expense_curing(frm) {
 function working_hrs(frm) {
     if (frm.doc.molding_date) {
         frappe.db.get_single_value("CW Settings", "working_area").then((value) => {
-            if(!value) {
-                frappe.throw({message: "Please choose Working Area for compound wall in CW Settings"})
+            if (!value) {
+                frappe.throw({ message: "Please choose Working Area for compound wall in CW Settings" });
             }
-            if(!frm.doc.molding_date){
-                frappe.throw({message: "Please enter Manufacturing Date"})
+            if (!frm.doc.molding_date) {
+                frappe.throw({ message: "Please enter Manufacturing Date" });
             }
-            frm.set_value("work_area", value ? value : '');
+            frm.set_value("work_area", value ? value : "");
             frappe.call({
-                    method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.get_working_hrs",
-                    args: {
-                        attendance_date: frm.doc.molding_date,
-                        machine: value,
-                    },
-                    callback: function(r) {
-                        frm.set_value("total_working_hrs", r.message.hours ? r.message.hours : 0);
-                        frm.set_value("no_of_labour", r.message.labours ? r.message.labours : 0);
-                    }
-                  })
+                method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.get_working_hrs",
+                args: {
+                    attendance_date: frm.doc.molding_date,
+                    machine: value,
+                },
+                callback: function (r) {
+                    frm.set_value("total_working_hrs", r.message.hours ? r.message.hours : 0);
+                    frm.set_value("no_of_labour", r.message.labours ? r.message.labours : 0);
+                },
+            });
         });
     }
 }
@@ -310,9 +308,29 @@ function production_qty_calc(frm, cdt, cdn) {
     let produced_qty = (data.production_qty ? data.production_qty : 0) - (data.damaged_qty ? data.damaged_qty : 0);
     frappe.model.set_value(cdt, cdn, "produced_qty", produced_qty);
     if (data.item) {
-        frappe.db.get_value("Item", data.item, "pavers_per_sqft", (doc) => {
-            frappe.model.set_value(cdt, cdn, "production_sqft", doc.pavers_per_sqft ? (data.produced_qty ? data.produced_qty : 0) / doc.pavers_per_sqft : show_alert(data.item, "Pieces Per Sqft"));
-            frappe.model.set_value(cdt, cdn, "ts_production_sqft", doc.pavers_per_sqft ? (data.production_qty ? data.production_qty : 0) / doc.pavers_per_sqft : show_alert(data.item, "Pieces Per Sqft"));
+        frappe.call({
+            method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.uom_conversion",
+            args: {
+                item: data.item,
+                from_uom: "Nos",
+                from_qty: data.produced_qty ? data.produced_qty : 0,
+                to_uom: "Square Foot",
+            },
+            callback: function (r) {
+                frappe.model.set_value(cdt, cdn, "production_sqft", r.message || 0);
+            },
+        });
+        frappe.call({
+            method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.uom_conversion",
+            args: {
+                item: data.item,
+                from_uom: "Nos",
+                from_qty: data.production_qty ? data.production_qty : 0,
+                to_uom: "Square Foot",
+            },
+            callback: function (r) {
+                frappe.model.set_value(cdt, cdn, "ts_production_sqft", r.message || 0);
+            },
         });
     }
 }

@@ -221,8 +221,13 @@ doc_events = {
 		"before_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.fill_attn_cancel_detail"
 	},
 	"TS Employee Attendance Tool": {
-		"validate": "ganapathy_pavers.custom.py.employee_atten_tool.day_wise_department",
-		"on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.doc_cancel"
+		"validate": [
+					"ganapathy_pavers.custom.py.employee_atten_tool.day_wise_department",
+					"ganapathy_pavers.custom.py.employee_atten_tool.validate_same_dates"
+					],
+		"on_update": "ganapathy_pavers.custom.py.employee_atten_tool.create_and_delete_checkins",
+		"on_cancel":"ganapathy_pavers.custom.py.employee_atten_tool.doc_cancel",
+		"on_submit": "ganapathy_pavers.custom.py.employee_atten_tool.create_attendance"
 	}
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",

@@ -1,0 +1,32 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "UOM Conversion Detail",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2022-10-11 10:55:05.800891",
+   "default_value": null,
+   "doc_type": "UOM Conversion Detail",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "conversion_factor",
+   "idx": 0,
+   "modified": "2022-10-11 10:55:05.800891",
+   "modified_by": "admin@gmail.com",
+   "name": "UOM Conversion Detail-conversion_factor-precision",
+   "owner": "admin@gmail.com",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "precision",
+   "property_type": "Select",
+   "row_name": null,
+   "value": "6"
+  }
+ ],
+ "sync_on_migrate": 1
+}

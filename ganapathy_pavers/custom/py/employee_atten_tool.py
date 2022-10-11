@@ -2,7 +2,7 @@ import frappe
 import json
 from frappe.utils.csvutils import getlink
 from datetime import datetime
-
+from frappe.utils import date_diff
 
 
 @frappe.whitelist()
@@ -52,7 +52,8 @@ def validate_duplicate_entry(self, event):
 
 @frappe.whitelist()
 def check_in(table_list, ts_name):
-	table_list=json.loads(table_list)
+	if(isinstance(table_list, str)):
+		table_list=json.loads(table_list)
 	for i in table_list:
 		if(i.get('check_in') and i.get('employee')):
 			if(i.get('location')):
@@ -74,14 +75,15 @@ def check_in(table_list, ts_name):
 				elif(frappe.db.exists('Employee Checkin', prev_doc)):
 					
 					doc=frappe.get_doc('Employee Checkin', prev_doc)
-					doc.update({
-						'employee':i.get("employee"),
-						'log_type':"IN",
-						'time': i.get('check_in'),
-						'ts_emp_att_tool_name':ts_name,
-					})
-					doc.flags.ignore_mandatory=True
-					doc.save()
+					if(doc.employee!=i.get('employee') or doc.log_type!="IN" or doc.time!=i.get('check_in') or doc.ts_emp_att_tool_name!=ts_name):
+						doc.update({
+							'employee':i.get("employee"),
+							'log_type':"IN",
+							'time': i.get('check_in'),
+							'ts_emp_att_tool_name':ts_name,
+						})
+						doc.flags.ignore_mandatory=True
+						doc.save()
 		
 		if(i.get('check_out') and i.get('employee')):
 			if(i.get('location')):
@@ -103,14 +105,15 @@ def check_in(table_list, ts_name):
 						
 				elif(frappe.db.exists('Employee Checkin', prev_doc)):
 					doc=frappe.get_doc('Employee Checkin', prev_doc)
-					doc.update({
-						'employee':i.get("employee"),
-						'log_type':"OUT",
-						'time': i.get('check_out'),
-						'ts_emp_att_tool_name':ts_name,
-					})
-					doc.flags.ignore_mandatory=True
-					doc.save()
+					if(doc.employee!=i.get('employee') or doc.log_type!="OUT" or doc.time!=i.get('check_out') or doc.ts_emp_att_tool_name!=ts_name):
+						doc.update({
+							'employee':i.get("employee"),
+							'log_type':"OUT",
+							'time': i.get('check_out'),
+							'ts_emp_att_tool_name':ts_name,
+						})
+						doc.flags.ignore_mandatory=True
+						doc.save()
 	
 @frappe.whitelist()
 def get_check_in(employee, name, logtype):
@@ -121,7 +124,8 @@ def get_check_in(employee, name, logtype):
 
 @frappe.whitelist()
 def attendance(table_list, company, ts_name):
-	table_list=json.loads(table_list)
+	if(isinstance(table_list, str)):
+		table_list=json.loads(table_list)
 	validate_empty_field(table_list)
 	doc1=frappe.get_single('Global Defaults')
 	if(not doc1.default_company and not company):
@@ -145,7 +149,7 @@ def attendance(table_list, company, ts_name):
 def update_attendance_to_checkin(self, event):
 	emp_checkin_name=frappe.get_all('Employee Checkin', {'employee': self.employee, 'time': ['between', [self.attendance_date, self.attendance_date]]}, pluck='name')
 	for doc in emp_checkin_name:
-		frappe.db.set_value('Employee Checkin', doc, 'attendance', self.name)
+		frappe.db.set_value('Employee Checkin', doc, 'attendance', self.name, update_modified=False)
 
 
 def fill_emp_cancel_detail(self, event):
@@ -175,6 +179,7 @@ def fill_emp_cancel_detail(self, event):
 			'ts_emp_checkin':cancel_list
 		})
 		doc.flags.ignore_mandatory=True
+		doc.run_method = lambda x: x
 		doc.save('Update')
 
 def fill_attn_cancel_detail(self, event):
@@ -238,7 +243,8 @@ def update_dept(employee, location, machine):
 	
 @frappe.whitelist()
 def delete_check_in(table_list, ts_name):
-	table_list=json.loads(table_list)
+	if(isinstance(table_list, str)):
+		table_list=json.loads(table_list)
 	emp_list=[]
 	for row in table_list:
 		if(row.get('employee')):
@@ -276,6 +282,19 @@ def day_wise_department(self, event):
 		if(docs):
 			frappe.throw(f'Attendance tool already exist for this date {frappe.utils.csvutils.getlink("TS Employee Attendance Tool", docs[0])} for{(" "+frappe.bold(self.designation)) if self.designation else ""}{(" "+frappe.bold(self.branch)) if self.branch else ""}{(" "+frappe.bold(self.location)) if self.location else ""}')
 
+def validate_same_dates(self, event):
+	for row in self.employee_detail:
+		if(row.check_out and row.check_in):
+			frappe.errprint(str(date_diff(row.check_out, row.check_in)))
+			if(date_diff(row.check_out, row.check_in)!=0):
+				frappe.throw(f"Checkin and Checkout must be a same date for row {row.idx}")
+
+def create_and_delete_checkins(self, event):	
+	check_in([i.__dict__ for i in self.employee_detail], self.name)
+	delete_check_in([i.__dict__ for i in self.employee_detail], self.name)
+
+def create_attendance(self, event):
+	attendance([i.__dict__ for i in self.employee_detail], self.company, self.name)
 
 def doc_cancel(self, event):
 	for checkin in frappe.get_all("Employee Checkin",{'ts_emp_att_tool_name':self.name,}):
