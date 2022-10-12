@@ -96,7 +96,6 @@ frappe.ui.form.on('Shot Blast Items', {
 		frappe.db.get_doc("Material Manufacturing", row.material_manufacturing).then((r) => {
 			frappe.model.set_value(cdt,cdn,"item_name",r.item_to_manufacture)
 			frappe.model.set_value(cdt,cdn,"batch",r.batch_no_curing)
-			frappe.model.set_value(cdt,cdn,"bundle",r.shot_blasted_bundle)                
 		});
 	},
 	damages_in_nos: function(frm,cdt,cdn){
@@ -135,12 +134,11 @@ frappe.ui.form.on('Shot Blast Items', {
 			args:{
 				item:row.item_name,
 				batch:row.batch,
-				to_uom:"bundle"
+				to_uom:"bundle",
+				mm: row.material_manufacturing || ''
 			},
 			callback(r){
-				if (r.message){
-					frappe.model.set_value(row.doctype,row.name,'available_bundles1', r.message);
-				}
+				frappe.model.set_value(row.doctype,row.name,'bundle', r.message || 0);
 				cur_frm.refresh_field('items')
 
 			}
