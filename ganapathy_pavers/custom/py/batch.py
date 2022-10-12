@@ -9,11 +9,11 @@ def autoname(self, event=None):
         if(self.reference_doctype == "Stock Entry" and self.reference_name):
             se_doc = frappe.get_doc(self.reference_doctype, self.reference_name)
             if(se_doc.usb):
-                usb_date = frappe.get_value("Material Manufacturing", se_doc.usb, 'from_time')
+                usb_date = frappe.get_value("Material Manufacturing", se_doc.usb, 'from_time_rack') or frappe.throw(f"Plaese Enter Unmolding Date in {frappe.bold(frappe.utils.csvutils.getlink('Material Manufacturing', se_doc.usb))}")
                 if(usb_date):
                     date=get_date_str(usb_date)
             elif(se_doc.cw_usb):
-                cw_usb_date = frappe.get_value("CW Manufacturing", se_doc.cw_usb, 'molding_date')
+                cw_usb_date = frappe.get_value("CW Manufacturing", se_doc.cw_usb, 'unmolding_date') or frappe.throw(f"Plaese Enter Unmolding Date in {frappe.bold(frappe.utils.csvutils.getlink('CW Manufacturing', se_doc.cw_usb))}")
                 if(cw_usb_date):
                     date=str(cw_usb_date)
             else:

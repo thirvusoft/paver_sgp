@@ -495,7 +495,8 @@
   {
    "fieldname": "from_time_rack",
    "fieldtype": "Datetime",
-   "label": "From Time"
+   "label": "From Time",
+   "reqd": 1
   },
   {
    "fieldname": "to_time_rack",
@@ -998,7 +999,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-10-11 10:05:11.713743",
+ "modified": "2022-10-12 10:56:21.397191",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
