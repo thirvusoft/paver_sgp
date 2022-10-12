@@ -5,7 +5,48 @@ import frappe
 from frappe import _, errprint
 from frappe.utils import format_date
 
-def execute(filters=None):
+def execute(filters={}):
+	columns = get_columns()
+	if(filters.get('group_by')=='Site Name'):
+		return columns, run(filters)[0]
+	else:
+		data=[]
+		ts_filters={}
+		if filters.get('employee'):
+			ts_filters['name1'] = filters.get('employee')
+		if filters.get('from_date') and filters.get('to_date'):
+			ts_filters['start_date'] = ['between', [filters.get('from_date'), filters.get('to_date')]]
+		if filters.get("site_name"):
+			ts_filters['parent'] = filters.get("site_name")
+		jw=list(set(frappe.get_all("TS Job Worker Details", filters=ts_filters, pluck="name1")))
+		jw.sort()
+		currency = frappe.db.get_value("Currency", frappe.db.get_default("currency"), "symbol") or ''
+		filters['ts_group_by'] = 'Job Worker'
+		filters['group_by'] = 'Site Name'
+		final_total_sqft=0
+		final_total_amount=0
+		theme = frappe.db.get_value("User", frappe.session.user, "desk_theme")
+		group_total_colour = {'Light': 'Green', 'Dark': 'Green'}
+		for i in jw:
+			if(i):
+				filters['employee']=i
+				jw_data=run(filters)
+				final_total_sqft+=jw_data[1]
+				final_total_amount+=jw_data[2]
+				data+=jw_data[0]
+				total = ["" for i in range(9)]
+				total[0] = f"<b style='color:{group_total_colour.get(theme)}; font-size:20px;text-align: center;'>{frappe.get_value('Employee', i, 'employee_name')} <span style='font-size: 15px;'>Group Total</span></b>"
+				total[6] = f'<b style="color:{group_total_colour.get(theme)}; font-size:20px;">{"%.2f"%jw_data[1]}</b>'
+				total[8] = f'<b style="color:{group_total_colour.get(theme)}; font-size:20px;">{currency} {"%.2f"%jw_data[2]}</b>'
+				data.append(total)
+		total = ["" for i in range(9)]
+		total[0] = f"<b>Total</b>"
+		total[6] = frappe.bold("%.2f"%final_total_sqft)
+		total[8] = frappe.bold(f"{currency} %.2f"%final_total_amount)
+		data.append(total)
+		return columns, data
+
+def run(filters={}):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 	employee = filters.get("employee")
@@ -34,7 +75,7 @@ def execute(filters=None):
 										on site.name = jwd.parent 
 									{0}
 									order by {1}, jwd.start_date, site.name
-									""".format(conditions, 'site.name' if(filters.get('group_by')=='Site Name') else 'jobworker'))
+									""".format(conditions, 'site.name'))
 
 	data = [[format_date(i[0], 'dd-mm-yyyy')]+list(i)[1:] for i in report_data]
 	final_data = []
@@ -42,8 +83,6 @@ def execute(filters=None):
 	total_sqft=0
 	total_amount=0
 	currency = frappe.db.get_value("Currency", frappe.db.get_default("currency"), "symbol") or ''
-	if(filters.get('group_by')=='Job Worker'):
-		group=2
 	if(len(data)):
 		start = 0
 		for i in range(len(data)):
@@ -78,13 +117,14 @@ def execute(filters=None):
 	total[0] = "<b>Total</b>"
 	total[6] = frappe.bold("%.2f"%total_sqft)
 	total[8] = frappe.bold(f"{currency} %.2f"%total_amount)
-	final_data.append(total)
-	columns = get_columns()
-	return columns, final_data
+	if(filters.get('ts_group_by')!='Job Worker'):
+		final_data.append(total)
+	
+	return final_data, (total_sqft or 0), (total_amount or 0)
 
 def get_columns():
 	columns = [
-		_("Date") + ":Data/Project:100",
+		_("Date") + ":Data/Project:200",
 		_("Site Name") + ":Link/Project:200",
 		_("Job Worker") + ":Data/Employee:150",
 		_("Supervisor") + ":Data/Employee:150",
