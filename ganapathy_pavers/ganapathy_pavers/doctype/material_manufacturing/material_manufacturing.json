@@ -529,7 +529,7 @@
   },
   {
    "fieldname": "rack_shifting_total_expense1",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
    "label": "Rack Shifting Expense",
    "read_only": 1
   },
@@ -999,7 +999,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-10-12 10:56:21.397191",
+ "modified": "2022-10-12 13:09:54.023527",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
@@ -1020,5 +1020,6 @@
  ],
  "search_fields": "item_to_manufacture",
  "sort_field": "modified",
- "sort_order": "DESC"
+ "sort_order": "DESC",
+ "track_changes": 1
 }

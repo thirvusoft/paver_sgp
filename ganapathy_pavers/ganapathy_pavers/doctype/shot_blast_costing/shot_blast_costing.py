@@ -5,6 +5,7 @@
 import json
 import frappe
 from frappe.model.document import Document
+from erpnext.stock.doctype.batch.batch import get_batch_qty
 
 class ShotBlastCosting(Document):
     def before_submit(doc):
@@ -50,13 +51,16 @@ def make_stock_entry(doc):
     frappe.msgprint("New Stock Entry Created "+stock_entry.name)
 
 @frappe.whitelist()
-def uom_conversion(item,batch='None',to_uom=None):
+def uom_conversion(item, batch=None, to_uom=None, mm=None):
+    if(not mm):
+        warehouse=frappe.db.get_single_value("USB Setting", 'default_curing_target_warehouse_for_setting')
+    else:
+        warehouse=frappe.get_value('Material Manufacturing', mm, 'curing_target_warehouse')
     if batch:
-        batch_doc = frappe.get_doc('Batch',batch)
-        if batch_doc.stock_uom:
-            from_uom = batch_doc.stock_uom
-        if batch_doc.batch_qty:
-            from_qty = batch_doc.batch_qty
+        batch_qty = get_batch_qty(batch_no=batch, warehouse=warehouse ) or 0
+        from_uom = frappe.get_value("Batch", batch, "stock_uom")
+        if batch_qty:
+            from_qty = batch_qty
         item_doc = frappe.get_doc('Item', item)
         from_conv = 0
         to_conv = 0
@@ -75,3 +79,5 @@ def uom_conversion(item,batch='None',to_uom=None):
             return (float(from_qty) * from_conv) / to_conv
         else:
             return 0
+    else:
+        return 0
