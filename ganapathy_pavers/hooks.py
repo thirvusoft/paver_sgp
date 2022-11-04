@@ -189,6 +189,7 @@ doc_events = {
 	},
 	"Sales Invoice":{
     	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer",
+		"validate":"ganapathy_pavers.custom.py.sales_invoice.einvoice_validation",
     	"on_submit":[
 					"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.update_return_qty_sitework",

@@ -11,50 +11,53 @@ from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing
 from frappe.utils.data import time_diff_in_hours
  
 class MaterialManufacturing(Document):
-   def validate(doc):
-       total_raw_material=[]
-       total_cement_2a = []
-       total_ggbs2_a = []
-       total_dust_a = []
-       total_chips_a =[]
-       for i in doc.raw_material_consumption:
-           if i.total == None or i.cm2_t == None or i.cm2_a == None or i.ggbs2_a == None or i.ggbs2_t == None:
-               frappe.throw("Kindly Fill The Raw Material Consumption Table Completely")
-           total_raw_material.append(i.total)
-           total_cement_2a.append(i.cm2_a)
-           total_ggbs2_a.append(i.ggbs2_a)
-           total_chips_a.append(i.bin1_a + i.bin2_a)
-           total_dust_a.append(i.bin3_a + i.bin4_a)
-       if len(total_raw_material) == 0:
-           doc.total_no_of_raw_material = 0
-           doc.total_no_of_dust=0
-           doc.total_no_of_chips=0
-           doc.total_no_of_cement = 0
-           doc.total_no_of_ggbs2 = 0
-           doc.average_of_raw_material = 0
-           doc.average_of_cement = 0
-           doc.average_of__ggbs2 = 0
-           doc.average_of_chips=0
-           doc.average_of_dust=0
-       else:
-           avg_raw_material = sum(total_raw_material)/len(total_raw_material)
-           doc.total_no_of_raw_material = sum(total_raw_material)
-           doc.total_no_of_dust = sum(total_dust_a)
-           doc.total_no_of_chips = sum(total_chips_a)
-           doc.total_no_of_cement = sum(total_cement_2a)
-           doc.total_no_of_ggbs2 = sum(total_ggbs2_a)
-           doc.average_of_raw_material = avg_raw_material
-           doc.average_of_cement = sum(total_cement_2a)/len(total_cement_2a)
-           doc.average_of__ggbs2 = sum(total_ggbs2_a)/len(total_ggbs2_a)  
-           doc.average_of_chips = sum(total_chips_a)/len(total_chips_a)  
-           doc.average_of_dust = sum(total_dust_a)/len(total_dust_a)
-   def before_submit(doc):
-       manufacture = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
-       repack = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
-       material = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer"},pluck="name")
-       if len(manufacture) == 0 or len(repack) == 0 or len(material) == 0:
-           frappe.throw("Process Incomplete. Create Stock Entry To Submit")
- 
+	def validate(doc):
+		total_raw_material=[]
+		total_cement_2a = []
+		total_ggbs2_a = []
+		total_dust_a = []
+		total_chips_a =[]
+		for i in doc.raw_material_consumption:
+			if i.total == None or i.cm2_t == None or i.cm2_a == None or i.ggbs2_a == None or i.ggbs2_t == None:
+				frappe.throw("Kindly Fill The Raw Material Consumption Table Completely")
+			total_raw_material.append(i.total)
+			total_cement_2a.append(i.cm2_a)
+			total_ggbs2_a.append(i.ggbs2_a)
+			total_chips_a.append(i.bin1_a + i.bin2_a)
+			total_dust_a.append(i.bin3_a + i.bin4_a)
+		if len(total_raw_material) == 0:
+			doc.total_no_of_raw_material = 0
+			doc.total_no_of_dust=0
+			doc.total_no_of_chips=0
+			doc.total_no_of_cement = 0
+			doc.total_no_of_ggbs2 = 0
+			doc.average_of_raw_material = 0
+			doc.average_of_cement = 0
+			doc.average_of__ggbs2 = 0
+			doc.average_of_chips=0
+			doc.average_of_dust=0
+		else:
+			avg_raw_material = sum(total_raw_material)/len(total_raw_material)
+			doc.total_no_of_raw_material = sum(total_raw_material)
+			doc.total_no_of_dust = sum(total_dust_a)
+			doc.total_no_of_chips = sum(total_chips_a)
+			doc.total_no_of_cement = sum(total_cement_2a)
+			doc.total_no_of_ggbs2 = sum(total_ggbs2_a)
+			doc.average_of_raw_material = avg_raw_material
+			doc.average_of_cement = sum(total_cement_2a)/len(total_cement_2a)
+			doc.average_of__ggbs2 = sum(total_ggbs2_a)/len(total_ggbs2_a)  
+			doc.average_of_chips = sum(total_chips_a)/len(total_chips_a)  
+			doc.average_of_dust = sum(total_dust_a)/len(total_dust_a)
+		for row in doc.items:
+			row.amount = (row.rate or 0) * (row.qty or 0)
+			
+	def before_submit(doc):
+		manufacture = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
+		repack = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
+		material = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer"},pluck="name")
+		if len(manufacture) == 0 or len(repack) == 0 or len(material) == 0:
+			frappe.throw("Process Incomplete. Create Stock Entry To Submit")
+
 @frappe.whitelist()
 def total_hrs(from_time = None,to = None):
    if(from_time and to):
@@ -200,8 +203,10 @@ def make_stock_entry(doc,type1):
        frappe.msgprint("New Stock Entry Created "+stock_entry.name)
    elif doc.get("stock_entry_rack_shift")=="Repack" and type1 == "create_rack_shiftingstock_entry":
        if doc.get("total_rack_shift_expense") == 0:
-           frappe.throw("Please Enter From Time - To Time in Rack Shifting Section and Save This Form")
+           frappe.throw("Please Enter From Time - To Time in Rack Shifting Section and Save This Form as Rack Shifting expense is empty")
        valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Repack","docstatus":["!=",2]},pluck="name")
+       stock_entry.set_posting_time = 1
+       stock_entry.posting_date = frappe.utils.formatdate(doc.get("to_time_rack"), "yyyy-MM-dd")
        if len(valid) >= 1:
            frappe.throw("Already Stock Entry("+valid[0]+") Created For Repack")
        if doc.get("batch_no_manufacture"):
@@ -222,9 +227,6 @@ def make_stock_entry(doc,type1):
        basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_nos),
         basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_nos)
        ))
-       frappe.errprint(str(qty))
-       frappe.errprint(default_bundle)
-       frappe.errprint(str(uom_conversion(doc.get("item_to_manufacture"), "bundle",qty, default_bundle)))
        stock_entry.append('items', dict(
            t_warehouse = doc.get("rack_shift_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), "bundle",qty, default_bundle),uom = default_bundle,
            basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_bundle),
@@ -244,6 +246,8 @@ def make_stock_entry(doc,type1):
        frappe.msgprint("New Stock Entry Created "+stock_entry.name)
    elif doc.get("curing_stock_entry_type")=="Material Transfer" and type1 == "curing_stock_entry":
        valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer","docstatus":["!=",2]},pluck="name")
+       stock_entry.set_posting_time = 1
+       stock_entry.posting_date = frappe.utils.formatdate(doc.get("to_time_rack"), "yyyy-MM-dd")
        if len(valid) >= 1:
            frappe.throw("Already Stock Entry("+valid[0]+") Created For Material Transfer")
        if doc.get("batch_no_rack_shifting"):

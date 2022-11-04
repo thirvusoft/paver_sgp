@@ -1,7 +1,7 @@
 var salary_balance,standard_hrs=0;
 frappe.ui.form.on('Salary Slip',{
     employee:function(frm,cdt,cdn){
-        if(frm.doc.designation=='Job Worker'){
+        if(frm.doc.designation=='Job Worker' && frm.doc.start_date && frm.doc.end_date){
             frappe.db.get_doc('Employee', frm.doc.employee).then((doc) => {
                 salary_balance=doc.salary_balance
             });
@@ -85,6 +85,12 @@ frappe.ui.form.on('Salary Slip',{
                 frm.set_value('total_amount',frm.doc.total_amount-frm.doc.salary_balance)
         }
 
+    },
+    start_date: function (frm) {
+        cur_frm.trigger('employee')
+    },
+    end_date: function (frm) {
+        cur_frm.trigger('employee')
     },
     total_time_of_food_taken:function(frm){
         var emp = frm.doc.employee

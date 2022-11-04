@@ -31,7 +31,7 @@ def site_work_details(employee,start_date,end_date):
     start_date=getdate(start_date)
     end_date=getdate(end_date)
     for data in job_worker:
-            if data.name1 == employee and data.start_date >= start_date and data.start_date <= end_date and data.end_date >= start_date and data.end_date <= end_date:
+            if data.name1 == employee and (data.start_date and data.start_date >= start_date) and (data.start_date and data.start_date <= end_date) and (data.end_date and data.end_date >= start_date) and (data.end_date and data.end_date <= end_date):
                 site_work.append([data.parent,data.amount])
     return site_work
 
