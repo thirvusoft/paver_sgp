@@ -42,6 +42,43 @@ frappe.ui.form.on('Sales Order', {
         });
     },
     refresh:function(frm){
+        cur_frm.set_df_property("branch", "allow_on_submit", 0)
+        if (cur_frm.doc.docstatus == 1 && !cur_frm.doc.branch) {
+            cur_frm.add_custom_button("Update Branch", function() {
+                let dialog=new frappe.ui.Dialog({
+                    title: "Update Branch",
+                    fields: [
+                        {
+                            fieldname: "branch",
+                            label: "Branch",
+                            fieldtype: "Link",
+                            options: "Branch",
+                            reqd: 1,
+                        }
+                    ],
+                    primary_action: async function(data) {
+                        if (cur_frm.is_dirty()) {
+                            await cur_frm.save()
+                        }
+                        frappe.call({
+                            method: "ganapathy_pavers.custom.py.sales_order.update_branch",
+                            args: {
+                                branch: data.branch,
+                                name: cur_frm.doc.name,
+                            },
+                            callback: function(r) {
+                                dialog.hide()
+                                cur_frm.reload_doc()
+                                frappe.show_alert({message: "Branch updated successfully", indicator: 'green'})
+                            }
+                        })
+                    }
+                })
+                dialog.show()
+            }).addClass('btn ellipsis btn-primary').removeClass('btn-default')
+        } else {
+            cur_frm.remove_custom_button("Update Branch")
+        }
         if(cur_frm.doc.is_multi_customer){
             cur_frm.set_df_property('customer','reqd',0);
         }
@@ -232,6 +269,37 @@ frappe.ui.form.on('Sales Order', {
     }
 })
 
+frappe.ui.form.on("Sales Order", {
+    onload_post_render: function(frm) {
+        if(frm.is_new()) {
+            frm.set_value("branch", "")
+        }
+    },
+    taxes_and_charges: function(frm) {
+        if(frm.doc.branch) {
+            frappe.db.get_value("Branch", frm.doc.branch, "is_accounting").then( value => {
+                if (!value.message.is_accounting) {
+                    if(frm.doc.taxes_and_charges)
+                        frm.set_value("taxes_and_charges", "")
+                    if(frm.doc.tax_category)
+                        frm.set_value("tax_category", "")
+                    if(frm.doc.taxes)
+                        frm.clear_table("taxes")
+                        refresh_field("taxes")
+                }
+            })
+        }
+    },
+    tax_category: function(frm) {
+        frm.trigger("taxes_and_charges")
+    },
+    branch: function (frm) {
+        frm.trigger("taxes_and_charges")
+    },
+    validate: function(frm) {
+        frm.trigger("taxes_and_charges")
+    },
+})
 
 async function compoun_walls_calc(frm,cdt,cdtn){
     let sales_uom, def_uom, ig, conv=1, ts_uom;

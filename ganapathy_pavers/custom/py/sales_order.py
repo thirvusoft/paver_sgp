@@ -331,3 +331,7 @@ def item_table_pa_cw(self, event):
         elif (types=="Compound Wall" and (i.item_group)=="Pavers"):
             frappe.throw(f"You can't select both {frappe.bold('Pavers')} and {frappe.bold('Compound Walls')}. Please remove the item: "+frappe.bold(i.item_code))
 
+
+@frappe.whitelist()
+def update_branch(branch, name):
+    frappe.db.set_value("Sales Order", name, 'branch', branch)
