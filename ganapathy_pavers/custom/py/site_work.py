@@ -173,7 +173,7 @@ def validate_jw_qty(self):
             if(row.item not  in jw_items):
                 jw_items[row.item]=0
             item_doc=frappe.get_doc('Item', row.item)
-            conv_factor=[conv.conversion_factor for conv in item_doc.uoms if(conv.uom=='Square Foot')]
+            conv_factor=[conv.conversion_factor for conv in item_doc.uoms if(conv.uom=="SQF")]
             if(not conv_factor):
                 frappe.throw('Please enter Square Feet Conversion for an item: '+ frappe.bold(getlink('Item', row.item)))
             jw_items[row.item]+=float(row.sqft_allocated or 0)*conv_factor[0]
@@ -188,7 +188,7 @@ def validate_jw_qty(self):
         delivered_qty = 0
         for row in self.delivery_detail:
             if(row.item and frappe.get_value("Item", row.item, 'item_group') == "Compound Walls"):
-                delivered_qty += uom_conversion(row.item, '', float(row.delivered_stock_qty), 'Square Foot')
+                delivered_qty += uom_conversion(row.item, '', float(row.delivered_stock_qty), "SQF")
         
         completed_qty = 0
         for row in self.job_worker:

@@ -35,7 +35,7 @@ async function bundle_calc(frm, cdt, cdn){
         conv1=bundle_conv/other_conv
         conv2=nos_conv/other_conv
     })
-    if (row.uom == "Square Foot") {
+    if (row.uom == "SQF") {
         frappe.model.set_value(cdt, cdn, 'qty', roundNumber(row.ts_qty*conv1 + row.pieces*conv2))
     } else {
         frappe.model.set_value(cdt, cdn, 'qty', row.ts_qty*conv1 + row.pieces*conv2)

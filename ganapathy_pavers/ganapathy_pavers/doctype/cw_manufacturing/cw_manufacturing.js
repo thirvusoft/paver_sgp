@@ -314,7 +314,7 @@ function production_qty_calc(frm, cdt, cdn) {
                 item: data.item,
                 from_uom: "Nos",
                 from_qty: data.produced_qty ? data.produced_qty : 0,
-                to_uom: "Square Foot",
+                to_uom: "SQF",
             },
             callback: function (r) {
                 frappe.model.set_value(cdt, cdn, "production_sqft", r.message || 0);
@@ -326,7 +326,7 @@ function production_qty_calc(frm, cdt, cdn) {
                 item: data.item,
                 from_uom: "Nos",
                 from_qty: data.production_qty ? data.production_qty : 0,
-                to_uom: "Square Foot",
+                to_uom: "SQF",
             },
             callback: function (r) {
                 frappe.model.set_value(cdt, cdn, "ts_production_sqft", r.message || 0);

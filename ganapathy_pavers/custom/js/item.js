@@ -77,7 +77,7 @@ stock_uom: function(frm) {
 
                 if (cur_frm.doc.pavers_per_sqft){
                     dict.push({
-                        "uom": "Square Foot",
+                        "uom": "SQF",
                         "conversion_factor": cur_frm.doc.pavers_per_sqft
                     })
 

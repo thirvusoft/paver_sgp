@@ -380,7 +380,7 @@ frappe.ui.form.on('Sales Order Item', {
                     if (doc.uoms[doc_row].uom == 'bundle') {
                         bundle_conv = doc.uoms[doc_row].conversion_factor
                     }
-                    if (doc.uoms[doc_row].uom == 'Square Foot') {
+                    if (doc.uoms[doc_row].uom == "SQF") {
                         sqft_conv = doc.uoms[doc_row].conversion_factor
                     }
                     if (doc.uoms[doc_row].uom == 'Nos') {

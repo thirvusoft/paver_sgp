@@ -183,8 +183,8 @@ def make_stock_entry(doc,type1):
            frappe.throw("Kindly Save this Form")
        stock_entry.append('items', dict(
            t_warehouse = doc.get("target_warehouse"), item_code = doc.get("item_to_manufacture"), qty = uom_conversion(doc.get("item_to_manufacture"), 'Nos', doc.get("total_completed_qty"), default_nos), uom = default_nos,is_finished_item = 1,
-           basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_nos),
-           basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_nos)
+           basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos),
+           basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos)
            ))
        if doc.get("damage_qty") > 0:
            if default_scrap_warehouse:
@@ -224,13 +224,13 @@ def make_stock_entry(doc,type1):
        qty = doc.get("total_no_of_bundle") + r_qty
        stock_entry.append('items', dict(
        s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), "Nos", (doc.get("total_no_of_produced_qty")+doc.get("rack_shift_damage_qty"))-(int(r_total_qty) or doc.get("remaining_qty")), default_nos),uom = default_nos ,batch_no = doc.get("batch_no_manufacture"),
-       basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_nos),
-        basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_nos)
+       basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos),
+        basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos)
        ))
        stock_entry.append('items', dict(
            t_warehouse = doc.get("rack_shift_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), "bundle",qty, default_bundle),uom = default_bundle,
-           basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_bundle),
-            basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_bundle)
+           basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_bundle),
+            basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_bundle)
            ))
        if doc.get("rack_shift_damage_qty") > 0:
            stock_entry.append('items', dict(
@@ -259,14 +259,14 @@ def make_stock_entry(doc,type1):
            frappe.throw("Please Enter No of Bundle")
        stock_entry.append('items', dict(
        s_warehouse = doc.get("curing_source_warehouse"),t_warehouse = doc.get("curing_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), 'bundle', doc.get("no_of_bundle"), default_bundle), uom = default_bundle,batch_no = doc.get("batch_no_rack_shifting"),
-       basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_bundle),
-        basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_bundle)
+       basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_bundle),
+        basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_bundle)
        ))
        if doc.get("curing_damaged_qty") > 0:
            stock_entry.append('items', dict(
                t_warehouse = default_scrap_warehouse, item_code = doc.get("item_to_manufacture")   ,qty = uom_conversion(doc.get("item_to_manufacture"), 'Nos', doc.get("curing_damaged_qty"), default_nos), uom = default_nos, is_process_loss = 1,
-              basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_nos),
-               basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"Square Foot",doc.get("item_price"),default_nos)
+              basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos),
+               basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos)
                ))
        stock_entry.append('additional_costs', dict(
                expense_account  = expenses_included_in_valuation, amount = doc.get("labour_cost"),description = "In This Labour Cost Added"
