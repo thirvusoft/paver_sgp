@@ -280,12 +280,17 @@ frappe.ui.form.on("Sales Order", {
             frappe.db.get_value("Branch", frm.doc.branch, "is_accounting").then(value => {
                 if (!value.message.is_accounting) {
                     if (frm.doc.taxes_and_charges)
-                        frm.set_value("taxes_and_charges", "")
+                        frm.set_value("taxes_and_charges", "");
                     if (frm.doc.tax_category)
-                        frm.set_value("tax_category", "")
+                        frm.set_value("tax_category", "");
                     if (frm.doc.taxes)
-                        frm.clear_table("taxes")
-                    refresh_field("taxes")
+                        frm.clear_table("taxes");
+                    refresh_field("taxes");
+                    (cur_frm.doc.items || []).forEach(row => {
+                        frappe.model.set_value(row.doctype, row.name, 'unacc', 1);
+                        frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
+                    })
+                    refresh_field("items");
                 }
             })
         }
@@ -348,6 +353,24 @@ async function compoun_walls_calc(frm, cdt, cdtn) {
 
 frappe.ui.form.on('Sales Order Item', {
     item_code: function (frm, cdt, cdtn) {
+        if (frm.doc.branch) {
+            frappe.db.get_value("Branch", frm.doc.branch, "is_accounting").then(value => {
+                if (!value.message.is_accounting) {
+                    if (frm.doc.taxes_and_charges)
+                        frm.set_value("taxes_and_charges", "");
+                    if (frm.doc.tax_category)
+                        frm.set_value("tax_category", "");
+                    if (frm.doc.taxes)
+                        frm.clear_table("taxes");
+                    refresh_field("taxes");
+                    (cur_frm.doc.items || []).forEach(row => {
+                        frappe.model.set_value(row.doctype, row.name, 'unacc', 1);
+                        frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
+                    })
+                    refresh_field("items");
+                }
+            })
+        }
         compoun_walls_calc(frm, cdt, cdtn)
     },
     ts_qty: function (frm, cdt, cdn) {
