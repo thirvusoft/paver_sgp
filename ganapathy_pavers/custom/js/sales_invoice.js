@@ -41,11 +41,33 @@ async function bundle_calc(frm, cdt, cdn){
     frappe.model.set_value(cdt, cdn, 'rate', rate)
 }
 
+frappe.ui.form.on("Sales Invoice Item", {
+    item_code: function(frm, cdt, cdn) {
+        if(frm.doc.branch) {
+            frappe.db.get_value("Branch", frm.doc.branch, "is_accounting").then( value => {
+                if (!value.message.is_accounting) {
+                    if(frm.doc.taxes_and_charges)
+                        frm.set_value("taxes_and_charges", "")
+                    if(frm.doc.tax_category)
+                        frm.set_value("tax_category", "")
+                    if(frm.doc.taxes)
+                        frm.clear_table("taxes")
+                    refresh_field("taxes")
+                    (cur_frm.doc.items || []).forEach(row => {
+                        frappe.model.set_value(row.doctype, row.name, 'unacc', 1);
+                        frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
+                    })
+                    refresh_field("items");
+                }
+            })
+        }
+    }
+})
 
 
 frappe.ui.form.on('Sales Invoice', {
     onload_post_render: function(frm) {
-        if(frm.is_new()) {
+        if(frm.is_new() && !frm.doc.customer) {
             frm.set_value("branch", "")
         }
     },
@@ -59,7 +81,12 @@ frappe.ui.form.on('Sales Invoice', {
                         frm.set_value("tax_category", "")
                     if(frm.doc.taxes)
                         frm.clear_table("taxes")
-                        refresh_field("taxes")
+                    refresh_field("taxes");
+                    (cur_frm.doc.items || []).forEach(row => {
+                        frappe.model.set_value(row.doctype, row.name, 'unacc', 1);
+                        frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
+                    })
+                    refresh_field("items");
                 }
             })
         }
@@ -172,4 +199,15 @@ frappe.ui.form.on('Sales Invoice',{
             }
         })
     },
-})
+});
+
+frappe.ui.form.on("Sales Invoice Item", {
+    item_code: function (frm, cdt, cdn) {
+        (cur_frm.doc.items || []).forEach(row => {
+            if (row.unacc && row.item_tax_template) {
+                frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
+            }
+        });
+        refresh_field("items");
+    }
+});
