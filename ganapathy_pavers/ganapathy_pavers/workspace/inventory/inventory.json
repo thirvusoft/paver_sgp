@@ -1,4 +1,5 @@
 {
+ "_liked_by": "[]",
  "category": "Modules",
  "charts": [
   {
@@ -30,16 +31,16 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Stock Summary",
-   "link_to": "Total Stock Summary",
+   "link_to": "Stock Summary Report",
    "link_type": "Report",
-   "onboard": 1,
+   "onboard": 0,
    "type": "Link"
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Stock Ledger",
    "link_to": "Stock Ledger",
    "link_type": "Report",
@@ -48,7 +49,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Item Wise Sales Register",
    "link_to": "Item-wise Sales Register",
    "link_type": "Report",
@@ -56,8 +57,8 @@
    "type": "Link"
   }
  ],
- "modified": "2022-09-02 17:02:46.254577",
- "modified_by": "admin@gpy.com",
+ "modified": "2022-11-09 18:25:15.932450",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "INVENTORY",
  "onboarding": "",
