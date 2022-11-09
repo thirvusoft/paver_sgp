@@ -133,7 +133,15 @@ frappe.ui.form.on("Delivery Note Item", {
     item_code: function (frm, cdt, cdn) {
         (cur_frm.doc.items || []).forEach(row => {
             if (row.unacc) {
-                frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
+                frappe.model.set_value(row.doctype, row.name, 'item_tax_template', null);
+            }
+        })
+        refresh_field("items");
+    },
+    qty: function(frm, cdt, cdn) {
+        (cur_frm.doc.items || []).forEach(row => {
+            if (row.unacc) {
+                frappe.model.set_value(row.doctype, row.name, 'item_tax_template', null);
             }
         })
         refresh_field("items");
@@ -144,7 +152,7 @@ frappe.ui.form.on("Delivery Note", {
     validate: function(frm) {
         (cur_frm.doc.items || []).forEach(row => {
             if (row.unacc) {
-                frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
+                frappe.model.set_value(row.doctype, row.name, 'item_tax_template', null);
             }
         })
         refresh_field("items");
