@@ -9,6 +9,10 @@ def update_check_box(doctype):
     docs=frappe.get_all(doctype, {'branch': ['in', uncheck_branch], 'docstatus': ['!=', '2']}, pluck="name")
     for doc in docs:
         _doc=frappe.get_doc(doctype, doc)
-        for row in _doc.items:
+        items=_doc.items
+        for row in items:
             row.unacc=1
+        _doc.update({
+            "items": items
+        })
         _doc.save('update')
