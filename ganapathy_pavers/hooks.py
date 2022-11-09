@@ -150,7 +150,10 @@ doc_events = {
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields",
-		"validate":"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
+		"validate":[
+			"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
+			"ganapathy_pavers.custom.py.tax_validation.tax_validation"
+			],
 		"on_update_after_submit": ["ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
 									"ganapathy_pavers.custom.py.sales_order.update_site"]
 	},
@@ -167,7 +170,10 @@ doc_events = {
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
 					 ],
-		"validate":"ganapathy_pavers.custom.py.delivery_note.validate",
+		"validate":[
+			"ganapathy_pavers.custom.py.delivery_note.validate",
+			"ganapathy_pavers.custom.py.tax_validation.dn_tax_validation"
+			],
 		"before_submit":"ganapathy_pavers.custom.py.vehicle_log.vehicle_log_creation"
 	},
 	"Purchase Order":{
@@ -189,7 +195,10 @@ doc_events = {
 	},
 	"Sales Invoice":{
     	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer",
-		"validate":"ganapathy_pavers.custom.py.sales_invoice.einvoice_validation",
+		"validate":[
+			"ganapathy_pavers.custom.py.sales_invoice.einvoice_validation",
+			"ganapathy_pavers.custom.py.tax_validation.tax_validation"
+			],
     	"on_submit":[
 					"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.update_return_qty_sitework",
