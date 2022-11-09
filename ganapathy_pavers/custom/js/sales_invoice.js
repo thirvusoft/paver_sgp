@@ -204,7 +204,7 @@ frappe.ui.form.on('Sales Invoice',{
 frappe.ui.form.on("Sales Invoice Item", {
     item_code: function (frm, cdt, cdn) {
         (cur_frm.doc.items || []).forEach(row => {
-            if (row.unacc) {
+            if (row.unacc && row.item_tax_template) {
                 frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
             }
         });
