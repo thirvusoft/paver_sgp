@@ -22,6 +22,8 @@ def tax_validation(self, event=None):
             row.item_tax_template=None
     
 
+
+# Core function || path: apps/erpnext/erpnext/controllers/accounts_controller.py
 def set_missing_item_details_tax(self, for_validate=False):
     """set missing item values except item_tax_rate"""
     force_item_fields = ("item_group", "brand", "stock_uom", "is_fixed_asset", #"item_tax_rate",
