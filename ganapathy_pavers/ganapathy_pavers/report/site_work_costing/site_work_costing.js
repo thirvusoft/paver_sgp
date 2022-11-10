@@ -16,5 +16,13 @@ frappe.query_reports["Site Work Costing"] = {
 			fieldtype: "Link",
 			options: "Project",
 		},
+		{
+			fieldname: "item_group",
+			label: "Item Group",
+			fieldtype: "MultiSelectList",
+			get_data: function(txt) {
+				return frappe.db.get_link_options('Item Group', txt);
+			}
+		},
 	]
 };
