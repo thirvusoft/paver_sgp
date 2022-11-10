@@ -374,9 +374,9 @@ def uom_conversion(item, from_uom='', from_qty=0, to_uom=''):
         if(row.uom == to_uom):
             to_conv = row.conversion_factor
     if(not from_conv):
-        throw_error(from_uom + " Bundle Conversion", "Item")
+        throw_error(from_uom + " Bundle Conversion", item)
     if(not to_conv):
-        throw_error(to_uom + " Bundle Conversion", 'Item')
+        throw_error(to_uom + " Bundle Conversion", item)
     
     return (float(from_qty) * from_conv) / to_conv
 
