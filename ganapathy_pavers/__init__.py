@@ -28,6 +28,7 @@ def get_valuation_rate(item_code, warehouse, posting_date=frappe.utils.nowdate()
 			"item_code": item_code,
 			"warehouse": warehouse,
 			"posting_date": ["<=", posting_date],
+			"is_cancelled": 0,
 		},
 		pluck="valuation_rate", order_by="posting_date DESC", limit=1)
 	
@@ -35,11 +36,13 @@ def get_valuation_rate(item_code, warehouse, posting_date=frappe.utils.nowdate()
 		rate=frappe.get_all("Stock Ledger Entry", {
 			"item_code": item_code,
 			"warehouse": warehouse,
+			"is_cancelled": 0,
 		},
 		pluck="valuation_rate", order_by="posting_date DESC", limit=1)
 	if not rate:
 		rate=frappe.get_all("Stock Ledger Entry", {
 			"item_code": item_code,
+			"is_cancelled": 0,
 		},
 		pluck="valuation_rate", order_by="posting_date DESC", limit=1)
 	if not rate:
@@ -57,6 +60,7 @@ def get_buying_rate(item_code, warehouse, posting_date=frappe.utils.nowdate()):
 			"item_code": item_code,
 			"warehouse": warehouse,
 			"posting_date": ["<=", posting_date],
+			"is_cancelled": 0,
 		},
 		pluck="incoming_rate", order_by="posting_date DESC", limit=1)
 	
@@ -64,11 +68,13 @@ def get_buying_rate(item_code, warehouse, posting_date=frappe.utils.nowdate()):
 		rate=frappe.get_all("Stock Ledger Entry", {
 			"item_code": item_code,
 			"warehouse": warehouse,
+			"is_cancelled": 0,
 		},
 		pluck="incoming_rate", order_by="posting_date DESC", limit=1)
 	if not rate:
 		rate=frappe.get_all("Stock Ledger Entry", {
 			"item_code": item_code,
+			"is_cancelled": 0,
 		},
 		pluck="incoming_rate", order_by="posting_date DESC", limit=1)
 	if not rate:
