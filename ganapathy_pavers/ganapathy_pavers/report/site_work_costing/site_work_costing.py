@@ -27,6 +27,15 @@ def get_data(filters={}):
 		sw_data.append({
 			"customer": sw_doc.customer,
 			"site_work": sw_doc.name,
+			"sqft_supplied": None,
+			"measurement_sqft": None,
+			"man_buy_cost": None,
+			"transportation_cost": None,
+			"jw_cost": None,
+			"additional_cost": None,
+			"actual_cost": None,
+			"bill_cost": None,
+			"profit": None,
 		})
 		item_details=[]
 		valuation_rate=[]
@@ -115,7 +124,7 @@ def get_data(filters={}):
 			"profit": sw_doc.get("site_profit_amount")
 		})
 		if len(sw_data)>2:
-			data+=sw_data+[{}, {}]
+			data+=sw_data#+[{}, {}]
 	return data
 
 
