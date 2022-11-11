@@ -5,6 +5,8 @@ from frappe.utils import nowdate
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import get_bank_cash_account
 from ganapathy_pavers.custom.py.sales_order import get_item_rate
 from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
+from ganapathy_pavers import get_valuation_rate, get_buying_rate
+
 
 
 @frappe.whitelist()
@@ -14,7 +16,7 @@ def item_details_fetching_pavers(item_code):
         item_price = get_item_rate(item_code)
         area_bundle= doc.bundle_per_sqr_ft
         return area_bundle,item_price
-	
+
 @frappe.whitelist()
 def item_details_fetching_compoundwall(item_code):
     if item_code:
@@ -41,37 +43,31 @@ def before_save(doc, action=None):
     doc.total_job_worker_cost=job_worker_total
     for i in doc.raw_material:
         raw_material_total = raw_material_total+(i.amount or 0)
-    doc.total_amount_of_raw_material=raw_material_total   
+    doc.total_amount_of_raw_material=raw_material_total
     total_costing=additionalcost_total+item_details_total+job_worker_total+raw_material_total
 
     doc.total_expense_amount=total_costing
-	
+
     item_cost=0
     rm_cost=0
     for item in doc.item_details:
         if(item.get('warehouse')):
-            bin_=frappe.get_value('Bin', {'warehouse': item.warehouse, 'item_code': item.item}, 'valuation_rate')
+            bin_=get_valuation_rate(item_code=item.item, warehouse=item.warehouse, posting_date=frappe.utils.get_date_str(doc.creation))
             item_cost+=(bin_ or 0)* (item.stock_qty or 0)
 
     for item in doc.item_details_compound_wall:
         if(item.get('warehouse')):
-            bin_=frappe.get_value('Bin', {'warehouse': item.warehouse, 'item_code': item.item}, 'valuation_rate')
+            bin_=get_valuation_rate(item_code=item.item, warehouse=item.warehouse, posting_date=frappe.utils.get_date_str(doc.creation))
             item_cost+=(bin_ or 0)* (item.stock_qty or 0)
 
     for item in doc.raw_material:
-        doc1=frappe.get_all('Item Price', {'buying':1, 'item_code': item.item}, ["price_list_rate", "uom"])
-        if(doc1):
-            if(not doc1[0].uom):
-                doc1[0].uom=frappe.get_value('Item', item.item, 'stock_uom')
-            if(item.stock_uom and doc1[0].uom):
-                item_doc=frappe.get_doc('Item', item.item)
-                conv=0
-                for row in item_doc.uoms:
-                    if(row.uom==doc1[0].uom):
-                        conv=row.conversion_factor
-                if(not conv):
-                    frappe.throw(f'Please enter {doc1[0].uom} conversion for an item: '+frappe.bold(getlink('Item', item.item)))
-                rm_cost+=(doc1[0]['price_list_rate'] or 0)*(item.stock_qty or 0)/conv
+        warehouse=frappe.get_value("Sales Order Item", {"item_code":item.item, "parent":item.sales_order}, "warehouse")
+        if not warehouse:
+            warehouse=frappe.get_all("Sales Order Item", {"parent":item.sales_order, "warehouse":["is", "set"]}, pluck="warehouse")
+            if warehouse:
+                warehouse=warehouse[0]
+        rate=get_buying_rate(item_code=item.item, warehouse=warehouse, posting_date=frappe.utils.get_date_str(doc.creation))
+        rm_cost+=(rate or 0)*(item.stock_qty or 0)
     doc.actual_site_cost_calculation=(item_cost or 0)+(doc.total or 0)+(doc.total_job_worker_cost or 0)+ (rm_cost or 0) + (doc.transporting_cost or 0)
     doc.site_profit_amount=(doc.total_expense_amount or 0) - (doc.actual_site_cost_calculation or 0)
     return doc
@@ -84,7 +80,7 @@ def add_total_amount(items):
 
 def autoname(self, event):
     self.name= self.project_name
-        
+
 def create_status():
     print('Creating Property Setter for Site Work Status')
     doc=frappe.new_doc('Property Setter')
@@ -97,7 +93,7 @@ def create_status():
     })
     doc.save()
     frappe.db.commit()
-    
+
 
 
 def validate(self,event):
@@ -126,8 +122,8 @@ def validate(self,event):
                     if(acc_paid_to):pass
                 except:
                     frappe.throw(("Please set Company and Default account for ({0}) mode of payment").format(mode))
-                
-                
+
+
                 doc=frappe.new_doc('Payment Entry')
                 doc.update({
                     'company': self.company,
@@ -159,7 +155,7 @@ def validate(self,event):
             'additional_cost': add_cost,
             'total_advance_amount': (self.total_advance_amount or 0)+ (total_amount or 0)
         })
-        
+
 def validate_jw_qty(self):
     delivered_item={}
     for row in self.delivery_detail:
@@ -183,13 +179,13 @@ def validate_jw_qty(self):
             wrong_items.append(frappe.bold(item))
     if(wrong_items):
         frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+', '.join(wrong_items))
-    
+
     if(self.type == "Compound Wall"):
         delivered_qty = 0
         for row in self.delivery_detail:
             if(row.item and frappe.get_value("Item", row.item, 'item_group') == "Compound Walls"):
                 delivered_qty += uom_conversion(row.item, '', float(row.delivered_stock_qty), "SQF")
-        
+
         completed_qty = 0
         for row in self.job_worker:
             if((not row.item) or row.item_group == "Compound Walls"):
@@ -197,7 +193,7 @@ def validate_jw_qty(self):
 
         if(completed_qty > delivered_qty):
             frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty.")
-        
+
 def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, exchange_rate):
     doc=frappe.new_doc('Employee Advance')
     doc.update({
@@ -208,7 +204,7 @@ def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, ex
         'advance_amount': adv_amt,
         'advance_account': adv_act,
         'exchange_rate' : (exchange_rate or 1),
-        'company': company, 
+        'company': company,
         'mode_of_payment': mop,
         'purpose': f'Advance amount received from the site work {sw}',
         'project' : sw,
@@ -246,7 +242,7 @@ def update_delivery_detail(self, event):
         catch = 0
         for row in range(len(self.delivery_detail)):
             if(self.delivery_detail[row].item == items):
-                self.delivery_detail[row].qty_to_deliver = to_delivered_qty[items] 
+                self.delivery_detail[row].qty_to_deliver = to_delivered_qty[items]
                 self.delivery_detail[row].pending_qty__to_deliver = (to_delivered_qty[items] or 0) - (self.delivery_detail[row].delivered_stock_qty or 0)
                 catch = 1
         if(not catch):
@@ -254,4 +250,4 @@ def update_delivery_detail(self, event):
             self.update({
                 'delivery_detail': (self.delivery_detail or []) + delivery_detail
             })
-    
+

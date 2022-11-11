@@ -20,14 +20,20 @@ def tax_validation(self, event=None):
         for row in self.items:
             row.unacc=1
             row.item_tax_template=None
+    else:
+        for row in self.items:
+            row.unacc=0
     
 
 
 # Core function || path: apps/erpnext/erpnext/controllers/accounts_controller.py
 def set_missing_item_details_tax(self, for_validate=False):
     """set missing item values except item_tax_rate"""
-    force_item_fields = ("item_group", "brand", "stock_uom", "is_fixed_asset", #"item_tax_rate",
+    force_item_fields = ("item_group", "brand", "stock_uom", "is_fixed_asset", "item_tax_rate",
 	"pricing_rules", "weight_per_unit", "weight_uom", "total_weight")
+    if self.branch and not frappe.get_value("Branch", self.branch, "is_accounting"):
+        force_item_fields = ("item_group", "brand", "stock_uom", "is_fixed_asset", #"item_tax_rate",
+        "pricing_rules", "weight_per_unit", "weight_uom", "total_weight")
     from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos
 
     if hasattr(self, "items"):

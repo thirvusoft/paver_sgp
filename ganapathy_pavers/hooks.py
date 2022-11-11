@@ -114,6 +114,11 @@ override_doctype_class = {
 # ---------------
 # Hook on document methods and events
 
+jenv = {
+	"methods": [
+		"get_bank_details:ganapathy_pavers.get_bank_details",
+	]
+}
 
 doc_events = {
 	"Stock Entry": {

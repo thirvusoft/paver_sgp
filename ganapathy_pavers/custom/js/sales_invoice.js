@@ -58,6 +58,10 @@ frappe.ui.form.on("Sales Invoice Item", {
                         frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
                     })
                     refresh_field("items");
+                } else {
+                    (cur_frm.doc.items || []).forEach(row => {
+                        frappe.model.set_value(row.doctype, row.name, 'unacc', 0);
+                    })
                 }
             })
         }
@@ -87,6 +91,10 @@ frappe.ui.form.on('Sales Invoice', {
                         frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
                     })
                     refresh_field("items");
+                } else {
+                    (cur_frm.doc.items || []).forEach(row => {
+                        frappe.model.set_value(row.doctype, row.name, 'unacc', 0);
+                    })
                 }
             })
         }
