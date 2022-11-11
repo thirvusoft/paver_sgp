@@ -101,7 +101,7 @@ def get_data(filters={}):
 			raw_material.append(row.item)
 			warehouse=frappe.get_value("Sales Order Item", {"item_code":row.item, "parent":row.sales_order}, "warehouse")
 			if not warehouse:
-				warehouse=frappe.get_all("Sales Order Item", {"parent":"SGP-SO-0722-00004", "warehouse":["is", "set"]}, pluck="warehouse")
+				warehouse=frappe.get_all("Sales Order Item", {"parent":row.sales_order, "warehouse":["is", "set"]}, pluck="warehouse")
 				if warehouse:
 					warehouse=warehouse[0]
 			vr=get_buying_rate(item_code=row.item, warehouse=warehouse, posting_date=frappe.utils.get_date_str(sw_doc.creation))

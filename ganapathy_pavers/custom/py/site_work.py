@@ -63,7 +63,7 @@ def before_save(doc, action=None):
     for item in doc.raw_material:
         warehouse=frappe.get_value("Sales Order Item", {"item_code":item.item, "parent":item.sales_order}, "warehouse")
         if not warehouse:
-            warehouse=frappe.get_all("Sales Order Item", {"parent":"SGP-SO-0722-00004", "warehouse":["is", "set"]}, pluck="warehouse")
+            warehouse=frappe.get_all("Sales Order Item", {"parent":item.sales_order, "warehouse":["is", "set"]}, pluck="warehouse")
             if warehouse:
                 warehouse=warehouse[0]
         rate=get_buying_rate(item_code=item.item, warehouse=warehouse, posting_date=frappe.utils.get_date_str(doc.creation))
