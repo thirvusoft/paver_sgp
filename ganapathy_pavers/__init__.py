@@ -80,3 +80,6 @@ def get_buying_rate(item_code, warehouse, posting_date=frappe.utils.nowdate()):
 		return 0
 	return rate[0]
 
+def get_bank_details(company):
+	doc=frappe.get_all("Bank Account", {"company": company, "account": frappe.get_value("Company", company, "default_bank_account")}, ["branch_name", "ifsc_code", "bank", "bank_account_no"])
+	return doc[0] if doc else {"branch_name":"", "ifsc_code":"", "bank":"", "bank_account_no":""}
