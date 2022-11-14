@@ -284,7 +284,7 @@ doctype_js = {
 				"Work Order" : "/utils/js/workorder.js",
 
 	     		"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
-
+				"Quotation": "/custom/js/quotation.js"
 
 			 }
 # Scheduled Tasks
