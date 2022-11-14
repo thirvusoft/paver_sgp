@@ -9,7 +9,7 @@ def execute(filters=None):
 	to_date = filters.get("to_date")
 	data = []
 
-	cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]]},pluck="name")
+	cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]],'type':["!=","Fencing Post"]},pluck="name")
 	test_data = []
 
 	if cw_list:
