@@ -36,7 +36,8 @@ def get_columns(filters):
         {
             "label": _("No of Days"),
             "fieldtype": "Int",
-            "fieldname": "no_of_dats",
+            "fieldname": "no_of_days",
+	    "hidden":1,
             "width": 100
         },
          {
