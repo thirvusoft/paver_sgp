@@ -14,7 +14,8 @@ def execute(filters=None):
 	doc = frappe.get_all("CW Manufacturing", {"molding_date":["between", (from_date, to_date)],"type":"Fencing Post","production_sqft":["!=",0],"docstatus":["!=",2]}, order_by = 'molding_date')
 	
 	data = []
-	
+	final_data = []
+
 	if doc:
 		for doc_name in doc:		
 			doc_details = frappe.get_doc("CW Manufacturing",doc_name.name)
@@ -22,16 +23,16 @@ def execute(filters=None):
 			if not data:
 				for material in doc_details.item_details:
 
-					sub_list = []
-					sub_list.append(doc_details.molding_date.strftime("%B")),
-					sub_list.append(material.item)
-					sub_list.append(material.production_sqft)
-					sub_list.append(None)
-					sub_list.append(doc_details.raw_material_cost / doc_details.production_sqft)
-					sub_list.append(doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft))
-					sub_list.append(doc_details.total_cost_per_sqft)
-					sub_list.append(1)
-					data.append(sub_list)
+					data.append({
+						"month":doc_details.molding_date.strftime("%B"),
+						"item":material.item,
+						"production_sqft":material.production_sqft,
+						"days":None,
+						"production_cost":doc_details.raw_material_cost / doc_details.production_sqft,
+						"expense":doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft),
+						"total_cost_per_sqft":doc_details.total_cost_per_sqft,
+						"total_item_count":1
+					})
 
 			else:
 
@@ -39,34 +40,37 @@ def execute(filters=None):
 					matched_item  = 0
 
 					for item in	data:
-						
-						if item[1] == material.item and item[0] == doc_details.molding_date.strftime("%B"):
+
+						if item["item"] == material.item and item["month"] == doc_details.molding_date.strftime("%B"):
 							matched_item  = 1
-							item[2] += material.production_sqft
-							item[4] += doc_details.raw_material_cost / doc_details.production_sqft
-							item[5] += doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft)
-							item[6] += doc_details.total_cost_per_sqft
-							item[7] += 1
+							item["production_sqft"] += material.production_sqft
+							item["production_cost"] += doc_details.raw_material_cost / doc_details.production_sqft
+							item["expense"] += doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft)
+							item["total_cost_per_sqft"] += doc_details.total_cost_per_sqft
+							item["total_item_count"] += 1
 
 					if not matched_item:
 						
-						sub_list = []
-						sub_list.append(doc_details.molding_date.strftime("%B")),
-						sub_list.append(material.item)
-						sub_list.append(material.production_sqft)
-						sub_list.append(None)
-						sub_list.append(doc_details.raw_material_cost / doc_details.production_sqft)
-						sub_list.append(doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft))
-						sub_list.append(doc_details.total_cost_per_sqft)
-						sub_list.append(1)
-						data.append(sub_list)
+						data.append({
+						"month":doc_details.molding_date.strftime("%B"),
+						"item":material.item,
+						"production_sqft":material.production_sqft,
+						"days":None,
+						"production_cost":doc_details.raw_material_cost / doc_details.production_sqft,
+						"expense":doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft),
+						"total_cost_per_sqft":doc_details.total_cost_per_sqft,
+						"total_item_count":1
+					})
 
 		for row in data:
-			row[4] = row[4] / row[7]
-			row[5] = row[5] / row[7]
-			row[6] = row[6] / row[7]
+			
+			row["production_cost"] = row["production_cost"] / row["total_item_count"]
+			row["expense"] = row["expense"] / row["total_item_count"]
+			row["total_cost_per_sqft"] = row["total_cost_per_sqft"] / row["total_item_count"]
+			
+			final_data.append(list(row.values()))
 
-	return columns, data
+	return columns, final_data
 
 def get_columns():
 
