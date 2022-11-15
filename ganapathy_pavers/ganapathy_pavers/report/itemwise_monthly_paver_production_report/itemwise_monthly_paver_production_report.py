@@ -3,8 +3,6 @@
 
 import frappe 
 from frappe import _
-from datetime import date, datetime, timedelta
-from erpnext.education.report.student_monthly_attendance_sheet.student_monthly_attendance_sheet import daterange
 
 
 
