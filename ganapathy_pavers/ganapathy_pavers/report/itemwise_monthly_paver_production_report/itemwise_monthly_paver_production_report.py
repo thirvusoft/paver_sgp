@@ -69,15 +69,15 @@ def get_data(filters):
     for i in paver:
         production_cost=i.total_raw_material/i.production_sqft
         expense=i.item_price-production_cost
-        f={"month":i.from_time.strftime("%B"),"item":f"{i.item_to_manufacture} {i.month}","sqft":i.production_sqft,"prod_cost":production_cost,"expense_cost":expense,"total_cost":i.item_price,"count":1}
-        if i.item_to_manufacture not in data:
-            data [i.item_to_manufacture] =f
+        f={"month":i.from_time.strftime("%B"),"item":[i.item_to_manufacture],"sqft":i.production_sqft,"prod_cost":production_cost,"expense_cost":expense,"total_cost":i.item_price,"count":1}
+        if f"{i.item_to_manufacture} {i.month}" not in data:
+            data f"{i.item_to_manufacture} {i.month}" =f
         else:
-            data [i.item_to_manufacture]['sqft']+=f["sqft"]
-            data [i.item_to_manufacture]['prod_cost']+=f["prod_cost"]
-            data [i.item_to_manufacture]['expense_cost']+=f["expense_cost"]
-            data [i.item_to_manufacture]['total_cost']+=f["total_cost"]
-            data [i.item_to_manufacture]['count']+=1
+            data f"{i.item_to_manufacture} {i.month}"['sqft']+=f["sqft"]
+            data f"{i.item_to_manufacture} {i.month}"['prod_cost']+=f["prod_cost"]
+            data f"{i.item_to_manufacture} {i.month}"['expense_cost']+=f["expense_cost"]
+            data f"{i.item_to_manufacture} {i.month}"['total_cost']+=f["total_cost"]
+            data f"{i.item_to_manufacture} {i.month}"['count']+=1
     for i in data:
         data [i]['sqft']/=data[i]["count"]
         data [i]['prod_cost']/=data[i]["count"]
