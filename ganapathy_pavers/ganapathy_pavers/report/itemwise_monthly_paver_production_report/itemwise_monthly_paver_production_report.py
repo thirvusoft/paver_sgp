@@ -69,7 +69,7 @@ def get_data(filters):
     for i in paver:
         production_cost=i.total_raw_material/i.production_sqft
         expense=i.item_price-production_cost
-        f={"month":i.from_time.strftime("%B"),"item":i.item_to_manufacture,"sqft":i.production_sqft,"prod_cost":production_cost,"expense_cost":expense,"total_cost":i.item_price,"count":1}
+        f={"month":i.from_time.strftime("%B"),"item":f"{i.item_to_manufacture} {i.month}","sqft":i.production_sqft,"prod_cost":production_cost,"expense_cost":expense,"total_cost":i.item_price,"count":1}
         if i.item_to_manufacture not in data:
             data [i.item_to_manufacture] =f
         else:
