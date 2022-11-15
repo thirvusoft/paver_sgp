@@ -3,7 +3,6 @@
 
 import frappe
 from frappe import _
-import pandas as pd
 
 def execute(filters=None):
 	columns = get_columns()
