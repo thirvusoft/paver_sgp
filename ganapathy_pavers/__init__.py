@@ -23,7 +23,9 @@ def uom_conversion(item, from_uom='', from_qty=0, to_uom=''):
     return (float(from_qty) * from_conv) / to_conv
 
 
-def get_valuation_rate(item_code, warehouse, posting_date=frappe.utils.nowdate()):
+def get_valuation_rate(item_code, warehouse, posting_date=None):
+	if not posting_date:
+		posting_date = frappe.utils.nowdate()
 	rate=frappe.get_all("Stock Ledger Entry", {
 			"item_code": item_code,
 			"warehouse": warehouse,
@@ -55,7 +57,9 @@ def get_valuation_rate(item_code, warehouse, posting_date=frappe.utils.nowdate()
 	return rate[0]
 
 
-def get_buying_rate(item_code, warehouse, posting_date=frappe.utils.nowdate()):
+def get_buying_rate(item_code, warehouse, posting_date=None):
+	if posting_date:
+		posting_date = frappe.utils.nowdate()
 	rate=frappe.get_all("Stock Ledger Entry", {
 			"item_code": item_code,
 			"warehouse": warehouse,
