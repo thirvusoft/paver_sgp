@@ -11,7 +11,7 @@ def execute(filters=None):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 
-	doc = frappe.get_all("CW Manufacturing",{"molding_date":["between", (from_date, to_date)],"type":"Fencing Post","docstatus":["!=",2]})
+	doc = frappe.get_all("CW Manufacturing",{"molding_date":["between", (from_date, to_date)],"type":"Fencing Post","production_sqft":["!=",0],"docstatus":["!=",2]})
 	
 	data = []
 	
@@ -63,7 +63,7 @@ def execute(filters=None):
 			total_production_cost += doc_details.total_expense_for_unmolding
 			total_production_cost += doc_details.labour_expense_for_curing
 
-			if not	data:
+			if not data:
 
 				for material in doc_details.items:
 
