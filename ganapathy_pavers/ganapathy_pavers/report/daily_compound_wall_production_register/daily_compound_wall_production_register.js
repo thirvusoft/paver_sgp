@@ -9,14 +9,16 @@ frappe.query_reports["Daily Compound Wall Production Register"] = {
 			"label": __("From Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today(),
-			"width": "80"
+			"width": "80",
+			"reqd":1
 		},
 		{
 			"fieldname":"to_date",
 			"label": __("To Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today(),
-			"width": "80"
+			"width": "80",
+			"reqd":1
 		}
 	]
  };
