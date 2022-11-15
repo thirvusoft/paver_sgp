@@ -67,7 +67,6 @@ def get_columns(filters):
 def get_data(filters):
     data={}
     paver=frappe.db.get_all("Material Manufacturing",  filters={'from_time':['between',[filters.get('from_date'),filters.get('to_date')]]}, fields=['item_to_manufacture','production_sqft','item_price','total_raw_material','from_time'], order_by='from_time')
-    print(paver)
     for i in paver:
         production_cost=i.total_raw_material/i.production_sqft
         expense=i.item_price-production_cost
