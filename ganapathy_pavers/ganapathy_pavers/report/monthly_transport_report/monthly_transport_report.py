@@ -33,10 +33,8 @@ def execute(filters=None):
                 "Delivery Note", i.delivery_note, 'type')
             if dn_type == "Pavers":
                 pavers_km += i['today_odometer_value']
-                frappe.errprint(pavers_km)
             elif dn_type == "Compound Wall":
                 cw_km += i['today_odometer_value']
-                frappe.errprint(cw_km)
 
         elif i.sales_invoice:
             si_type = frappe.get_value(
@@ -189,38 +187,40 @@ def execute(filters=None):
     sub_list.append("")
     data.append(sub_list)
 
-    sub_list = []
-    sub_list.append("<b>Others</b>")
-    sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
-    data.append(sub_list)
+    if  transport_based_on == "Report":
 
-    sub_list = []
-    sub_list.append("<b>Item</b>")
-    sub_list.append("<b>Qty</b>")
-    sub_list.append("<b>Uom</b>")
-    sub_list.append("")
-    sub_list.append("")
-    data.append(sub_list)
+        sub_list = []
+        sub_list.append("<b>Others</b>")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
 
-    for j in dn_item:
-        if j.item_group not in ["Compound Walls" , "Pavers"]:
-            sub_list = []
-            sub_list.append(j.item_code)
-            sub_list.append(round(j.stock_qty,2))
-            sub_list.append(j.stock_uom)
-            sub_list.append("")
-            sub_list.append("")
-            data.append(sub_list)
-    sub_list = []
-    sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
-    data.append(sub_list)
+        sub_list = []
+        sub_list.append("<b>Item</b>")
+        sub_list.append("<b>Qty</b>")
+        sub_list.append("<b>Uom</b>")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
+
+        for j in dn_item:
+            if j.item_group not in ["Compound Walls" , "Pavers"]:
+                sub_list = []
+                sub_list.append(j.item_code)
+                sub_list.append(round(j.stock_qty,2))
+                sub_list.append(j.stock_uom)
+                sub_list.append("")
+                sub_list.append("")
+                data.append(sub_list)
+        sub_list = []
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
 
     if pavers_total or cw_total:
         total_sqft = pavers_total + cw_total
