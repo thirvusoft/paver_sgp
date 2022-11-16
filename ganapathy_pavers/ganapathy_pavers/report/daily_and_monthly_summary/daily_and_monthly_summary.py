@@ -48,12 +48,19 @@ def get_data(filters= {}):
 	pm_sqft = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='production_sqft'))
 	cw_sqft = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))
 	delivery_notes = frappe.db.get_all('Delivery Note', filters=dl_filt, pluck='name')
+
+	si_filt = dl_filt
+	si_filt['update_stock'] = 1
+	sales_invoice = frappe.db.get_all('Sales Invoice', filters=si_filt, pluck='name')
 	
 	final_data.append({'type':'Daily Paver Production', 'sqft':pm_sqft})
 	final_data.append({'type':'Daily Compound Wall Production', 'sqft':cw_sqft})
 	
 	pv_dl_items = frappe.db.get_all('Delivery Note Item', filters={'parent':['in', delivery_notes], 'item_group':'Pavers'}, fields=['item_code', 'stock_qty', 'uom'])
 	cw_dl_items = frappe.db.get_all('Delivery Note Item', filters={'parent':['in', delivery_notes], 'item_group':'Compound Walls'}, fields=['item_code', 'stock_qty', 'uom'])
+
+	pv_si_items = frappe.db.get_all('Sales Invoice Item', filters={'parent':['in', sales_invoice], 'item_group':'Pavers'}, fields=['item_code', 'stock_qty', 'uom'])
+	cw_si_items = frappe.db.get_all('Sales Invoice Item', filters={'parent':['in', sales_invoice], 'item_group':'Compound Walls'}, fields=['item_code', 'stock_qty', 'uom'])
 	
 	pv_dl_qty = 0
 	cw_dl_qty = 0
@@ -63,8 +70,18 @@ def get_data(filters= {}):
 			pv_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.uom, from_qty=i.stock_qty, to_uom='SQF')
 		else:
 			pv_dl_qty += i.stock_qty
+	for i in pv_si_items:
+		if(i.uom != 'SQF'):
+			pv_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.uom, from_qty=i.stock_qty, to_uom='SQF')
+		else:
+			pv_dl_qty += i.stock_qty
 	
 	for i in cw_dl_items:
+		if(i.uom != 'SQF'):
+			cw_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.uom, from_qty=i.stock_qty, to_uom='SQF')
+		else:
+			cw_dl_qty += i.stock_qty
+	for i in cw_si_items:
 		if(i.uom != 'SQF'):
 			cw_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.uom, from_qty=i.stock_qty, to_uom='SQF')
 		else:
