@@ -7,12 +7,12 @@ frappe.query_reports["Daily and Monthly Summary"] = {
 		{
 			'fieldname':'from_date',
 			'label':'From Date',
-			'fieldtype':'Datetime',
+			'fieldtype':'Date',
 		},
 		{
 			'fieldname':'to_date',
 			'label':'To Date',
-			'fieldtype':'Datetime',
+			'fieldtype':'Date',
 		},
 	]
 };
