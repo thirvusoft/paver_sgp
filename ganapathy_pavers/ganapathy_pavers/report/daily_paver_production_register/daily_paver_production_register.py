@@ -62,7 +62,16 @@ def get_columns(filters):
 
 def get_data(filters):
     data=[]
-    daily_paver=frappe.db.get_all("Material Manufacturing", filters={'from_time':['between',[filters.get('from_date'),filters.get('to_date')]]}, fields=["name","item_to_manufacture","work_station","from_time","production_qty","no_of_racks"], order_by="item_to_manufacture")
+    frappe.errprint(filters)
+    _filters={'from_time':['between',[filters.get('from_date'),filters.get('to_date')]]}
+    if filters.get('item'):
+        _filters["item_to_manufacture"]=filters.get('item')
+    if filters.get('machine'):
+        _filters["work_station"]=filters.get('machine')
+    frappe.errprint(filters)
+    daily_paver=frappe.db.get_all("Material Manufacturing", filters=_filters,fields=["name","item_to_manufacture","work_station","from_time","production_qty","no_of_racks"], order_by="item_to_manufacture")
+
+    
     grand_total=0
         
     for i in range(len(daily_paver)):

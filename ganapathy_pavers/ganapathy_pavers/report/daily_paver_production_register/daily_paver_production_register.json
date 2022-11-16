@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "columns": [],
  "creation": "2022-11-15 09:08:28.634249",
  "disable_prepared_report": 0,
@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "SGP Header 1",
- "modified": "2022-11-15 09:08:28.634249",
+ "modified": "2022-11-16 11:56:59.518084",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Daily Paver Production Register",

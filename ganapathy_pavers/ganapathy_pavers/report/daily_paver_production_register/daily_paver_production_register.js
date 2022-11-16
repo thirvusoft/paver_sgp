@@ -19,6 +19,22 @@ frappe.query_reports["Daily Paver Production Register"] = {
 			"default": frappe.datetime.get_today(),
 			"width": "80",
 			"reqd":1
+		},
+		{
+			"fieldname":"item",
+			"label": __("Item"),
+			"fieldtype": "Link",
+			"options":"Item",
+			"width": "80"
+		
+		},
+		{
+			"fieldname":"machine",
+			"label": __("Machine"),
+			"fieldtype": "Link",
+			"options":"Workstation",
+			"width": "80"
+			
 		}
 
 	]
