@@ -58,7 +58,7 @@ def get_valuation_rate(item_code, warehouse, posting_date=None):
 
 
 def get_buying_rate(item_code, warehouse, posting_date=None):
-	if posting_date:
+	if not posting_date:
 		posting_date = frappe.utils.nowdate()
 	rate=frappe.get_all("Stock Ledger Entry", {
 			"item_code": item_code,
