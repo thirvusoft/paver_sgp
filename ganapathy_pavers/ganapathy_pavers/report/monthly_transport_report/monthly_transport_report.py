@@ -195,6 +195,10 @@ def execute(filters=None):
     sub_list.append("")
     data.append(sub_list)
 
+    if pavers_total or cw_total:
+        total_sqft = pavers_total + cw_total
+        data[1][4] = data[1][4] + str(pavers_total + cw_total)
+
     sub_list = []
     sub_list.append("<b>Expenses Details</b>")
     sub_list.append("")
@@ -211,6 +215,21 @@ def execute(filters=None):
     sub_list.append("<b>Amount CW</b>")
     data.append(sub_list)
 
+    expense_details = frappe.db.sql(""" select child.maintenance as maintenance, sum(child.expense) as expense from `tabVehicle Log` as parent left outer join `tabMaintenance Details` as child on child.parent = parent.name where child.maintenance is not null and parent.date between '{0}' and '{1}' and parent.license_plate = '{2}' group by child.maintenance """.format(from_date,to_date,vehicle_no), as_dict= True)
+
+    total_amt_pavers = 0
+    total_amt_cw = 0
+
+    for j in expense_details:
+        sub_list = []
+        sub_list.append(j['maintenance'])
+        sub_list.append(round(j['expense'],2))
+        sub_list.append(round(j['expense']/total_sqft,3))
+        sub_list.append(round((pavers_total / total_sqft)*j['expense'],2))
+        total_amt_pavers += round((pavers_total / total_sqft)*j['expense'],2)
+        sub_list.append(round((cw_total / total_sqft)*j['expense'],2))
+        total_amt_cw += round((cw_total / total_sqft)*j['expense'],2)
+        data.append(sub_list)
 
     sub_list = []
     sub_list.append(i.maintanence)
@@ -224,24 +243,24 @@ def execute(filters=None):
     sub_list.append("<b>Total Amount</b>")
     sub_list.append("")
     sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
+    sub_list.append(f'<b>{total_amt_pavers}</b>')
+    sub_list.append(f'<b>{total_amt_cw}</b>')
     data.append(sub_list)
 
     sub_list = []
     sub_list.append("<b>Total SQFT</b>")
     sub_list.append("")
     sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
+    sub_list.append(f'<b>{pavers_total}</b>')
+    sub_list.append(f'<b>{cw_total}</b>')
     data.append(sub_list)
 
     sub_list = []
     sub_list.append("<b>Total Cost</b>")
     sub_list.append("")
     sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
+    sub_list.append(f'<b>{round(total_amt_pavers/pavers_total,2)}</b>')
+    sub_list.append(f'<b>{round(total_amt_cw/cw_total,2)}</b>')
     data.append(sub_list)
 
     return columns, data
