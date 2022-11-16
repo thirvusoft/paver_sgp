@@ -25,6 +25,12 @@ frappe.query_reports["Monthly Transport Report"] = {
 			"options": "Vehicle",
 			"width": "100"
 		},
-
+		{
+			"fieldname":"transport_based_on",
+			"label": __("Monthly Transport Based On"),
+			"fieldtype": "Select",
+			"options": "Report\nSummary",
+			"width": "200"
+		},
 	]
 };

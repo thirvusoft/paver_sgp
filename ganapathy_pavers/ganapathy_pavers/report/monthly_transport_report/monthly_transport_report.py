@@ -11,6 +11,7 @@ def execute(filters=None):
     from_date = filters.get("from_date")
     to_date = filters.get("to_date")
     vehicle_no = filters.get("vehicle_no")
+    transport_based_on = filters.get("transport_based_on")
 
     doc = frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no}, [
                             'last_odometer', 'odometer', 'delivery_note', 'sales_invoice', 'today_odometer_value'], order_by="date",)
@@ -60,22 +61,31 @@ def execute(filters=None):
     sub_list.append("")
     sub_list.append("Total Sqrft :")
     data.append(sub_list)
+    if  transport_based_on == "Report":
+        sub_list = []
+        sub_list.append("<b>Pavers Report</b>")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
+    else:
+        sub_list = []
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
 
-    sub_list = []
-    sub_list.append("<b>Pavers Report</b>")
-    sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
-    data.append(sub_list)
-
-    sub_list = []
-    sub_list.append("<b>Item</b>")
-    sub_list.append("<b>Total pavers</b>")
-    sub_list.append("<b>Total Sqrft</b>")
-    sub_list.append("")
-    sub_list.append("")
-    data.append(sub_list)
+    if  transport_based_on == "Report":
+        sub_list = []
+        sub_list.append("<b>Item</b>")
+        sub_list.append("<b>Total pavers</b>")
+        sub_list.append("<b>Total Sqrft</b>")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
 
     dn_item_list=[]
     si_item_list=[]
@@ -83,8 +93,6 @@ def execute(filters=None):
     si_item=frappe.get_all("Sales Invoice Item",{"parent":['in',si_doc]},['item_code','item_group','sum(stock_qty) as stock_qty', 'stock_uom'],group_by='item_code')
 
     si_qty = lambda item_code: sum([i['stock_qty'] for i in si_item if(i['item_code']==item_code)])
-
-    frappe.errprint(dn_item)
 
     pavers_total=0
     for j in dn_item:
@@ -96,17 +104,26 @@ def execute(filters=None):
             pavers_total+=(round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"SQF"),2))
             sub_list.append("")
             sub_list.append("")
-            data.append(sub_list)
+            if transport_based_on == "Report":
+                data.append(sub_list)
     
-    sub_list = []
-    sub_list.append("")
-    sub_list.append("<b>Total Sqrft :</b>")
-    sub_list.append(f"<b>{pavers_total}</b>")
-    sub_list.append("")
-    sub_list.append("")
-    data.append(sub_list)
+    if  transport_based_on == "Report":
+        sub_list = []
+        sub_list.append("")
+        sub_list.append("<b>Total Sqrft :</b>")
+        sub_list.append(f"<b>{pavers_total}</b>")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
         
-                    
+    else:
+        sub_list = []
+        sub_list.append("<b>Pavers Sqrft :</b>")
+        sub_list.append("")
+        sub_list.append(f"<b>{pavers_total}</b>")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
 
     sub_list = []
     sub_list.append("")
@@ -116,22 +133,23 @@ def execute(filters=None):
     sub_list.append("")
     data.append(sub_list)
                 
+    if  transport_based_on == "Report":
+        sub_list = []
+        sub_list.append("<b>Compound Wall Report</b>")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
 
-    sub_list = []
-    sub_list.append("<b>Compound Wall Report</b>")
-    sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
-    sub_list.append("")
-    data.append(sub_list)
-
-    sub_list = []
-    sub_list.append("<b>Item</b>")
-    sub_list.append("<b>Total Qty</b>")
-    sub_list.append("<b>Total Sqrft</b>")
-    sub_list.append("")
-    sub_list.append("")
-    data.append(sub_list)
+    if  transport_based_on == "Report":
+        sub_list = []
+        sub_list.append("<b>Item</b>")
+        sub_list.append("<b>Total Qty</b>")
+        sub_list.append("<b>Total Sqrft</b>")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
     
     cw_total=0
     for j in dn_item:
@@ -143,16 +161,25 @@ def execute(filters=None):
             cw_total+=round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"SQF"),2)
             sub_list.append("")
             sub_list.append("")
-            data.append(sub_list)
+            if  transport_based_on == "Report":
+                data.append(sub_list)
     
-    sub_list = []
-    sub_list.append("")
-    sub_list.append("<b>Total Sqrft :</b>")
-    sub_list.append(f"<b>{cw_total}</b>")
-    sub_list.append("")
-    sub_list.append("")
-    data.append(sub_list)
-    
+    if  transport_based_on == "Report":
+        sub_list = []
+        sub_list.append("")
+        sub_list.append("<b>Total Sqrft :</b>")
+        sub_list.append(f"<b>{cw_total}</b>")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
+    else:
+        sub_list = []
+        sub_list.append("<b>Compund Wall Total Sqrft :</b>")
+        sub_list.append("")
+        sub_list.append(f"<b>{cw_total}</b>")
+        sub_list.append("")
+        sub_list.append("")
+        data.append(sub_list)
 
     sub_list = []
     sub_list.append("")
