@@ -1,0 +1,52 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-11-16 12:37:18.820083",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "type",
+  "item",
+  "qty",
+  "days"
+ ],
+ "fields": [
+  {
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Type"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Qty"
+  },
+  {
+   "fieldname": "days",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Days"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-11-16 14:00:17.244457",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Raw Material Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

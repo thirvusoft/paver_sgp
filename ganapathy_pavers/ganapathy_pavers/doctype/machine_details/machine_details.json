@@ -1,0 +1,52 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-11-16 12:48:24.192938",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "machine",
+  "rack",
+  "sqft"
+ ],
+ "fields": [
+  {
+   "fieldname": "item",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item"
+  },
+  {
+   "fieldname": "machine",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Machine",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "rack",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Rack"
+  },
+  {
+   "fieldname": "sqft",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Sqft"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-11-16 13:58:59.252317",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Machine Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
