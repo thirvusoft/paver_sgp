@@ -27,7 +27,7 @@ def execute(filters=None):
 								sum(rack_shifting_total_expense1) as rack_shifting_total_expense1,
 								sum(total_expense) as total_expense,
 								sum(labour_expense) as labour_expense,
-								sum(strapping_cost_per_sqft) as strapping_cost_per_sqft,
+								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
 								avg(shot_blast_per_sqft) as shot_blast_per_sqft,
 								sum(labour_cost_manufacture) as labour_cost_manufacture,
 								sum(labour_cost_in_rack_shift) as labour_cost_in_rack_shift,
