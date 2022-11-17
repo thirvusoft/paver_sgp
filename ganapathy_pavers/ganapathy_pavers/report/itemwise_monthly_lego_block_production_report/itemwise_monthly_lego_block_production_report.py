@@ -10,7 +10,7 @@ def execute(filters=None):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 
-	doc = frappe.get_all("CW Manufacturing", {"molding_date":["between", (from_date, to_date)],"type":"Fencing Post","production_sqft":["!=",0],"docstatus":["!=",2]}, order_by = 'molding_date')
+	doc = frappe.get_all("CW Manufacturing", {"molding_date":["between", (from_date, to_date)],"type":"Lego Block","production_sqft":["!=",0],"docstatus":["!=",2]}, order_by = 'molding_date')
 	
 	data = []
 	final_data = []
@@ -19,10 +19,10 @@ def execute(filters=None):
 		for doc_name in doc:
 
 			doc_details = frappe.get_doc("CW Manufacturing",doc_name.name)
-			
+
 			if not data:
 				for material in doc_details.item_details:
-					
+
 					data.append({
 						"month":doc_details.molding_date.strftime("%B"),
 						"item":material.item,
@@ -35,7 +35,6 @@ def execute(filters=None):
 					})
 
 			else:
-
 				for material in doc_details.item_details:
 					matched_item  = 0
 
