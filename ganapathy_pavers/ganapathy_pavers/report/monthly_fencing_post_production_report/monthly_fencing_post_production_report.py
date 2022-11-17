@@ -27,26 +27,26 @@ def execute(filters=None):
 		total_production_cost = 0
 		report_total_cost_per_sqft = 0
 		total_cost = 0
+		
+		data.append({
+			"material": "-",
+			"qty": "-",
+			"consumption": "-",
+			"uom": "-",
+			"rate": "-",
+			"amount": "-",
+			"cost_per_sqft": "-"
+		})	
 
-		sub_list = []
-		sub_list.append("-")
-		sub_list.append("-")
-		sub_list.append("-")
-		sub_list.append("-")
-		sub_list.append("-")
-		sub_list.append("-")
-		sub_list.append("-")
-		data.append(sub_list)
-
-		sub_list = []
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		data.append(sub_list)
+		data.append({
+			"material": None,
+			"qty": None,
+			"consumption": None,
+			"uom": None,
+			"rate": None,
+			"amount": None,
+			"cost_per_sqft": None
+		})	
 
 		for doc_name in doc:
 			
@@ -64,135 +64,131 @@ def execute(filters=None):
 			total_production_cost += doc_details.labour_expense_for_curing
 
 			if not data:
-
 				for material in doc_details.items:
 
-						sub_list = []
-						
-						sub_list.append(material.item_code)
-						sub_list.append(round(material.qty, 2)),
-						sub_list.append(0)
-						sub_list.append(material.uom)
-						sub_list.append(round(material.rate, 3))
-						sub_list.append(0)
-						sub_list.append(0)
-						data.append(sub_list) 
+						data.append({
+							"material": material.item_code,
+							"qty": material.qty,
+							"consumption": 0,
+							"uom": material.uom,
+							"rate": material.rate,
+							"amount": 0,
+							"cost_per_sqft": 0
+						})
 
 			else:
-
 				for material in doc_details.items:
-
 					matched_item  = 0
 
 					for item in	data:
-
-						if item[0] == material.item_code:
+						if item["material"] == material.item_code:
 
 							matched_item = 1
-							item[1] += round(material.qty, 2)
-							item[4] += round(material.rate, 3)
+							item["qty"] += material.qty
+							item["rate"] += material.rate
 
 					if not matched_item:
-						
-						sub_list = []
-						sub_list.append(material.item_code)
-						sub_list.append(round(material.qty, 2))
-						sub_list.append(0)
-						sub_list.append(material.uom)
-						sub_list.append(round(material.rate, 3))
-						sub_list.append(0)
-						sub_list.append(0)
-						data.append(sub_list) 
+						data.append({
+							"material": material.item_code,
+							"qty": material.qty,
+							"consumption": 0,
+							"uom": material.uom,
+							"rate": material.rate,
+							"amount": 0,
+							"cost_per_sqft": 0
+						})
+
 		idx = 0
 		for row in	data:
-			if row[1] != "-" and row[1]:
-				row[2] = round(row[1] / total_production_sqft, 3)
-				row[4] = round(row[4] / len(doc), 2)
-				row[5] = round(row[1] * row[4], 2)
-				row[6] = round(row[5] / total_production_sqft, 2)
-				report_total_cost_per_sqft += row[6]
+			
+			if row["qty"] != "-" and row["qty"]:
+				row["consumption"] = round(row["qty"] / total_production_sqft, 3)
+				row["rate"] = round(row["rate"] / len(doc), 2)
+				row["amount"] = round(row["qty"] * row["rate"], 2)
+				row["cost_per_sqft"] = round(row["amount"] / total_production_sqft, 2)
+				report_total_cost_per_sqft += row["cost_per_sqft"]
 			else:
 				if idx == 0:
 					idx = 1
-					row[2] = f"<b>SQFT : {round(total_production_sqft,3)}</b>"
-					row[3] = f"<b>Production Cost per SQFT : {round(total_cost_per_sqft / len(doc),3)}</b>"
-					row[4] = f"<b>No of Days : </b>"
-		
-		sub_list = []
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append("<b>Total Production Cost</b>")
-		sub_list.append(f"<b>{round(total_production_cost, 2)}</b>")
-		sub_list.append(f"<b>{round(report_total_cost_per_sqft, 2)}</b>")
-		data.append(sub_list)
+					row["consumption"] = f"<b>SQFT : {round(total_production_sqft,3)}</b>"
+					row["uom"] = f"<b>Production Cost per SQFT : {round(total_cost_per_sqft / len(doc),3)}</b>"
+					row["rate"] = f"<b>No of Days : </b>"
+
+		data.append({
+			"material": None,
+			"qty": None,
+			"consumption": None,
+			"uom": None,
+			"rate": "<b>Total Production Cost</b>",
+			"amount": f"<b>{round(total_production_cost, 2)}</b>",
+			"cost_per_sqft": f"<b>{round(report_total_cost_per_sqft, 2)}</b>"
+		})
 		total_cost += report_total_cost_per_sqft
 		
-		sub_list = []
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append("<b>Labour Cost Per Sqft</b>")
-		sub_list.append(f"<b>{round((labour_cost_per_sqft / len(doc)), 2)}</b>")
-		data.append(sub_list)
+		data.append({
+			"material": None,
+			"qty": None,
+			"consumption": None,
+			"uom": None,
+			"rate": None,
+			"amount": "<b>Labour Cost Per Sqft</b>",
+			"cost_per_sqft": f"<b>{round((labour_cost_per_sqft / len(doc)), 2)}</b>"
+		})
 		total_cost += labour_cost_per_sqft / len(doc)
 
-		sub_list = []
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append("<b>Operator Cost Per Sqft</b>")
-		sub_list.append(f"<b>{round((operator_cost_per_sqft / len(doc)), 2)}</b>")
-		data.append(sub_list)
+		data.append({
+			"material": None,
+			"qty": None,
+			"consumption": None,
+			"uom": None,
+			"rate": None,
+			"amount": "<b>Operator Cost Per Sqft</b>",
+			"cost_per_sqft": f"<b>{round((operator_cost_per_sqft / len(doc)), 2)}</b>"
+		})
 		total_cost += operator_cost_per_sqft / len(doc)
 
-		sub_list = []
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append("<b>Strapping Cost Per Sqft</b>")
-		sub_list.append(f"<b>{round((strapping_cost_per_sqft / len(doc)), 2)}</b>")
-		data.append(sub_list)
+		data.append({
+			"material": None,
+			"qty": None,
+			"consumption": None,
+			"uom": None,
+			"rate": None,
+			"amount": "<b>Strapping Cost Per Sqft</b>",
+			"cost_per_sqft": f"<b>{round((strapping_cost_per_sqft / len(doc)), 2)}</b>"
+		})
 		total_cost += strapping_cost_per_sqft / len(doc)
 
-		sub_list = []
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append("<b>Additional Cost Per Sqft</b>")
-		sub_list.append(f"<b>{round((additional_cost_per_sqft / len(doc)), 2)}</b>")
-		data.append(sub_list)
+		data.append({
+			"material": None,
+			"qty": None,
+			"consumption": None,
+			"uom": None,
+			"rate": None,
+			"amount": "<b>Additional Cost Per Sqft</b>",
+			"cost_per_sqft": f"<b>{round((additional_cost_per_sqft / len(doc)), 2)}</b>"
+		})
 		total_cost += additional_cost_per_sqft / len(doc)
 
-		sub_list = []
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append("<b>Raw Material Cost Per Sqft</b>")
-		sub_list.append(f"<b>{round((raw_material_cost_per_sqft / len(doc)), 2)}</b>")
-		data.append(sub_list)
+		data.append({
+			"material": None,
+			"qty": None,
+			"consumption": None,
+			"uom": None,
+			"rate": None,
+			"amount": "<b>Raw Material Cost Per Sqft</b>",
+			"cost_per_sqft": f"<b>{round((raw_material_cost_per_sqft / len(doc)), 2)}</b>"
+		})
 		total_cost += raw_material_cost_per_sqft / len(doc)
 
-		sub_list = []
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append(None)
-		sub_list.append("<b>Total Cost</b>")
-		sub_list.append(f"<b>{round(total_cost, 2)}</b>")
-		data.append(sub_list)
+		data.append({
+			"material": None,
+			"qty": None,
+			"consumption": None,
+			"uom": None,
+			"rate": None,
+			"amount": "<b>Total Cost</b>",
+			"cost_per_sqft": f"<b>{round(total_cost, 2)}</b>"
+		})
 
 	return columns, data
 
