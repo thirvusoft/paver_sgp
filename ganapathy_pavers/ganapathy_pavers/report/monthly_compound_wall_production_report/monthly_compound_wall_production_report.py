@@ -21,16 +21,16 @@ def execute(filters=None):
 								sum(total_expence) as total_expence,
 								sum(total_expense_for_unmolding) as total_expense_for_unmolding,
 								sum(labour_expense_for_curing) as total_expense_for_curing,
-								sum(labour_cost_per_sqft) as labour_cost_per_sqft,
-								sum(operator_cost_per_sqft) as operator_cost_per_sqft,
-								sum(strapping_cost_per_sqft) as strapping_cost_per_sqft,
-								sum(additional_cost_per_sqft) as additional_cost_per_sqft,
-								sum(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name in {0} """.format(tuple(cw_list)),as_dict=1)
+								avg(labour_cost_per_sqft) as labour_cost_per_sqft,
+								avg(operator_cost_per_sqft) as operator_cost_per_sqft,
+								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
+								avg(additional_cost_per_sqft) as additional_cost_per_sqft,
+								avg(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name in {0} """.format(tuple(cw_list)),as_dict=1)
 
 		test_data.append({
 			"material":"-",
 			"qty":"-",
-			"consumption":f"<b>SQFT FT :</b> {production_qty[0]['production_sqft']:,.3f}",
+			"consumption":f"<b>SQFT :</b> {production_qty[0]['production_sqft']:,.3f}",
 			"uom":f"<b>Production Cost per SQFT :</b> ₹{production_qty[0]['total_cost_per_sqft']:,.3f}",
 			"rate":None,
 			"amount":None,
@@ -91,14 +91,51 @@ def execute(filters=None):
 	return columns, data
  
 def get_columns():
-	columns = [
-		_("Material") + ":Link/Item:150",
-		_("QTY") + ":Data:150",
-		_("Consumption") + ":Data:200",
-		_("UOM") + ":Link/UOM:250",
-		_("Rate") + ":Data:200",
-		_("Amount") + ":Data:150",
-		_("Cost Per SQFT") + ":Data:100",
-		]
+	columns = [{
+		"fieldtype":"Link",
+		"fieldname":"material",
+		"label":"<b>Date</b>",
+		"width":150,
+		"options":"Item"
+		},
+		{
+		"fieldtype":"Data",
+		"fieldname":"qty",
+		"label":"<b>QTY</b>",
+		"width":150
+		},
+		{
+		"fieldtype":"Data",
+		"fieldname":"consumption",
+		"label":"<b>Consumption</b>",
+		"width":200
+		},
+		{
+		"fieldtype":"Data",
+		"fieldname":"uom",
+		"label":"<b>UOM</b>",
+		"width":250
+		},
+		{
+		"fieldtype":"Data",
+		"fieldname":"rate",
+		"label":"<b>Rate</b>",
+		"width":200
+		},
+		{
+		"fieldtype":"Data",
+		"fieldname":"amount",
+		"label":"<b>Amount</b>",
+		"width":150
+		},
+		{
+		"fieldtype":"Data",
+		"fieldname":"cost_per_sqft",
+		"label":"<b>Cost Per SQFT</b>",
+		"width":100
+		}
+	
+	
+	]
 	
 	return columns

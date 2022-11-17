@@ -1481,7 +1481,7 @@
    "name": "Item-compound_wall_type",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "Slab\nPost\nFencing Post",
+   "options": "Slab\nPost\nFencing Post\nLego Block",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
