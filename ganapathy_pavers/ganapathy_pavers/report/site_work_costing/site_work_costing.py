@@ -113,6 +113,7 @@ def get_data(filters={}):
 			})
 
 		sw_data.append({
+			"item_code": frappe.bold("Total"),
 			"sqft_supplied": sum([uom_conversion(row.item, row.stock_uom, row.delivered_stock_qty, square_foot) or 0 for row in sw_doc.delivery_detail]+[row.delivered_quantity for row in sw_doc.raw_material]),
 			"measurement_sqft": sw_doc.get("measurement_sqft"),
 			"man_buy_cost": sum(buying_rate) + sum(valuation_rate),
