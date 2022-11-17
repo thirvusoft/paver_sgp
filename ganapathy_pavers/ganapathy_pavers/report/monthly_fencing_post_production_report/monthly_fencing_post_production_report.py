@@ -51,52 +51,54 @@ def execute(filters=None):
 		for doc_name in doc:
 			
 			doc_details = frappe.get_doc("CW Manufacturing",doc_name.name)
+			
+			if doc_details.production_sqft:
 
-			total_production_sqft += doc_details.production_sqft
-			total_cost_per_sqft += doc_details.total_cost_per_sqft
-			labour_cost_per_sqft += doc_details.labour_cost_per_sqft
-			operator_cost_per_sqft += doc_details.operator_cost_per_sqft
-			strapping_cost_per_sqft += doc_details.strapping_cost_per_sqft
-			additional_cost_per_sqft += doc_details.additional_cost_per_sqft
-			raw_material_cost_per_sqft += doc_details.raw_material_cost_per_sqft
-			total_production_cost += doc_details.total_expence
-			total_production_cost += doc_details.total_expense_for_unmolding
-			total_production_cost += doc_details.labour_expense_for_curing
+				total_production_sqft += doc_details.production_sqft
+				total_cost_per_sqft += doc_details.total_cost_per_sqft
+				labour_cost_per_sqft += doc_details.labour_cost_per_sqft
+				operator_cost_per_sqft += doc_details.operator_cost_per_sqft
+				strapping_cost_per_sqft += doc_details.strapping_cost_per_sqft
+				additional_cost_per_sqft += doc_details.additional_cost_per_sqft
+				raw_material_cost_per_sqft += doc_details.raw_material_cost_per_sqft
+				total_production_cost += doc_details.total_expence
+				total_production_cost += doc_details.total_expense_for_unmolding
+				total_production_cost += doc_details.labour_expense_for_curing
 
-			if not data:
-				for material in doc_details.items:
+				if not data:
+					for material in doc_details.items:
 
-						data.append({
-							"material": material.item_code,
-							"qty": material.qty,
-							"consumption": 0,
-							"uom": material.uom,
-							"rate": material.rate,
-							"amount": 0,
-							"cost_per_sqft": 0
-						})
+							data.append({
+								"material": material.item_code,
+								"qty": material.qty,
+								"consumption": 0,
+								"uom": material.uom,
+								"rate": material.rate,
+								"amount": 0,
+								"cost_per_sqft": 0
+							})
 
-			else:
-				for material in doc_details.items:
-					matched_item  = 0
+				else:
+					for material in doc_details.items:
+						matched_item  = 0
 
-					for item in	data:
-						if item["material"] == material.item_code:
+						for item in	data:
+							if item["material"] == material.item_code:
 
-							matched_item = 1
-							item["qty"] += material.qty
-							item["rate"] += material.rate
+								matched_item = 1
+								item["qty"] += material.qty
+								item["rate"] += material.rate
 
-					if not matched_item:
-						data.append({
-							"material": material.item_code,
-							"qty": material.qty,
-							"consumption": 0,
-							"uom": material.uom,
-							"rate": material.rate,
-							"amount": 0,
-							"cost_per_sqft": 0
-						})
+						if not matched_item:
+							data.append({
+								"material": material.item_code,
+								"qty": material.qty,
+								"consumption": 0,
+								"uom": material.uom,
+								"rate": material.rate,
+								"amount": 0,
+								"cost_per_sqft": 0
+							})
 
 		idx = 0
 		for row in	data:
