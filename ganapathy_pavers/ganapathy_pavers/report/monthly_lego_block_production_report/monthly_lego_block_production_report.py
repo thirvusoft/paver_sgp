@@ -66,6 +66,16 @@ def execute(filters=None):
 			if not data:
 				for material in doc_details.items:
 
+					matched_item  = 0
+
+					for item in	data:
+						if item["material"] == material.item_code:
+
+							matched_item = 1
+							item["qty"] += material.qty
+							item["rate"] += material.rate
+
+					if not matched_item:
 						data.append({
 							"material": material.item_code,
 							"qty": material.qty,
