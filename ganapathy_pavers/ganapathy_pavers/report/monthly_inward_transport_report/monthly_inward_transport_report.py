@@ -18,7 +18,16 @@ def execute(filters=None):
 	pi_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'purchase_invoice':['is',"set"]}, pluck='purchase_invoice')
 	start_km = 0
 	end_km = 0
-	mileage = frappe.db.sql(""" select avg(mileage) as mileage from `tabVehicle Log` where purchase_receipt is not null or purchase_invoice is not null""",as_dict=True)
+	mileage = 0
+	try:
+		mileage_doc= frappe.get_last_doc("Vehicle Log",{"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,"mileage":['>',0]},order_by="date asc")
+		mileage = mileage_doc.mileage
+	except:		
+		try:
+			mileage_doc= frappe.get_last_doc("Vehicle Log",{"date": ["<", from_date], "license_plate": vehicle_no,"mileage":['>',0]},order_by="date asc")
+			mileage = mileage_doc.mileage
+		except:
+			pass
 
 	receipt_grand_total = frappe.get_list("Purchase Receipt",{"name":["in",pr_doc]},['sum(grand_total) as grand_total'],pluck="grand_total")
 	invoice_grand_total = frappe.get_list("Purchase Invoice",{"name":["in",pi_doc]},['sum(grand_total) as grand_total'],pluck="grand_total")
@@ -38,7 +47,7 @@ def execute(filters=None):
 	sub_list.append(f"End KM :{end_km}")
 	sub_list.append(f"Total KM :{end_km-start_km}")
 	sub_list.append("")
-	sub_list.append(f"Mileage :{mileage[0]['mileage']}")
+	sub_list.append(f"Mileage :{mileage}")
 
 	data.append(sub_list)
 
