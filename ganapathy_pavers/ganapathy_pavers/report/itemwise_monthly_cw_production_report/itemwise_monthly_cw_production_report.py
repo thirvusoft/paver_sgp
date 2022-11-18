@@ -18,11 +18,23 @@ def execute(filters=None):
 	if doc:
 		for doc_name in doc:		
 			doc_details = frappe.get_doc("CW Manufacturing",doc_name.name)
-			
 			if not data:
 				for material in doc_details.item_details:
+					matched_item  = 0
 
-					data.append({
+					for item in	data:
+
+						if item["item"] == material.item and item["month"] == doc_details.molding_date.strftime("%B"):
+							matched_item  = 1
+							item["production_sqft"] += material.production_sqft
+							item["production_cost"] += doc_details.raw_material_cost / doc_details.production_sqft
+							item["expense"] += doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft)
+							item["total_cost_per_sqft"] += doc_details.total_cost_per_sqft
+							item["total_item_count"] += 1
+
+					if not matched_item:
+						
+						data.append({
 						"month":doc_details.molding_date.strftime("%B"),
 						"item":material.item,
 						"production_sqft":material.production_sqft,
@@ -32,6 +44,7 @@ def execute(filters=None):
 						"total_cost_per_sqft":doc_details.total_cost_per_sqft,
 						"total_item_count":1
 					})
+					
 
 			else:
 
