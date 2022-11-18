@@ -1,0 +1,354 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-11-16 12:28:36.386676",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "petrol_rate",
+  "diesel_rate",
+  "column_break_4",
+  "labour_present",
+  "labour_absent",
+  "operator_present",
+  "operator_absent",
+  "section_break_9",
+  "warehouse",
+  "load_item_details",
+  "colour_details",
+  "data_12",
+  "red_total_n",
+  "column_break_14",
+  "black_total_n",
+  "column_break_16",
+  "grey_total_n",
+  "column_break_18",
+  "brown_total_n",
+  "column_break_20",
+  "yellow_total_n",
+  "colour_details_of_sb_section",
+  "colour_details_of_sb",
+  "shot_blast_section",
+  "red_total_s",
+  "column_break_24",
+  "black_total_s",
+  "column_break_26",
+  "grey_total_s",
+  "column_break_28",
+  "brown_total_s",
+  "column_break_30",
+  "yellow_total_s",
+  "size_details_section",
+  "size_details",
+  "data_26",
+  "raw_material_details_section",
+  "raw_material_details",
+  "strapping_roll_details_section",
+  "strapping_role",
+  "colour_powder_section",
+  "colour_powder",
+  "load_current_stock",
+  "compound_wall_stock_section",
+  "compound_wall_stock",
+  "compound_wall_item_stock",
+  "machine_details_section",
+  "machine_details",
+  "vehicle_details_section",
+  "vehicle_details",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "petrol_rate",
+   "fieldtype": "Float",
+   "label": "Petrol Rate"
+  },
+  {
+   "fieldname": "diesel_rate",
+   "fieldtype": "Float",
+   "label": "Diesel Rate"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "labour_present",
+   "fieldtype": "Int",
+   "label": "Labour Present"
+  },
+  {
+   "fieldname": "labour_absent",
+   "fieldtype": "Int",
+   "label": "Labour Absent"
+  },
+  {
+   "fieldname": "operator_present",
+   "fieldtype": "Int",
+   "label": "Operator Present"
+  },
+  {
+   "fieldname": "operator_absent",
+   "fieldtype": "Int",
+   "label": "Operator Absent"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Daily Maintenance",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "colour_details",
+   "fieldtype": "Table",
+   "label": "Colour Details",
+   "options": "Colour Details"
+  },
+  {
+   "fieldname": "load_item_details",
+   "fieldtype": "Button",
+   "label": "Load Item Details"
+  },
+  {
+   "fieldname": "data_12",
+   "fieldtype": "Section Break",
+   "label": "Normal Total"
+  },
+  {
+   "fieldname": "red_total_n",
+   "fieldtype": "Float",
+   "label": "Red Total "
+  },
+  {
+   "fieldname": "black_total_n",
+   "fieldtype": "Float",
+   "label": "Black Total "
+  },
+  {
+   "fieldname": "grey_total_n",
+   "fieldtype": "Float",
+   "label": "Grey Total "
+  },
+  {
+   "fieldname": "brown_total_n",
+   "fieldtype": "Float",
+   "label": "Brown Total "
+  },
+  {
+   "fieldname": "yellow_total_n",
+   "fieldtype": "Float",
+   "label": "Yellow Total "
+  },
+  {
+   "fieldname": "shot_blast_section",
+   "fieldtype": "Section Break",
+   "label": "Shot Blast"
+  },
+  {
+   "fieldname": "red_total_s",
+   "fieldtype": "Float",
+   "label": "Red Total "
+  },
+  {
+   "fieldname": "black_total_s",
+   "fieldtype": "Float",
+   "label": "Black Total "
+  },
+  {
+   "fieldname": "grey_total_s",
+   "fieldtype": "Float",
+   "label": "Grey Total "
+  },
+  {
+   "fieldname": "brown_total_s",
+   "fieldtype": "Float",
+   "label": "Brown Total "
+  },
+  {
+   "fieldname": "yellow_total_s",
+   "fieldtype": "Float",
+   "label": "Yellow Total "
+  },
+  {
+   "fieldname": "size_details",
+   "fieldtype": "Table",
+   "label": "Size Details",
+   "options": "Size Details"
+  },
+  {
+   "fieldname": "size_details_section",
+   "fieldtype": "Section Break",
+   "label": "Size details"
+  },
+  {
+   "fieldname": "data_26",
+   "fieldtype": "Float",
+   "label": "Overall Total"
+  },
+  {
+   "fieldname": "raw_material_details_section",
+   "fieldtype": "Section Break",
+   "label": "Raw Material Details"
+  },
+  {
+   "fieldname": "raw_material_details",
+   "fieldtype": "Table",
+   "label": "Raw Material Details",
+   "options": "Raw Material Details"
+  },
+  {
+   "fieldname": "strapping_roll_details_section",
+   "fieldtype": "Section Break",
+   "label": "Strapping Roll Details"
+  },
+  {
+   "fieldname": "strapping_role",
+   "fieldtype": "Table",
+   "label": "Strapping Role",
+   "options": "Strapping Roll"
+  },
+  {
+   "fieldname": "colour_powder_section",
+   "fieldtype": "Section Break",
+   "label": "Colour Powder"
+  },
+  {
+   "fieldname": "colour_powder",
+   "fieldtype": "Table",
+   "label": "Colour Powder",
+   "options": "Colour Powder Details"
+  },
+  {
+   "fieldname": "load_current_stock",
+   "fieldtype": "Button",
+   "label": "Load Current Stock"
+  },
+  {
+   "fieldname": "compound_wall_stock_section",
+   "fieldtype": "Section Break",
+   "label": "Compound Wall Stock"
+  },
+  {
+   "fieldname": "compound_wall_stock",
+   "fieldtype": "Table",
+   "label": "Compound Wall Stock",
+   "options": "Compound Wall Details"
+  },
+  {
+   "fieldname": "compound_wall_item_stock",
+   "fieldtype": "Table",
+   "label": "Compound Wall Item Stock",
+   "options": "Compound Wall Item Stock"
+  },
+  {
+   "fieldname": "machine_details_section",
+   "fieldtype": "Section Break",
+   "label": "Machine Details"
+  },
+  {
+   "fieldname": "machine_details",
+   "fieldtype": "Table",
+   "label": "Machine Details",
+   "options": "Machine Details"
+  },
+  {
+   "fieldname": "vehicle_details_section",
+   "fieldtype": "Section Break",
+   "label": "Vehicle Details"
+  },
+  {
+   "fieldname": "vehicle_details",
+   "fieldtype": "Table",
+   "label": "Vehicle Details",
+   "options": "Vehicle Details"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_24",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_26",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_28",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_30",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "colour_details_of_sb_section",
+   "fieldtype": "Section Break",
+   "label": "Colour Details of SB"
+  },
+  {
+   "fieldname": "colour_details_of_sb",
+   "fieldtype": "Table",
+   "label": "Colour Details of SB",
+   "options": "Colour Details of SB"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-11-16 19:19:24.481689",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Daily Maintenance",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
