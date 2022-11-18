@@ -11,7 +11,7 @@ def execute(filters=None):
 	to_date = filters.get("to_date")
 	date_list = date_range_list(getdate(from_date),getdate(to_date))
 	data = []
-	cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]],'type':["!=","Fencing Post"]},pluck="name")
+	cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]],'type':["in",['Post','Slab']]},pluck="name")
 	cw_items = []
 	if cw_list:
 		cw_items = frappe.db.get_list("CW Items",filters={'parent':['in',cw_list]},fields=["item",'sum(produced_qty) as produced_qty','sum(production_sqft) as production_sqft'],group_by="item",order_by="item")
