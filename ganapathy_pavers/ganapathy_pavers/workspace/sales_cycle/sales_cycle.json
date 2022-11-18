@@ -98,16 +98,6 @@
    "type": "Link"
   },
   {
-   "dependencies": "Project",
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Site Costing",
-   "link_to": "Site Costing",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
    "dependencies": "Purchase Invoice",
    "hidden": 0,
    "is_query_report": 0,
@@ -126,10 +116,19 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Site Costing Report",
+   "link_to": "Site Work Costing",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2022-10-06 17:41:28.405323",
- "modified_by": "Administrator",
+ "modified": "2022-11-11 14:58:48.476893",
+ "modified_by": "admin@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "Sales Cycle",
  "owner": "Administrator",

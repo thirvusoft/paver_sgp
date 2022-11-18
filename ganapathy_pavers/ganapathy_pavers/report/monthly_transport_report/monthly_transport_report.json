@@ -1,0 +1,30 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2022-11-14 18:05:48.697117",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "SGP Header 1",
+ "modified": "2022-11-14 18:05:48.697117",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Monthly Transport Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Vehicle",
+ "report_name": "Monthly Transport Report",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Fleet Manager"
+  },
+  {
+   "role": "Vehicle Manager"
+  }
+ ]
+}

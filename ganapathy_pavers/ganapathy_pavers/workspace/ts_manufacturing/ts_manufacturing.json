@@ -16,6 +16,14 @@
  "label": "TS Manufacturing",
  "links": [
   {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Paver Production Reports",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
    "dependencies": "Material Manufacturing",
    "hidden": 0,
    "is_query_report": 0,
@@ -24,10 +32,125 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Daily Paver Production Register",
+   "link_to": "Daily Paver Production Register",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Itemwise Monthly Paver Production Report",
+   "link_to": "Itemwise Monthly Paver Production Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Monthly Paver Production Report",
+   "link_to": "Monthly Paver Production Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Compound Wall Production Reports",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Itemwise Monthly CW Production Report",
+   "link_to": "Itemwise Monthly CW Production Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Daily Compound Wall Production Register",
+   "link_to": "Daily Compound Wall Production Register",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Monthly Compound Wall Production Report",
+   "link_to": "Monthly Compound Wall Production Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Fencing Post Production Reports",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Itemwise Monthly Fencing Production Report",
+   "link_to": "Itemwise Monthly Fencing Production Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Monthly Fencing Post Production Report",
+   "link_to": "Monthly Fencing Post Production Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Lego Block Production Reports",
+   "link_to": "",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Itemwise Monthly Lego Block Production Report",
+   "link_to": "Itemwise Monthly Lego Block Production Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Monthly Lego Block Production Report",
+   "link_to": "Monthly Lego Block Production Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2022-09-23 17:02:11.953498",
- "modified_by": "Administrator",
+ "modified": "2022-11-18 11:16:56.639611",
+ "modified_by": "ponnusamyv434@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "TS Manufacturing",
  "onboarding": "Manufacturing",
