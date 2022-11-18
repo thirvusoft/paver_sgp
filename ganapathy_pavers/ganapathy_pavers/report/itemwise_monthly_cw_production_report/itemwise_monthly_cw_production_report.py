@@ -18,7 +18,6 @@ def execute(filters=None):
 	if doc:
 		for doc_name in doc:		
 			doc_details = frappe.get_doc("CW Manufacturing",doc_name.name)
-			
 			if not data:
 				for material in doc_details.item_details:
 					
@@ -46,6 +45,7 @@ def execute(filters=None):
 						"total_cost_per_sqft":doc_details.total_cost_per_sqft,
 						"total_item_count":1
 					})
+					
 
 			else:
 
