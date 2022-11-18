@@ -24,16 +24,6 @@
    "type": "Card Break"
   },
   {
-   "dependencies": "Material Manufacturing",
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Paver Manufacturing Report",
-   "link_to": "Paver Manufacturing Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
    "hidden": 0,
    "is_query_report": 1,
    "label": "Daily Paver Production Register",
@@ -149,7 +139,7 @@
    "type": "Link"
   }
  ],
- "modified": "2022-11-18 11:16:56.639611",
+ "modified": "2022-11-18 17:00:35.431527",
  "modified_by": "ponnusamyv434@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "TS Manufacturing",
