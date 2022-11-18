@@ -1,0 +1,37 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-11-16 12:45:28.330388",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "stock"
+ ],
+ "fields": [
+  {
+   "fieldname": "item",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item"
+  },
+  {
+   "fieldname": "stock",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Stock"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-11-16 13:59:37.749006",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Compound Wall Item Stock",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
