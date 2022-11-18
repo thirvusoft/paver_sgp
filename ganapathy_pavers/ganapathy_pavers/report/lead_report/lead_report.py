@@ -67,8 +67,11 @@ def get_columns(filters):
 
 def get_data(filters):
 	lead_t=filters.get('lead_type')
-	filter_={'creation':['between',[filters.get('from_date'),filters.get('to_date')]],'status':filters.get('status')}
-	if lead_t:
-		filter_["type"]= lead_t
+    	filter_={'creation':['between',[filters.get('from_date'),filters.get('to_date')]]}
+    	status_=filters.get('status')
+    	if lead_t:
+        	filter_["type"]= lead_t
+    	if status_:
+        	filter_['status']= status_
 	lead=frappe.db.get_all("Lead", filters=filter_,fields=['lead_name','lead_owner','company_name','status','notes','type', 'source', 'reference_name'])
 	return lead
