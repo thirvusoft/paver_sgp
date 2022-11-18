@@ -39,9 +39,18 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Vehicle report",
+   "link_to": "Vehicle report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2022-11-18 17:03:29.690360",
+ "modified": "2022-11-18 19:30:37.543965",
  "modified_by": "ponnusamyv434@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Maintenance",
