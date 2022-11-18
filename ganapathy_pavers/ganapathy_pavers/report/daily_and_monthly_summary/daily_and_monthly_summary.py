@@ -56,34 +56,34 @@ def get_data(filters= {}):
 	final_data.append({'type':'Daily Paver Production', 'sqft':pm_sqft})
 	final_data.append({'type':'Daily Compound Wall Production', 'sqft':cw_sqft})
 	
-	pv_dl_items = frappe.db.get_all('Delivery Note Item', filters={'parent':['in', delivery_notes], 'item_group':'Pavers'}, fields=['item_code', 'stock_qty', 'uom'])
-	cw_dl_items = frappe.db.get_all('Delivery Note Item', filters={'parent':['in', delivery_notes], 'item_group':'Compound Walls'}, fields=['item_code', 'stock_qty', 'uom'])
+	pv_dl_items = frappe.db.get_all('Delivery Note Item', filters={'parent':['in', delivery_notes], 'item_group':'Pavers'}, fields=['item_code', 'stock_qty', 'stock_uom'])
+	cw_dl_items = frappe.db.get_all('Delivery Note Item', filters={'parent':['in', delivery_notes], 'item_group':'Compound Walls'}, fields=['item_code', 'stock_qty', 'stock_uom'])
 
-	pv_si_items = frappe.db.get_all('Sales Invoice Item', filters={'parent':['in', sales_invoice], 'item_group':'Pavers'}, fields=['item_code', 'stock_qty', 'uom'])
-	cw_si_items = frappe.db.get_all('Sales Invoice Item', filters={'parent':['in', sales_invoice], 'item_group':'Compound Walls'}, fields=['item_code', 'stock_qty', 'uom'])
+	pv_si_items = frappe.db.get_all('Sales Invoice Item', filters={'parent':['in', sales_invoice], 'item_group':'Pavers'}, fields=['item_code', 'stock_qty', 'stock_uom'])
+	cw_si_items = frappe.db.get_all('Sales Invoice Item', filters={'parent':['in', sales_invoice], 'item_group':'Compound Walls'}, fields=['item_code', 'stock_qty', 'stock_uom'])
 	
 	pv_dl_qty = 0
 	cw_dl_qty = 0
 
 	for i in pv_dl_items:
-		if(i.uom != 'SQF'):
-			pv_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.uom, from_qty=i.stock_qty, to_uom='SQF')
+		if(i.stock_uom != 'SQF'):
+			pv_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.stock_uom, from_qty=i.stock_qty, to_uom='SQF')
 		else:
 			pv_dl_qty += i.stock_qty
 	for i in pv_si_items:
-		if(i.uom != 'SQF'):
-			pv_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.uom, from_qty=i.stock_qty, to_uom='SQF')
+		if(i.stock_uom != 'SQF'):
+			pv_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.stock_uom, from_qty=i.stock_qty, to_uom='SQF')
 		else:
 			pv_dl_qty += i.stock_qty
 	
 	for i in cw_dl_items:
-		if(i.uom != 'SQF'):
-			cw_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.uom, from_qty=i.stock_qty, to_uom='SQF')
+		if(i.stock_uom != 'SQF'):
+			cw_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.stock_uom, from_qty=i.stock_qty, to_uom='SQF')
 		else:
 			cw_dl_qty += i.stock_qty
 	for i in cw_si_items:
-		if(i.uom != 'SQF'):
-			cw_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.uom, from_qty=i.stock_qty, to_uom='SQF')
+		if(i.stock_uom != 'SQF'):
+			cw_dl_qty += ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.stock_uom, from_qty=i.stock_qty, to_uom='SQF')
 		else:
 			cw_dl_qty += i.stock_qty
 
