@@ -3,6 +3,13 @@ frappe.ui.form.on("Purchase Invoice", {
         if (frm.is_new()) {
             frm.set_value("branch", "");
         }
+        if (!frm.doc.branch) {
+            frappe.db.get_list("Branch", { filters: { is_accounting: 1 } }).then(res => {
+                if ((res || []).length > 0) {
+                    frm.set_value("branch", res[0].name);
+                }
+            });
+        }
     },
     taxes_and_charges: function (frm) {
         if (frm.doc.branch) {
