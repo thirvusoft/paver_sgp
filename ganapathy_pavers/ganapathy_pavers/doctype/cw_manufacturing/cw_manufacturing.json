@@ -599,13 +599,13 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Type",
-   "options": "Post\nSlab\nFencing Post"
+   "options": "Post\nSlab\nFencing Post\nLego Block"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-14 12:04:25.030426",
+ "modified": "2022-11-17 10:19:31.455713",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",
