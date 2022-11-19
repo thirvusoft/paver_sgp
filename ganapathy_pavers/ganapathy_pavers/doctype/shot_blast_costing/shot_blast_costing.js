@@ -100,14 +100,6 @@ frappe.ui.form.on('Shot Blast Items', {
 		frappe.db.get_doc("Material Manufacturing", row.material_manufacturing).then(async (r) => {
 			frappe.model.set_value(cdt, cdn, "item_name", r.item_to_manufacture)
 			frappe.model.set_value(cdt, cdn, "batch", r.batch_no_curing)
-			// await frm.set_query("batch","items",function(frm,cdt,cdn){
-			// 	return {
-			// 		filters: {
-			// 			"name": ["in", [r.batch_no_curing]],
-			// 			item_code: ['in', mm_items]
-			// 		}
-			// 	}
-			// });
 		});
 	},
 	damages_in_nos: function (frm, cdt, cdn) {
