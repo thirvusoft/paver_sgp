@@ -12,10 +12,45 @@ class ShotBlastCosting(Document):
         material = frappe.get_all("Stock Entry",filters={"shot_blast":doc.get("name"),"stock_entry_type":"Material Transfer"},pluck="name")
         if len(material) == 0:
             frappe.throw("Process Incomplete. Create Stock Entry To Submit")
-        for i in doc.items:
-            frappe.db.set_value("Material Manufacturing",i.material_manufacturing,'shot_blasted_bundle', i.bundle-i.bundle_taken)
-            if i.bundle-i.bundle_taken == 0:
-                frappe.db.set_value("Material Manufacturing",i.material_manufacturing,'status1', "Completed")
+    def on_update(doc):
+        if doc.docstatus<=1:
+            sbc=frappe.db.sql("""
+                select material_manufacturing, sum(bundle_taken) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2) group by material_manufacturing;
+            """, as_dict=True)
+            for i in sbc:
+                bundle=(frappe.db.get_value("Material Manufacturing", i['material_manufacturing'], 'no_of_bundle') or 0)
+                frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'shot_blasted_bundle', bundle-(i['bundle_taken'] or 0))
+                if bundle-(i['bundle_taken'] or 0) <= 0:
+                    frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'status1', "Completed")
+                else:
+                    frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'status1', "Shot Blast")
+       
+
+    def on_trash(doc):
+        sbc=frappe.db.sql(f"""
+            select material_manufacturing, sum(bundle_taken) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2 and name!='{doc.name}') group by material_manufacturing;
+        """, as_dict=True)
+        # and name!= '{doc.name}'
+        mm=frappe.db.sql(f"""
+            select material_manufacturing, sum(bundle_taken) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2 and name='{doc.name}') group by material_manufacturing;
+        """)
+        for mm_doc in mm:
+            mm1=frappe.db.sql(f"""
+                select name from `tabShot Blast Items` where parent!='{doc.name}' and material_manufacturing='{mm_doc[0]}'
+            """)
+            if not mm1:
+                sbc+=({'material_manufacturing': mm_doc[0], "bundle_taken": 0},)
+        for i in sbc:
+            bundle=(frappe.db.get_value("Material Manufacturing", i['material_manufacturing'], 'no_of_bundle') or 0)
+            frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'shot_blasted_bundle', bundle-(i['bundle_taken'] or 0))
+            if bundle-(i['bundle_taken'] or 0) <= 0:
+                frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'status1', "Completed")
+            else:
+                frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'status1', "Shot Blast")
+
+    def on_cancel(doc):
+        doc.on_trash()
+
 @frappe.whitelist()
 def make_stock_entry(doc):
     doc=json.loads(doc)
@@ -51,33 +86,9 @@ def make_stock_entry(doc):
     frappe.msgprint("New Stock Entry Created "+stock_entry.name)
 
 @frappe.whitelist()
-def uom_conversion(item, batch=None, to_uom=None, mm=None):
-    if(not mm):
-        warehouse=frappe.db.get_single_value("USB Setting", 'default_curing_target_warehouse_for_setting')
-    else:
-        warehouse=frappe.get_value('Material Manufacturing', mm, 'curing_target_warehouse')
+def uom_conversion(mm, batch=None):
     if batch:
-        batch_qty = get_batch_qty(batch_no=batch, warehouse=warehouse ) or 0
-        from_uom = frappe.get_value("Batch", batch, "stock_uom")
-        if batch_qty:
-            from_qty = batch_qty
-        item_doc = frappe.get_doc('Item', item)
-        from_conv = 0
-        to_conv = 0
-        for row in item_doc.uoms:
-            if(row.uom == from_uom):
-                from_conv = row.conversion_factor
-            if(row.uom == to_uom):
-                to_conv = row.conversion_factor
-
-        if(not from_conv):
-            frappe.msgprint(f"Assign {from_uom} conversion factor for {item}")
-        if(not to_conv):
-            frappe.msgprint(f"Assign {to_uom} conversion factor for {item}")
-        
-        if from_conv and to_conv:
-            return (float(from_qty) * from_conv) / to_conv
-        else:
-            return 0
+        batch_qty = frappe.get_value('Material Manufacturing', mm, 'shot_blasted_bundle')
+        return batch_qty
     else:
         return 0

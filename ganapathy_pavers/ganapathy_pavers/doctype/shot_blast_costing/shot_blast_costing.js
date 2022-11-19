@@ -129,13 +129,15 @@ frappe.ui.form.on('Shot Blast Items', {
 	},
 	batch:function(frm,cdt,cdn){
 		let row = locals[cdt][cdn]
+		if (!row.material_manufacturing) {
+			frappe.show_alert({message: `Kindly enter <b>Paver Manufacturing</b> at row ${row.idx}`, indicator: "red"})
+			return
+		}
 		frappe.call({
 			method:"ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.uom_conversion",
 			args:{
-				item:row.item_name,
 				batch:row.batch,
-				to_uom:"bundle",
-				mm: row.material_manufacturing || ''
+				mm: row.material_manufacturing
 			},
 			callback(r){
 				frappe.model.set_value(row.doctype,row.name,'bundle', r.message || 0);
