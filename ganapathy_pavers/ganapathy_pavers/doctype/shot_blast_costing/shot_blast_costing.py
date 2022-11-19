@@ -5,7 +5,7 @@
 import json
 import frappe
 from frappe.model.document import Document
-from erpnext.stock.doctype.batch.batch import get_batch_qty
+from erpnext.controllers.queries import get_fields
 
 class ShotBlastCosting(Document):
     def before_submit(doc):
@@ -92,3 +92,28 @@ def uom_conversion(mm, batch=None):
         return batch_qty
     else:
         return 0
+
+@frappe.whitelist()
+def batch_query(doctype, txt, searchfield, start, page_len, filters, as_dict=False):
+    searchfield = frappe.get_meta(doctype).get_search_fields()
+    searchfield = "(" +"or ".join(field + " like %(txt)s" for field in searchfield)
+    if filters and filters.get('material_manufacturing'):
+        searchfield+=f""") and name='{frappe.get_value("Material Manufacturing", filters.get("material_manufacturing"), "batch_no_curing")}' """
+    fields = ', '.join(get_fields(doctype))
+    res = frappe.db.sql(
+        f"""SELECT 
+                {fields} 
+            FROM 
+                `tab{doctype}` 
+            WHERE
+                ({searchfield})
+            ORDER BY
+                (case when locate(%(_txt)s, name) > 0 then locate(%(_txt)s, name) else 99999 end),
+                idx desc,
+                name
+            LIMIT
+                {page_len} offset {start}
+        """,
+        {"txt": "%%%s%%" % txt, "_txt": txt.replace("%", ""), "start": start, "page_len": page_len},
+    )
+    return res
