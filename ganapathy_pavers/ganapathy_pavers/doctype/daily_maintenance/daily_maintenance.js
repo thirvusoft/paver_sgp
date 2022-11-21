@@ -23,6 +23,7 @@ frappe.ui.form.on('Daily Maintenance', {
 				cur_frm.set_value("machine_details", r.message[5])
 				cur_frm.set_value("compound_wall_stock", r.message[6])
 				cur_frm.set_value("colour_powder", r.message[7])
+				cur_frm.set_value("compound_wall_item_stock", r.message[8])
 
 				
 			}
