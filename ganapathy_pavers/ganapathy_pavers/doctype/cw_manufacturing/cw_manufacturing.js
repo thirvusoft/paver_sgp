@@ -410,6 +410,7 @@ async function std_item(frm) {
                             row.bom_qty = d.ts_qty;
                             row.from_usb = 1;
                             row.stock_uom = d.stock_uom;
+                            row.source_warehouse = d.source_warehouse
                             row.uom = d.uom;
                             if (d.rate == 0) {
                                 row.rate = d.validation_rate;
@@ -455,6 +456,7 @@ async function item_adding(frm) {
                             row.qty = d.qty;
                             row.bom_qty = d.ts_qty;
                             row.stock_uom = d.stock_uom;
+                            row.source_warehouse = d.source_warehouse
                             row.from_bom = 1;
                             row.uom = d.uom;
                             row.rate = d.rate;

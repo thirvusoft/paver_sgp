@@ -114,7 +114,7 @@ def make_stock_entry_for_molding(doc):
         if (doc.get("items")):
             for i in doc.get("items"):
                 stock_entry.append('items', dict(
-                    s_warehouse=(doc.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"]*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), uom=i["uom"],
+                    s_warehouse=(i.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"]*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), uom=i["uom"],
                     basic_rate=i['rate'],
                      basic_rate_hidden=i['rate'],
                    
@@ -330,7 +330,14 @@ def std_item(doc):
         bom_doc = frappe.get_doc("BOM", bom)
         for item in bom_doc.items:
             if(item.is_usb_item and item.item_code in items):
-                items[item.item_code]['ts_qty'] = item.qty
+                if item.qty:
+                    items[item.item_code]['ts_qty'] = item.qty
+                if 'ts_qty' not in items[item.item_code]:
+                    items[item.item_code]['ts_qty']=0
+                if item.source_warehouse:
+                    items[item.item_code]['source_warehouse'] = item.source_warehouse
+                if 'source_warehouse' not in items[item.item_code]:
+                    items[item.item_code]['source_warehouse']=''
     return list(items.values())
 
 
