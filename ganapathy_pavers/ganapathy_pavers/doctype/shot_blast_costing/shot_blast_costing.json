@@ -219,13 +219,15 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-22 16:14:41.831759",
+ "modified": "2022-11-19 11:21:47.993777",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Costing",
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -235,6 +237,7 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

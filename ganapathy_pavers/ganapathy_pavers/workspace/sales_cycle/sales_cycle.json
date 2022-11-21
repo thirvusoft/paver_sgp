@@ -54,36 +54,8 @@
   {
    "hidden": 0,
    "is_query_report": 1,
-   "label": "Site Work Completion - Report",
-   "link_to": "Site Work Completion - Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
    "label": "Job Worker - Report",
    "link_to": "Job Worker - Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Site Work Wise Delivery Report",
-   "link_to": "Site Work Wise Delivery Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "dependencies": "Vehicle Log",
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Vehicle Fuel Report",
-   "link_to": "Vehicle Fuel Report",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -98,21 +70,27 @@
    "type": "Link"
   },
   {
-   "dependencies": "Purchase Invoice",
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Supplier wise delivered report",
-   "link_to": "Supplier wise delivered report",
+   "label": "Site Work Reports",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Site Work Completion - Report",
+   "link_to": "Site Work Completion - Report",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
   },
   {
-   "dependencies": "Purchase Invoice",
    "hidden": 0,
-   "is_query_report": 0,
-   "label": "Item wise delivered quantity from supplier report",
-   "link_to": "Item wise delivered quantity from supplier report",
+   "is_query_report": 1,
+   "label": "Site Work Wise Delivery Report",
+   "link_to": "Site Work Wise Delivery Report",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -125,10 +103,27 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reprots",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Daily and Monthly Summary",
+   "link_to": "Daily and Monthly Summary",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2022-11-11 14:58:48.476893",
- "modified_by": "admin@gmail.com",
+ "modified": "2022-11-18 17:56:24.579644",
+ "modified_by": "ponnusamyv434@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "Sales Cycle",
  "owner": "Administrator",

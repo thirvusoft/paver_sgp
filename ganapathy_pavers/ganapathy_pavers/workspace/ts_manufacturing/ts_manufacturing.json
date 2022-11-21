@@ -24,11 +24,10 @@
    "type": "Card Break"
   },
   {
-   "dependencies": "Material Manufacturing",
    "hidden": 0,
-   "is_query_report": 0,
-   "label": "Paver Manufacturing Report",
-   "link_to": "Paver Manufacturing Report",
+   "is_query_report": 1,
+   "label": "Itemwise Monthly Paver Production Report",
+   "link_to": "Itemwise Monthly Paver Production Report",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -38,15 +37,6 @@
    "is_query_report": 1,
    "label": "Daily Paver Production Register",
    "link_to": "Daily Paver Production Register",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Itemwise Monthly Paver Production Report",
-   "link_to": "Itemwise Monthly Paver Production Report",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -115,6 +105,15 @@
   {
    "hidden": 0,
    "is_query_report": 1,
+   "label": "Daily Fencing Post production",
+   "link_to": "Daily Fencing Post production",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
    "label": "Monthly Fencing Post Production Report",
    "link_to": "Monthly Fencing Post Production Report",
    "link_type": "Report",
@@ -149,7 +148,7 @@
    "type": "Link"
   }
  ],
- "modified": "2022-11-18 11:16:56.639611",
+ "modified": "2022-11-18 19:34:30.914064",
  "modified_by": "ponnusamyv434@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "TS Manufacturing",

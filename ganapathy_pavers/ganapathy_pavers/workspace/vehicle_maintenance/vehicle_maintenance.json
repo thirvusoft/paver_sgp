@@ -13,9 +13,45 @@
  "is_default": 0,
  "is_standard": 1,
  "label": "Vehicle Maintenance",
- "links": [],
- "modified": "2022-09-23 14:27:59.739429",
- "modified_by": "parameshwari@gmail.com",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vehicle Reprots",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Monthly Transport Report",
+   "link_to": "Monthly Transport Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Diesel Consumption Summary",
+   "link_to": "Diesel Consumption Summary",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Vehicle report",
+   "link_to": "Vehicle report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2022-11-18 19:30:37.543965",
+ "modified_by": "ponnusamyv434@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Maintenance",
  "owner": "Administrator",

@@ -83,9 +83,10 @@ def add_item(bom_no,doc):
    bom_doc = frappe.get_doc("BOM",bom_no)
    fields = ['item_code','qty', 'layer_type', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']
    for i in bom_doc.items:
-       row = {field:i.__dict__[field] for field in fields}
-       row['ts_qty'] = row.get('qty') or 0
-       items.append(row)
+       if i.layer_type=="Top Layer":
+         row = {field:i.__dict__[field] for field in fields}
+         row['ts_qty'] = row.get('qty') or 0
+         items.append(row)
    return items
 @frappe.whitelist()
 def std_item(doc):
@@ -139,7 +140,11 @@ def std_item(doc):
                if(row.item_code not in bom_qty):
                    bom_qty[row.item_code] = 0
                bom_qty[row.item_code] += row.qty
- 
+               for item in items:
+                     if(item["item_code"]==row.item_code and row.source_warehouse):
+                        item['source_warehouse']=row.source_warehouse
+                     if 'source_warehouse' not in item:
+                        item['source_warehouse']=''
    return {'items': items, 'bom_qty': bom_qty}
  
 @frappe.whitelist()
@@ -175,7 +180,7 @@ def make_stock_entry(doc,type1):
        if(doc.get("items")): 
            for i in doc.get("items"):
                stock_entry.append('items', dict(
-               s_warehouse = doc.get("source_warehouse"), item_code = i["item_code"],qty = i["qty"], uom = i["uom"],
+               s_warehouse = i.get("source_warehouse") or doc.get("source_warehouse"), item_code = i["item_code"],qty = i["qty"], uom = i["uom"],
                basic_rate_hidden = i["rate"],
                basic_rate = i["rate"]
                ))

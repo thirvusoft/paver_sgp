@@ -24,7 +24,7 @@ frappe.query_reports["Lead Report"] = {
 			"fieldname":"lead_type",
 			"label": __("Lead Type"),
 			"fieldtype": "Select",
-			"options":"\nPaver\nCompound Wall",
+			"options":"\nPavers\nCompound Wall",
 			"width":"100"
 		},
 		{

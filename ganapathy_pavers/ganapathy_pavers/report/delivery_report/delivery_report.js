@@ -62,7 +62,7 @@ frappe.query_reports["Delivery Report"] = {
 			"fieldname":"type",
 			"label": __("Type"),
 			"fieldtype": "Select",
-			"options": "\nPavers\ncompound Walls",
+			"options": "\nPavers\nCompound Wall",
 		},
 		{
 			"fieldname":"customer_group",

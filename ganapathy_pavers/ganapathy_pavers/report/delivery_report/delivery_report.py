@@ -55,8 +55,7 @@ class PartyLedgerSummaryReport(object):
 			{
 				"fieldname":"type",
 				"label": _("Type"),
-				"fieldtype": "Select",
-				"options": "\nPavers\ncompound Walls",
+				"fieldtype": "Data",
 				"width":150
 			},
 		]

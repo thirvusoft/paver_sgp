@@ -62,26 +62,27 @@ def execute(filters=None):
 
     
     columns = get_columns()
-    data.sort(key = lambda x: (x[1] if(group_by == "Date") else (x[5]), x[0]))
+    data.sort(key = lambda x: ((x[0], x[1]) if(group_by == "Date") else ((x[5], x[0]) if(group_by == 'Item Wise') else (x[2], x[0]))))
     matched_item=""
-    for i in range (0,len(data)-1,1):
-        if data[i][1] == data[i+1][1]:
-            matched_item = data[i][1]
-            data[i+1][0]=None
-            data[i+1][1]=None
-            data[i+1][2]=None
-            data[i+1][3]=None
-            data[i+1][4]=None
-                
-    
-        elif matched_item == data[i+1][1]:
-            data[i+1][0]=None
-            data[i+1][1]=None
-            data[i+1][2]=None
-            data[i+1][3]=None
-            data[i+1][4]=None
-        else:
-            matched_item=""
+    if group_by!="Customer Wise":
+        for i in range (0,len(data)-1,1):
+            if data[i][1] == data[i+1][1]:
+                matched_item = data[i][1]
+                data[i+1][0]=None
+                data[i+1][1]=None
+                data[i+1][2]=None
+                data[i+1][3]=None
+                data[i+1][4]=None
+                    
+        
+            elif matched_item == data[i+1][1]:
+                data[i+1][0]=None
+                data[i+1][1]=None
+                data[i+1][2]=None
+                data[i+1][3]=None
+                data[i+1][4]=None
+            else:
+                matched_item=""
     final_data = (group_total(filters, data) or []) if(data) else []
     return columns, final_data
  
@@ -126,7 +127,24 @@ def group_total(filters = {}, data = []):
                     ret_list.append(data[row])
                     total = add_list(total, data[row])
             return ret_list
-        
+
+        elif(filters.get("group_by") == "Customer Wise"):
+            ret_list = []
+            total = [0] * 13
+            data.append([None]*13)
+            for row in range(len(data)):
+                if(row!=0  and data[row][2]!=data[row-1][2]):
+                    total[3] = "Group Total"
+                    ret_list.append([frappe.bold(str(i)) if(i!=None) else '' for i in total])
+                    ret_list.append([None] * 13)
+                    ret_list.append(data[row])
+                    total = [0] * 13
+                    total = add_list(total, data[row])
+                else:
+                    ret_list.append(data[row])
+                    total = add_list(total, data[row])
+            return ret_list
+
         else:
             ret_list = []
             total = [0] * 13
