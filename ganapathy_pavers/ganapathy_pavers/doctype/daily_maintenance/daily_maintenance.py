@@ -25,7 +25,7 @@ class DailyMaintenance(Document):
 
 	
 @frappe.whitelist()
-def paver_item(warehouse, date):
+def paver_item(warehouse, date, warehouse_colour):
 	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name')
 	# print(item)
 	items_stock=[]
@@ -137,7 +137,7 @@ def paver_item(warehouse, date):
 
 	#compound_wall_items
 	compound_item=frappe.db.get_all("Item", filters={'item_group':"Compound Walls","compound_wall_type":"Post"},pluck='name')
-	
+	post_item={}
 	if compound_item:
 		# for i in compound_item:
 			ci_wo= frappe.db.get_all("Item", filters={'item_name':['like','%WITHOUT%'],'name':['in',compound_item],'disabled':0})
@@ -145,22 +145,68 @@ def paver_item(warehouse, date):
 			if ci_wo:
 				template={'post_length':ci_wo}
 				for j in ci_wo:
-					j['wo_bolt']=get_stock_qty(j.name, warehouse)
-					j['post_length']=j['name'].split('FEET')[0]+ 'FEET'
-					
-			ci_w= frappe.db.get_all("Item", filters={'item_name':['not like','%WITHOUT%'], 'name':['in',compound_item],'disabled':0})
+					post=j['name'].split('FEET')[0]+ 'FEET'
+					if post in post_item:
+						if 'wo_bolt' in post_item[post]:
+							post_item[post]['wo_bolt']+=get_stock_qty(j.name, warehouse) or 0
+						else:
+							post_item[post]['wo_bolt']=get_stock_qty(j.name, warehouse) or 0
+
+						# post_item[post]['post_length']=j['name'].split('FEET')[0]+ 'FEET'
+					else:
+						post_item[post]={'wo_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post}
+			print(post_item)		
+			ci_w= frappe.db.get_all("Item", filters={'item_name':['not like','%WITHOUT%, %CORNER BOLT%, %FENCING BOLT%'], 'name':['in',compound_item],'disabled':0})
 		
 			if ci_w:
 				template={'post_length':ci_w}
 				for j in ci_w:
-					j['with_bolt']=get_stock_qty(j.name, warehouse)
+					post=j['name'].split('FEET')[0]+ 'FEET'
+					if post in post_item:
+						if 'with_bolt' in post_item[post]:
+							post_item[post]['with_bolt']+=get_stock_qty(j.name, warehouse) or 0
+						else:
+							post_item[post]['with_bolt']=get_stock_qty(j.name, warehouse) or 0
+
+      
+						# post_item[post]['post_length']=j['name'].split('FEET')[0]+ 'FEET'
+					else:
+						post_item[post]={'with_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post}
+			print(post_item)
+			
+			ci_wo_cp= frappe.db.get_all("Item", filters={'item_name':['like','%CORNER WITHOUT%'], 'name':['in',compound_item],'disabled':0})
+			if ci_wo_cp:
+				template={'post_length':ci_wo_cp}
+				for j in ci_wo_cp:
+					j['pc_wo_bolt']=get_stock_qty(j.name, warehouse)
 					j['post_length']=j['name'].split('FEET')[0]+ 'FEET'
+			
+   
+			ci_w_cp= frappe.db.get_all("Item", filters={'item_name':['like','%CORNER BOLT%'], 'name':['in',compound_item],'disabled':0})
+			if ci_w_cp:
+				template={'post_length':ci_w_cp}
+				for j in ci_w_cp:
+					j['pc_with_bolt']=get_stock_qty(j.name, warehouse)
+					j['post_length']=j['name'].split('FEET')[0]+ 'FEET'
+			
+			
+	#colour powder items
+	colour_item=frappe.db.get_all("Item", filters={'item_group':"Raw Material",'has_variants':1},pluck='name')
+	colour_details=[]
+	for col in colour_item:
+		item_col=frappe.db.get_all("Item", filters=[['name','like','%Pigment%'],['variant_of','in',col]])
+		if item_col:
+			for j in item_col:
+				color_stock=get_stock_qty(j.name, warehouse_colour)
+				template={'colour':j.name,'stock':color_stock}
+				colour_details.append(template)
+				# print(color_stock)		
+				# print(colour_details)
+		# print(item_col)
 				
-			print(ci_wo+ci_w)
-		
  
  
  
  
  
-	return items_stock, total_stock,items_stock_shot,total_stock_shot, list(sqf.values()), production,  ci_wo+ci_w
+	return items_stock, total_stock,items_stock_shot,total_stock_shot, list(sqf.values()), production,  list(post_item.values()), colour_details

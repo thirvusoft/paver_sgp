@@ -5,7 +5,7 @@ frappe.ui.form.on('Daily Maintenance', {
 	 load_item_details: function(frm) {
 		frappe.call({
 			method:"ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.paver_item",
-			args:{warehouse:cur_frm.doc.warehouse,date:cur_frm.doc.date},
+			args:{warehouse:cur_frm.doc.warehouse,date:cur_frm.doc.date, warehouse_colour:cur_frm.doc.warehouse_colour},
 			callback:function(r){
 				cur_frm.set_value('colour_details', r.message[0])
 				cur_frm.set_value('red_total_n', r.message[1]['red'])
@@ -22,6 +22,7 @@ frappe.ui.form.on('Daily Maintenance', {
 				cur_frm.set_value("vehicle_details", r.message[4])
 				cur_frm.set_value("machine_details", r.message[5])
 				cur_frm.set_value("compound_wall_stock", r.message[6])
+				cur_frm.set_value("colour_powder", r.message[7])
 
 				
 			}
