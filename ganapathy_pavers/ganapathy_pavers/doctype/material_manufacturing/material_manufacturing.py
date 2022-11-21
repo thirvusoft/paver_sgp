@@ -83,9 +83,13 @@ def add_item(bom_no,doc):
    bom_doc = frappe.get_doc("BOM",bom_no)
    fields = ['item_code','qty', 'layer_type', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']
    for i in bom_doc.items:
-       row = {field:i.__dict__[field] for field in fields}
-       row['ts_qty'] = row.get('qty') or 0
-       items.append(row)
+       if i.layer_type=="Top Layer":
+         row = {field:i.__dict__[field] for field in fields}
+         row['ts_qty'] = row.get('qty') or 0
+         ws_warehosue=get_items_warehosue_from_workstation(i.item_code, i.layer_type, doc.get("work_station"))
+         if ws_warehosue:
+            row['source_warehouse']=ws_warehosue
+         items.append(row)
    return items
 @frappe.whitelist()
 def std_item(doc):
@@ -139,9 +143,26 @@ def std_item(doc):
                if(row.item_code not in bom_qty):
                    bom_qty[row.item_code] = 0
                bom_qty[row.item_code] += row.qty
- 
+               for item in items:
+                     if(item["item_code"]==row.item_code and row.source_warehouse):
+                        item['source_warehouse']=row.source_warehouse
+                     if 'source_warehouse' not in item:
+                        item['source_warehouse']=''
+   if(doc.get('work_station')):
+      for item in items:
+         ws_warehosue=get_items_warehosue_from_workstation(item["item_code"], item["layer_type"], doc.get("work_station"))
+         if ws_warehosue:
+            item['source_warehouse']=ws_warehosue
    return {'items': items, 'bom_qty': bom_qty}
- 
+
+def get_items_warehosue_from_workstation(item_code : str, layer_type : str, workstation : str) -> str:
+   ws=frappe.get_doc("Workstation", workstation)
+   for row in ws.raw_material_warehouse:
+      if row.layer_type and row.layer_type!=layer_type:
+         continue
+      if row.item_code==item_code:
+         return row.source_warehouse
+
 @frappe.whitelist()
 def item_data(item_code):
    if(item_code):
@@ -175,7 +196,7 @@ def make_stock_entry(doc,type1):
        if(doc.get("items")): 
            for i in doc.get("items"):
                stock_entry.append('items', dict(
-               s_warehouse = doc.get("source_warehouse"), item_code = i["item_code"],qty = i["qty"], uom = i["uom"],
+               s_warehouse = i.get("source_warehouse") or doc.get("source_warehouse"), item_code = i["item_code"],qty = i["qty"], uom = i["uom"],
                basic_rate_hidden = i["rate"],
                basic_rate = i["rate"]
                ))

@@ -467,7 +467,8 @@ function std_item(frm){
 								else{
 									row.rate = d.rate;
 								}
-								row.amount= d.amount
+								row.amount= d.amount;
+								row.source_warehouse= d.source_warehouse;
 							}
 						// }
 					}
