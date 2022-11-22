@@ -139,6 +139,8 @@ def paver_item(warehouse, date, warehouse_colour):
 	compound_item=frappe.db.get_all("Item", filters={'item_group':"Compound Walls","compound_wall_type":"Post",'item_name':['like',"%FEET%"]},pluck='name')
 	post_item={}
 	# print(compound_item)
+	compound_item=frappe.db.get_all("Item", filters={'item_group':"Compound Walls","compound_wall_type":"Post"},pluck='name')
+	
 	if compound_item:
 		# for i in compound_item:
 			ci_wo= frappe.db.get_all("Item", filters={'item_name':['like','%WITHOUT%'],'name':['in',compound_item],'disabled':0})
@@ -262,3 +264,24 @@ def paver_item(warehouse, date, warehouse_colour):
 	print(slab_item)
 
 	return items_stock, total_stock,items_stock_shot,total_stock_shot, list(sqf.values()), production,  list(post_item.values()), colour_details, slab_details
+				template={'post_length':ci_wo}
+				for j in ci_wo:
+					j['wo_bolt']=get_stock_qty(j.name, warehouse)
+					j['post_length']=j['name'].split('FEET')[0]+ 'FEET'
+					
+			ci_w= frappe.db.get_all("Item", filters={'item_name':['not like','%WITHOUT%'], 'name':['in',compound_item],'disabled':0})
+		
+			if ci_w:
+				template={'post_length':ci_w}
+				for j in ci_w:
+					j['with_bolt']=get_stock_qty(j.name, warehouse)
+					j['post_length']=j['name'].split('FEET')[0]+ 'FEET'
+				
+			print(ci_wo+ci_w)
+		
+ 
+ 
+ 
+ 
+ 
+	return items_stock, total_stock,items_stock_shot,total_stock_shot, list(sqf.values()), production,  ci_wo+ci_w

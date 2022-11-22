@@ -3,6 +3,11 @@ var prop_name;
 
 frappe.ui.form.on('Sales Order', {
     onload: function (frm) {
+        if (cur_frm.doc.docstatus == 1) {
+            cur_frm.add_custom_button('Update Customer Details', function () {
+                update_customer()
+            })
+        }
         frm.set_query('customer', 'customers_name', function () {
             return {
                 filters: {
@@ -467,3 +472,42 @@ async function bundle_calc(frm, cdt, cdn) {
     }
 }
 
+function update_customer() {
+    let dialog = new frappe.ui.Dialog({
+        title: "Update MultiCustomer Details",
+        fields: [
+            {
+                fieldname: 'customers_name',
+                fieldtype: 'Table',
+                label: 'Customers Name',
+                data: cur_frm.doc.customers_name,
+                reqd: 1,
+                fields: [
+                    {
+                        fieldname: 'customer',
+                        fieldtype: 'Link',
+                        label: 'Customer',
+                        options: 'Customer',
+                        in_list_view: 1
+                    }
+                ]
+            }
+        ],
+        primary_action: async function (data) {
+            await frappe.call({
+                method: "ganapathy_pavers.custom.py.sales_order.update_multicustomer",
+                args: {
+                    customers_name: data.customers_name,
+                    sales_order: cur_frm.doc.name
+                },
+                freeze: true,
+                freeze_message: "Updating",
+                callback(r) {
+                    cur_frm.reload_doc()
+                    dialog.hide()
+                }
+            })
+        }
+    })
+    dialog.show()
+}

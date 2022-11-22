@@ -338,6 +338,12 @@ def std_item(doc):
                     items[item.item_code]['source_warehouse'] = item.source_warehouse
                 if 'source_warehouse' not in items[item.item_code]:
                     items[item.item_code]['source_warehouse']=''
+    for row in doc.get('item_details') or  []:
+        if row.get('workstation'):
+            for item in items:            
+                ws_warehouse=get_items_warehosue_from_workstation(items[item]['item_code'], 1, row.get('workstation'))
+                if ws_warehouse:
+                    items[item]['source_warehouse']=ws_warehouse
     return list(items.values())
 
 
@@ -467,8 +473,19 @@ def add_item(doc, batches = 1):
                         else:
                             items[i.item_code]['qty'] += (no_of_batches * i.qty)
                             items[i.item_code]['amount'] += (no_of_batches * i.amount)
-                           
+        for k in doc:
+            if k.get('workstation'):
+                for row in list(items.values()):
+                    ws_warehouse=get_items_warehosue_from_workstation(row['item_code'], 0, k.get('workstation'))
+                    if ws_warehouse:
+                        row['source_warehouse']=ws_warehouse           
         
     return list(items.values())
            
-
+def get_items_warehosue_from_workstation(item_code : str, is_usb_item : int, workstation : str) -> str:
+   ws=frappe.get_doc("Workstation", workstation)
+   for row in ws.raw_material_warehouse:
+      if row.is_usb_item!=(is_usb_item or 0):
+         continue
+      if row.item_code==item_code:
+         return row.source_warehouse

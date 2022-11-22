@@ -408,6 +408,7 @@ async function std_item(frm) {
                             row.no_of_batches = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0;
                             row.qty = d.qty;
                             row.bom_qty = d.ts_qty;
+                            row.is_usb_item = 1;
                             row.from_usb = 1;
                             row.stock_uom = d.stock_uom;
                             row.source_warehouse = d.source_warehouse
