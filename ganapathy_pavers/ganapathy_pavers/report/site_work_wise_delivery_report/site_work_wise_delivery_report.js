@@ -50,7 +50,7 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 			"fieldname":"group_by",
 			"label": __("Group By"),
 			"fieldtype": "Select",
-			"options": "Date\nItem Wise",
+			"options": "Date\nItem Wise\nCustomer Wise",
 			"default": "Date",
 			"width": "100"
 		},

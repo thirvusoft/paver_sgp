@@ -4,7 +4,7 @@ __version__ = '0.0.1'
 from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import throw_error
 import frappe
 
-def uom_conversion(item, from_uom='', from_qty=0, to_uom=''):
+def uom_conversion(item : str, from_uom='', from_qty=0, to_uom='') -> float:
     if(not from_uom):
         from_uom = frappe.get_value('Item', item, 'stock_uom')
     item_doc = frappe.get_doc('Item', item)
@@ -23,7 +23,7 @@ def uom_conversion(item, from_uom='', from_qty=0, to_uom=''):
     return (float(from_qty) * from_conv) / to_conv
 
 
-def get_valuation_rate(item_code, warehouse, posting_date=None):
+def get_valuation_rate(item_code : str, warehouse : str, posting_date=None) -> float:
 	if not posting_date:
 		posting_date = frappe.utils.nowdate()
 	rate=frappe.get_all("Stock Ledger Entry", {
@@ -57,7 +57,7 @@ def get_valuation_rate(item_code, warehouse, posting_date=None):
 	return rate[0]
 
 
-def get_buying_rate(item_code, warehouse, posting_date=None):
+def get_buying_rate(item_code : str, warehouse : str, posting_date=None) -> float:
 	if not posting_date:
 		posting_date = frappe.utils.nowdate()
 	rate=frappe.get_all("Stock Ledger Entry", {
@@ -90,6 +90,6 @@ def get_buying_rate(item_code, warehouse, posting_date=None):
 		return 0
 	return rate[0]
 
-def get_bank_details(company):
+def get_bank_details(company : str) -> dict:
 	doc=frappe.get_all("Bank Account", {"company": company, "account": frappe.get_value("Company", company, "default_bank_account")}, ["branch_name", "ifsc_code", "bank", "bank_account_no"])
 	return doc[0] if doc else {"branch_name":"", "ifsc_code":"", "bank":"", "bank_account_no":""}

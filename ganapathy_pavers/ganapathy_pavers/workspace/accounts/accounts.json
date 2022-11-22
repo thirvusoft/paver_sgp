@@ -25,7 +25,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Supplier Ledger Summary",
    "link_to": "Supplier Ledger Summary",
    "link_type": "Report",
@@ -34,7 +34,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Customer ledger Summary",
    "link_to": "Customer Ledger Summary",
    "link_type": "Report",
@@ -43,7 +43,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "General Ledger",
    "link_to": "General Ledger",
    "link_type": "Report",
@@ -52,7 +52,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Balance Sheet",
    "link_to": "Balance Sheet",
    "link_type": "Report",
@@ -61,7 +61,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Profit and Loss",
    "link_to": "Profit and Loss Statement",
    "link_type": "Report",
@@ -69,8 +69,8 @@
    "type": "Link"
   }
  ],
- "modified": "2022-09-23 14:28:12.940408",
- "modified_by": "parameshwari@gmail.com",
+ "modified": "2022-11-18 17:37:28.293545",
+ "modified_by": "ponnusamyv434@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "Accounts",
  "onboarding": "",
