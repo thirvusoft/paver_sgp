@@ -11,7 +11,7 @@ def execute(filters=None):
 	to_date = filters.get("to_date")
 
 	doc = frappe.get_all("CW Manufacturing", {"molding_date":["between", (from_date, to_date)],"type":"Fencing Post","production_sqft":["!=",0],"docstatus":["!=",2]}, order_by = 'molding_date')
-	
+	days_count = {}
 	data = []
 	final_data = []
 
@@ -22,7 +22,8 @@ def execute(filters=None):
 			
 			if not data:
 				for material in doc_details.item_details:
-					
+					if(f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}' not in days_count):days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] = 1
+					else:days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] += 1
 					matched_item  = 0
 
 					for item in	data:
@@ -52,7 +53,8 @@ def execute(filters=None):
 
 				for material in doc_details.item_details:
 					matched_item  = 0
-
+					if(f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}' not in days_count):days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] = 1
+					else:days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] += 1
 					for item in	data:
 
 						if item["item"] == material.item and item["month"] == doc_details.molding_date.strftime("%B"):
@@ -83,7 +85,13 @@ def execute(filters=None):
 			row["total_cost_per_sqft"] = row["total_cost_per_sqft"] / row["total_item_count"]
 			
 			final_data.append(list(row.values()))
+	days_count=sorted(days_count, key=lambda x:x)
+	key = {i.split('.+.+.+.')[0]:0 for i in days_count}
 
+	for i in days_count:
+		key[i.split('.+.+.+.')[0]] += 1
+	for i in final_data:
+		i[3] = key[i[0]+i[1]]
 	return columns, final_data
 
 def get_columns():
@@ -96,7 +104,7 @@ def get_columns():
 			"fieldname":"no_of_days",
 			"label":"No Of Days",
 			"width":100,
-			"hidden":1,
+			# "hidden":1,
 			"fieldtype":"Int"
 		},
 		_("Prod Cost") + ":Currency:100",
