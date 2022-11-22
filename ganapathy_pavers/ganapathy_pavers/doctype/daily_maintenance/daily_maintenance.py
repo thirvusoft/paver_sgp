@@ -141,8 +141,8 @@ def paver_item(warehouse, date, warehouse_colour):
 	# print(compound_item)
 	if compound_item:
 		# for i in compound_item:
-			ci_wo= frappe.db.get_all("Item", filters={'item_name':['like','%WITHOUT%'],'name':['in',compound_item],'disabled':0})
-			
+			ci_wo= frappe.db.get_all("Item", filters={'item_name':['like','% FEET WITHOUT BOLT POST%'],'name':['in',compound_item],'disabled':0})
+			# print(ci_wo)
 			if ci_wo:
 				template={'post_length':ci_wo, 'type':'Normal'}
 				for j in ci_wo:
@@ -157,8 +157,8 @@ def paver_item(warehouse, date, warehouse_colour):
 					else:
 						post_item[post]={'wo_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post, 'type':'Normal'}
 			# print(post_item)		
-			ci_w= frappe.db.get_all("Item", filters={'item_name':['not like','%WITHOUT%, %CORNER BOLT%, %FENCING BOLT%'], 'name':['in',compound_item],'disabled':0})
-		
+			ci_w= frappe.db.get_all("Item", filters={'item_name':['like','%FEET BOLT POST%'], 'name':['in',compound_item],'disabled':0})
+			print(ci_w)
 			if ci_w:
 				template={'post_length':ci_w, 'type':'Normal'}
 				for j in ci_w:
@@ -189,39 +189,40 @@ def paver_item(warehouse, date, warehouse_colour):
 
 					else:
 						post_item[post]={'pc_wo_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post}
-			print(post_item)
+			# print(post_item)
 			
    
-			ci_w_cp= frappe.db.get_all("Item", filters={'item_name':['like','%CORNER BOLT%'], 'name':['in',compound_item],'disabled':0})
-			if ci_w_cp:
-				template={'post_length':ci_w_cp,'type':'Normal'}
-				for j in ci_w_cp:
-					post=j['name'].split('FEET')[0]+ 'FEET'
-					if post in post_item:
-						if 'pc_with_bolt' in post_item[post]:
-							post_item[post]['pc_with_bolt']+=get_stock_qty(j.name, warehouse) or 0
-						else:
-							post_item[post]['pc_with_bolt']=get_stock_qty(j.name, warehouse) or 0
+			# ci_w_cp= frappe.db.get_all("Item", filters={'item_name':['like','%CORNER BOLT%'], 'name':['in',compound_item],'disabled':0})
+			# print(ci_w_cp)
+			# if ci_w_cp:
+			# 	template={'post_length':ci_w_cp,'type':'Normal'}
+			# 	for j in ci_w_cp:
+			# 		post=j['name'].split('FEET')[0]+ 'FEET'
+			# 		if post in post_item:
+			# 			if 'pc_with_bolt' in post_item[post]:
+			# 				post_item[post]['pc_with_bolt']+=get_stock_qty(j.name, warehouse) or 0
+			# 			else:
+			# 				post_item[post]['pc_with_bolt']=get_stock_qty(j.name, warehouse) or 0
 
-					else:
-						post_item[post]={'pc_with_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post}
+			# 		else:
+			# 			post_item[post]={'pc_with_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post}
       
-			ci_fencing_wo= frappe.db.get_all("Item", filters={'item_name':['like','%FENCING WITHOUT BOLT POST%'], 'item_group':'Compound Walls','disabled':0})
-			print(ci_fencing_wo)
-			if ci_fencing_wo:
-				for j in ci_fencing_wo:
-					post=j['name'].split('FEET')[0]+ 'FEET'
-					if post in post_item and post_item[post]['type']=='Fencing':
-						if 'wo_bolt' in post_item[post]:
-							post_item[post]['wo_bolt']+=get_stock_qty(j.name, warehouse) or 0
-						else:
-							post_item[post]['wo_bolt']=get_stock_qty(j.name, warehouse) or 0
+			# ci_fencing_wo= frappe.db.get_all("Item", filters={'item_name':['like','%FENCING WITHOUT BOLT POST%'], 'item_group':'Compound Walls','disabled':0})
+			# print(ci_fencing_wo)
+			# if ci_fencing_wo:
+			# 	for j in ci_fencing_wo:
+			# 		post=j['name'].split('FEET')[0]+ 'FEET'
+			# 		if post in post_item and post_item[post]['type']=='Fencing':
+			# 			if 'wo_bolt' in post_item[post]:
+			# 				post_item[post]['wo_bolt']+=get_stock_qty(j.name, warehouse) or 0
+			# 			else:
+			# 				post_item[post]['wo_bolt']=get_stock_qty(j.name, warehouse) or 0
 
-					else:
-						post_item[post]={'wo_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post, 'type':"Fencing"}
-			print(post_item)
+			# 		else:
+			# 			post_item[post]={'wo_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post, 'type':"Fencing"}
+			# # print(post_item)
    
-			ci_fencing_with= frappe.db.get_all("Item", filters={'item_name':['like','%FENCING  BOLT POST%'], 'item_group':'Compound Walls','disabled':0})
+			ci_fencing_with= frappe.db.get_all("Item", filters={'item_name':['like','%FENCING BOLT POST%'], 'item_group':'Compound Walls','disabled':0})
 			print(ci_fencing_with)
 			if ci_fencing_with:
 				for j in ci_fencing_with:
@@ -234,7 +235,7 @@ def paver_item(warehouse, date, warehouse_colour):
 
 					else:
 						post_item[post]={'with_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post, 'type':"Fencing"}
-			print(post_item)
+			# print(post_item)
 			
 	#colour powder items
 	colour_item=frappe.db.get_all("Item", filters={'item_group':"Raw Material",'has_variants':1},pluck='name')
@@ -242,9 +243,21 @@ def paver_item(warehouse, date, warehouse_colour):
 	for col in colour_item:
 		item_col=frappe.db.get_all("Item", filters=[['name','like','%Pigment%'],['variant_of','in',col]])
 		if item_col:
+			
 			for j in item_col:
 				color_stock=get_stock_qty(j.name, warehouse_colour)
-				template={'colour':j.name,'stock':color_stock}
+				attribute=frappe.get_doc("Item",j.name)
+				colour=""
+				
+				for k in attribute.attributes:
+					if k.attribute=="Colour":
+						colour=k.attribute_value.lower()
+					if not colour:
+						continue
+					if colour not in template:
+						template[colour]=0
+						template[colour]+=color_stock
+				template={'colour':j.name,'stock':color_stock, 'attribute_value':colour}
 				colour_details.append(template)
 				
 	# slab type item
@@ -259,6 +272,21 @@ def paver_item(warehouse, date, warehouse_colour):
 	post_=get_stock_qty('POST CAP', warehouse)
 	post={'item':post_cap, 'stock':post_}
 	slab_details.append(post)
-	print(slab_item)
+	# print(slab_item)
+ 
+	#pavers size details 
+	paver_item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name')
+	# print(paver_item)
+	for i in paver_item:
+		normal=frappe.db.get_all("Item", filters=[
+										['variant_of','=',i],
+										["Item Variant Attribute","attribute_value",'=','Normal']], pluck='name')
+		# print(normal)
+		for j in normal:
+			# print(f""" select name from `tabItem` WHERE name regexp '[0-9][mM][Mm]' and 'disabled'=0 name in {tuple(normal)}""")
+			paver=frappe.db.sql(""" select name from `tabItem` WHERE name regexp '[0-9][mM][Mm]' and 'disabled'=0 """)
+			# print(paver)
+      
+	
 
 	return items_stock, total_stock,items_stock_shot,total_stock_shot, list(sqf.values()), production,  list(post_item.values()), colour_details, slab_details
