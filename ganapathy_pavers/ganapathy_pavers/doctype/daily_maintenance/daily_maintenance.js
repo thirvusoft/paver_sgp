@@ -13,15 +13,17 @@ frappe.ui.form.on('Daily Maintenance', {
 				cur_frm.set_value('grey_total_n', r.message[1]['grey'])
 				cur_frm.set_value('brown_total_n', r.message[1]['brown'])
 				cur_frm.set_value('yellow_total_n',r.message[1]['yellow'])
-				cur_frm.set_value("vehicle_details", r.message[2])
-				cur_frm.set_value("machine_details", r.message[3])
+				cur_frm.set_value('colour_details_of_sb', r.message[2])
+				cur_frm.set_value('red_total_s', r.message[3]['red'])
+				cur_frm.set_value('black_total_s',r.message[3]['black'])
+				cur_frm.set_value('grey_total_s', r.message[3]['grey'])
+				cur_frm.set_value('brown_total_s', r.message[3]['brown'])
+				cur_frm.set_value('yellow_total_s',r.message[3]['yellow'])
+				cur_frm.set_value("vehicle_details", r.message[4])
+				cur_frm.set_value("machine_details", r.message[5])
+				cur_frm.set_value("compound_wall_stock", r.message[6])
 
-				// cur_frm.set_value('colour_details_of_sb', r.message[2])
-				// cur_frm.set_value('red_total_s', r.message[3]['red'])
-				// cur_frm.set_value('black_total_s',r.message[3]['black'])
-				// cur_frm.set_value('grey_total_s', r.message[3]['grey'])
-				// cur_frm.set_value('brown_total_s', r.message[3]['brown'])
-				// cur_frm.set_value('yellow_total_s',r.message[3]['yellow'])
+				
 			}
 
 		})
