@@ -86,6 +86,9 @@ def add_item(bom_no,doc):
        if i.layer_type=="Top Layer":
          row = {field:i.__dict__[field] for field in fields}
          row['ts_qty'] = row.get('qty') or 0
+         ws_warehosue=get_items_warehosue_from_workstation(i.item_code, i.layer_type, doc.get("work_station"))
+         if ws_warehosue:
+            row['source_warehouse']=ws_warehosue
          items.append(row)
    return items
 @frappe.whitelist()
@@ -145,8 +148,21 @@ def std_item(doc):
                         item['source_warehouse']=row.source_warehouse
                      if 'source_warehouse' not in item:
                         item['source_warehouse']=''
+   if(doc.get('work_station')):
+      for item in items:
+         ws_warehosue=get_items_warehosue_from_workstation(item["item_code"], item["layer_type"], doc.get("work_station"))
+         if ws_warehosue:
+            item['source_warehouse']=ws_warehosue
    return {'items': items, 'bom_qty': bom_qty}
- 
+
+def get_items_warehosue_from_workstation(item_code : str, layer_type : str, workstation : str) -> str:
+   ws=frappe.get_doc("Workstation", workstation)
+   for row in ws.raw_material_warehouse:
+      if row.layer_type and row.layer_type!=layer_type:
+         continue
+      if row.item_code==item_code:
+         return row.source_warehouse
+
 @frappe.whitelist()
 def item_data(item_code):
    if(item_code):

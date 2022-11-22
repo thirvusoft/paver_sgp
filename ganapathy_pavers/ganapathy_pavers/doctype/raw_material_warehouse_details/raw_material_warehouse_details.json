@@ -1,0 +1,59 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-11-21 15:00:25.065544",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "layer_type",
+  "is_usb_item",
+  "source_warehouse"
+ ],
+ "fields": [
+  {
+   "columns": 2,
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "columns": 3,
+   "fieldname": "layer_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Layer Type(Paver)",
+   "options": "\nTop Layer\nPanmix"
+  },
+  {
+   "columns": 3,
+   "fieldname": "source_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "columns": 2,
+   "default": "0",
+   "fieldname": "is_usb_item",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is USB Item(CW)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-11-21 16:27:44.827179",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Raw Material Warehouse Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
