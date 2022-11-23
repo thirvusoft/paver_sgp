@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "DSM.-.{date}.-.###",
  "creation": "2022-11-16 12:28:36.386676",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -16,6 +17,9 @@
   "operator_absent",
   "section_break_9",
   "warehouse",
+  "column_break_11",
+  "warehouse_colour",
+  "section_break_13",
   "load_item_details",
   "colour_details",
   "data_12",
@@ -68,12 +72,12 @@
   },
   {
    "fieldname": "petrol_rate",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Petrol Rate"
   },
   {
    "fieldname": "diesel_rate",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Diesel Rate"
   },
   {
@@ -312,7 +316,7 @@
   {
    "fieldname": "warehouse",
    "fieldtype": "Link",
-   "label": "Warehouse",
+   "label": "Warehouse for Pavers and Compound Walls",
    "options": "Warehouse"
   },
   {
@@ -325,12 +329,26 @@
    "fieldtype": "Table",
    "label": "Colour Details of SB",
    "options": "Colour Details of SB"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warehouse_colour",
+   "fieldtype": "Link",
+   "label": "Warehouse for Colour Powder Items",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-16 19:19:24.481689",
+ "modified": "2022-11-23 15:30:26.748703",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Daily Maintenance",
@@ -346,6 +364,7 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],
