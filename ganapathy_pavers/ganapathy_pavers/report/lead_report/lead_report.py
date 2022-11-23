@@ -75,4 +75,4 @@ def get_data(filters):
         filter_['status']= status_
     lead=frappe.db.get_all("Lead", filters=filter_,fields=['lead_name','lead_owner','company_name','status','notes','type', 'source', 'reference_name'])
     return lead
-    return lead
+ 
