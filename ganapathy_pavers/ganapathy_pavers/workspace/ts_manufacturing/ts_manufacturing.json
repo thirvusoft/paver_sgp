@@ -141,6 +141,15 @@
   {
    "hidden": 0,
    "is_query_report": 1,
+   "label": "Daily Lego Post production",
+   "link_to": "Daily Lego Post production",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
    "label": "Monthly Lego Block Production Report",
    "link_to": "Monthly Lego Block Production Report",
    "link_type": "Report",
@@ -148,8 +157,8 @@
    "type": "Link"
   }
  ],
- "modified": "2022-11-18 19:34:30.914064",
- "modified_by": "ponnusamyv434@gmail.com",
+ "modified": "2022-11-23 13:27:37.260207",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Manufacturing",
  "onboarding": "Manufacturing",

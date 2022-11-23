@@ -32,7 +32,7 @@ def execute(filters=None):
 							matched_item  = 1
 							item["production_sqft"] += material.production_sqft
 							item["production_cost"] += doc_details.raw_material_cost / doc_details.production_sqft
-							item["expense"] += doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft)
+							item["expense"] += doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing)
 							item["total_cost_per_sqft"] += doc_details.total_cost_per_sqft
 							item["total_item_count"] += 1
 
@@ -44,7 +44,7 @@ def execute(filters=None):
 						"production_sqft":material.production_sqft,
 						"days":None,
 						"production_cost":doc_details.raw_material_cost / doc_details.production_sqft,
-						"expense":doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft),
+						"expense":doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing),
 						"total_cost_per_sqft":doc_details.total_cost_per_sqft,
 						"total_item_count":1
 					})
@@ -61,7 +61,7 @@ def execute(filters=None):
 							matched_item  = 1
 							item["production_sqft"] += material.production_sqft
 							item["production_cost"] += doc_details.raw_material_cost / doc_details.production_sqft
-							item["expense"] += doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft)
+							item["expense"] += doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing)
 							item["total_cost_per_sqft"] += doc_details.total_cost_per_sqft
 							item["total_item_count"] += 1
 
@@ -73,7 +73,7 @@ def execute(filters=None):
 						"production_sqft":material.production_sqft,
 						"days":None,
 						"production_cost":doc_details.raw_material_cost / doc_details.production_sqft,
-						"expense":doc_details.total_cost_per_sqft - (doc_details.raw_material_cost / doc_details.production_sqft),
+						"expense":doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing),
 						"total_cost_per_sqft":doc_details.total_cost_per_sqft,
 						"total_item_count":1
 					})

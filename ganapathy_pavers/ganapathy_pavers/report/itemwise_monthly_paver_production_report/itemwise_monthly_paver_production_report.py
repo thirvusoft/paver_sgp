@@ -64,9 +64,11 @@ def get_columns(filters):
 
 def get_data(filters):
     data={}
-    paver=frappe.db.get_all("Material Manufacturing",  filters={'from_time':['between',[filters.get('from_date'),filters.get('to_date')]]}, fields=['item_to_manufacture','production_sqft','item_price','total_raw_material','from_time'], order_by='from_time')
+    paver=frappe.db.get_all("Material Manufacturing",  filters={'from_time':['between',[filters.get('from_date'),filters.get('to_date')]]}, fields=['item_to_manufacture','production_sqft','item_price','total_raw_material','from_time', 'strapping_cost_per_sqft', 'labour_cost_per_sqft'], order_by='from_time')
     for i in paver:
-        production_cost=i.total_raw_material/i.production_sqft
+        if not i.production_sqft:
+            continue
+        production_cost=(i.total_raw_material/i.production_sqft) + i.strapping_cost_per_sqft + i.labour_cost_per_sqft
         expense=i.item_price-production_cost
         f={"month":i.from_time.strftime("%B"),"item":i.item_to_manufacture,"sqft":i.production_sqft,"prod_cost":production_cost,"expense_cost":expense,"total_cost":i.item_price,"no_of_days":1}
         if f"{i.item_to_manufacture} {i.month}" not in data:
