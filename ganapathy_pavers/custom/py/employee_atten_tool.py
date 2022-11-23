@@ -285,7 +285,6 @@ def day_wise_department(self, event):
 def validate_same_dates(self, event):
 	for row in self.employee_detail:
 		if(row.check_out and row.check_in):
-			frappe.errprint(str(date_diff(row.check_out, row.check_in)))
 			if(date_diff(row.check_out, row.check_in)!=0):
 				frappe.throw(f"Checkin and Checkout must be a same date for row {row.idx}")
 
