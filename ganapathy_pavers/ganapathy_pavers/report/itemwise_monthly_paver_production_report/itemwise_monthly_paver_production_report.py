@@ -37,7 +37,6 @@ def get_columns(filters):
             "label": _("No of Days"),
             "fieldtype": "Int",
             "fieldname": "no_of_days",
-	    "hidden":1,
             "width": 100
         },
          {
@@ -69,7 +68,7 @@ def get_data(filters):
     for i in paver:
         production_cost=i.total_raw_material/i.production_sqft
         expense=i.item_price-production_cost
-        f={"month":i.from_time.strftime("%B"),"item":i.item_to_manufacture,"sqft":i.production_sqft,"prod_cost":production_cost,"expense_cost":expense,"total_cost":i.item_price,"count":1}
+        f={"month":i.from_time.strftime("%B"),"item":i.item_to_manufacture,"sqft":i.production_sqft,"prod_cost":production_cost,"expense_cost":expense,"total_cost":i.item_price,"no_of_days":1}
         if f"{i.item_to_manufacture} {i.month}" not in data:
             data[f"{i.item_to_manufacture} {i.month}"] =f
         else:
@@ -77,13 +76,13 @@ def get_data(filters):
             data[f"{i.item_to_manufacture} {i.month}"]['prod_cost']+=f["prod_cost"]
             data[f"{i.item_to_manufacture} {i.month}"]['expense_cost']+=f["expense_cost"]
             data[f"{i.item_to_manufacture} {i.month}"]['total_cost']+=f["total_cost"]
-            data[f"{i.item_to_manufacture} {i.month}"]['count']+=1
+            data[f"{i.item_to_manufacture} {i.month}"]['no_of_days']+=1
     for i in data:
         # data [i]['sqft']/=data[i]["count"]
-        data [i]['prod_cost']/=data[i]["count"]
-        data [i]['expense_cost']/=data[i]["count"]
-        data [i]['total_cost']/=data[i]["count"]
-        
+        data [i]['prod_cost']/=data[i]["no_of_days"]
+        data [i]['expense_cost']/=data[i]["no_of_days"]
+        data [i]['total_cost']/=data[i]["no_of_days"]
+    
     return list(data.values())
 	
 
