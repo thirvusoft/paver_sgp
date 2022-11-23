@@ -42,13 +42,14 @@ def paver_item(warehouse, date, warehouse_colour):
 				stock_qty=get_stock_qty(j.name, warehouse)
 
 				attribute=frappe.get_doc("Item",j.name)
-				colour=""
-			
-				for k in attribute.attributes:
-					if k.attribute=="Colour":
-						colour=k.attribute_value.lower()
-					if not colour:
-						continue
+				colour=frappe.db.sql(f"""
+					select attribute_value from `tabItem Variant Attribute` where parent='{j.name}' and parenttype='Item' and attribute='Colour'
+				""")
+				if colour and colour[0]:
+					colour=colour[0][0].lower()
+				else:
+					continue
+					
 				if colour not in template:
 					template[colour]=0
 				template[colour]+=stock_qty
@@ -70,13 +71,13 @@ def paver_item(warehouse, date, warehouse_colour):
 				stock_qty_sb=get_stock_qty(sb.name, warehouse)
 
 				attribute=frappe.get_doc("Item",sb.name)
-				colour_sb=""
-			
-				for cl in attribute.attributes:
-					if cl.attribute=="Colour":
-						colour_sb=cl.attribute_value.lower()
-					if not colour_sb:
-						continue
+				colour_sb=frappe.db.sql(f"""
+					select attribute_value from `tabItem Variant Attribute` where parent='{sb.name}' and parenttype='Item' and attribute='Colour'
+				""")
+				if colour_sb and colour_sb[0]:
+					colour_sb=colour_sb[0][0].lower()
+				else:
+					continue
 				if colour_sb not in template_1:
 					template_1[colour_sb]=0
 				template_1[colour_sb]+=stock_qty_sb
@@ -112,27 +113,21 @@ def paver_item(warehouse, date, warehouse_colour):
  	
   	#machine_details
 	production=[]
-	paver_m=frappe.db.sql(f""" select item_to_manufacture, work_station, sum(production_sqft) as production_sqft,
-                         		sum(no_of_racks) as no_of_racks from `tabMaterial Manufacturing` where date(from_time) = '{date}' group by item_to_manufacture """, as_list=True)
-	if paver_m:
-		sqft=0
-		rack=0
-		for paver in paver_m:  
-			production_details={'item':paver[0],'machine':paver[1],'rack':paver[2],'sqft':paver[3]}
-			rack+=paver[2]
-			sqft+=paver[3]
-			production.append(production_details)
-		production.append({'item':'Total Sqft', 'rack':rack, 'sqft':sqft})
-	cw_m=frappe.db.get_all("CW Manufacturing", filters={'molding_date':date}, pluck='name')
-	if cw_m:
-		cw_item=frappe.db.get_all("CW Items", filters={'parent':['in' ,cw_m]}, fields=['item','workstation','production_sqft'])
-		sqft=0
-		for cw in cw_item:
-			if cw:
-				cw_production={'item':cw.item,'machine':cw.workstation, 'rack':'', 'sqft':cw.production_sqft}
-				sqft+=cw.production_sqft
-				production.append(cw_production)
-		production.append({'item':'Total Sqft', 'sqft':sqft})
+	paver=frappe.db.sql(f"""select item_to_manufacture as item, work_station as machine, sum(production_sqft) as sqft,
+	sum(no_of_racks) as rack from `tabMaterial Manufacturing` where date(from_time) = '{date}' group by item_to_manufacture, work_station""", as_dict=True)
+	if paver:
+		production+=paver
+		production+=frappe.db.sql(f"""select "Total Stock" as item, sum(production_sqft) as sqft,
+	sum(no_of_racks) as rack from `tabMaterial Manufacturing` where date(from_time) = '{date}' """, as_dict=True)
+	
+	cw=frappe.db.sql(f"""select cwi.item as item, cwi.workstation as machine, cwi.production_sqft as sqft from `tabCW Items` as cwi
+	 	left outer join `tabCW Manufacturing` as cw on cwi.parent=cw.name where cw.molding_date='{date}' and cw.docstatus!=2 group by cwi.item, cwi.workstation;
+	""", as_dict=True)
+	if cw:
+		production+=cw
+		production+=frappe.db.sql(f"""select "Total Stock" as item, sum(cwi.production_sqft) as sqft from `tabCW Items` as cwi
+	 	left outer join `tabCW Manufacturing` as cw on cwi.parent=cw.name where cw.molding_date='{date}' and cw.docstatus!=2;
+	""", as_dict=True)
 	
 
 	#compound_wall_items
@@ -141,10 +136,9 @@ def paver_item(warehouse, date, warehouse_colour):
 	# print(compound_item)
 	if compound_item:
 		# for i in compound_item:
-			ci_wo= frappe.db.get_all("Item", filters={'item_name':['like','% FEET WITHOUT BOLT POST%'],'name':['in',compound_item],'disabled':0})
+			ci_wo= frappe.db.get_all("Item", filters=[['item_name','like','%WITHOUT%'],['item_name','not like','%CORNER%'],['name','in',compound_item],['disabled','=',0]])
 			# print(ci_wo)
 			if ci_wo:
-				template={'post_length':ci_wo, 'type':'Normal'}
 				for j in ci_wo:
 					post=j['name'].split('FEET')[0]+ 'FEET'
 					if post in post_item and post_item[post]['type']=='Normal':
@@ -157,10 +151,9 @@ def paver_item(warehouse, date, warehouse_colour):
 					else:
 						post_item[post]={'wo_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post, 'type':'Normal'}
 			# print(post_item)		
-			ci_w= frappe.db.get_all("Item", filters={'item_name':['like','%FEET BOLT POST%'], 'name':['in',compound_item],'disabled':0})
+			ci_w= frappe.db.get_all("Item", filters=[['item_name','not like','%WITHOUT%'], ['item_name','not like','%CORNER%'], ['name','in',compound_item],['disabled', '=', 0]])
 			print(ci_w)
 			if ci_w:
-				template={'post_length':ci_w, 'type':'Normal'}
 				for j in ci_w:
 					post=j['name'].split('FEET')[0]+ 'FEET'
 					if post in post_item and post_item[post]['type']=='Normal':
@@ -178,7 +171,6 @@ def paver_item(warehouse, date, warehouse_colour):
 			ci_wo_cp= frappe.db.get_all("Item", filters={'item_name':['like','%CORNER WITHOUT%'], 'name':['in',compound_item],'disabled':0})
 			print(ci_wo_cp)
 			if ci_wo_cp:
-				template={'post_length':ci_wo_cp, 'type':'Normal'}
 				for j in ci_wo_cp:
 					post=j['name'].split('FEET')[0]+ 'FEET'
 					if post in post_item:
@@ -289,4 +281,4 @@ def paver_item(warehouse, date, warehouse_colour):
       
 	
 
-	return items_stock, total_stock,items_stock_shot,total_stock_shot, list(sqf.values()), production,  list(post_item.values()), colour_details, slab_details
+	return items_stock, total_stock, items_stock_shot, total_stock_shot, list(sqf.values()), production,  list(post_item.values()), colour_details, slab_details
