@@ -112,7 +112,7 @@ frappe.ui.form.on('Shot Blast Items', {
 	},
 	bundle_taken: function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
-		if (row.bundle_taken > row.bundle) {
+		if (row.bundle_taken > row.Bdl) {
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
 		frappe.db.get_value("Item", { "name": row.item_name }, "bundle_per_sqr_ft", (sqft) => {
@@ -144,7 +144,7 @@ frappe.ui.form.on('Shot Blast Items', {
 				mm: row.material_manufacturing
 			},
 			callback(r) {
-				frappe.model.set_value(row.doctype, row.name, 'bundle', r.message || 0);
+				frappe.model.set_value(row.doctype, row.name, 'Bdl', r.message || 0);
 				cur_frm.refresh_field('items')
 
 			}
@@ -158,7 +158,7 @@ function total(frm) {
 	for (var i = 0; i < frm.doc.items.length; i++) {
 		total_bundle += frm.doc.items[i].bundle_taken
 		total_sqft += frm.doc.items[i].sqft
-		if (frm.doc.items[i].bundle_taken > frm.doc.items[i].bundle) {
+		if (frm.doc.items[i].bundle_taken > frm.doc.items[i].Bdl) {
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
 	}

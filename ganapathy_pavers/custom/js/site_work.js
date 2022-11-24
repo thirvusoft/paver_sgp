@@ -175,22 +175,22 @@ function percent_complete(frm,cdt,cdn){
 
 function completed_bundle_calc(frm,cdt,cdn){
 	let data = locals[cdt][cdn]
-	let bundle = data.completed_bundle
+	let Bdl = data.completed_bundle
 	var item_bundle_per_sqft
 	let allocated_sqft
 	var item = data.item
-	if(bundle && item && data.item_group == "Pavers"){
+	if(Bdl && item && data.item_group == "Pavers"){
 		frappe.db.get_doc('Item',item).then(value => {
 			item_bundle_per_sqft = 0
 			for(let i=0; i<value.uoms.length; i++){
-				if(value.uoms[i].uom=='bundle'){
+				if(value.uoms[i].uom=='Bdl'){
 					item_bundle_per_sqft=value.uoms[i].conversion_factor
 				}
 			}
 			if(!item_bundle_per_sqft){
-				frappe.throw({'message': 'Please enter bundle conversion for an item: '+item})
+				frappe.throw({'message': 'Please enter Bdl conversion for an item: '+item})
 			}
-			allocated_sqft = bundle * item_bundle_per_sqft
+			allocated_sqft = Bdl * item_bundle_per_sqft
 			frappe.model.set_value(cdt,cdn,"sqft_allocated",allocated_sqft?allocated_sqft:0)
 		})
 	} else if (frm.doc.type == "Compound Wall") {

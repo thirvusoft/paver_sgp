@@ -249,7 +249,7 @@ def make_stock_entry(doc,type1):
         basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos)
        ))
        stock_entry.append('items', dict(
-           t_warehouse = doc.get("rack_shift_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), "bundle",qty, default_bundle),uom = default_bundle,
+           t_warehouse = doc.get("rack_shift_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), "Bdl",qty, default_bundle),uom = default_bundle,
            basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_bundle),
             basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_bundle)
            ))
@@ -279,7 +279,7 @@ def make_stock_entry(doc,type1):
        if doc.get("no_of_bundle") == 0:
            frappe.throw("Please Enter No of Bundle")
        stock_entry.append('items', dict(
-       s_warehouse = doc.get("curing_source_warehouse"),t_warehouse = doc.get("curing_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), 'bundle', doc.get("no_of_bundle"), default_bundle), uom = default_bundle,batch_no = doc.get("batch_no_rack_shifting"),
+       s_warehouse = doc.get("curing_source_warehouse"),t_warehouse = doc.get("curing_target_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), 'Bdl', doc.get("no_of_bundle"), default_bundle), uom = default_bundle,batch_no = doc.get("batch_no_rack_shifting"),
        basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_bundle),
         basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_bundle)
        ))

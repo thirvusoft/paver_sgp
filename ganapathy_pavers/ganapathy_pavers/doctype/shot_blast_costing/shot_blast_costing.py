@@ -18,9 +18,9 @@ class ShotBlastCosting(Document):
                 select material_manufacturing, sum(bundle_taken) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2) group by material_manufacturing;
             """, as_dict=True)
             for i in sbc:
-                bundle=(frappe.db.get_value("Material Manufacturing", i['material_manufacturing'], 'no_of_bundle') or 0)
-                frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'shot_blasted_bundle', bundle-(i['bundle_taken'] or 0))
-                if bundle-(i['bundle_taken'] or 0) <= 0:
+                Bdl=(frappe.db.get_value("Material Manufacturing", i['material_manufacturing'], 'no_of_bundle') or 0)
+                frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'shot_blasted_bundle', Bdl-(i['bundle_taken'] or 0))
+                if Bdl-(i['bundle_taken'] or 0) <= 0:
                     frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'status1', "Completed")
                 else:
                     frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'status1', "Shot Blast")
@@ -41,9 +41,9 @@ class ShotBlastCosting(Document):
             if not mm1:
                 sbc+=({'material_manufacturing': mm_doc[0], "bundle_taken": 0},)
         for i in sbc:
-            bundle=(frappe.db.get_value("Material Manufacturing", i['material_manufacturing'], 'no_of_bundle') or 0)
-            frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'shot_blasted_bundle', bundle-(i['bundle_taken'] or 0))
-            if bundle-(i['bundle_taken'] or 0) <= 0:
+            Bdl=(frappe.db.get_value("Material Manufacturing", i['material_manufacturing'], 'no_of_bundle') or 0)
+            frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'shot_blasted_bundle', Bdl-(i['bundle_taken'] or 0))
+            if Bdl-(i['bundle_taken'] or 0) <= 0:
                 frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'status1', "Completed")
             else:
                 frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'status1', "Shot Blast")

@@ -9,7 +9,7 @@
   "material_manufacturing",
   "item_name",
   "bundle_taken",
-  "bundle",
+  "Bdl",
   "damages_in_nos",
   "sqft",
   "damages_in_sqft",
@@ -35,7 +35,7 @@
   },
   {
    "columns": 1,
-   "fieldname": "bundle",
+   "fieldname": "Bdl",
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Total Bundle",

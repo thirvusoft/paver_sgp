@@ -6,25 +6,25 @@ frappe.ui.form.on("Item", {
         frm.set_value("pavers_per_bundle",pavers_per_bundle)
     },
     pavers_per_bundle : function(frm,cdt,cdn) {
-        bundle(frm,cdt,cdn)
+        Bdl(frm,cdt,cdn)
     },
     weight_per_paver:function(frm,cdt,cdn){
-        bundle(frm,cdt,cdn)
+        Bdl(frm,cdt,cdn)
     },
     weight_per_piece : function(frm,cdt,cdn) {
-        bundle(frm,cdt,cdn)
+        Bdl(frm,cdt,cdn)
     },
     pieces_per_bundle : function(frm,cdt,cdn) {
-        bundle(frm,cdt,cdn)
+        Bdl(frm,cdt,cdn)
     },
     no_of_layers_per_bundle:function(frm,cdt,cdn){
         var data = locals[cdt][cdn]
         pavers_per_bundle = data.pavers_per_layer *data.no_of_layers_per_bundle
         frm.set_value("pavers_per_bundle",pavers_per_bundle)
-        bundle(frm,cdt,cdn)
+        Bdl(frm,cdt,cdn)
     },
     pavers_per_sqft:function(frm,cdt,cdn){
-        bundle(frm,cdt,cdn)
+        Bdl(frm,cdt,cdn)
     },
     item_group:function(frm,cdt,cdn){
             if(cur_frm.doc.item_group=="Pavers"||cur_frm.doc.item_group=="Compound Wall")
@@ -37,7 +37,7 @@ frappe.ui.form.on("Item", {
 })
 
 
-function bundle(frm,cdt,cdn) {
+function Bdl(frm,cdt,cdn) {
     var data = locals[cdt][cdn]
     var weight_per_paver = data.weight_per_paver
     var weight_per_bundle = data.pavers_per_bundle * weight_per_paver
@@ -86,7 +86,7 @@ stock_uom: function(frm) {
 
                 if (cur_frm.doc.pavers_per_bundle){
                     dict.push({
-                        "uom": "bundle",
+                        "uom": "Bdl",
                         "conversion_factor": cur_frm.doc.pavers_per_bundle
                     })
 
