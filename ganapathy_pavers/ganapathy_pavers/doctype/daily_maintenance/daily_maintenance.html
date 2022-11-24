@@ -1,0 +1,332 @@
+<div style="display: flex; align-items: center; flex-wrap: nowrap; width: 100%; font-size: 15px; text-align: center">
+    <div style="width: 100%; text-align: left"><b>DATE:{{doc.date}}</b></div>
+    <div style="width: 100%"><b>PETROL RATE:{{doc.petrol_rate}}</b></div>
+    <div style="width: 100%; text-align: right"><b>DIESEL RATE:{{doc.diesel_rate}}</b></div>
+</div>
+<div class="main">
+    <div style="display: flex; align-items: left; flex-wrap: wrap; gap: 10px">
+        {% for row in raw_materials %}
+        <table style="width: 49%">
+            <tr>
+                <th class="silo-line1" colspan="3">{{ row }}</th>
+            </tr>
+            <tr>
+                <th class="silo-line2" style="width: 20%"></th>
+                <th class="silo-line2" style="width: 10%; text-align: left">TON</th>
+                <th class="silo-line2" style="width: 20%; text-align: left">NO OF DAYS</th>
+            </tr>
+            {% for data in raw_materials[row] %}
+            <tr>
+                <td class="silo-item" style="width: 20%">{{ data.item }}</td>
+                <td class="silo-item" style="width: 10%; text-align: left">{{ "%.2f"%data.qty }}</td>
+                <td class="silo-item" style="width: 20%; text-align: left">{{ data.days }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endfor %}
+    </div>
+</div>
+<br />
+
+<div class="main">
+    <div class="left">
+        <table>
+            <tr>
+                <th style="width: 50%; text-align: center; color: #e45829" colspan="3">STRAPING ROLL</th>
+            </tr>
+            <tr>
+                <th style="width: 25%; text-align: left; color: black">COLOUR</th>
+                <th style="width: 25%; text-align: left; color: black">STOCK</th>
+            </tr>
+            {% for strapping_role in doc.strapping_role %}
+            <tr>
+                <td style="Width:25%; text-align:left; color:{{strapping_role.colour}}">{{strapping_role.colour}}</td>
+                <td style="Width:25%; text-align:left; color:{{strapping_role.colour}}">{{strapping_role.stock or 0}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="right">
+        <table>
+            <tr>
+                <th style="width: 50%; text-align: center; color: #e45829" colspan="3">WORKERS DETAILS</th>
+            </tr>
+            <tr>
+                <td style="width: 20%; color: black" rowspan="2">LABOUR</td>
+                <td style="width: 10%; color: blue">PRESENT</td>
+                <td style="width: 20%; color: blue">{{doc.labour_present}}</td>
+            </tr>
+            <tr>
+                <td style="width: 10%; color: red">ABSENT</td>
+                <td style="width: 20%; color: red">{{doc.labour_absent}}</td>
+            </tr>
+            <tr>
+                <td style="width: 20%; color: black" rowspan="2">OPERATOR</td>
+                <td style="width: 10%; color: blue">PRESENT</td>
+                <td style="width: 20%; color: blue">{{doc.operator_present}}</td>
+            </tr>
+            <tr>
+                <td style="width: 10%; color: red">ABSENT</td>
+                <td style="width: 20%; color: red">{{doc.operator_absent}}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<br />
+{% if doc.colour_powder%}
+<div class="main1">
+    <table>
+        <tr>
+            <th style="width: 100%; text-align: center; color: #e45829" colspan="4">COLOUR POWDER ITEMS</th>
+        </tr>
+        <tr>
+            <th style="width: 25%; color: black; text-align: center">COLOUR</th>
+            <th style="width: 25%; color: black; text-align: center">STOCK</th>
+            <th style="width: 25%; color: black; text-align: center">SQFT</th>
+            <th style="width: 25%; color: black; text-align: center">No of Days</th>
+        </tr>
+        {% for colour_powder in doc.colour_powder %}
+        <tr>
+            <td style="Width:25%; color:{{colour_powder.attribute_value}}">{{colour_powder.colour}}</td>
+            <td style="Width:25%; color:{{colour_powder.attribute_value}}">{{colour_powder.stock}}</td>
+            <td style="width: 25%; color: black">{{colour_powder.sqft or 0}}</td>
+            <td style="width: 25%; color: black">{{colour_powder.no_of_days or 0}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+{% if doc.colour_details %}
+<div class="main2">
+    <table>
+        <tr>
+            <th style="width: 100; text-align: center; color: #e45829" colspan="6">NORMAL PAVERS STOCK</th>
+        </tr>
+        <tr>
+            <th style="text-align: center; color: black">PAVER</th>
+            <th style="text-align: center; color: black" colspan="5">STOCK</th>
+        </tr>
+        <tr>
+            <th style="width: 70%; text-align: center; color: black">ITEM</th>
+            <th style="width: 5%; text-align: center; color: red">RED</th>
+            <th style="width: 5%; text-align: center; color: black">BLACK</th>
+            <th style="width: 5%; text-align: center; color: grey">GREY</th>
+            <th style="width: 5%; text-align: center; color: brown">BROWN</th>
+            <th style="width: 5%; text-align: center; color: yellow">YELLOW</th>
+        </tr>
+        {% for colour_details in doc.colour_details %}
+        <tr>
+            <td style="color: black; text-align: left">{{colour_details.short_name}}</td>
+            <td style="color: red">{{colour_details.red or 0}}</td>
+            <td style="color: black">{{colour_details.black or 0}}</td>
+            <td style="color: grey">{{colour_details.grey or 0}}</td>
+            <td style="color: brown">{{colour_details.brown or 0}}</td>
+            <td style="color: yellow">{{colour_details.yellow or 0}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+<div class="total">
+    <table>
+        <tr>
+            <th style="width: 100%; text-align: center; color: black" colspan="2">TOTAL</th>
+        </tr>
+        <tr>
+            <td style="text-align: left; color: black">100MM PAVER</td>
+            <td style="color: black">6769</td>
+        </tr>
+        <tr>
+            <td style="text-align: left; color: black">120MM PAVER</td>
+            <td style="color: black">101</td>
+        </tr>
+        <tr>
+            <td style="text-align: left; color: black">60MM PAVER</td>
+            <td style="color: black">13212</td>
+        </tr>
+        <tr>
+            <td style="text-align: left; color: black">65MM PAVER</td>
+            <td style="color: black">1748</td>
+        </tr>
+        <tr>
+            <td style="text-align: left; color: black">70MM PAVER</td>
+            <td style="color: black">1487</td>
+        </tr>
+        <tr>
+            <td style="text-align: left; color: black">80MM PAVER</td>
+            <td style="color: black">22007</td>
+        </tr>
+        <tr>
+            <td style="text-align: left; color: black">KERB STONE</td>
+            <td style="color: black">2874</td>
+        </tr>
+    </table>
+    {% if doc.colour_details_of_sb %}
+    <div class="main3">
+        <table>
+            <tr>
+                <th style="text-align: center; color: #e45829" colspan="6">SHOT BLAST PAVERS STOCK</th>
+            </tr>
+            <tr>
+                <th style="text-align: center; color: black">PAVER</th>
+                <th style="text-align: center; color: black" colspan="5">STOCK</th>
+            </tr>
+            <tr>
+                <th style="width: 70% !important; text-align: center; color: black">ITEM</th>
+                <th style="text-align: center; color: red">RED</th>
+                <th style="text-align: center; color: black">BLACK</th>
+                <th style="text-align: center; color: grey">GREY</th>
+                <th style="text-align: center; color: brown">BROWN</th>
+                <th style="text-align: center; color: yellow">YELLOW</th>
+            </tr>
+            {% for colour_details_of_sb in doc.colour_details_of_sb %}
+            <tr>
+                <td style="color: black; text-align: left">{{colour_details_of_sb.short_name}}</td>
+                <td style="color: red">{{colour_details_of_sb.get_formatted('red' )}}</td>
+                <td style="color: black">{{colour_details_of_sb.get_formatted('black' )}}</td>
+                <td style="color: grey">{{colour_details_of_sb.get_formatted('grey' )}}</td>
+                <td style="color: brown">{{colour_details_of_sb.get_formatted('brown' )}}</td>
+                <td style="color: yellow">{{colour_details_of_sb.get_formatted('yellow' )}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+    <div class="total">
+        <table>
+            <tr>
+                <th style="color: black; text-align: center" colspan="2">TOTAL</th>
+            </tr>
+            <tr>
+                <td style="text-align: left; color: black">60MM PAVER</td>
+                <td style="color: black">18334</td>
+            </tr>
+            <tr>
+                <td style="text-align: left; color: black">65MM PAVER</td>
+                <td style="color: black">18108</td>
+            </tr>
+            <tr>
+                <td style="text-align: left; color: black">70MM PAVER</td>
+                <td style="color: black">11822</td>
+            </tr>
+            <tr>
+                <td style="text-align: left; color: black">75MM PAVER</td>
+                <td style="color: black">206</td>
+            </tr>
+            <tr>
+                <td style="text-align: left; color: black">80MM PAVER</td>
+                <td style="color: black">3724</td>
+            </tr>
+            <tr>
+                <td style="text-align: center; color: black">Overall Total</td>
+                <td style="color: black">101401</td>
+            </tr>
+        </table>
+    </div>
+    <div class="cw">
+        <table>
+            <tr>
+                <th style="text-align: center; color: #e45829" colspan="5">COMPOUND WALL STOCKS</th>
+            </tr>
+
+            <tr>
+                <th style="width: 40%; text-align: center; color: black">POST LENGTH</th>
+                <th style="width: 15%; text-align: center; color: green">WITH OUT BOLT</th>
+                <th style="width: 15%; text-align: center; color: #3729b1">WITH BOLT</th>
+                <th style="width: 15%; text-align: center; color: green">CP WITH OUT BOLT</th>
+                <th style="width: 15%; text-align: center; color: #3729b1">CP WITH BOLT</th>
+            </tr>
+
+            {% for compound_wall_stock in doc.compound_wall_stock %} {% if compound_wall_stock.type=='Normal' %}
+            <tr>
+                <td>{{compound_wall_stock.post_length}}</td>
+                <td style="color: green">{{compound_wall_stock.wo_bolt or 0}}</td>
+                <td style="color: #3729b1">{{compound_wall_stock.with_bolt or 0}}</td>
+                <td style="color: green">{{compound_wall_stock.pc_wo_bolt or 0}}</td>
+                <td style="color: #3729b1">{{compound_wall_stock.pc_with_bolt or 0}}</td>
+            </tr>
+            {% endif %} {% endfor %}
+        </table>
+    </div>
+
+    <div class="cw_s">
+        {% if doc.compound_wall_item_stock %}
+        <table>
+            {% for compound_wall_item_stock in doc.compound_wall_item_stock %}
+            <tr>
+                <th style="width: 50%; text-align: left; color: black">{{compound_wall_item_stock.item}}</th>
+                <th style="width: 50%; text-align: center; color: black">{{compound_wall_item_stock.stock}}</th>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+    <div class="cw_f">
+        <table>
+            <tr>
+                <th style="text-align: center; color: #e45829" colspan="3">FENCING POST</th>
+            </tr>
+            <tr>
+                <th style="color: black; width: 50%; text-align: center">POST LENGTH</th>
+                <th style="color: green; width: 30%">WITH OUT BOLT</th>
+                <th style="color: #3729b1">WITH BOLT</th>
+            </tr>
+
+            {% for compound_wall_stock in doc.compound_wall_stock %} {% if compound_wall_stock.type=='Fencing' %}
+            <tr>
+                <td>{{compound_wall_stock.post_length}}</td>
+                <td style="color: green">{{compound_wall_stock.wo_bolt or 0}}</td>
+                <td style="color: #3729b1">{{compound_wall_stock.with_bolt or 0}}</td>
+            </tr>
+            {% endif %} {% endfor %}
+        </table>
+    </div>
+    <div class="main4">
+        {% if doc.machine_details %}
+        <div class="machine">
+            <table>
+                <tr>
+                    <th style="width: 70%; text-align: center; color: black" colspan="4">Production Details</th>
+                </tr>
+                <tr>
+                    <th style="color: black">Item</th>
+                    <th style="color: black">Machine</th>
+                    <th style="color: black">Rack</th>
+                    <th style="color: black">Sqft</th>
+                </tr>
+                {% for machine_details in doc.machine_details %}
+                <tr>
+                    <td>{{machine_details.item or ""}}</td>
+                    <td>{{machine_details.machine or ""}}</td>
+                    <td>
+                        {% if machine_details.rack %} 
+                            {{'%0.1f'% machine_details.rack or ""| float}} 
+                        {% endif %}
+                    </td>
+                    <td>{{'%0.1f'% machine_details.sqft or ""| float}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+        </div>
+        {% if doc.vehicle_details %}
+        <div class="vehicle">
+            <table>
+                <tr>
+                    <th style="width: 30%; text-align: center; color: black" colspan="2">Vehicle Details</th>
+                </tr>
+                <tr>
+                    <th style="color: black">Vehicle</th>
+                    <th style="color: black">Sqft</th>
+                </tr>
+                {% for vehicle_details in doc.vehicle_details %}
+                <tr>
+                    <td>{{vehicle_details.vehicle}}</td>
+                    <td>{{'%0.1f'% vehicle_details.sqft or ""| float}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>

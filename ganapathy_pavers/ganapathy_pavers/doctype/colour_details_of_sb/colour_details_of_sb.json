@@ -29,31 +29,31 @@
   },
   {
    "fieldname": "red",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Red"
   },
   {
    "fieldname": "black",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Black"
   },
   {
    "fieldname": "grey",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Grey"
   },
   {
    "fieldname": "brown",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Brown"
   },
   {
    "fieldname": "yellow",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Yellow"
   }
@@ -61,7 +61,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-11-16 17:51:48.369917",
+ "modified": "2022-11-24 20:10:19.463158",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Colour Details of SB",

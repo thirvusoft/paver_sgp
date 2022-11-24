@@ -1,0 +1,136 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-11-24 12:59:30.734881",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "raw_material_warehouses_section",
+  "m12",
+  "m12top",
+  "m12pan",
+  "m12ggbs",
+  "column_break_6",
+  "m3",
+  "m3top",
+  "m3pan",
+  "m3ggbs",
+  "column_break_11",
+  "compound_wall",
+  "cw_cement",
+  "cw_ggbs",
+  "section_break_15",
+  "items"
+ ],
+ "fields": [
+  {
+   "fieldname": "raw_material_warehouses_section",
+   "fieldtype": "Section Break",
+   "label": "Raw Material Warehouses"
+  },
+  {
+   "fieldname": "m12top",
+   "fieldtype": "Link",
+   "label": "Machine1&2 Top Layer Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "m12pan",
+   "fieldtype": "Link",
+   "label": "Machine1&2 Panmix Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "m12ggbs",
+   "fieldtype": "Link",
+   "label": "Machine1&2 GGBS Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "m12",
+   "fieldtype": "Heading",
+   "label": "Machine 1&2"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "m3",
+   "fieldtype": "Heading",
+   "label": "Machine 3"
+  },
+  {
+   "fieldname": "m3top",
+   "fieldtype": "Link",
+   "label": "Machine3 Top Layer Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "m3ggbs",
+   "fieldtype": "Link",
+   "label": "Machine3 GGBS Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "compound_wall",
+   "fieldtype": "Heading",
+   "label": "Compound Wall"
+  },
+  {
+   "fieldname": "cw_cement",
+   "fieldtype": "Link",
+   "label": "Compound Wall Cement Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "cw_ggbs",
+   "fieldtype": "Link",
+   "label": "Compound Wall GGBS Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "m3pan",
+   "fieldtype": "Link",
+   "label": "Machine3 Panmix Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Raw Material Items to show in DSM",
+   "options": "DSM Items"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-11-24 18:19:54.040260",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "DSM Defaults",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

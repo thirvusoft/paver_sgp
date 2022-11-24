@@ -31,5 +31,17 @@ frappe.query_reports["Stock Summary Report"] = {
 			"options": "Item Group",
 			"depends_on": "eval: doc.group_by == 'Item Group'",
 		},
+		{
+			"fieldname": "item_name",
+			"label": __("Item Name (Like)"),
+			"fieldtype": "Data",
+			"width": "80",
+		},
+		{
+			"fieldname": "item_name_nl",
+			"label": __("Item Name (Not Like)"),
+			"fieldtype": "Data",
+			"width": "80",
+		},
 	]
 }

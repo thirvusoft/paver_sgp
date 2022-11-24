@@ -6,9 +6,9 @@ frappe.ui.form.on('Daily Maintenance', {
 		frappe.call({
 			method: "ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.paver_item",
 			args: {
-				warehouse: cur_frm.doc.warehouse || frappe.throw({message: "Please enter <b>Warehouse for Pavers and Compound Walls</b>", title: "Missing Fields", indicator: "red"}),
-				date: cur_frm.doc.date, 
-				warehouse_colour: cur_frm.doc.warehouse_colour || frappe.throw({message: "Please enter <b>Warehouse for Colour Powder Items</b>", title: "Missing Fields", indicator: "red"})
+				warehouse: cur_frm.doc.warehouse || frappe.throw({ message: "Please enter <b>Warehouse for Pavers and Compound Walls</b>", title: "Missing Fields", indicator: "red" }),
+				date: cur_frm.doc.date,
+				warehouse_colour: cur_frm.doc.warehouse_colour || frappe.throw({ message: "Please enter <b>Warehouse for Colour Powder Items</b>", title: "Missing Fields", indicator: "red" })
 			},
 			freeze: true,
 			freeze_message: loading_svg() || "Fetching data...",
@@ -30,13 +30,11 @@ frappe.ui.form.on('Daily Maintenance', {
 				cur_frm.set_value("compound_wall_stock", r.message[6])
 				cur_frm.set_value("colour_powder", r.message[7])
 				cur_frm.set_value("compound_wall_item_stock", r.message[8])
-
-
+				cur_frm.set_value("size_details", r.message[9])
+				cur_frm.set_value("raw_material_details", r.message[10])
 			}
-
 		})
 	}
-
 });
 
 function loading_svg() {

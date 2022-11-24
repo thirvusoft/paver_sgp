@@ -10,42 +10,50 @@
   "wo_bolt",
   "with_bolt",
   "pc_wo_bolt",
-  "pc_with_bolt"
+  "pc_with_bolt",
+  "type"
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "post_length",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Post Length"
   },
   {
+   "columns": 1,
    "fieldname": "wo_bolt",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "WO Bolt"
   },
   {
+   "columns": 1,
    "fieldname": "with_bolt",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "With Bolt"
   },
   {
+   "columns": 1,
    "fieldname": "pc_wo_bolt",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "PC WO Bolt"
   },
   {
+   "columns": 1,
    "fieldname": "pc_with_bolt",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "PC With Bolt"
   },
   {
+   "columns": 2,
    "fieldname": "type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Type",
    "options": "\nNormal\nFencing"
   }
@@ -53,9 +61,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-11-21 17:04:17.744341",
-
- "modified": "2022-11-19 09:56:18.999808",
+ "modified": "2022-11-24 20:11:06.747116",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Compound Wall Details",

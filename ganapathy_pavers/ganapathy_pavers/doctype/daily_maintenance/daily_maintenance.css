@@ -1,0 +1,60 @@
+.main {
+    width: 100%;
+    padding-bottom: 10px !important;
+}
+.left {
+    width: 50%;
+    float: left;
+}
+.right {
+    width: 50%;
+    float: right;
+    padding-left: 10px;
+}
+
+.right table,
+th,
+td {
+    border: 1px solid black;
+    width: 100%;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+
+.main4 {
+    width: 100%;
+    padding-bottom: 10px !important;
+}
+.machine {
+    width: 70%;
+    float: left;
+    padding-bottom: 10px !important;
+}
+.vehicle {
+    width: 30%;
+    float: right;
+    padding-left: 10px;
+}
+
+.silo-line1 {
+    width: 50%;
+    text-align: center;
+    color: #e45829;
+}
+.silo-line2 {
+    color: #1dcc06;
+}
+.silo-item {
+    color: blue;
+}
+table,
+th,
+td {
+    width: 100%;
+    border: 1px solid black;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 900;
+}
