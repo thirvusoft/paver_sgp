@@ -18,8 +18,7 @@
   "m3ggbs",
   "column_break_11",
   "compound_wall",
-  "cw_cement",
-  "cw_ggbs",
+  "cw_wh",
   "section_break_15",
   "items"
  ],
@@ -83,18 +82,6 @@
    "label": "Compound Wall"
   },
   {
-   "fieldname": "cw_cement",
-   "fieldtype": "Link",
-   "label": "Compound Wall Cement Warehouse",
-   "options": "Warehouse"
-  },
-  {
-   "fieldname": "cw_ggbs",
-   "fieldtype": "Link",
-   "label": "Compound Wall GGBS Warehouse",
-   "options": "Warehouse"
-  },
-  {
    "fieldname": "m3pan",
    "fieldtype": "Link",
    "label": "Machine3 Panmix Warehouse",
@@ -109,12 +96,18 @@
    "fieldtype": "Table",
    "label": "Raw Material Items to show in DSM",
    "options": "DSM Items"
+  },
+  {
+   "fieldname": "cw_wh",
+   "fieldtype": "Link",
+   "label": "Compound Wall Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-11-24 18:19:54.040260",
+ "modified": "2022-11-24 21:09:29.075266",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "DSM Defaults",

@@ -18,26 +18,35 @@ def get_raw_materials_for_print(doc):
 	res={}
 	for row in doc.raw_material_details:
 		if row.machine not in res:
-			res[row.machine]=[]
-		res[row.machine].append(row)
+			res[row.machine]={'items': [], 'width': '49'}
+		res[row.machine]['items'].append(row)
+	if len(res)%2==1:
+		res[list(res.keys())[-1]]['width']='100'
 	return res
+
+@frappe.whitelist()
+def get_attendance_details(date):
+	labour_employee_details= frappe.db.sql("""select count(att.name) from `tabAttendance` as att left outer join `tabEmployee` 
+									as employee on att.employee=employee.name where employee.designation="Labour Worker" and att.attendance_date='{0}' and att.status="Present" """.format(date),as_list=True)
+	labour_present=labour_employee_details[0][0]
+	operator_employee_details= frappe.db.sql("""select count(att.name) from `tabAttendance` as att left outer join `tabEmployee` 
+									as employee on att.employee=employee.name where employee.designation="Operator" and att.attendance_date='{0}' and att.status="Present" """.format(date),as_list=True)
+	operator_present=operator_employee_details[0][0]
+	labour_employee_details_absent= frappe.db.sql("""select count(att.name) from `tabAttendance` as att left outer join `tabEmployee` 
+									as employee on att.employee=employee.name where employee.designation="Labour Worker" and att.attendance_date='{0}' and att.status="Absent" """.format(date),as_list=True)
+	labour_absent=labour_employee_details_absent[0][0]
+	operator_employee_details_absent= frappe.db.sql("""select count(att.name) from `tabAttendance` as att left outer join `tabEmployee` 
+									as employee on att.employee=employee.name where employee.designation="Operator" and att.attendance_date='{0}' and att.status="Absent" """.format(date),as_list=True)
+	operator_absent=operator_employee_details_absent[0][0]
+	return {
+			'labour_present': labour_present,
+			'operator_present': operator_present,
+			'labour_absent': labour_absent,
+			'operator_absent': operator_absent
+			}
+
 class DailyMaintenance(Document):
-	def onload(self):
-		labour_employee_details= frappe.db.sql("""select count(att.name) from `tabAttendance` as att left outer join `tabEmployee` 
-										as employee on att.employee=employee.name where employee.designation="Labour Worker" and att.attendance_date='{0}' and att.status="Present" """.format(self.date),as_list=True)
-		self.labour_present=labour_employee_details[0][0]
-		operator_employee_details= frappe.db.sql("""select count(att.name) from `tabAttendance` as att left outer join `tabEmployee` 
-										as employee on att.employee=employee.name where employee.designation="Operator" and att.attendance_date='{0}' and att.status="Present" """.format(self.date),as_list=True)
-		self.operator_present=operator_employee_details[0][0]
-		labour_employee_details_absent= frappe.db.sql("""select count(att.name) from `tabAttendance` as att left outer join `tabEmployee` 
-										as employee on att.employee=employee.name where employee.designation="Labour Worker" and att.attendance_date='{0}' and att.status="Absent" """.format(self.date),as_list=True)
-		self.labour_absent=labour_employee_details_absent[0][0]
-		operator_employee_details_absent= frappe.db.sql("""select count(att.name) from `tabAttendance` as att left outer join `tabEmployee` 
-										as employee on att.employee=employee.name where employee.designation="Operator" and att.attendance_date='{0}' and att.status="Absent" """.format(self.date),as_list=True)
-		self.operator_absent=operator_employee_details_absent[0][0]
-
-
-	
+	pass
 @frappe.whitelist()
 def paver_item(warehouse, date, warehouse_colour):
 	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name')
@@ -324,7 +333,7 @@ def raw_material_stock_details():
 	dsm=frappe.get_single("DSM Defaults")
 	m12_warehouse_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.m12top, "Machine 1&2", "TOPLAYER"), (dsm.m12pan, "Machine 1&2", "PANMIX"), (dsm.m12ggbs, "Machine 1&2", "PAVER")]]
 	m3_warehouse_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.m3top, "Machine 3", "TOPLAYER"), (dsm.m3pan, "Machine 3", "PANMIX"), (dsm.m3ggbs, "Machine 3", "PAVER")]]
-	cw_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.cw_cement, "Compound Wall", "C.WALL"), (dsm.cw_ggbs, "Compound Wall", "C.WALL")]]
+	cw_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.cw_wh, "Compound Wall", "C.WALL")]]
 	print(m12_warehouse_stock)
 	print(m3_warehouse_stock)
 	print(cw_stock)

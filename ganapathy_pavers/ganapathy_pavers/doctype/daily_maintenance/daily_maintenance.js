@@ -2,6 +2,22 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Daily Maintenance', {
+	get_attendance_details: function (frm) {
+		if (cur_frm.doc.date) {
+			frappe.call({
+				method: "ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.get_attendance_details",
+				args: {
+					date: cur_frm.doc.date,
+				},
+				callback: function (res) {
+					cur_frm.set_value('labour_present', res['message']['labour_present']);
+					cur_frm.set_value('operator_present', res['message']['operator_present']);
+					cur_frm.set_value('labour_absent',res['message']['labour_absent']);
+					cur_frm.set_value('operator_absent', res['message']['operator_absent']);
+				}
+			});
+		}
+	},
 	load_item_details: function (frm) {
 		frappe.call({
 			method: "ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.paver_item",

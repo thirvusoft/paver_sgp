@@ -10,6 +10,7 @@
   "date",
   "petrol_rate",
   "diesel_rate",
+  "get_attendance_details",
   "column_break_4",
   "labour_present",
   "labour_absent",
@@ -343,12 +344,17 @@
   {
    "fieldname": "section_break_13",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "get_attendance_details",
+   "fieldtype": "Button",
+   "label": "Get Attendance Details"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-23 15:30:26.748703",
+ "modified": "2022-11-24 20:59:03.887860",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Daily Maintenance",

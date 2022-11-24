@@ -6,7 +6,7 @@
 <div class="main">
     <div style="display: flex; align-items: left; flex-wrap: wrap; gap: 10px">
         {% for row in raw_materials %}
-        <table style="width: 49%">
+        <table style="width: {{raw_materials[row]['width']}}%">
             <tr>
                 <th class="silo-line1" colspan="3">{{ row }}</th>
             </tr>
@@ -15,7 +15,7 @@
                 <th class="silo-line2" style="width: 10%; text-align: left">TON</th>
                 <th class="silo-line2" style="width: 20%; text-align: left">NO OF DAYS</th>
             </tr>
-            {% for data in raw_materials[row] %}
+            {% for data in raw_materials[row]['items'] %}
             <tr>
                 <td class="silo-item" style="width: 20%">{{ data.item }}</td>
                 <td class="silo-item" style="width: 10%; text-align: left">{{ "%.2f"%data.qty }}</td>
