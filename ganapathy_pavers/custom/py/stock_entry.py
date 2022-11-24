@@ -3,19 +3,24 @@ from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
 from erpnext.stock.stock_ledger import get_valuation_rate
 import frappe
 from frappe.utils.data import flt
+from ganapathy_pavers import uom_conversion
 
 def update_asset(self, event):
-    if(self.stock_entry_type=="Manufacture" and self.bom_no and self.fg_completed_qty):
+    fg_completed_qty=0
+    for row in self.items:
+        if row.is_finished_item:
+            fg_completed_qty+=(uom_conversion(row.item_code, row.stock_uom, row.stock_qty, 'Nos') or 0)
+    if(self.stock_entry_type=="Manufacture" and self.bom_no and fg_completed_qty):
         asset=frappe.get_value('BOM', self.bom_no, 'asset_name')
         if(asset):
             doc=frappe.get_doc('Asset', asset)
             if(event=='on_submit'):
                 doc.update({
-                    'current_number_of_strokes': float(self.fg_completed_qty)+float(float(doc.current_number_of_strokes) or 0)
+                    'current_number_of_strokes': float(fg_completed_qty)+float(float(doc.current_number_of_strokes) or 0)
                 })  
             if(event=='on_cancel'):
                 doc.update({
-                    'current_number_of_strokes': -float(self.fg_completed_qty)+float(float(doc.current_number_of_strokes) or 0)
+                    'current_number_of_strokes': -float(fg_completed_qty)+float(float(doc.current_number_of_strokes) or 0)
                 })
             if((float(doc.notification_alert_at or 0)<float(doc.current_number_of_strokes or 0)) and doc.to_notify!=1):
                 doc.update({
