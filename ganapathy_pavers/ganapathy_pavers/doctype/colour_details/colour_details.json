@@ -33,35 +33,35 @@
   {
    "columns": 1,
    "fieldname": "red",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Red"
   },
   {
    "columns": 1,
    "fieldname": "black",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Black"
   },
   {
    "columns": 1,
    "fieldname": "grey",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Grey"
   },
   {
    "columns": 1,
    "fieldname": "brown",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Brown"
   },
   {
    "columns": 1,
    "fieldname": "yellow",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Yellow"
   },
@@ -79,7 +79,7 @@
  "is_submittable": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-11-23 16:07:30.906552",
+ "modified": "2022-11-24 20:09:36.124713",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Colour Details",
