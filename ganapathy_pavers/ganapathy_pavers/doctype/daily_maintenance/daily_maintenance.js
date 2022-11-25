@@ -3,28 +3,26 @@
 
 frappe.ui.form.on('Daily Maintenance', {
 	get_attendance_details: function (frm) {
-		if (cur_frm.doc.date) {
-			frappe.call({
-				method: "ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.get_attendance_details",
-				args: {
-					date: cur_frm.doc.date,
-				},
-				callback: function (res) {
-					cur_frm.set_value('labour_present', res['message']['labour_present']);
-					cur_frm.set_value('operator_present', res['message']['operator_present']);
-					cur_frm.set_value('labour_absent',res['message']['labour_absent']);
-					cur_frm.set_value('operator_absent', res['message']['operator_absent']);
-				}
-			});
-		}
+		frappe.call({
+			method: "ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.get_attendance_details",
+			args: {
+				date: cur_frm.doc.date || cur_frm.scroll_to_field('date') + frappe.throw({ message: "Please enter <b>Date</b> to fetch Attendance details", title: "Missing Fields", indicator: "red" }),
+			},
+			callback: function (res) {
+				cur_frm.set_value('labour_present', res['message']['labour_present']);
+				cur_frm.set_value('operator_present', res['message']['operator_present']);
+				cur_frm.set_value('labour_absent', res['message']['labour_absent']);
+				cur_frm.set_value('operator_absent', res['message']['operator_absent']);
+			}
+		});
 	},
 	load_item_details: function (frm) {
 		frappe.call({
 			method: "ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.paver_item",
 			args: {
-				warehouse: cur_frm.doc.warehouse || frappe.throw({ message: "Please enter <b>Warehouse for Pavers and Compound Walls</b>", title: "Missing Fields", indicator: "red" }),
-				date: cur_frm.doc.date,
-				warehouse_colour: cur_frm.doc.warehouse_colour || frappe.throw({ message: "Please enter <b>Warehouse for Colour Powder Items</b>", title: "Missing Fields", indicator: "red" })
+				warehouse: cur_frm.doc.warehouse || cur_frm.scroll_to_field('warehouse') + frappe.throw({ message: "Please enter <b>Warehouse for Pavers and Compound Walls</b>", title: "Missing Fields", indicator: "red" }),
+				date: cur_frm.doc.date || cur_frm.scroll_to_field('date') + frappe.throw({ message: "Please enter <b>Date</b> to fetch production and vehicle details", title: "Missing Fields", indicator: "red" }),
+				warehouse_colour: cur_frm.doc.warehouse_colour || cur_frm.scroll_to_field('warehouse_colour') + frappe.throw({ message: "Please enter <b>Warehouse for Colour Powder Items</b>", title: "Missing Fields", indicator: "red" })
 			},
 			freeze: true,
 			freeze_message: loading_svg() || "Fetching data...",
