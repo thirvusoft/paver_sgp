@@ -271,6 +271,10 @@ def paver_item(warehouse, date, warehouse_colour):
 				if j.name not in colour_details:
 					colour_details[j.name]={'colour': j.name, 'attribute_value': colour, 'stock':0}
 				colour_details[j.name]['stock']+=color_stock
+	dolamite=frappe.db.get_all("Item", filters=[['name','like','%dolamite%']])
+	for j in dolamite:
+		color_stock=get_stock_qty(j.name, warehouse_colour)
+		colour_details[j.name]={'colour': j.name, 'stock':color_stock}
 	colour_details=list(colour_details.values())
 	for item in colour_details:
 		if 'pigment' in item['colour'].lower():
