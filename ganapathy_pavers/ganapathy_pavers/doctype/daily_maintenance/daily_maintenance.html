@@ -1,3 +1,4 @@
+{% set raw_materials = get_raw_materials_for_print(doc) %}
 <div style="display: flex; align-items: center; flex-wrap: nowrap; width: 100%; font-size: 15px; text-align: center">
     <div style="width: 100%; text-align: left"><b>DATE:{{doc.date}}</b></div>
     <div style="width: 100%"><b>PETROL RATE:{{doc.petrol_rate}}</b></div>

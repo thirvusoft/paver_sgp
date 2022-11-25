@@ -8,8 +8,7 @@ from ganapathy_pavers import uom_conversion
 
 
 def daily_maintenance_print_format(doc):
-	raw_materails=get_raw_materials_for_print(doc)
-	html=frappe.render_template('ganapathy_pavers/ganapathy_pavers/doctype/daily_maintenance/daily_maintenance.html', {'doc':doc, 'raw_materials': raw_materails})
+	html=frappe.render_template('ganapathy_pavers/ganapathy_pavers/doctype/daily_maintenance/daily_maintenance.html', {'doc':doc})
 	css=f"<style>{frappe.render_template('ganapathy_pavers/ganapathy_pavers/doctype/daily_maintenance/daily_maintenance.css', {'doc':doc})}</style>"
 	res=html+css
 	return res
@@ -355,9 +354,12 @@ def get_stock_details_from_warehosue(warehouse, machine="", prefix=""):
 	_prefix=prefix
 	if _prefix and _prefix[-1]!=" ":
 		_prefix+=" "
+	condition=""
+	if item_filters and len(item_filters)>1:
+		condition=f' and bin.item_code in {tuple(item_filters)}'
+	elif item_filters:
+		condition=f' and bin.item_code="{item_filters[0]}"'
 	stock=frappe.db.sql(f"""select concat('{_prefix}', bin.item_code) as item, bin.actual_qty as qty, '{prefix}' as type, '{machine}' as machine from `tabBin` as bin
 		left outer join `tabItem` as item on item.item_code=bin.item_code where item.item_group='Raw Material'
-		and bin.warehouse='{warehouse}' and bin.actual_qty>0 {
-			(f' and bin.item_code in {tuple(item_filters)}') if item_filters else ''
-		};""", as_dict=True)
+		and bin.warehouse='{warehouse}' and bin.actual_qty>0 {condition};""", as_dict=True)
 	return stock
