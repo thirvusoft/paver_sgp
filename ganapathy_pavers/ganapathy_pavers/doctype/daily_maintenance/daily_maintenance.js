@@ -50,7 +50,10 @@ frappe.ui.form.on('Daily Maintenance', {
 				cur_frm.set_value("raw_material_details", r.message[10])
 			}
 		})
-	}
+	},
+	load_current_stock: function (frm) {
+		cur_frm.trigger("load_item_details")
+	},
 });
 
 function loading_svg() {
