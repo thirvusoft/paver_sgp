@@ -13,9 +13,7 @@
   "m12ggbs",
   "column_break_6",
   "m3",
-  "m3top",
-  "m3pan",
-  "m3ggbs",
+  "m3wh",
   "column_break_11",
   "compound_wall",
   "cw_wh",
@@ -61,18 +59,6 @@
    "label": "Machine 3"
   },
   {
-   "fieldname": "m3top",
-   "fieldtype": "Link",
-   "label": "Machine3 Top Layer Warehouse",
-   "options": "Warehouse"
-  },
-  {
-   "fieldname": "m3ggbs",
-   "fieldtype": "Link",
-   "label": "Machine3 GGBS Warehouse",
-   "options": "Warehouse"
-  },
-  {
    "fieldname": "column_break_11",
    "fieldtype": "Column Break"
   },
@@ -80,12 +66,6 @@
    "fieldname": "compound_wall",
    "fieldtype": "Heading",
    "label": "Compound Wall"
-  },
-  {
-   "fieldname": "m3pan",
-   "fieldtype": "Link",
-   "label": "Machine3 Panmix Warehouse",
-   "options": "Warehouse"
   },
   {
    "fieldname": "section_break_15",
@@ -102,12 +82,18 @@
    "fieldtype": "Link",
    "label": "Compound Wall Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "m3wh",
+   "fieldtype": "Link",
+   "label": "Machine3 Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-11-24 21:09:29.075266",
+ "modified": "2022-11-25 13:04:37.251810",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "DSM Defaults",
