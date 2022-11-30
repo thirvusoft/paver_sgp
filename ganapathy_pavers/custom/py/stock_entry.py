@@ -9,7 +9,7 @@ def update_asset(self, event):
     fg_completed_qty=0
     for row in self.items:
         if row.is_finished_item:
-            fg_completed_qty+=(uom_conversion(row.item_code, row.stock_uom, row.stock_qty, 'Nos') or 0)
+            fg_completed_qty+=(uom_conversion(row.item_code, row.stock_uom, row.transfer_qty, 'Nos') or 0)
     if(self.stock_entry_type=="Manufacture" and self.bom_no and fg_completed_qty):
         asset=frappe.get_value('BOM', self.bom_no, 'asset_name')
         if(asset):
@@ -30,6 +30,8 @@ def update_asset(self, event):
                 doc.update({
                     'to_notify': 0
                 })
+            doc.flags.ignore_mandatory=True
+            doc.flags.ignore_permission=True
             doc.save('Update')
 
 class Tsstockentry(StockEntry):

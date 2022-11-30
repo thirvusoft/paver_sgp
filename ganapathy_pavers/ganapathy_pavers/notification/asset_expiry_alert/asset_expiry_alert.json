@@ -11,8 +11,8 @@
  "event": "Value Change",
  "idx": 0,
  "is_standard": 1,
- "message": "Your mould is going to expire...!",
- "modified": "2022-07-16 17:50:37.779882",
+ "message": "Your mould {{ doc.item_code }} is going to expire...!",
+ "modified": "2022-11-26 09:52:09.666035",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Asset Expiry Alert",
@@ -23,6 +23,9 @@
   },
   {
    "receiver_by_role": "Admin"
+  },
+  {
+   "receiver_by_role": "Accounts Manager"
   }
  ],
  "send_system_notification": 1,
