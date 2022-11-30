@@ -35,10 +35,26 @@ function dashboard_data(date) {
                     PRODUCTION DETAILS OF ${month.toUpperCase()} MONTH
                 </div>
                 <div class="production-info">
-                    <div><li>Paver: ${parseInt(paver)}</li></div>
-                    <div><li>Compound Wall: ${parseInt(cw)}</li></div>
-                    <div><li>Lego Block: ${parseInt(lego)}</li></div>
-                    <div><li>Fencing Post: ${parseInt(fp)}</li></div>
+                    <div>
+                        <div class="production-info-data-div">
+                            Paver: ${parseInt(paver)}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="production-info-data-div">
+                            Compound Wall: ${parseInt(cw)}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="production-info-data-div">
+                            Lego Block: ${parseInt(lego)}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="production-info-data-div">
+                            Fencing Post: ${parseInt(fp)}
+                        </div>
+                    </div>
                 </div>
                 <style>
                     .production-heading {
@@ -59,11 +75,21 @@ function dashboard_data(date) {
                     .production-info div {
                         font-size: 110%;
                         padding: 10px;
+                        display: flex;
+                        flex-wrap: nowrap;
                         width: 25%;
                         background: rgb(91 86 86 / 50%);
                         border-radius: 10px;
                         color: rgb(0 0 0);
                     }
+                    .production-info-data, .production-info-data-div {
+                        width: 100% !important;
+                        align-items: center;
+                    }
+                    .production-info-data-div {
+                        background: rgb(255 251 251 / 40%) !important;
+                        font-weight: 700;
+                    }                 
                 </style>
             `
             cur_frm.dashboard.clear_comment()
