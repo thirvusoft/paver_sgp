@@ -1,0 +1,146 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-12-01 10:44:49.732538",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "account",
+  "debit",
+  "common_for_column",
+  "paver",
+  "compound_wall",
+  "lego_block",
+  "fencing_post",
+  "column_break_8",
+  "paver_account",
+  "cw_account",
+  "lg_account",
+  "fp_account",
+  "column_break_13",
+  "paver_amount",
+  "cw_amount",
+  "lg_amount",
+  "fp_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "debit",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Debit"
+  },
+  {
+   "fieldname": "common_for_column",
+   "fieldtype": "Column Break",
+   "label": "Common For"
+  },
+  {
+   "default": "0",
+   "fieldname": "paver",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Paver"
+  },
+  {
+   "default": "0",
+   "fieldname": "compound_wall",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Compound Wall"
+  },
+  {
+   "default": "0",
+   "fieldname": "lego_block",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Lego Block"
+  },
+  {
+   "default": "0",
+   "fieldname": "fencing_post",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Fencing Post"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.paver",
+   "fieldname": "paver_account",
+   "fieldtype": "Link",
+   "label": "Paver Account",
+   "options": "Account"
+  },
+  {
+   "depends_on": "eval:doc.compound_wall",
+   "fieldname": "cw_account",
+   "fieldtype": "Link",
+   "label": "Compound Wall Account",
+   "options": "Account"
+  },
+  {
+   "depends_on": "eval:doc.lego_block",
+   "fieldname": "lg_account",
+   "fieldtype": "Link",
+   "label": "Lego Block Account",
+   "options": "Account"
+  },
+  {
+   "depends_on": "eval:doc.fencing_post",
+   "fieldname": "fp_account",
+   "fieldtype": "Link",
+   "label": "Fencing Post Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.paver",
+   "fieldname": "paver_amount",
+   "fieldtype": "Currency",
+   "label": "Paver Amount"
+  },
+  {
+   "depends_on": "eval:doc.compound_wall",
+   "fieldname": "cw_amount",
+   "fieldtype": "Currency",
+   "label": "Compound Wall Amount"
+  },
+  {
+   "depends_on": "eval:doc.lego_block",
+   "fieldname": "lg_amount",
+   "fieldtype": "Currency",
+   "label": "Lego Block Amount"
+  },
+  {
+   "depends_on": "eval:doc.fencing_post",
+   "fieldname": "fp_amount",
+   "fieldtype": "Currency",
+   "label": "Fencing Post Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-12-01 13:13:03.035661",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Common Expense JE",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
