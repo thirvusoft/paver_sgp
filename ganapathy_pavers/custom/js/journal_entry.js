@@ -171,10 +171,10 @@ function dashboard_data(date) {
             let msg = `
                 <div class="close-dialog">
                     <span></span>
-                    <span class="close-x" onclick="cur_frm.dashboard.clear_comment(); return false;">x</span>
-                </div>
-                <div class="production-heading">
+                    <div class="production-heading">
                     PRODUCTION DETAILS OF ${month.toUpperCase()} MONTH
+                </div>
+                    <span class="close-x" onclick="cur_frm.dashboard.clear_comment(); return false;">x</span>
                 </div>
                 <div class="production-info">
                     <div class="production-info-data">
@@ -253,13 +253,20 @@ function dashboard_data(date) {
                         cursor: pointer;
                     }
                     .close-x {
-                        background: rgb(0 0 0 / 47%) !important;
+                        background: rgb(0 0 0 / 29%) !important;
                         height: 25px;
                         width: 25px;
                         text-align: center !important;
                         border-radius: 50%;
                         display: inline-block;
                         color: black;
+                        transition: transform .2s;
+                    }
+                    .close-x:hover {
+                        -webkit-transform: scale(1.5);
+                        transform: scale(1.2);
+                        border-radius: 30%;
+                        background: rgb(0 0 0 / 47%) !important;
                     }
                 </style>
             `
