@@ -1,4 +1,5 @@
 import frappe
+import json
 from datetime import datetime
 from ganapathy_pavers import uom_conversion
 from frappe.utils.data import getdate
@@ -57,3 +58,39 @@ def get_production_details(date):
         pass
     return res
 
+@frappe.whitelist()
+def split_expenses(common_exp):
+    common_exp=json.loads(common_exp)
+    com_acc=[]
+    for row in common_exp:
+        add=True
+        if row.get("paver") and row.get("paver_account") and float(row.get("paver_amount")):
+            com_acc.append({
+                "account": row.get("paver_account"),
+                "debit": row.get("paver_amount") or 0
+            })
+            add=False
+        if row.get("compound_wall") and row.get("cw_account") and float(row.get("cw_amount")):
+            com_acc.append({
+                "account": row.get("cw_account"),
+                "debit": row.get("cw_amount") or 0
+            })
+            add=False
+        if row.get("lego_block") and row.get("lg_account") and float(row.get("lg_amount")):
+            com_acc.append({
+                "account": row.get("lg_account"),
+                "debit": row.get("lg_amount") or 0
+            })
+            add=False
+        if row.get("fencing_post") and row.get("fp_account") and float(row.get("fp_amount")):
+            com_acc.append({
+                "account": row.get("fp_account"),
+                "debit": row.get("fp_amount") or 0
+            })
+            add=False
+        if add:
+            com_acc.append({
+                "account": row.get("account"),
+                "debit": row.get("debit") or 0
+            })
+    return com_acc
