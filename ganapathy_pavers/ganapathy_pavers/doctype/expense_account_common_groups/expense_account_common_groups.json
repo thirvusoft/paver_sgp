@@ -1,0 +1,55 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-12-01 09:59:15.322697",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "paver_account",
+  "cw_account",
+  "lg_account",
+  "fp_account"
+ ],
+ "fields": [
+  {
+   "fieldname": "paver_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Paver Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "cw_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Compound Wall Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "lg_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Lego Block Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "fp_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Fencing Post Account",
+   "options": "Account"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-12-01 10:06:08.111098",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Expense Account Common Groups",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

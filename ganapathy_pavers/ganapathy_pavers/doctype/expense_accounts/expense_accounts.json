@@ -1,0 +1,151 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-12-01 09:53:19.588673",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "default_accounts",
+  "section_break_2",
+  "paver_group",
+  "column_break_4",
+  "cw_group",
+  "column_break_6",
+  "lg_group",
+  "column_break_8",
+  "fp_group",
+  "section_break_10",
+  "paver_uom",
+  "column_break_12",
+  "cw_uom",
+  "column_break_14",
+  "lg_uom",
+  "column_break_16",
+  "fp_uom",
+  "section_break_18",
+  "expense_account_common_groups"
+ ],
+ "fields": [
+  {
+   "fieldname": "default_accounts",
+   "fieldtype": "Heading",
+   "label": "<center><h2>DEFAULT ACCOUNTS SETUP FOR EXPENSE ENTRY</h2></center>"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break",
+   "label": "Groups"
+  },
+  {
+   "fieldname": "paver_group",
+   "fieldtype": "Link",
+   "label": "Paver Group",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cw_group",
+   "fieldtype": "Link",
+   "label": "Compound Wall Group",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "lg_group",
+   "fieldtype": "Link",
+   "label": "Lego Block Group",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fp_group",
+   "fieldtype": "Link",
+   "label": "Fencing Post Group",
+   "options": "Account"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break",
+   "label": "Production UOM"
+  },
+  {
+   "fieldname": "expense_account_common_groups",
+   "fieldtype": "Table",
+   "label": "Expense Account Common Groups",
+   "options": "Expense Account Common Groups"
+  },
+  {
+   "fieldname": "paver_uom",
+   "fieldtype": "Link",
+   "label": "Paver UOM",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cw_uom",
+   "fieldtype": "Link",
+   "label": "Compound Wall UOM",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "lg_uom",
+   "fieldtype": "Link",
+   "label": "Lego Block UOM",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fp_uom",
+   "fieldtype": "Link",
+   "label": "Fencing Post UOM",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "section_break_18",
+   "fieldtype": "Section Break",
+   "label": "Common Entry Accounts"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-12-01 10:24:35.462863",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Expense Accounts",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -69,7 +69,7 @@
    "type": "Link"
   }
  ],
- "modified": "2022-11-18 17:37:28.293545",
+ "modified": "2022-12-01 10:01:42.716704",
  "modified_by": "ponnusamyv434@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "Accounts",
@@ -112,6 +112,12 @@
    "doc_view": "",
    "label": "Opening Balance",
    "link_to": "Opening Invoice Creation Tool",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "",
+   "label": "Expense Accounts",
+   "link_to": "Expense Accounts",
    "type": "DocType"
   }
  ]
