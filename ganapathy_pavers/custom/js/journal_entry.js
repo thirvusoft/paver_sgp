@@ -169,26 +169,30 @@ function dashboard_data(date) {
             lego = res.lego || 0;
             fp = res.fp || 0;
             let msg = `
+                <div class="close-dialog">
+                    <span></span>
+                    <span class="close-x" onclick="cur_frm.dashboard.clear_comment(); return false;">x</span>
+                </div>
                 <div class="production-heading">
                     PRODUCTION DETAILS OF ${month.toUpperCase()} MONTH
                 </div>
                 <div class="production-info">
-                    <div>
+                    <div class="production-info-data">
                         <div class="production-info-data-div">
                             Paver: ${parseInt(paver)}
                         </div>
                     </div>
-                    <div>
+                    <div class="production-info-data">
                         <div class="production-info-data-div">
                             Compound Wall: ${parseInt(cw)}
                         </div>
                     </div>
-                    <div>
+                    <div class="production-info-data">
                         <div class="production-info-data-div">
                             Lego Block: ${parseInt(lego)}
                         </div>
                     </div>
-                    <div>
+                    <div class="production-info-data">
                         <div class="production-info-data-div">
                             Fencing Post: ${parseInt(fp)}
                         </div>
@@ -227,10 +231,36 @@ function dashboard_data(date) {
                         background: rgb(255 251 251 / 40%) !important;
                         font-weight: 700;
                         justify-content: center;
+                        pointer-events: auto;
                     }
-                    .production-info-data-div:hover {
-                        opacity: 0.7;
-                    }       
+                    .production-info-data {
+                        pointer-events: none;
+                        transition: transform .2s;
+                    }
+                    .production-info-data:hover {
+                        -webkit-transform: scale(1.5);
+                        transform: scale(1.1);
+                        cursor: pointer;
+                    }
+                    .close-dialog {
+                        display: flex;
+                        width: 100%;
+                        align-items: right;
+                        justify-content: space-between;
+                        font-size: 125%;
+                    }
+                    .close-dialog :hover {
+                        cursor: pointer;
+                    }
+                    .close-x {
+                        background: rgb(0 0 0 / 47%) !important;
+                        height: 25px;
+                        width: 25px;
+                        text-align: center !important;
+                        border-radius: 50%;
+                        display: inline-block;
+                        color: black;
+                    }
                 </style>
             `
             cur_frm.dashboard.clear_comment();
