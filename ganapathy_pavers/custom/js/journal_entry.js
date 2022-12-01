@@ -227,7 +227,10 @@ function dashboard_data(date) {
                         background: rgb(255 251 251 / 40%) !important;
                         font-weight: 700;
                         justify-content: center;
-                    }                
+                    }
+                    .production-info-data-div:hover {
+                        opacity: 0.7;
+                    }       
                 </style>
             `
             cur_frm.dashboard.clear_comment();
