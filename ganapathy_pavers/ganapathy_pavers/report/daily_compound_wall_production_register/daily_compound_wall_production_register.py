@@ -22,7 +22,7 @@ def execute(filters=None):
 			produced_qty = frappe.db.sql(""" select child.item as item,sum(child.produced_qty) as produced_qty from `tabCW Manufacturing` as parent left outer join `tabCW Items` as child on child.parent = parent.name  where parent.molding_date = '{0}' group by child.item order by child.item asc""".format(date),as_dict= True)
 			for qty in produced_qty:
 				test_data.update({
-					qty['item']:int(qty['produced_qty'])
+					qty['item']:"%.2f"%(qty['produced_qty'])
 				})
 			data.append(test_data)
 		total_data = ["<b>Total</b>"]
