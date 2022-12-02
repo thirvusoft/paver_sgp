@@ -17,6 +17,9 @@ frappe.ui.form.on("Journal Entry", {
         }
     },
     split_expense: async function (frm) {
+        if(cur_frm.doc.docstatus!=0) {
+            return;
+        }
         validate_common_accounts()
         frappe.dom.freeze('.......');
         cur_frm.fields_dict.accounts.grid.grid_rows.forEach(async row => {
@@ -78,7 +81,18 @@ frappe.ui.form.on("Common Expense JE", {
 
 function validate_common_accounts() {
     cur_frm.doc.common_expenses.forEach(row => {
-
+        if (row.paver && !row.paver_account) {
+            frappe.throw({message: `<b>Paver Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res"});
+        }
+        if (row.compound_wall && !row.cw_account) {
+            frappe.throw({message: `<b>Compound Wall Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res"});
+        }
+        if (row.lego_block && !row.lg_account) {
+            frappe.throw({message: `<b>Lego Block Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res"});
+        }
+        if (row.fencing_post && !row.fp_account) {
+            frappe.throw({message: `<b>Fencing Post Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res"});
+        }
     });
 }
 
