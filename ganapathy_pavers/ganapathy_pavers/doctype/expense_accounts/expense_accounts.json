@@ -76,6 +76,7 @@
   {
    "fieldname": "section_break_10",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Production UOM"
   },
   {
@@ -129,7 +130,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-01 10:24:35.462863",
+ "modified": "2022-12-02 19:08:05.384209",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Expense Accounts",

@@ -113,7 +113,7 @@ def execute(filters=None):
 		for row in	data:
 			
 			if row["qty"] != "-" and row["qty"]:
-				row["consumption"] = round(row["qty"] / total_production_sqft, 3)
+				row["consumption"] = round(row["qty"] / total_production_sqft, 4)
 				row["rate"] = round(row["rate"] / len(doc), 2)
 				row["amount"] = round(row["qty"] * row["rate"], 2)
 				row["cost_per_sqft"] = round(row["amount"] / total_production_sqft, 2)
@@ -121,8 +121,8 @@ def execute(filters=None):
 			else:
 				if idx == 0:
 					idx = 1
-					row["consumption"] = f"<b>SQFT : {round(total_production_sqft,3)}</b>"
-					row["uom"] = f"<b>Production Cost per SQFT : {round(total_cost_per_sqft / len(doc),3)}</b>"
+					row["consumption"] = f"<b>SQFT : {round(total_production_sqft, 4)}</b>"
+					row["uom"] = f"<b>Production Cost per SQFT : {round(total_cost_per_sqft / len(doc), 4)}</b>"
 					row["rate"] = f"<b>No of Days : </b>"
 
 		data.append({
@@ -203,8 +203,8 @@ def execute(filters=None):
 		total_sqf=0
 		total_amt=0
 		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'))
-		if prod_details.get('lg'):
-			exp, total_sqf, total_amt=get_expense_data(prod_details.get('lg'), filters, total_production_sqft, total_sqf, total_amt)
+		if prod_details.get('lego'):
+			exp, total_sqf, total_amt=get_expense_data(prod_details.get('lego'), filters, total_production_sqft, total_sqf, total_amt)
 			if exp:
 				data.append({
 					"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Details</b>"
@@ -219,8 +219,8 @@ def execute(filters=None):
 				data.append({})
 				data.append({
 					"qty": "<b style='background: rgb(242 140 140 / 81%)'>Total</b>",
-					"consumption": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_sqf, 3)}</b>",
-					"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 3)}</b>"
+					"consumption": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_sqf, 4)}</b>",
+					"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 4)}</b>"
 				})
 
 	return columns, data
@@ -262,10 +262,10 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 				if res:
 					res.append({})
 				dic['qty']=i['value']
-				dic["consumption"]=round((i["balance"]/prod_sqft)*sqft, 3) if sqft else 0
-				total_sqf+=(round((i["balance"]/prod_sqft)*sqft, 3) if sqft else 0)
-				dic["uom"]=round(i["balance"]/prod_sqft, 3)
-				total_amt+=(round(i["balance"]/prod_sqft, 3) or 0)
+				dic["uom"]=round(i["balance"], 4)
+				total_sqf+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
+				dic["consumption"]=round(i["balance"]/prod_sqft, 4)
+				total_amt+=(round(i["balance"]/prod_sqft, 4) or 0)
 				res.append(dic)	
 	return res, total_sqf, total_amt
 
@@ -275,10 +275,10 @@ def get_expense_from_child(prod_sqft, account, sqft, total_sqf, total_amt):
 		if i["balance"]:
 			dic={}
 			dic['qty']=i['value']
-			dic["consumption"]=round((i["balance"]/prod_sqft)*sqft, 3) if sqft else 0
-			total_sqf+=(round((i["balance"]/prod_sqft)*sqft, 3) if sqft else 0)
-			dic["uom"]=round(i["balance"]/prod_sqft, 3)
-			total_amt+=(round(i["balance"]/prod_sqft, 3) or 0)
+			dic["uom"]=round(i["balance"], 4)
+			total_sqf+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
+			dic["consumption"]=round(i["balance"]/prod_sqft, 4)
+			total_amt+=(round(i["balance"]/prod_sqft, 4) or 0)
 			res.append(dic)
 		if i['child_nodes']:
 			res1, total_sqf, total_amt=(get_expense_from_child(i['child_nodes'], sqft, total_sqf, total_amt))
@@ -294,7 +294,7 @@ def group_total(child):
 		amt+=(i.get('uom') or 0)
 	res.append({
 		'qty': "<b style='background: rgb(127 221 253 / 85%)'>Group Total</b>",
-		'sqft': f"<b style='background: rgb(127 221 253 / 85%)'>{round(sqf, 3)}</b>",
-		'uom': f"<b style='background: rgb(127 221 253 / 85%)'>{round(amt, 3)}</b>",
+		'sqft': f"<b style='background: rgb(127 221 253 / 85%)'>{round(sqf, 4)}</b>",
+		'uom': f"<b style='background: rgb(127 221 253 / 85%)'>{round(amt, 4)}</b>",
 	})
 	return res

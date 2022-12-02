@@ -2,8 +2,8 @@ import frappe
 import json
 from datetime import datetime
 from ganapathy_pavers import uom_conversion
-from frappe.utils.data import getdate
 from dateutil.relativedelta import relativedelta
+from frappe.utils import add_days
 
 
 def journal_entry(self, event):
@@ -17,6 +17,42 @@ def journal_entry(self, event):
 
 @frappe.whitelist()
 def get_production_details(date=None, from_date=None, to_date=None):
+    res={'month': '', 'paver': 0, 'cw': 0, 'lego': 0, 'fp': 0}
+    try:
+        if date and not from_date and not to_date:
+            date=datetime.strptime(date, "%Y-%m-%d")
+            to_date=date+relativedelta(day=1, months=+1, days=-1)
+            from_date=date+relativedelta(day=1)
+            res['month']=date.strftime("%B")
+        cw_filt = {'docstatus':['!=', 2], 'type': ['in', ['Post', 'Slab']]}
+        lg_filt ={'docstatus':['!=', 2], 'type': 'Lego Block'}
+        fp_filt ={'docstatus':['!=', 2], 'type': 'Fencing Post'}
+        pm_filt = {'docstatus':['!=', 2]}
+        if(from_date):
+            pm_filt['from_time'] = ['>=', add_days(from_date,1)]
+            cw_filt['molding_date'] = ['>=', from_date]
+            lg_filt['molding_date'] = ['>=', from_date]
+            fp_filt['molding_date'] = ['>=', from_date]
+
+        if(to_date):
+            pm_filt['to'] = ['<=', add_days(to_date,1)]
+            cw_filt['molding_date'] = ['<=', to_date]
+            lg_filt['molding_date'] = ['<=', to_date]
+            fp_filt['molding_date'] = ['<=', to_date]
+        if(from_date and to_date):
+            cw_filt['molding_date'] = ['between', (from_date, to_date)]
+            lg_filt['molding_date'] = ['between', (from_date, to_date)]
+            fp_filt['molding_date'] = ['between', (from_date, to_date)]
+        res['paver'] = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='production_sqft'))
+        res['cw'] = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))
+        res['lego'] = sum(frappe.db.get_all('CW Manufacturing', filters=lg_filt, pluck='production_sqft'))
+        res['fp'] = sum(frappe.db.get_all('CW Manufacturing', filters=fp_filt, pluck='production_sqft'))
+    except:
+        pass
+    return res
+
+@frappe.whitelist()
+def get_production_info(date=None, from_date=None, to_date=None):
     res={'month': '', 'paver': 0, 'cw': 0, 'lego': 0, 'fp': 0}
     try:
         exp=frappe.get_single("Expense Accounts")
