@@ -14,9 +14,8 @@ def execute(filters=None):
     sales_type = filters.get("sales_type")
     group_by = filters.get("group_by")
     item_code = filters.get("item_code")
-    conditions = ""
+    conditions = " where doc.docstatus = 1"
     if from_date or to_date or customer or site_name or sales_type or group_by or item_code:
-        conditions = " where 1 = 1"
         if from_date and to_date:
             conditions += "  and doc.posting_date between '{0}' and '{1}' ".format(from_date, to_date)
         if customer:
