@@ -114,8 +114,28 @@ def execute(filters=None):
 				"cost_per_sqft":f"<b>₹{abstract_cost[cost]:,.2f}</b>"
 			})
 
-	if len(test_data) > 2:
-		data += test_data
+		if len(test_data) > 2:
+			data += test_data
+		total_sqf=0
+		total_amt=0
+		exp, total_sqf, total_amt=get_expense_data(filters, production_qty[0]['production_sqft'], total_sqf, total_amt)
+		if exp:
+			data.append({
+				"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Details</b>"
+			})
+			data.append({
+				"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Type</b>",
+				"qty": "<b style='background: rgb(242 140 140 / 81%)'>Expense</b>",
+				"sqft": "<b style='background: rgb(242 140 140 / 81%)'>Per Sqft</b>",
+				"uom": "<b style='background: rgb(242 140 140 / 81%)'>Amount</b>"
+			})
+			data+=exp
+			data.append({})
+			data.append({
+				"qty": "<b style='background: rgb(242 140 140 / 81%)'>Total</b>",
+				"sqft": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_sqf, 3)}</b>",
+				"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 3)}</b>"
+			})
 	columns = get_columns()
 	return columns, data
 
@@ -131,3 +151,61 @@ def get_columns():
 		]
 
 	return columns
+
+def get_expense_data(filters, sqft, total_sqf, total_amt):
+	exp=frappe.get_single("Expense Accounts")
+	if not exp.paver_group:
+		return [], 0, 0
+	exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group)
+	res=[]
+	for i in exp_tree:
+		dic={}
+		if i.get("expandable"):
+			dic["material"]=i['value']
+			child, total_sqf, total_amt=get_expense_from_child(i['child_nodes'], sqft, total_sqf, total_amt)
+			if child:
+				res.append(dic)
+				res+=child
+				res+=group_total(child)
+		else:
+			if i["balance"]:
+				dic={}
+				if res:
+					res.append({})
+				dic['qty']=i['value']
+				dic["sqft"]=round(i["balance"]/sqft, 3) if sqft else 0
+				total_sqf+=(round(i["balance"]/sqft, 3) if sqft else 0)
+				dic["uom"]=round(i["balance"], 3)
+				total_amt+=(round(i["balance"], 3) or 0)
+				res.append(dic)	
+	return res, total_sqf, total_amt
+
+def get_expense_from_child(account, sqft, total_sqf, total_amt):
+	res=[]
+	for i in account:
+		if i["balance"]:
+			dic={}
+			dic['qty']=i['value']
+			dic["sqft"]=round(i["balance"]/sqft, 3) if sqft else 0
+			total_sqf+=(round(i["balance"]/sqft, 3) if sqft else 0)
+			dic["uom"]=round(i["balance"], 3)
+			total_amt+=(round(i["balance"], 3) or 0)
+			res.append(dic)
+		if i['child_nodes']:
+			res1, total_sqf, total_amt=(get_expense_from_child(i['child_nodes'], sqft, total_sqf, total_amt))
+			res+=res1
+	return res, total_sqf, total_amt
+
+def group_total(child):
+	res=[]
+	sqf=0
+	amt=0
+	for i in child:
+		sqf+=(i.get('sqft') or 0)
+		amt+=(i.get('uom') or 0)
+	res.append({
+		'qty': "<b style='background: rgb(127 221 253 / 85%)'>Group Total</b>",
+		'sqft': f"<b style='background: rgb(127 221 253 / 85%)'>{round(sqf, 3)}</b>",
+		'uom': f"<b style='background: rgb(127 221 253 / 85%)'>{round(amt, 3)}</b>",
+	})
+	return res

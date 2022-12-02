@@ -22,7 +22,7 @@ frappe.ui.form.on("Journal Entry", {
         }
         validate_common_accounts()
         frappe.dom.freeze('.......');
-        cur_frm.fields_dict.accounts.grid.grid_rows.forEach(async row => {
+        (cur_frm.fields_dict.accounts.grid.grid_rows || []).forEach(async row => {
             if(row.doc.from_common_entry) {
                 row.doc.__checked=1;
             }
@@ -38,7 +38,7 @@ frappe.ui.form.on("Journal Entry", {
             freeze: true,
             freeze_message: "Splitting Expenses",
             callback(r) {
-                let res=r.message
+                let res=r.message || []
                 res.forEach(row => {
                     let child = cur_frm.add_child("accounts");
                     child.account = row.account;
@@ -80,7 +80,7 @@ frappe.ui.form.on("Common Expense JE", {
 });
 
 function validate_common_accounts() {
-    cur_frm.doc.common_expenses.forEach(row => {
+    (cur_frm.doc.common_expenses || []).forEach(row => {
         if (row.paver && !row.paver_account) {
             frappe.throw({message: `<b>Paver Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res"});
         }
