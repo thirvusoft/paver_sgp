@@ -50,7 +50,7 @@ def get_account_balance_on(account, company, from_date, to_date):
 		return 0
 	query=f"""
 		select sum(debit) as debit from `tabGL Entry` where company='{company}' and
-		date(posting_date)>'{from_date}' and date(posting_date)<'{to_date}' and is_cancelled=0
+		date(posting_date)>='{from_date}' and date(posting_date)<='{to_date}' and is_cancelled=0
 		and account='{account['value']}'
 	"""
 	balance=frappe.db.sql(query, as_list=True)
