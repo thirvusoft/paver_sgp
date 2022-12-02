@@ -16,15 +16,16 @@ def journal_entry(self, event):
             break
 
 @frappe.whitelist()
-def get_production_details(date):
+def get_production_details(date=None, from_date=None, to_date=None):
     res={'month': '', 'paver': 0, 'cw': 0, 'lego': 0, 'fp': 0}
     try:
         exp=frappe.get_single("Expense Accounts")
         paver_uom, cw_uom, lg_uom, fp_uom = exp.paver_uom, exp.cw_uom, exp.lg_uom, exp.fp_uom
-        date=datetime.strptime(date, "%Y-%m-%d")
-        to_date=date+relativedelta(day=1, months=+1, days=-1)
-        from_date=date+relativedelta(day=1)
-        res['month']=date.strftime("%B")
+        if date and not from_date and not to_date:
+            date=datetime.strptime(date, "%Y-%m-%d")
+            to_date=date+relativedelta(day=1, months=+1, days=-1)
+            from_date=date+relativedelta(day=1)
+            res['month']=date.strftime("%B")
         query=f"""
             select sed.item_code, sum(sed.transfer_qty) as qty, sed.stock_uom as uom from `tabStock Entry Detail` as sed 
             left outer join `tabStock Entry` as se on se.name=sed.parent where se.docstatus=1 and 

@@ -3,6 +3,7 @@
  
 import frappe
 from frappe import _
+from ganapathy_pavers.custom.py.journal_entry import get_production_details
 
 def execute(filters=None):
 	from_date = filters.get("from_date")
@@ -89,24 +90,26 @@ def execute(filters=None):
 			data += test_data
 		total_sqf=0
 		total_amt=0
-		exp, total_sqf, total_amt=get_expense_data(filters, production_qty[0]['production_sqft'], total_sqf, total_amt)
-		if exp:
-			data.append({
-				"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Details</b>"
-			})
-			data.append({
-				"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Type</b>",
-				"qty": "<b style='background: rgb(242 140 140 / 81%)'>Expense</b>",
-				"consumption": "<b style='background: rgb(242 140 140 / 81%)'>Per Sqft</b>",
-				"uom": "<b style='background: rgb(242 140 140 / 81%)'>Amount</b>"
-			})
-			data+=exp
-			data.append({})
-			data.append({
-				"qty": "<b style='background: rgb(242 140 140 / 81%)'>Total</b>",
-				"consumption": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_sqf, 3)}</b>",
-				"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 3)}</b>"
-			})
+		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'))
+		if prod_details.get('cw'):
+			exp, total_sqf, total_amt=get_expense_data(prod_details.get('cw'),filters, (production_qty[0]['production_sqft']), total_sqf, total_amt)
+			if exp:
+				data.append({
+					"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Details</b>"
+				})
+				data.append({
+					"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Type</b>",
+					"qty": "<b style='background: rgb(242 140 140 / 81%)'>Expense</b>",
+					"consumption": "<b style='background: rgb(242 140 140 / 81%)'>Per Sqft</b>",
+					"uom": "<b style='background: rgb(242 140 140 / 81%)'>Amount</b>"
+				})
+				data+=exp
+				data.append({})
+				data.append({
+					"qty": "<b style='background: rgb(242 140 140 / 81%)'>Total</b>",
+					"consumption": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_sqf, 3)}</b>",
+					"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 3)}</b>"
+				})
 	columns = get_columns()
 	return columns, data
  
@@ -161,7 +164,7 @@ def get_columns():
 	return columns
 
 
-def get_expense_data(filters, sqft, total_sqf, total_amt):
+def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 	exp=frappe.get_single("Expense Accounts")
 	if not exp.cw_group:
 		return [], 0, 0
@@ -171,7 +174,7 @@ def get_expense_data(filters, sqft, total_sqf, total_amt):
 		dic={}
 		if i.get("expandable"):
 			dic["material"]=i['value']
-			child, total_sqf, total_amt=get_expense_from_child(i['child_nodes'], sqft, total_sqf, total_amt)
+			child, total_sqf, total_amt=get_expense_from_child(prod_sqft, i['child_nodes'], sqft, total_sqf, total_amt)
 			if child:
 				res.append(dic)
 				res+=child
@@ -182,23 +185,23 @@ def get_expense_data(filters, sqft, total_sqf, total_amt):
 				if res:
 					res.append({})
 				dic['qty']=i['value']
-				dic["consumption"]=round(i["balance"]/sqft, 3) if sqft else 0
-				total_sqf+=(round(i["balance"]/sqft, 3) if sqft else 0)
-				dic["uom"]=round(i["balance"], 3)
-				total_amt+=(round(i["balance"], 3) or 0)
+				dic["consumption"]=round((i["balance"]/prod_sqft)*sqft, 3) if sqft else 0
+				total_sqf+=(round((i["balance"]/prod_sqft)*sqft, 3) if sqft else 0)
+				dic["uom"]=round(i["balance"]/prod_sqft, 3)
+				total_amt+=(round(i["balance"]/prod_sqft, 3) or 0)
 				res.append(dic)	
 	return res, total_sqf, total_amt
 
-def get_expense_from_child(account, sqft, total_sqf, total_amt):
+def get_expense_from_child(prod_sqft, account, sqft, total_sqf, total_amt):
 	res=[]
 	for i in account:
 		if i["balance"]:
 			dic={}
 			dic['qty']=i['value']
-			dic["consumption"]=round(i["balance"]/sqft, 3) if sqft else 0
-			total_sqf+=(round(i["balance"]/sqft, 3) if sqft else 0)
-			dic["uom"]=round(i["balance"], 3)
-			total_amt+=(round(i["balance"], 3) or 0)
+			dic["consumption"]=round((i["balance"]/prod_sqft)*sqft, 3) if sqft else 0
+			total_sqf+=(round((i["balance"]/prod_sqft)*sqft, 3) if sqft else 0)
+			dic["uom"]=round(i["balance"]/prod_sqft, 3)
+			total_amt+=(round(i["balance"]/prod_sqft, 3) or 0)
 			res.append(dic)
 		if i['child_nodes']:
 			res1, total_sqf, total_amt=(get_expense_from_child(i['child_nodes'], sqft, total_sqf, total_amt))
