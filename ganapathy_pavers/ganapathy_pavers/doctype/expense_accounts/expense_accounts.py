@@ -33,7 +33,41 @@ class ExpenseAccounts(Document):
 	def tree_node(self, from_date, to_date, company=erpnext.get_default_company(), parent = "", doctype='Account') -> list:
 		root = get_account_balances(get_children(doctype, parent or company, company), company, from_date, to_date)
 		return (self.get_tree(root, company, from_date, to_date))
-	
+
+
+def get_tree(root, company):
+	for i in root:
+		i['child_nodes'] = get_tree(get_children('Account', i.value, company), company)
+	return root
+
+def tree_node(company=erpnext.get_default_company(), parent = "", doctype='Account') -> list:
+	root = get_children(doctype, parent or company, company)
+	return (get_tree(root, company))
+
+@frappe.whitelist()
+def get_filter(company=""):
+	if not company:
+		company=erpnext.get_default_company()
+	exp=frappe.get_single("Expense Accounts")
+	accounts={'paver': exp.paver_group, 'cw': exp.cw_group, 'fp': exp.fp_group, 'lg': exp.lg_group}
+	res={}
+	for account in accounts:
+		if accounts[account]:
+			tree=tree_node(company, accounts[account])
+			acc_list=[]
+			ret_acc_list=get_filter_list(tree, acc_list)
+			res[account]=ret_acc_list
+	return res
+
+def get_filter_list(accounts, acc_list):
+	for acc in accounts:
+		print(acc.get('value'))
+		if acc.get('expandable')==1:
+			acc_list=get_filter_list(acc.get('child_nodes'), acc_list)
+		else:
+			acc_list.append(acc.get('value'))
+	return acc_list
+
 @frappe.whitelist()
 def get_common_account(account):
 	exp=frappe.get_single("Expense Accounts")
