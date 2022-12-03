@@ -17,14 +17,14 @@ frappe.ui.form.on("Journal Entry", {
         }
     },
     split_expense: async function (frm) {
-        if(cur_frm.doc.docstatus!=0) {
+        if (cur_frm.doc.docstatus != 0) {
             return;
         }
         validate_common_accounts()
         frappe.dom.freeze('.......');
         (cur_frm.fields_dict.accounts.grid.grid_rows || []).forEach(async row => {
-            if(row.doc.from_common_entry) {
-                row.doc.__checked=1;
+            if (row.doc.from_common_entry) {
+                row.doc.__checked = 1;
             }
         });
         cur_frm.fields_dict.accounts.grid.delete_rows();
@@ -38,7 +38,7 @@ frappe.ui.form.on("Journal Entry", {
             freeze: true,
             freeze_message: "Splitting Expenses",
             callback(r) {
-                let res=r.message || []
+                let res = r.message || []
                 res.forEach(row => {
                     let child = cur_frm.add_child("accounts");
                     child.account = row.account;
@@ -46,7 +46,11 @@ frappe.ui.form.on("Journal Entry", {
                     child.from_common_entry = 1;
                     refresh_field("accounts");
                 });
-                
+                let total_debit = 0;
+                (cur_frm.doc.accounts || []).forEach(row => {
+                    total_debit += row.debit_in_account_currency
+                });
+                cur_frm.set_value("total_debit", total_debit)
             }
         });
         frappe.dom.unfreeze();
@@ -82,16 +86,16 @@ frappe.ui.form.on("Common Expense JE", {
 function validate_common_accounts() {
     (cur_frm.doc.common_expenses || []).forEach(row => {
         if (row.paver && !row.paver_account) {
-            frappe.throw({message: `<b>Paver Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res"});
+            frappe.throw({ message: `<b>Paver Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res" });
         }
         if (row.compound_wall && !row.cw_account) {
-            frappe.throw({message: `<b>Compound Wall Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res"});
+            frappe.throw({ message: `<b>Compound Wall Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res" });
         }
         if (row.lego_block && !row.lg_account) {
-            frappe.throw({message: `<b>Lego Block Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res"});
+            frappe.throw({ message: `<b>Lego Block Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res" });
         }
         if (row.fencing_post && !row.fp_account) {
-            frappe.throw({message: `<b>Fencing Post Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res"});
+            frappe.throw({ message: `<b>Fencing Post Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res" });
         }
     });
 }
@@ -111,27 +115,27 @@ function allocate_amount(frm, cdt, cdn) {
     if (data.fencing_post) {
         total_production += (fp || 0);
     }
-    
+
     if (data.paver) {
-        frappe.model.set_value(cdt, cdn, 'paver_amount', data.debit * (paver/total_production));
+        frappe.model.set_value(cdt, cdn, 'paver_amount', data.debit * (paver / total_production));
     } else {
         frappe.model.set_value(cdt, cdn, 'paver_amount', 0);
     }
 
     if (data.compound_wall) {
-        frappe.model.set_value(cdt, cdn, 'cw_amount', data.debit * (cw/total_production));
+        frappe.model.set_value(cdt, cdn, 'cw_amount', data.debit * (cw / total_production));
     } else {
         frappe.model.set_value(cdt, cdn, 'cw_amount', 0);
     }
 
     if (data.fencing_post) {
-        frappe.model.set_value(cdt, cdn, 'fp_amount', data.debit * (fp/total_production));
+        frappe.model.set_value(cdt, cdn, 'fp_amount', data.debit * (fp / total_production));
     } else {
         frappe.model.set_value(cdt, cdn, 'fp_amount', 0);
     }
 
     if (data.lego_block) {
-        frappe.model.set_value(cdt, cdn, 'lg_amount', data.debit * (lego/total_production));
+        frappe.model.set_value(cdt, cdn, 'lg_amount', data.debit * (lego / total_production));
     } else {
         frappe.model.set_value(cdt, cdn, 'lg_amount', 0);
     }
