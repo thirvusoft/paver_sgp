@@ -34,16 +34,17 @@ def get_data(filters= {}):
 	cw_filt = {'docstatus':['!=', 2]}
 	dl_filt = {'docstatus':1}
 	if(filters.get('from_date')):
-		pm_filt['from_time'] = ['>=', add_days(filters.get('from_date'),1)]
+		pm_filt['from_time'] = ['>=', filters.get('from_date')]
 		cw_filt['molding_date'] = ['>=', filters.get('from_date')]
 		dl_filt['posting_date'] = ['>=', filters.get('from_date')]
 
 	if(filters.get('to_date')):
-		pm_filt['to'] = ['<=', add_days(filters.get('to_date'),1)]
+		pm_filt['from_time'] = ['<=', filters.get('to_date')]
 		cw_filt['molding_date'] = ['<=', filters.get('to_date')]
 		dl_filt['posting_date'] = ['<=', filters.get('to_date')]
 	if(filters.get('from_date') and filters.get('to_date')):
 		cw_filt['molding_date'] = ['between', (filters.get('from_date'), filters.get('to_date'))]
+		pm_filt['from_time'] = ['between', (filters.get('from_date'), filters.get('to_date'))]
 
 	pm_sqft = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='production_sqft'))
 	cw_sqft = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))

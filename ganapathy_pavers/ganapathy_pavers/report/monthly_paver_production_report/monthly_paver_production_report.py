@@ -176,10 +176,10 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 				if res:
 					res.append({})
 				dic['qty']=i['value']
-				dic["sqft"]=round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0
-				total_sqf+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
-				dic["uom"]=round(i["balance"]/prod_sqft, 4)
-				total_amt+=(round(i["balance"]/prod_sqft, 4) or 0)
+				dic["sqft"]=(round(i["balance"]/prod_sqft, 4) or 0)
+				total_sqf+=(round(i["balance"]/prod_sqft, 4) or 0)
+				dic["uom"]=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
+				total_amt+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
 				res.append(dic)	
 	return res, total_sqf, total_amt
 
@@ -189,10 +189,10 @@ def get_expense_from_child(prod_sqft, account, sqft, total_sqf, total_amt):
 		if i["balance"]:
 			dic={}
 			dic['qty']=i['value']
-			dic["sqft"]=round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0
-			total_sqf+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
-			dic["uom"]=round(i["balance"]/prod_sqft, 4)
-			total_amt+=(round(i["balance"]/prod_sqft, 4) or 0)
+			dic["sqft"]=(round(i["balance"]/prod_sqft, 4) or 0)
+			total_sqf+=(round(i["balance"]/prod_sqft, 4) or 0)
+			dic["uom"]=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
+			total_amt+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
 			res.append(dic)
 		if i['child_nodes']:
 			res1, total_sqf, total_amt=(get_expense_from_child(i['child_nodes'], sqft, total_sqf, total_amt))

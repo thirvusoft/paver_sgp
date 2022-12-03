@@ -40,6 +40,7 @@ def get_production_details(date=None, from_date=None, to_date=None):
             lg_filt['molding_date'] = ['<=', to_date]
             fp_filt['molding_date'] = ['<=', to_date]
         if(from_date and to_date):
+            pm_filt['from_time'] = ['between', (from_date, to_date)]
             cw_filt['molding_date'] = ['between', (from_date, to_date)]
             lg_filt['molding_date'] = ['between', (from_date, to_date)]
             fp_filt['molding_date'] = ['between', (from_date, to_date)]
