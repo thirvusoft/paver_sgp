@@ -89,7 +89,8 @@ frappe.ui.form.on('Sales Invoice', {
                     }
                 })
             });
-            bttn.addClass("btn-primary")
+            bttn.removeClass("btn-default")
+            bttn.addClass("btn-success")
         }
     },
     onload_post_render: function(frm) {
