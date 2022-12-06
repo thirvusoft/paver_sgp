@@ -70,6 +70,28 @@ frappe.ui.form.on("Sales Invoice Item", {
 
 
 frappe.ui.form.on('Sales Invoice', {
+    refresh: function(frm) {
+        if (!cur_frm.doc.ewaybill && cur_frm.doc.einvoice_status == "Generated") {
+            let bttn=cur_frm.add_custom_button("Get E-Way Bill No", async function() {
+                await frappe.call({
+                    method: "ganapathy_pavers.custom.py.sales_invoice.get_einvoice_no",
+                    args: {
+                        name: cur_frm.doc.name || "",
+                        irn: cur_frm.doc.irn || "",
+                    },
+                    callback: function(r) {
+                        if(!r.message) {
+                            frappe.show_alert({message: "Couldn't get E-way Bill No", indicator: 'red'})
+                        } else {
+                            cur_frm.set_value("ewaybill", r.message)
+                            cur_frm.save('Update')
+                        }
+                    }
+                })
+            });
+            bttn.addClass("btn-primary")
+        }
+    },
     onload_post_render: function(frm) {
         if(frm.is_new() && !frm.doc.customer) {
             frm.set_value("branch", "")
