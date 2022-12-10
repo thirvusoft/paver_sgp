@@ -9,7 +9,7 @@ class EmployeeAdvanceTool(Document):
 def employee_finder(advance1):
 
 	employee_names=[]
-	a=frappe.db.get_all("Employee",filters={"designation":advance1},fields=["name", "employee_name"],order_by="employee_name")
+	a=frappe.db.get_all("Employee",filters={"designation":advance1, "status": "Active"},fields=["name", "employee_name"],order_by="employee_name")
 	for name in a:
 		employee_names.append(name)
 	return employee_names
@@ -31,7 +31,7 @@ def create_employee_advance(name,amount,date,payment_type):
 @frappe.whitelist()
 def employee_finder_attendance(designation='', department=''):
 	employee_names=[]
-	filters={}
+	filters={"status": "Active"}
 	if(designation):
 		filters["designation"]=designation
 	if(department):
