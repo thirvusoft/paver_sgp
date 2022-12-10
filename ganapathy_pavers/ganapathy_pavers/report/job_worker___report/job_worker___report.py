@@ -49,10 +49,12 @@ def execute(filters=None):
                 total[5] = sum((data[i][5] or 0) for i in range(start,i+1))
                 total[6] = adv
                 total[7] = sum((data[i][7] or 0) for i in range(start,i+1))
+                final_data[-1][4]=0
                 final_data.append(total)
                 start = i+1	
                 c=0
             else:
+                data[i][4]=0
                 if(c==0):data[i][6]=()
                 else:data[i][6]=()
                 c+=1
@@ -62,11 +64,12 @@ def execute(filters=None):
         final_data.append(data[-1])
         total = [" " for i in range(8)]
         total[2] = "<b style=color:orange;>""Total""</b>"
-        total[3] = sum((data[i][3] or 0) for i in range(start,len(data)))
+        total[3] = f"<b>{sum((data[i][3] or 0) for i in range(start,len(data)))}</b>"
         total[4] = sum((data[i][4] or 0) for i in range(start,len(data)))
-        total[5] = sum((data[i][5] or 0) for i in range(start,len(data)))
+        total[5] = f"<b>{sum((data[i][5] or 0) for i in range(start,len(data)))}</b>"
         total[6] = adv
-        total[7] = sum((data[i][7] or 0) for i in range(start,len(data)))
+        total[7] = f"<b>{sum((data[i][7] or 0) for i in range(start,len(data)))}</b>"
+        final_data[-1][4]=0
         final_data.append(total)
     columns = get_columns()
     return columns, final_data
@@ -77,10 +80,10 @@ def get_columns():
 		_("Site Name") + ":Link/Project:150",
 		_("Status") + ":Data/Project:150",
 		_("Completed Sqft") + ":Data:150",
-		_("Salary Balance") + ":Currency:150",
-		_("Amount") + ":Currency:150",
-		_("Advance Amount") + ":Currency:150",
-		_("Total Amount") + ":Currency:150",
+		_("Salary Balance") + ":Data:150",
+		_("Amount") + ":Data:150",
+		_("Advance Amount") + ":Data:150",
+		_("Total Amount") + ":Data:150",
 		]
 	
 	return columns
