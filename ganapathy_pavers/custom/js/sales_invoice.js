@@ -52,7 +52,9 @@ frappe.ui.form.on("Sales Invoice Item", {
                         frm.set_value("tax_category", "")
                     if(frm.doc.taxes)
                         frm.clear_table("taxes")
-                    refresh_field("taxes")
+                    if(cur_frm.fields_dict["taxes"] && cur_frm.fields_dict["taxes"].refresh) {
+                        cur_frm.fields_dict["taxes"].refresh()
+                    }
                     (cur_frm.doc.items || []).forEach(row => {
                         frappe.model.set_value(row.doctype, row.name, 'unacc', 1);
                         frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
@@ -108,7 +110,9 @@ frappe.ui.form.on('Sales Invoice', {
                         frm.set_value("tax_category", "")
                     if(frm.doc.taxes)
                         frm.clear_table("taxes")
-                    refresh_field("taxes");
+                    if(cur_frm.fields_dict["taxes"] && cur_frm.fields_dict["taxes"].refresh) {
+                        cur_frm.fields_dict["taxes"].refresh()
+                    }
                     (cur_frm.doc.items || []).forEach(row => {
                         frappe.model.set_value(row.doctype, row.name, 'unacc', 1);
                         frappe.model.set_value(row.doctype, row.name, 'item_tax_template', '');
