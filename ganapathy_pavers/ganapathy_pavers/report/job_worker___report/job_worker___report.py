@@ -40,7 +40,7 @@ def execute(filters=None):
         for i in range(len(data)-1):
             if (data[i][0] != data[i+1][0]):
                 adv=data[i][6]
-                data[i][6]=[]
+                data[i][6]=0
                 final_data.append(data[i])
                 total = [" " for i in range(8)]
                 total[2] = "<b style=color:orange;>""Total""</b>"
@@ -55,12 +55,12 @@ def execute(filters=None):
                 c=0
             else:
                 data[i][4]=0
-                if(c==0):data[i][6]=()
-                else:data[i][6]=()
+                if(c==0):data[i][6]=0
+                else:data[i][6]=0
                 c+=1
                 final_data.append(data[i])
         adv=data[-1][6]
-        data[-1][6]=()      
+        data[-1][6]=0
         final_data.append(data[-1])
         total = [" " for i in range(8)]
         total[2] = "<b style=color:orange;>""Total""</b>"
