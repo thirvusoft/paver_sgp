@@ -189,3 +189,24 @@ def updateservice_hours(doc):
 def fuel_supplier(name):
     supplier= frappe.get_single("Vehicle Settings").default_fuel_supplier
     return supplier
+
+def update_vehicle_log(self, event=None):
+    vl=frappe.get_all("Vehicle Log", {"docstatus": ["!=", 2], "delivery_note": self.name}, pluck="name")
+    if vl:
+        vl_doc=frappe.get_doc("Vehicle Log", vl[0])
+        if vl_doc.docstatus==1:
+            frappe.throw(f"Vehicle Log <b><a href='/app/vehicle-log/{vl[0]}'>{vl[0]}</a></b> is submitted.")
+        if self.return_odometer_value!=vl_doc.odometer:
+            vl_doc.update({
+                "odometer": self.return_odometer_value
+            })
+            vl_doc.save()
+
+def update_delivery_note(self, event=None):
+    if self.delivery_note:
+        dn=frappe.get_doc("Delivery Note", self.delivery_note)
+        if dn.docstatus!=2 and dn.return_odometer_value!=self.odometer:
+            dn.update({
+                "return_odometer_value": self.odometer
+            })
+            dn.save("Update")
