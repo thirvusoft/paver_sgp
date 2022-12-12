@@ -126,6 +126,20 @@ frappe.ui.form.on('Delivery Note', {
     },
     site_work: function (frm, cdt, cdn) {
         cur_frm.set_value('project', cur_frm.doc.site_work)
+    },
+    refresh: async function (frm) {
+        await frappe.db.get_list("Vehicle Log", {
+            filters: {
+                docstatus: ["!=", 2],
+                delivery_note: cur_frm.doc.name
+            }
+        }).then(async res => {
+            if (res && res[0]) {
+                await cur_frm.add_custom_button("Open Vehicle Log", function () {
+                    window.open(`/app/vehicle-log/${res[0].name}`)
+                }).removeClass("elipsis").addClass("btn-primary")
+            }
+        })
     }
 })
 

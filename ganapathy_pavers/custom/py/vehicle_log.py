@@ -114,9 +114,6 @@ def vehicle_log_creation(self, event):
         })
         vehicle_log.flags.ignore_permissions=True
         vehicle_log.save()
-    self.update({
-        "vehicle_log": vehicle_log.name
-    })
 
 def vehicle_log_draft(self, event):
     vehicle_draft=frappe.get_all("Vehicle Log",filters={"docstatus":0,"license_plate":self.license_plate})
