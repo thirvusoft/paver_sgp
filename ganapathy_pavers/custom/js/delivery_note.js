@@ -1,3 +1,4 @@
+var date, distance;
 frappe.ui.form.on('Delivery Note Item', {
     ts_qty: function (frm, cdt, cdn) {
         bundle_calc(frm, cdt, cdn)
@@ -110,11 +111,11 @@ frappe.ui.form.on('Delivery Note', {
 
     },
     on_submit: function (frm) {
-        if (frm.doc.docstatus === 1) {
-            frm.add_custom_button(__('Notify Supervisor'), function () {
+        // if (frm.doc.docstatus === 1) {
+        //     frm.add_custom_button(__('Notify Supervisor'), function () {
 
-            }).addClass("btn btn-primary btn-sm primary-action").css({ ' background-color': '#2490ef', });
-        }
+        //     }).addClass("btn btn-primary btn-sm primary-action").css({ ' background-color': '#2490ef', });
+        // }
 
     },
     current_odometer_value: function (frm) {
@@ -137,6 +138,29 @@ frappe.ui.form.on('Delivery Note', {
             if (res && res[0]) {
                 await cur_frm.add_custom_button("Open Vehicle Log", function () {
                     window.open(`/app/vehicle-log/${res[0].name}`)
+                }).removeClass("elipsis").addClass("btn-primary")
+            } else if (frm.doc.transporter=="Own Transporter" && frm.doc.own_vehicle_no && frm.doc.docstatus == 1) {
+                cur_frm.add_custom_button("Create Vehicle Log", async function () {
+                    date = cur_frm.doc.posting_date
+                    distance = cur_frm.doc.distance
+                    await frappe.run_serially([
+                        async () => {
+                            await frappe.new_doc("Vehicle Log", {
+                                license_plate: frm.doc.own_vehicle_no,
+                                employee: frm.doc.employee,
+                                date: date,
+                                select_purpose: "Goods Supply",
+                                delivery_note: frm.doc.name,
+                            })
+                        },
+                        () => {
+                            cur_frm.set_value("date", date)
+                            if (distance) {
+                                cur_frm.set_value("odometer", cur_frm.doc.last_odometer + distance)
+                            }
+                        }
+                    ])
+
                 }).removeClass("elipsis").addClass("btn-primary")
             }
         })
