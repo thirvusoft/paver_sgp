@@ -40,7 +40,7 @@ def get_production_rate(item_code, warehouse, creation):
     item_doc=frappe.get_doc("Item", item_code)
     date=creation.date()
     if item_doc.item_group=="Pavers":
-        paver_m=frappe.get_all("Material Manufacturing", filters={"docstatus": ["!=", 2], "from_time": ["<=", creation], "item_to_manufacture": item_code}, fields=["item_price", "name"], limit=1)
+        paver_m=frappe.get_all("Material Manufacturing", filters={"docstatus": ["!=", 2], "from_time": ["<=", creation], "item_to_manufacture": item_code}, fields=["item_price", "name"], limit=1, order_by="from_time desc")
         if (paver_m and not paver_m[0]["item_price"]) or not paver_m:
             production_rate=get_valuation_rate(item_code, warehouse, creation)
         else:
@@ -51,7 +51,7 @@ def get_production_rate(item_code, warehouse, creation):
             ["docstatus", "!=", 2],
             ["molding_date", "<=", date]
         ]
-        cw_m=frappe.get_all("CW Manufacturing", filters=filters, fields=["total_cost_per_sqft", "name"], limit=1)
+        cw_m=frappe.get_all("CW Manufacturing", filters=filters, fields=["total_cost_per_sqft", "name", "molding_date"], limit=1,  order_by="molding_date desc")
         if (cw_m and not cw_m[0]["total_cost_per_sqft"]) or not cw_m:
             production_rate=get_valuation_rate(item_code, warehouse, creation)
         else:
