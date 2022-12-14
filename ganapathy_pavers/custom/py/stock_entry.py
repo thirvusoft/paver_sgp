@@ -90,4 +90,5 @@ class Tsstockentry(StockEntry):
 def basic_rate_validation(doc,event):
     if(doc.usb or doc.cw_usb):
         for item in doc.items:
-            item.basic_rate = item.basic_rate_hidden
+            item.basic_rate = item.basic_rate_hidden/(item.conversion_factor)
+            item.valuation_rate = item.basic_rate_hidden/(item.conversion_factor)
