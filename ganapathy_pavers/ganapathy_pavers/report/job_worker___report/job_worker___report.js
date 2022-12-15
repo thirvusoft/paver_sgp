@@ -31,8 +31,12 @@ frappe.query_reports["Job Worker - Report"] = {
 			"fieldtype": "Link",
 			"options": "Employee",
 			"width": "100"
+		},
+		{
+			"fieldname": "group_site_work",
+			"label": "Group Site Work",
+			"fieldtype": "Check",
+			"default": 1
 		}
-
-
 	]
 };

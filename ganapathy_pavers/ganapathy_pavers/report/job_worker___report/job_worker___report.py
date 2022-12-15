@@ -8,6 +8,7 @@ def execute(filters=None):
     to_date = filters.get("to_date")
     employee = filters.get("employee")
     site_name = filters.get("site_name")
+    group_by_site="site.name, " if filters.get("group_site_work") else ""
     conditions = ""
     adv_conditions = ""
     if from_date or to_date or employee or site_name:
@@ -29,12 +30,21 @@ def execute(filters=None):
                                         left outer join `tabEmployee` as emp
                                             on emp.employee = jwd.name1
                                         {0}
-                                    group by jwd.name1,jwd.sqft_allocated)as total_cal
-                                """.format(conditions,adv_conditions))
+                                    group by jwd.name1,{2}jwd.sqft_allocated)as total_cal
+                                """.format(conditions,adv_conditions, group_by_site))
     data = [list(i) for i in report_data]
     final_data = []
     c = 0
-    
+    if filters.get("group_site_work"):
+        data1={}
+        for idx in range(len(data)):
+            _key=f"{data[idx][0]}---{data[idx][1]}"
+            if _key not in data1:
+                data1[_key]=data[idx]
+            else:
+                data1[_key][3]+=(data[idx][3] or 0)
+                data1[_key][5]+=(data[idx][5] or 0)
+        data=list(data1.values())
     if(len(data)):
         start = 0
         for i in range(len(data)-1):

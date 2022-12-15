@@ -115,6 +115,33 @@ frappe.ui.form.on('Salary Slip',{
                 frappe.model.set_value(child.doctype, child.name, "amount",frm.doc.total_paid_amount)
                 cur_frm.refresh_field("earnings")            }, 100);
         }   
+    },
+    split_paid_amount: function(frm) {
+        if (!frm.doc.paid_amount) {
+            frm.scroll_to_field("paid_amount")
+            return
+        }
+        if ((frm.doc.paid_amount || 0)>(frm.doc.total_amount || 0)) {
+            frappe.show_alert({message: "Paid Amount can't be greater than Total Amount", indicator: "red"})
+            frm.scroll_to_field("paid_amount")
+            return
+        }
+        let amount=frm.doc.paid_amount;
+        (frm.doc.site_work_details || []).forEach(row => {
+            let data=locals[row.doctype][row.name]
+            if (!amount) {
+                frappe.model.set_value(row.doctype, row.name, "paid_amount", 0)
+            }
+            let temp_amount=amount-data.amount;
+            if (temp_amount<0) {
+                frappe.model.set_value(row.doctype, row.name, "paid_amount", amount)
+                amount=0
+            } else {
+                frappe.model.set_value(row.doctype, row.name, "paid_amount", data.amount)
+                amount-=data.amount
+            }
+            console.log(amount)
+        })
     }
 })
 
