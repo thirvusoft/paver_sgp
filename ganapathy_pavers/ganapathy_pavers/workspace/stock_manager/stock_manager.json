@@ -14,8 +14,8 @@
  "is_standard": 1,
  "label": "STOCK MANAGER",
  "links": [],
- "modified": "2022-11-25 10:11:07.530830",
- "modified_by": "ponnusamyv434@gmail.com",
+ "modified": "2022-12-15 11:24:19.385333",
+ "modified_by": "admin@gmail.com",
  "module": "Ganapathy Pavers",
  "name": "STOCK MANAGER",
  "onboarding": "",
@@ -51,6 +51,12 @@
    "doc_view": "List",
    "label": "DSM Defaults",
    "link_to": "DSM Defaults",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "Tree",
+   "label": "Warehouse",
+   "link_to": "Warehouse",
    "type": "DocType"
   }
  ]

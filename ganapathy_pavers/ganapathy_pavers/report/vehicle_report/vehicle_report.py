@@ -90,6 +90,8 @@ def get_sqft(vl_filt, vehicle):
 	for i in dn_names:
 		dn_item = frappe.db.get_all('Delivery Note Item', filters={'parent':i['name']}, fields=['item_code', 'stock_qty', 'uom'])
 		for j in dn_item:
+			if not (frappe.get_value("Item", j.item_code, "item_group") in["Pavers", "Compound Walls"]):
+				continue
 			if(j.uom != 'SQF' and i['type'] == 'Pavers'):
 				paver_sqft += ganapathy_pavers.uom_conversion(j.item_code, from_uom=j.uom, from_qty=j.stock_qty, to_uom='SQF')
 			elif(j.uom == 'SQF' and i['type'] == 'Pavers'):
