@@ -23,7 +23,7 @@ def execute(filters=None):
             conditions += " and site.name = '{0}' ".format(site_name)
     report_data = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select (select employee_name from `tabEmployee` where name = jwd.name1 ) as jobworker,site.name,site.status,jwd.sqft_allocated,jwd.other_work, jwd.description_for_other_work,
                                         emp.salary_balance as salary_balance,jwd.amount as amount,
-                                        (select sum(empadv.advance_amount - empadv.return_amount) from `tabEmployee Advance` as empadv {1} and empadv.employee = jwd.name1 and docstatus = 1) as advance_amount
+                                        (select sum(empadv.advance_amount) from `tabEmployee Advance` as empadv {1} and empadv.employee = jwd.name1 and docstatus = 1) as advance_amount
                                         from `tabProject` as site
                                         left outer join `tabTS Job Worker Details` as jwd
                                             on site.name = jwd.parent
@@ -32,7 +32,6 @@ def execute(filters=None):
                                         {0}
                                     group by jwd.name1{2},jwd.sqft_allocated order by jwd.sqft_allocated)as total_cal
                                 """.format(conditions,adv_conditions, group_by_site))
-    [frappe.errprint(i) for i in report_data]
     data = [list(i) for i in report_data]
     final_data = []
     c = 0
@@ -84,23 +83,36 @@ def execute(filters=None):
         total[9] = f"<b>{'%.2f'%sum((data[i][9] or 0) for i in range(start,len(data)))}</b>"
         final_data[-1][6]=0
         final_data.append(total)
-    columns = get_columns()
+    other_work=0
     for row in final_data:
         if row[4]:
             row[4]="Yes"
+            other_work=1
         else:
             row[4]=""
             row[5]=""
+    columns = get_columns(other_work)
+    
     return columns, final_data
 
-def get_columns():
+def get_columns(other_work):
 	columns = [
 		_("Job Worker") + ":Data/Employee:150",
 		_("Site Name") + ":Link/Project:150",
 		_("Status") + ":Data/Project:150",
 		_("Completed Sqft") + ":Data:150",
-        _("Other Work") + ":Data",
-        _("Other Work Description") + ":Data",
+        {
+            "fieldname": "other_work",
+            "label": "Other Work",
+            "fieldtype": "Data",
+            "hidden": not other_work
+        },
+        {
+            "fieldname": "other_work_description",
+            "label": "Other Work Description",
+            "fieldtype": "Data",
+            "hidden": not other_work
+        },
 		_("Salary Balance") + ":Data:150",
 		_("Amount") + ":Data:150",
 		_("Advance Amount") + ":Data:150",

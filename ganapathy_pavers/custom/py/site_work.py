@@ -1,3 +1,4 @@
+import math
 import frappe
 import json
 from frappe.utils.csvutils import getlink
@@ -175,7 +176,7 @@ def validate_jw_qty(self):
             jw_items[row.item]+=float(row.sqft_allocated or 0)*conv_factor[0]
     wrong_items=[]
     for item in jw_items:
-        if((jw_items.get(item) or 0)>(delivered_item.get(item) or 0)):
+        if((jw_items.get(item) or 0)>math.ceil(delivered_item.get(item) or 0)):
             wrong_items.append(frappe.bold(item))
     if(wrong_items):
         frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+', '.join(wrong_items))
@@ -191,7 +192,7 @@ def validate_jw_qty(self):
             if((not row.item) or row.item_group == "Compound Walls"):
                 completed_qty += float(row.sqft_allocated or 0)
 
-        if(completed_qty > delivered_qty):
+        if(completed_qty > math.ceil(delivered_qty)):
             frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty.")
 
 def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, exchange_rate):
