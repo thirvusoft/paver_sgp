@@ -202,6 +202,10 @@ function completed_bundle_calc(frm,cdt,cdn){
 
 frappe.ui.form.on('TS Job Worker Details',{
 	rate: function(frm, cdt, cdn){
+		let data=locals[cdt][cdn]
+		if(data.amount_calc_by_person) {
+			return
+		}
 		amount(frm, cdt, cdn)
 	},
 	completed_bundle: function(frm,cdt,cdn){
@@ -217,7 +221,11 @@ frappe.ui.form.on('TS Job Worker Details',{
 		completed_bundle_calc(frm,cdt,cdn)
 	},
 	sqft_allocated: function(frm, cdt, cdn){
+		let data=locals[cdt][cdn]
 		percent_complete(frm, cdt, cdn)
+		if(data.amount_calc_by_person) {
+			return
+		}
 		amount(frm, cdt, cdn)
 	},
 	job_worker_add: function(frm, cdt, cdn){
@@ -242,6 +250,26 @@ frappe.ui.form.on('TS Job Worker Details',{
 		frappe.model.set_value(cdt,cdn,"end_date",date)
 		frappe.model.set_value(cdt,cdn,"rate",rate)
 	},
+	no_of_person: function(frm, cdt, cdn) {
+		let data=locals[cdt][cdn]
+		if(data.amount_calc_by_person) {
+			frappe.model.set_value(cdt, cdn, "amount", (data.no_of_person || 0)*(data.rate_person || 0))
+		}
+	},
+	rate_person:  function(frm, cdt, cdn) {
+		let data=locals[cdt][cdn]
+		if(data.amount_calc_by_person) {
+			frappe.model.set_value(cdt, cdn, "amount", (data.no_of_person || 0)*(data.rate_person || 0))
+		}
+	},
+	amount_calc_by_person: function(frm, cdt, cdn) {
+		let data=locals[cdt][cdn]
+		if(data.amount_calc_by_person) {
+			frappe.model.set_value(cdt, cdn, "amount", (data.no_of_person || 0)*(data.rate_person || 0))
+			return
+		}
+		amount(frm, cdt, cdn)
+	}
 })
 
 

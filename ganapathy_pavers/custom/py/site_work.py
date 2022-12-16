@@ -251,3 +251,7 @@ def update_delivery_detail(self, event):
                 'delivery_detail': (self.delivery_detail or []) + delivery_detail
             })
 
+def job_worker(self, event=None):
+    for row in self.job_worker:
+        if not row.other_work:
+            row.description_for_other_work=""

@@ -154,7 +154,8 @@ doc_events = {
 			"ganapathy_pavers.custom.py.site_work.validate",
 			"ganapathy_pavers.custom.py.site_work.validate_status",
 			"ganapathy_pavers.custom.py.site_work.rework_count",
-			"ganapathy_pavers.custom.py.site_work.update_delivery_detail"
+			"ganapathy_pavers.custom.py.site_work.update_delivery_detail",
+			"ganapathy_pavers.custom.py.site_work.job_worker"
 		],
 		"after_insert":"ganapathy_pavers.custom.py.site_work.validate",
 		"on_update":"ganapathy_pavers.custom.py.site_work.update_status"

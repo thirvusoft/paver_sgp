@@ -8,7 +8,7 @@ def execute(filters=None):
     to_date = filters.get("to_date")
     employee = filters.get("employee")
     site_name = filters.get("site_name")
-    group_by_site="site.name, " if filters.get("group_site_work") else ""
+    group_by_site=", site.name" if filters.get("group_site_work") else ""
     conditions = ""
     adv_conditions = ""
     if from_date or to_date or employee or site_name:
@@ -21,7 +21,7 @@ def execute(filters=None):
             conditions += " and jwd.name1 ='{0}' ".format(employee)
         if site_name:
             conditions += " and site.name = '{0}' ".format(site_name)
-    report_data = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select (select employee_name from `tabEmployee` where name = jwd.name1 ) as jobworker,site.name,site.status,jwd.sqft_allocated,
+    report_data = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select (select employee_name from `tabEmployee` where name = jwd.name1 ) as jobworker,site.name,site.status,jwd.sqft_allocated,jwd.other_work, jwd.description_for_other_work,
                                         emp.salary_balance as salary_balance,jwd.amount as amount,
                                         (select sum(empadv.advance_amount - empadv.return_amount) from `tabEmployee Advance` as empadv {1} and empadv.employee = jwd.name1 and docstatus = 1) as advance_amount
                                         from `tabProject` as site
@@ -30,8 +30,9 @@ def execute(filters=None):
                                         left outer join `tabEmployee` as emp
                                             on emp.employee = jwd.name1
                                         {0}
-                                    group by jwd.name1,{2}jwd.sqft_allocated)as total_cal
+                                    group by jwd.name1{2},jwd.sqft_allocated order by jwd.sqft_allocated)as total_cal
                                 """.format(conditions,adv_conditions, group_by_site))
+    [frappe.errprint(i) for i in report_data]
     data = [list(i) for i in report_data]
     final_data = []
     c = 0
@@ -43,45 +44,53 @@ def execute(filters=None):
                 data1[_key]=data[idx]
             else:
                 data1[_key][3]+=(data[idx][3] or 0)
-                data1[_key][5]+=(data[idx][5] or 0)
+                data1[_key][7]+=(data[idx][7] or 0)
         data=list(data1.values())
     if(len(data)):
         start = 0
         for i in range(len(data)-1):
             if (data[i][0] != data[i+1][0]):
-                adv=data[i][6]
-                data[i][6]=0
+                adv=data[i][8]
+                data[i][8]=0
                 final_data.append(data[i])
-                total = [" " for i in range(8)]
+                total = [" " for i in range(10)]
                 total[2] = "<b style=color:orange;>""Total""</b>"
                 total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,i+1))}</b>"
-                total[4] = sum((data[i][4] or 0) for i in range(start,i+1))
-                total[5] = f"<b>{'%.2f'%sum((data[i][5] or 0) for i in range(start,i+1))}</b>"
-                total[6] = adv
+                total[4]=0
+                total[6] = sum((data[i][6] or 0) for i in range(start,i+1))
                 total[7] = f"<b>{'%.2f'%sum((data[i][7] or 0) for i in range(start,i+1))}</b>"
-                final_data[-1][4]=0
+                total[8] = adv
+                total[9] = f"<b>{'%.2f'%sum((data[i][9] or 0) for i in range(start,i+1))}</b>"
+                final_data[-1][6]=0
                 final_data.append(total)
                 start = i+1	
                 c=0
             else:
-                data[i][4]=0
-                if(c==0):data[i][6]=0
-                else:data[i][6]=0
+                data[i][6]=0
+                if(c==0):data[i][8]=0
+                else:data[i][8]=0
                 c+=1
                 final_data.append(data[i])
-        adv=data[-1][6]
-        data[-1][6]=0
+        adv=data[-1][8]
+        data[-1][8]=0
         final_data.append(data[-1])
-        total = [" " for i in range(8)]
+        total = [" " for i in range(10)]
         total[2] = "<b style=color:orange;>""Total""</b>"
         total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,len(data)))}</b>"
-        total[4] = sum((data[i][4] or 0) for i in range(start,len(data)))
-        total[5] = f"<b>{'%.2f'%sum((data[i][5] or 0) for i in range(start,len(data)))}</b>"
-        total[6] = adv
+        total[4]=0
+        total[6] = sum((data[i][6] or 0) for i in range(start,len(data)))
         total[7] = f"<b>{'%.2f'%sum((data[i][7] or 0) for i in range(start,len(data)))}</b>"
-        final_data[-1][4]=0
+        total[8] = adv
+        total[9] = f"<b>{'%.2f'%sum((data[i][9] or 0) for i in range(start,len(data)))}</b>"
+        final_data[-1][6]=0
         final_data.append(total)
     columns = get_columns()
+    for row in final_data:
+        if row[4]:
+            row[4]="Yes"
+        else:
+            row[4]=""
+            row[5]=""
     return columns, final_data
 
 def get_columns():
@@ -90,6 +99,8 @@ def get_columns():
 		_("Site Name") + ":Link/Project:150",
 		_("Status") + ":Data/Project:150",
 		_("Completed Sqft") + ":Data:150",
+        _("Other Work") + ":Data",
+        _("Other Work Description") + ":Data",
 		_("Salary Balance") + ":Data:150",
 		_("Amount") + ":Data:150",
 		_("Advance Amount") + ":Data:150",
