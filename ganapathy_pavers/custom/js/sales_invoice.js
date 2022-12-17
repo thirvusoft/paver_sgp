@@ -131,6 +131,7 @@ frappe.ui.form.on('Sales Invoice', {
     },
     branch: function (frm) {
         frm.trigger("taxes_and_charges")
+        frm.trigger("proforma_invoice")
     },
     validate: function(frm) {
         frm.trigger("taxes_and_charges")
@@ -194,7 +195,20 @@ frappe.ui.form.on('Sales Invoice', {
         },
         site_work: function(frm, cdt, cdn){
             cur_frm.set_value('project', cur_frm.doc.site_work)
-        }
+        },
+        proforma_invoice: async function(frm) {
+            if (frm.doc.proforma_invoice && frm.doc.branch) {
+                await frappe.db.get_value("Branch", frm.doc.branch, "proforma_abbr").then(res => {
+                    if (res?.message?.proforma_abbr) {
+                        frm.set_value("abbr_sales", res?.message?.proforma_abbr)
+                    } else {
+                        frappe.throw({message: `Please enter <b>Proforma Invoice</b> abbreviation in branch <b><a href="/app/branch/${frm.doc.branch}">${frm.doc.branch}</a></b>`})
+                    }
+                })
+            } else {
+                frm.set_value("abbr_sales", "")
+            }
+        },
 })
 
 function amount(frm,cdt,cdn){
