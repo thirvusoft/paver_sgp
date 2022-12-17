@@ -8,7 +8,7 @@ from frappe import _
  
 def execute(filters=None):
     from_date = filters.get("from_date")
-    to_date = filters.get("to_date")
+    to_date = filters.get("to_date") or frappe.utils.nowdate()
     customer = filters.get("customer")
     site_name = filters.get("site_name")
     sales_type = filters.get("sales_type")
