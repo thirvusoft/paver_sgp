@@ -138,6 +138,7 @@ doc_events = {
           },
 	"Salary Slip":{
         		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update",
+				"on_cancel":"ganapathy_pavers.utils.py.salary_slip.employee_update",
 				'validate':"ganapathy_pavers.utils.py.salary_slip.validate_salaryslip"
 	},
 	"Driver":{

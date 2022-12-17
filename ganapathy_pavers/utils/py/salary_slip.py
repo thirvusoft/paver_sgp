@@ -37,7 +37,10 @@ def site_work_details(employee,start_date,end_date):
 
 def employee_update(doc,action):
     employee_doc = frappe.get_doc('Employee',doc.employee)
-    employee_doc.salary_balance=doc.total_unpaid_amount
+    if action=="on_submit":
+        employee_doc.salary_balance=doc.total_unpaid_amount
+    elif action=="on_cancel":
+        employee_doc.salary_balance=employee_doc.salary_balance-(doc.total_amount-doc.total_paid_amount)
     employee_doc.save()
 
 # def round_off(doc,action):

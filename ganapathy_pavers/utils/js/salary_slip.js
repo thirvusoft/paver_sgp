@@ -140,7 +140,6 @@ frappe.ui.form.on('Salary Slip',{
                 frappe.model.set_value(row.doctype, row.name, "paid_amount", data.amount)
                 amount-=data.amount
             }
-            console.log(amount)
         })
     }
 })
