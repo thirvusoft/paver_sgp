@@ -5,7 +5,10 @@ frappe.ui.form.on("Employee Advance Tool",{
 		var advance1=advance.designation
 		frappe.call({
 			method:"ganapathy_pavers.ganapathy_pavers.doctype.employee_advance_tool.employee_advance_tool.employee_finder",
-			args:{advance1},
+			args:{
+				advance1: advance1,
+				location:frm.doc.location
+			},
 			callback(r){
 				frm.clear_table("employee_advance_details");
 				for(var i=0;i<r.message.length;i++){
@@ -22,16 +25,26 @@ frappe.ui.form.on("Employee Advance Tool",{
 		})
 
 	},
-	
-	on_submit:function(frm,cdt,cdn){
+	location: function(frm) {
+		frm.trigger("designation")
+	},	
+	before_submit:function(frm,cdt,cdn){
 		var advance=locals[cdt][cdn]
-		console.log(advance.employee_advance_details.length)
 		for(var i=0;i<advance.employee_advance_details.length;i++){
+			if((advance.employee_advance_details[i].current_advance) && !(advance.employee_advance_details[i].mode_of_payment || frm.doc.mode_of_payment)) {
+				frappe.throw({message:`Mode of Payment is mandatory at #row ${i+1}`})
+			}
+		}
+		for(var i=0;i<advance.employee_advance_details.length;i++){
+
 			frappe.call({
 				method:"ganapathy_pavers.ganapathy_pavers.doctype.employee_advance_tool.employee_advance_tool.create_employee_advance",
+				freeze: true,
 				args:{amount:advance.employee_advance_details[i].current_advance,
 					name:advance.employee_advance_details[i].employee,
 					date:frm.doc.date,
+					branch: frm.doc.branch,
+					mode_of_payment:advance.employee_advance_details[i].mode_of_payment || frm.doc.mode_of_payment,
 					payment_type:advance.employee_advance_details[i].payment_method},
 			})
 		}

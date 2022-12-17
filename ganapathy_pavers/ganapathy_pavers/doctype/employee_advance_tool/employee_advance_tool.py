@@ -6,21 +6,28 @@ class EmployeeAdvanceTool(Document):
 	pass
 @frappe.whitelist()
 	
-def employee_finder(advance1):
+def employee_finder(advance1="", location=""):
 
 	employee_names=[]
-	a=frappe.db.get_all("Employee",filters={"designation":advance1, "status": "Active"},fields=["name", "employee_name"],order_by="employee_name")
+	filters={"status": "Active"}
+	if advance1:
+		filters["designation"]=advance1
+	if location:
+		filters["location"]=location
+	a=frappe.db.get_all("Employee",filters=filters,fields=["name", "employee_name"],order_by="employee_name")
 	for name in a:
 		employee_names.append(name)
 	return employee_names
 
 @frappe.whitelist()
-def create_employee_advance(name,amount,date,payment_type):
+def create_employee_advance(name,amount,date,payment_type,mode_of_payment,branch):
 		advance_doc=frappe.new_doc('Employee Advance')
 		advance_doc.employee = name
 		advance_doc.advance_amount = amount
 		advance_doc.posting_date = date
 		advance_doc.exchange_rate = 1.0
+		advance_doc.branch=branch
+		advance_doc.mode_of_payment=mode_of_payment
 		if payment_type=="Deduct from Salary":
 			advance_doc.repay_unclaimed_amount_from_salary=1
 		advance_doc.insert()
