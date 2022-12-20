@@ -66,7 +66,7 @@ def get_data(filters):
     if filters.get('item'):
         _filters["item_to_manufacture"]=filters.get('item')
     if filters.get('machine'):
-        _filters["work_station"]=filters.get('machine')
+        _filters["work_station"]=["in", filters.get('machine')]
     daily_paver=frappe.db.get_all("Material Manufacturing", filters=_filters,fields=["name","item_to_manufacture","work_station","from_time","production_sqft","no_of_racks"], order_by="item_to_manufacture")
 
     
@@ -87,11 +87,11 @@ def get_data(filters):
             frappe.throw("Please Select Nos Conversion of the item " f"{daily_paver[i].item_to_manufacture}")
         area_conv=square_ft/nos
         f=frappe._dict()
-        f.update({"paver_prod_no":daily_paver[i].name,"date":daily_paver[i].from_time,"item":daily_paver[i].item_to_manufacture,"machine":daily_paver[i].work_station,"area_conv":area_conv,"no_of_rack":daily_paver[i].no_of_racks,"sqft":daily_paver[i].production_sqft})
+        f.update({"paver_prod_no":daily_paver[i].name,"date":daily_paver[i].from_time,"item":daily_paver[i].item_to_manufacture,"machine":daily_paver[i].work_station,"area_conv":area_conv,"no_of_rack":daily_paver[i].no_of_racks,"sqft":daily_paver[i].production_sqft or 0})
         data.append(f)
-        grand_total+=f["sqft"]
+        grand_total+=float(f["sqft"] or 0)
         if i+1== len(daily_paver) or daily_paver[i].item_to_manufacture != daily_paver[i+1].item_to_manufacture :
-            data.append({"item":"<b>Group Total</b>","sqft":f"<b>{grand_total}</b>"})
+            data.append({"item":"<b>Group Total</b>","sqft":f"<b>{'%.2f'%(grand_total or 0)}</b>"})
             grand_total=0
         
     return data 

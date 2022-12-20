@@ -31,10 +31,12 @@ frappe.query_reports["Daily Paver Production Register"] = {
 		{
 			"fieldname":"machine",
 			"label": __("Machine"),
-			"fieldtype": "Link",
+			"fieldtype": "MultiSelectList",
 			"options":"Workstation",
-			"width": "80"
-			
+			"width": "80",
+			get_data: function(txt) {
+				return frappe.db.get_link_options('Workstation', txt);
+			}
 		}
 
 	]
