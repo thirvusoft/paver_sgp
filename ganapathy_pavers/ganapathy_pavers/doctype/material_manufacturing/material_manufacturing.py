@@ -190,6 +190,7 @@ def make_stock_entry(doc,type1):
        valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Manufacture","docstatus":["!=",2]},pluck="name")
        stock_entry.set_posting_time = 1
        stock_entry.posting_date = frappe.utils.formatdate(doc.get("to"), "yyyy-MM-dd")
+       stock_entry.posting_time=frappe.utils.get_datetime(doc.get("from_time")).time()
        if len(valid) >= 1:
            frappe.throw("Already Stock Entry("+valid[0]+") Created For Manufacture")
        stock_entry.stock_entry_type = doc.get("stock_entry_type")
@@ -228,6 +229,7 @@ def make_stock_entry(doc,type1):
        valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Repack","docstatus":["!=",2]},pluck="name")
        stock_entry.set_posting_time = 1
        stock_entry.posting_date = frappe.utils.formatdate(doc.get("to_time_rack"), "yyyy-MM-dd")
+       stock_entry.posting_time=frappe.utils.get_datetime(doc.get("to_time_rack")).time()
        if len(valid) >= 1:
            frappe.throw("Already Stock Entry("+valid[0]+") Created For Repack")
        if doc.get("batch_no_manufacture"):
@@ -269,6 +271,7 @@ def make_stock_entry(doc,type1):
        valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Material Transfer","docstatus":["!=",2]},pluck="name")
        stock_entry.set_posting_time = 1
        stock_entry.posting_date = frappe.utils.formatdate(doc.get("to_time_rack"), "yyyy-MM-dd")
+       stock_entry.posting_time=frappe.utils.get_datetime(doc.get("to_time_rack")).time()
        if len(valid) >= 1:
            frappe.throw("Already Stock Entry("+valid[0]+") Created For Material Transfer")
        if doc.get("batch_no_rack_shifting"):

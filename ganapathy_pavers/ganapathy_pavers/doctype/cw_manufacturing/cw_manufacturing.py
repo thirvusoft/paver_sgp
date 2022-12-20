@@ -3,7 +3,7 @@
 
 import frappe
 import json
-
+import datetime
 from frappe.model.document import Document
 
 
@@ -102,6 +102,7 @@ def make_stock_entry_for_molding(doc):
         stock_entry.cw_usb = doc.get("name")
         stock_entry.set_posting_time = 1
         stock_entry.posting_date = doc.get('molding_date')
+        stock_entry.posting_time=datetime.time(9,0,0,0)
         stock_entry.stock_entry_type = "Manufacture"
         stock_entry.bom_no = item.get("bom")
 
@@ -188,6 +189,7 @@ def make_stock_entry_for_bundling(doc):
         
         stock_entry.set_posting_time = 1
         stock_entry.posting_date = doc.get("unmolding_date")
+        stock_entry.posting_time=datetime.time(9,0,0,0)
         converted_qty = uom_conversion(item.get('item_code'), item.get("uom"),  item.get('qty') , default_nos)
         
         sqft_qty = uom_conversion(item.get('item_code'), item.get("uom"),  item.get('qty') , "SQF")
@@ -245,6 +247,7 @@ def make_stock_entry_for_curing(doc):
         stock_entry.stock_entry_type = "Material Transfer"
         stock_entry.set_posting_time = 1
         stock_entry.posting_date = doc.get("curing_date")
+        stock_entry.posting_time=datetime.time(9,0,0,0)
         if (item.get("item_code")):
             if (not frappe.get_value('Item', item.get("item_code"), 'has_batch_no')):
                 frappe.throw(
