@@ -226,13 +226,32 @@ class PartyLedgerSummaryReport(object):
 					row["adj_" + scrub(account)] = adjustments.get(account, 0)
 
 				out.append(row)
+		frappe.errprint(out)
 		out=self.get_outstand_based_on_delivery_note(out)
 		return out
 
 	def get_outstand_based_on_delivery_note(self,data):
 		out=[]
+		dn_filters={"docstatus": 1}
+		if self.filters.from_date and self.filters.to_date:
+				dn_filters["posting_date"] = ["between", [self.filters.from_date, self.filters.to_date]]
+		if self.filters.get("party"):
+			dn_filters["customer"] = self.filters.get("party")
+		if self.filters.get("project"):
+			dn_filters["project"] = self.filters.get("project")
+		if self.filters.get("company"):
+			dn_filters["company"] = self.filters.get("company")
+		customer_list=frappe.get_all("Delivery Note", dn_filters, ["customer", "project", "type"])
+		for i in customer_list:
+			run=1
+			for j in data:
+				if (j.get("party_name")==i.get("customer") and j.get("project")==i.get("project") and j.get("type")==i.get("type")):
+					run=0
+					continue
+			if run:
+				data.append(frappe._dict({'party': i.get("customer"), 'party_name': i.get("customer"), 'party_name': i.get("customer"), 'project': i.get("project"), 'type': i.get("type")}))
 		for customer in data:
-			filters={'customer': customer.party, 'docstatus':1}
+			filters={'customer': customer.get("party"), 'docstatus':1}
 			filters['project'] = (customer.get('project') or '')
 			filters['type'] = (customer.get('type') or '')
 			filters["posting_date"] = ["between", [self.filters.from_date, self.filters.to_date]]
@@ -240,9 +259,9 @@ class PartyLedgerSummaryReport(object):
 			delivery_amount = sum(frappe.get_all('Delivery Note', filters, pluck='rounded_total'))
 			delivered=delivery_amount
 			customer['out_delivery_amount']=delivery_amount
-			bls=(delivered-customer['paid_amount'])
+			bls=(delivered-customer.get('paid_amount', 0))
 			customer['outstanding_amount']=bls
-			if customer.out_delivery_amount or customer.paid_amount or customer.outstanding_amount or customer.invoiced_amount:
+			if customer.get("out_delivery_amount", 0) or customer.get("paid_amount", 0) or customer.get("outstanding_amount", 0) or customer.get("invoiced_amount", 0):
 				out.append(customer)
 		return out
  
