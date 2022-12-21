@@ -16,9 +16,11 @@ def journal_entry(self, event):
             break
 
 @frappe.whitelist()
-def get_production_details(date=None, from_date=None, to_date=None):
+def get_production_details(date=None, from_date=None, to_date=None, machines=[]):
     res={'month': '', 'paver': 0, 'cw': 0, 'lego': 0, 'fp': 0}
     try:
+        if (isinstance(machines, str)):
+            machines=json.loads(machines)
         if date and not from_date and not to_date:
             date=datetime.strptime(date, "%Y-%m-%d")
             to_date=date+relativedelta(day=1, months=+1, days=-1)
@@ -44,6 +46,9 @@ def get_production_details(date=None, from_date=None, to_date=None):
             cw_filt['molding_date'] = ['between', (from_date, to_date)]
             lg_filt['molding_date'] = ['between', (from_date, to_date)]
             fp_filt['molding_date'] = ['between', (from_date, to_date)]
+        if(machines):
+            pm_filt["work_station"] = ["in", machines]
+
         res['paver'] = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='production_sqft'))
         res['cw'] = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))
         res['lego'] = sum(frappe.db.get_all('CW Manufacturing', filters=lg_filt, pluck='production_sqft'))
@@ -102,25 +107,25 @@ def split_expenses(common_exp):
     com_acc=[]
     for row in common_exp:
         add=True
-        if row.get("paver") and row.get("paver_account") and float(row.get("paver_amount")):
+        if row.get("paver", 0) and row.get("paver_account", 0) and float(row.get("paver_amount", 0)):
             com_acc.append({
                 "account": row.get("paver_account"),
                 "debit": row.get("paver_amount") or 0
             })
             add=False
-        if row.get("compound_wall") and row.get("cw_account") and float(row.get("cw_amount")):
+        if row.get("compound_wall", 0) and row.get("cw_account", 0) and float(row.get("cw_amount", 0)):
             com_acc.append({
                 "account": row.get("cw_account"),
                 "debit": row.get("cw_amount") or 0
             })
             add=False
-        if row.get("lego_block") and row.get("lg_account") and float(row.get("lg_amount")):
+        if row.get("lego_block") and row.get("lg_account") and float(row.get("lg_amount", 0)):
             com_acc.append({
                 "account": row.get("lg_account"),
                 "debit": row.get("lg_amount") or 0
             })
             add=False
-        if row.get("fencing_post") and row.get("fp_account") and float(row.get("fp_amount")):
+        if row.get("fencing_post") and row.get("fp_account") and float(row.get("fp_amount", 0)):
             com_acc.append({
                 "account": row.get("fp_account"),
                 "debit": row.get("fp_amount") or 0

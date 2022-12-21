@@ -6,10 +6,10 @@ frappe.ui.form.on("Journal Entry", {
         frm.set_query("account", "common_expenses", function () {
             return erpnext.journal_entry.account_query(cur_frm);
         });
-        dashboard_data(cur_frm.doc.posting_date)
+        dashboard_data(cur_frm.doc.posting_date, cur_frm)
     },
     posting_date: function (frm) {
-        dashboard_data(cur_frm.doc.posting_date)
+        dashboard_data(cur_frm.doc.posting_date, cur_frm)
     },
     onload_post_render: function (frm) {
         if (frm.is_new()) {
@@ -27,9 +27,9 @@ frappe.ui.form.on("Journal Entry", {
                 row.doc.__checked = 1;
             }
         });
-        cur_frm.fields_dict.accounts.grid.delete_rows();
-        refresh_field("accounts");
-
+        await cur_frm.fields_dict.accounts.grid.delete_rows();
+        await frm.fields_dict.accounts.refresh();
+        await new Promise(r => setTimeout(r, 1000));
         await frappe.call({
             method: "ganapathy_pavers.custom.py.journal_entry.split_expenses",
             args: {
@@ -37,25 +37,64 @@ frappe.ui.form.on("Journal Entry", {
             },
             freeze: true,
             freeze_message: "Splitting Expenses",
-            callback(r) {
+            async callback (r) {
                 let res = r.message || []
-                res.forEach(row => {
+                res.forEach(async row => {
                     let child = cur_frm.add_child("accounts");
                     child.account = row.account;
                     child.debit_in_account_currency = row.debit;
                     child.from_common_entry = 1;
-                    refresh_field("accounts");
+                    await frm.fields_dict.accounts.refresh();
                 });
-                let total_debit = 0;
-                (cur_frm.doc.accounts || []).forEach(row => {
-                    total_debit += row.debit_in_account_currency
-                });
-                cur_frm.set_value("total_debit", total_debit)
+                await calculate_debit(frm)
             }
         });
         frappe.dom.unfreeze();
     },
+    machine_12: function (frm) {
+        dashboard_data(cur_frm.doc.posting_date, cur_frm)
+        if (frm.doc.machine_12 == 1) {
+            frm.set_value("machine_3", 0);
+        }
+        trigger_allocate_amount(frm)
+    },
+    machine_3: function (frm) {
+        dashboard_data(cur_frm.doc.posting_date, cur_frm)
+        if (frm.doc.machine_3 == 1) {
+            frm.set_value("machine_12", 0);
+        }
+        trigger_allocate_amount(frm)
+    }
 });
+
+async function calculate_debit(frm) {
+    let total_debit = 0, credit_acc_count = 0;
+    (frm.doc.accounts || []).forEach(row => {
+        total_debit += (row.debit_in_account_currency || 0);
+        if (!row.debit_in_account_currency) {
+            credit_acc_count += 1;
+        }
+    });
+    frm.set_value("total_debit", total_debit)
+    if (credit_acc_count === 1) {
+        (frm.doc.accounts || []).forEach(async row => {
+            if (!row.debit_in_account_currency) {
+                await frappe.model.set_value(row.doctype, row.name, "credit_in_account_currency", total_debit);
+                return
+            }
+        });
+    } else {
+
+    }
+
+}
+
+async function trigger_allocate_amount(frm) {
+    (frm.doc.common_expenses || []).forEach(async row => {
+        await allocate_amount(frm, row.doctype, row.name);
+    });
+    frm.trigger("split_expense");
+}
 
 frappe.ui.form.on("Common Expense JE", {
     paver: function (frm, cdt, cdn) {
@@ -100,7 +139,7 @@ function validate_common_accounts() {
     });
 }
 
-function allocate_amount(frm, cdt, cdn) {
+async function allocate_amount(frm, cdt, cdn) {
     let data = locals[cdt][cdn];
     let total_production = 0;
     if (data.paver) {
@@ -117,27 +156,27 @@ function allocate_amount(frm, cdt, cdn) {
     }
 
     if (data.paver) {
-        frappe.model.set_value(cdt, cdn, 'paver_amount', data.debit * (paver / total_production));
+        await frappe.model.set_value(cdt, cdn, 'paver_amount', data.debit * (paver / total_production));
     } else {
-        frappe.model.set_value(cdt, cdn, 'paver_amount', 0);
+        await frappe.model.set_value(cdt, cdn, 'paver_amount', 0);
     }
 
     if (data.compound_wall) {
-        frappe.model.set_value(cdt, cdn, 'cw_amount', data.debit * (cw / total_production));
+        await frappe.model.set_value(cdt, cdn, 'cw_amount', data.debit * (cw / total_production));
     } else {
-        frappe.model.set_value(cdt, cdn, 'cw_amount', 0);
+        await frappe.model.set_value(cdt, cdn, 'cw_amount', 0);
     }
 
     if (data.fencing_post) {
-        frappe.model.set_value(cdt, cdn, 'fp_amount', data.debit * (fp / total_production));
+        await frappe.model.set_value(cdt, cdn, 'fp_amount', data.debit * (fp / total_production));
     } else {
-        frappe.model.set_value(cdt, cdn, 'fp_amount', 0);
+        await frappe.model.set_value(cdt, cdn, 'fp_amount', 0);
     }
 
     if (data.lego_block) {
-        frappe.model.set_value(cdt, cdn, 'lg_amount', data.debit * (lego / total_production));
+        await frappe.model.set_value(cdt, cdn, 'lg_amount', data.debit * (lego / total_production));
     } else {
-        frappe.model.set_value(cdt, cdn, 'lg_amount', 0);
+        await frappe.model.set_value(cdt, cdn, 'lg_amount', 0);
     }
 }
 
@@ -169,15 +208,23 @@ function set_css(frm) {
     document.querySelectorAll("[data-fieldname='split_expense']")[1].style.backgroundColor = "#3399ff";
 }
 
-function dashboard_data(date) {
-    if (!date) {
+function dashboard_data(date, frm) {
+    if (!date || (!frm.doc.machine_12 && !frm.doc.machine_3)) {
         cur_frm.dashboard.clear_comment();
         return;
+    }
+    let machines = [];
+    if (frm.doc.machine_12) {
+        machines = ["Machine1", "Machine2"]
+    }
+    if (frm.doc.machine_3) {
+        machines = ["Machine3"]
     }
     frappe.call({
         method: "ganapathy_pavers.custom.py.journal_entry.get_production_details",
         args: {
-            date: date
+            date: date,
+            machines: machines
         },
         callback(r) {
             let res = r.message;
@@ -197,22 +244,22 @@ function dashboard_data(date) {
                 <div class="production-info">
                     <div class="production-info-data">
                         <div class="production-info-data-div">
-                            Paver: ${parseInt(paver)}
+                            Paver: ${roundNumber(paver)}
                         </div>
                     </div>
                     <div class="production-info-data">
                         <div class="production-info-data-div">
-                            Compound Wall: ${parseInt(cw)}
+                            Compound Wall: ${roundNumber(cw)}
                         </div>
                     </div>
                     <div class="production-info-data">
                         <div class="production-info-data-div">
-                            Lego Block: ${parseInt(lego)}
+                            Lego Block: ${roundNumber(lego)}
                         </div>
                     </div>
                     <div class="production-info-data">
                         <div class="production-info-data-div">
-                            Fencing Post: ${parseInt(fp)}
+                            Fencing Post: ${roundNumber(fp)}
                         </div>
                     </div>
                 </div>
