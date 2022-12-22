@@ -267,6 +267,12 @@ class PartyLedgerSummaryReport(object):
 			filters['type'] = (customer.get('type') or '')
 			filters["posting_date"] = ["between", [self.filters.from_date, self.filters.to_date]]
 
+			if self.filters.get("invoiced_delivery"):
+				dn_names1 = frappe.get_all('Delivery Note', filters, pluck='name')
+				dn_with_si = frappe.get_all('Sales Invoice Item', filters={'delivery_note':['in', dn_names1]}, pluck='delivery_note')
+				dn_names = [i for i in dn_names1 if(i not in dn_with_si)]
+				filters['name'] = ['in', dn_names]
+
 			delivery_amount = sum(frappe.get_all('Delivery Note', filters, pluck='rounded_total'))
 			delivered=delivery_amount
 			customer['out_delivery_amount']=delivery_amount

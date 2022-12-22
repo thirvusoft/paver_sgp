@@ -23,7 +23,11 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 			"label": __("Site Name"),
 			"fieldtype": "Link",
 			"options": "Project",
-			"width": "100"
+			"width": "100",
+			// "filters":  {
+			// 			"customer": frappe.query_report.get_filter_value("customer")
+			// 		}
+				
 		},
 		{
 			"fieldname":"sales_type",

@@ -120,13 +120,20 @@ frappe.query_reports["Delivery Report"] = {
 			"fieldname":"no_fetch_empty_site",
 			"label": __("Don't Fetch Records with no Site"),
 			"fieldtype": "Check",
-			"default": 1
+			"default": 1,
+			"depends_on": "eval: frappe.query_report.sw_status"
 		},
 		{
 			"fieldname":"show_invoice_amount",
 			"label": __("Show Invoice Amount"),
 			"fieldtype": "Check",
 			"default": 0
+		},
+		{
+			"fieldname":"invoiced_delivery",
+			"label": __("Don't Show Invoiced Deliveries"),
+			"fieldtype": "Check",
+			"default": 1
 		}
 	]
 };
