@@ -17,7 +17,7 @@ frappe.ui.form.on("Journal Entry", {
         }
     },
     split_expense: async function (frm) {
-        if (cur_frm.doc.docstatus != 0) {
+        if (cur_frm.doc.docstatus != 0 || (!frm.doc.machine_12 && !frm.doc.machine_3)) {
             return;
         }
         validate_common_accounts()
@@ -51,19 +51,21 @@ frappe.ui.form.on("Journal Entry", {
         });
         frappe.dom.unfreeze();
     },
-    machine_12: function (frm) {
-        dashboard_data(cur_frm.doc.posting_date, cur_frm)
+    machine_12: async function (frm) {
+        await dashboard_data(cur_frm.doc.posting_date, cur_frm)
         if (frm.doc.machine_12 == 1) {
             frm.set_value("machine_3", 0);
+            trigger_allocate_amount(frm)
         }
-        trigger_allocate_amount(frm)
+        
     },
-    machine_3: function (frm) {
-        dashboard_data(cur_frm.doc.posting_date, cur_frm)
+    machine_3: async function (frm) {
+        await  dashboard_data(cur_frm.doc.posting_date, cur_frm)
         if (frm.doc.machine_3 == 1) {
             frm.set_value("machine_12", 0);
+            trigger_allocate_amount(frm)
         }
-        trigger_allocate_amount(frm)
+        
     }
 });
 
@@ -208,7 +210,7 @@ function set_css(frm) {
     document.querySelectorAll("[data-fieldname='split_expense']")[1].style.backgroundColor = "#3399ff";
 }
 
-function dashboard_data(date, frm) {
+async function dashboard_data(date, frm) {
     if (!date || (!frm.doc.machine_12 && !frm.doc.machine_3)) {
         cur_frm.dashboard.clear_comment();
         return;
@@ -220,7 +222,7 @@ function dashboard_data(date, frm) {
     if (frm.doc.machine_3) {
         machines = ["Machine3"]
     }
-    frappe.call({
+    await frappe.call({
         method: "ganapathy_pavers.custom.py.journal_entry.get_production_details",
         args: {
             date: date,
