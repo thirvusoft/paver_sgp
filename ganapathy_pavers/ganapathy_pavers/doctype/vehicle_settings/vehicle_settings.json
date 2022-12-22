@@ -10,6 +10,10 @@
   "diesel_per_liter",
   "vehicle_update",
   "default_fuel_supplier",
+  "column_break_5",
+  "fuel_expense",
+  "default_branch",
+  "section_break_7",
   "email_id_for_notification"
  ],
  "fields": [
@@ -40,12 +44,32 @@
    "fieldtype": "Link",
    "label": "Default Fuel Supplier",
    "options": "Supplier"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "fuel_expense",
+   "fieldtype": "Link",
+   "label": "Default Expense Account for Fuel Entry",
+   "options": "Account"
+  },
+  {
+   "fieldname": "default_branch",
+   "fieldtype": "Link",
+   "label": "Default Branch for Fuel Expense entry",
+   "options": "Branch"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-08-04 15:14:10.006286",
+ "modified": "2022-12-22 13:35:43.237960",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Settings",

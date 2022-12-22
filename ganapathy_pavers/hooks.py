@@ -201,6 +201,7 @@ doc_events = {
 					  "ganapathy_pavers.custom.py.vehicle_log.onsubmit_hours",
 					  "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
 					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_draft",
+					#   "ganapathy_pavers.custom.py.vehicle_log.supplier_journal_entry",
 					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_mileage"],
 		"on_cancel":["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 					 "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
@@ -363,9 +364,9 @@ override_whitelisted_methods = {
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
-# override_doctype_dashboards = {
-# 	"Task": "ganapathy_pavers.task.get_dashboard_data"
-# }
+override_doctype_dashboards = {
+	"Vehicle Log": "ganapathy_pavers.custom.py.dashboards.vehicle_log.get_data"
+}
 
 # exempt linked doctypes from being automatically cancelled
 #

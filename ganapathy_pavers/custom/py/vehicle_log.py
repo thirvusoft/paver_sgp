@@ -1,4 +1,5 @@
 import frappe
+import erpnext
 from frappe.utils import date_diff
 
 def onsubmit(doc, event):
@@ -210,3 +211,61 @@ def update_delivery_note(self, event=None):
                 "return_odometer_value": self.odometer
             })
             dn.save("Update")
+
+def supplier_journal_entry(self, event=None):
+    if self.select_purpose!="Fuel":
+        return
+    debit_acc=frappe.db.get_single_value("Vehicle Settings", "fuel_expense")
+    if not debit_acc:
+        frappe.throw("Please enter <b>Default Expense Account for Fuel Entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+    branch=frappe.db.get_single_value("Vehicle Settings", "default_branch")
+    if not branch:
+        frappe.throw("Please enter <b>Default Branch for Fuel Expense entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+    company=erpnext.get_default_company()
+    doc=frappe.new_doc("Journal Entry")
+    doc.update({
+        "company": company,
+        "posting_date": self.date,
+        "accounts": [
+            {
+                "account": get_supplier_credit_acc(self.supplier, company),
+                "party_type": "Supplier",
+                "party": self.supplier or frappe.throw(f"Supplier is Mandatory for Fuel Entry in <a href='/app/vehicle-log/{self.name}'>{self.name}</a>"),
+                "credit_in_account_currency": self.total_fuel,
+                "branch": branch
+            },
+            {
+                "account": debit_acc,
+                "debit_in_account_currency": self.total_fuel,
+                "branch": branch
+            }
+        ],
+        "vehicle_log": self.name
+    })
+    doc.insert()
+    doc.submit()
+
+def get_supplier_credit_acc(supplier, company):
+	acc=""
+	supplier_doc=frappe.get_doc("Supplier", supplier)
+	for row in supplier_doc.accounts:
+		if row.company==company:
+			acc=row.account
+			break
+	if not acc:
+		supplier_grp_doc=frappe.get_doc("Supplier Group", supplier_doc.supplier_group)
+		for row in supplier_grp_doc.accounts:
+			if row.company==company:
+				acc=row.account
+				break
+	if not acc:
+		acc=frappe.db.get_value("Company", company, "default_payable_account")
+	if not acc:
+		frappe.throw(f"""Please set <b>Default Payable Account</b> in company <a href="/app/company/{company}"><b>{company}</b></a>""")
+	return acc
+
+def supplier_fuel_entry_patch():
+    fuel_logs=frappe.get_all("Vehicle Log", {"docstatus": 1, "select_purpose": "Fuel", "total_fuel": [">", 0]}, pluck="name")
+    for log in fuel_logs:
+        self=frappe.get_doc("Vehicle Log", log)
+        supplier_journal_entry(self)
