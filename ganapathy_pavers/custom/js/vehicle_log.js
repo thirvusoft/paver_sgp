@@ -11,20 +11,13 @@ frappe.ui.form.on("Vehicle Log" ,{
                 }
             })
         }
-        frm.set_query('employee', function(frm){
-            return {
-                filters:{
-                    'designation': 'Driver'
-                }
-            }
-        });
-        frm.set_query('supervisor', function(frm){
-            return {
-                filters:{
-                    'designation': 'Supervisor'
-                }
-            }
-        });
+        // frm.set_query('employee', function(frm){
+        //     return {
+        //         filters:{
+        //             'designation': ["in", ['Driver', 'Supervisor']]
+        //         }
+        //     }
+        // });
     },
 
     

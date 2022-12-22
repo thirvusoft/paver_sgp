@@ -42,7 +42,7 @@ class PartyLedgerSummaryReport(object):
 							final_data.append(row)
 					except:
 						pass
-				else:
+				elif(not self.filters.get("no_fetch_empty_site")):
 					final_data.append(row)
 			data=final_data
 		return columns, data
@@ -120,6 +120,7 @@ class PartyLedgerSummaryReport(object):
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
+				"hidden": not self.filters.get("show_invoice_amount")
 			},
 			{
 				"label": _(credit_or_debit_note),
@@ -220,7 +221,7 @@ class PartyLedgerSummaryReport(object):
 		for party, row in iteritems(self.party_data):
 			if (
 				row.opening_balance
-				or row.invoiced_amount
+				or (self.filters.get("show_invoice_amount") and row.invoiced_amount)
 				or row.paid_amount
 				or row.return_amount
 				or row.closing_amount

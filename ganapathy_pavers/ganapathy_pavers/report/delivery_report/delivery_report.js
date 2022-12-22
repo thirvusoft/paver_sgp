@@ -115,7 +115,18 @@ frappe.query_reports["Delivery Report"] = {
 			"label": __("Customer Name"),
 			"fieldtype": "Data",
 			"hidden": 1
+		},
+		{
+			"fieldname":"no_fetch_empty_site",
+			"label": __("Don't Fetch Records with no Site"),
+			"fieldtype": "Check",
+			"default": 1
+		},
+		{
+			"fieldname":"show_invoice_amount",
+			"label": __("Show Invoice Amount"),
+			"fieldtype": "Check",
+			"default": 0
 		}
-
 	]
 };
