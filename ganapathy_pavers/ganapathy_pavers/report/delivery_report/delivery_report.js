@@ -59,6 +59,13 @@ frappe.query_reports["Delivery Report"] = {
 			"options": "Project"
 		},
 		{
+			"fieldname":"sw_status",
+			"label": __("Site Work Status to don't fetch"),
+			"fieldtype": "Select",
+			"options": "\nOpen\nCompleted\nCancelled\nStock Pending at Site\nRework",
+			"default": "Completed"
+		},
+		{
 			"fieldname":"type",
 			"label": __("Type"),
 			"fieldtype": "Select",

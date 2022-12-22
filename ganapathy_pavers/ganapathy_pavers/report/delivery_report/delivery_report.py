@@ -33,6 +33,18 @@ class PartyLedgerSummaryReport(object):
 
 		columns = self.get_columns()
 		data = self.get_data()
+		if self.filters.get("sw_status"):
+			final_data=[]
+			for row in data:
+				if row.get("project"):
+					try:
+						if (frappe.get_value("Project", row.get("project"), "status") != self.filters.get("sw_status")):
+							final_data.append(row)
+					except:
+						pass
+				else:
+					final_data.append(row)
+			data=final_data
 		return columns, data
 	
 
@@ -163,7 +175,6 @@ class PartyLedgerSummaryReport(object):
 	 
 
 	def get_data(self,invoice=[]):
-		print(invoice)
 		company_currency = frappe.get_cached_value(
 			"Company", self.filters.get("company"), "default_currency"
 		)
@@ -226,7 +237,6 @@ class PartyLedgerSummaryReport(object):
 					row["adj_" + scrub(account)] = adjustments.get(account, 0)
 
 				out.append(row)
-		frappe.errprint(out)
 		out=self.get_outstand_based_on_delivery_note(out)
 		return out
 
