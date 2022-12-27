@@ -11,8 +11,10 @@ def execute(filters=None):
 	to_date = filters.get("to_date")
 	item=filters.get("item")
 	data = []
-
-	paver_list = frappe.db.get_list("Material Manufacturing",filters={'from_time':["between",[from_date,to_date]],"item_to_manufacture":item },pluck="name")
+	filters1={'from_time':["between",[from_date,to_date]] }
+	if item:
+		filters1["item_to_manufacture"]=item
+	paver_list = frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
 	test_data = []
 
 	if paver_list:
@@ -41,7 +43,7 @@ def execute(filters=None):
 		
 		test_data.append({
 			"material":"-",
-			"qty":f"<b>Item:</b> {production_qty[0]['item_to_manufacture']}",
+			"qty":f"""<b>Item:</b> {production_qty[0]['item_to_manufacture']  if filters.get("item_to_manufacture") else ""}""",
 			"sqft":f"<b>SQFT :</b> {production_qty[0]['production_sqft']:,.3f}",
 			"uom":f"<b>Production Cost per SQFT :</b> ₹{production_qty[0]['item_price']:,.3f}",
 			"rate":None,

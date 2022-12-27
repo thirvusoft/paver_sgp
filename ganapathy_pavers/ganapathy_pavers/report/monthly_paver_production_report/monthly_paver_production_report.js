@@ -26,7 +26,6 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"fieldtype": "Link",
 			"width": "100",
 			"options":"Item",
-			"reqd":1
 		}
 	]
 };
