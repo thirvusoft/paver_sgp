@@ -1,6 +1,7 @@
 var salary_balance,standard_hrs=0;
 frappe.ui.form.on('Salary Slip',{
     employee:function(frm,cdt,cdn){
+        frm.trigger("get_mess_amount");
         if(frm.doc.designation=='Job Worker' && frm.doc.start_date && frm.doc.end_date){
             frappe.db.get_doc('Employee', frm.doc.employee).then((doc) => {
                 salary_balance=doc.salary_balance
@@ -36,6 +37,21 @@ frappe.ui.form.on('Salary Slip',{
         var date = frm.doc.end_date;
         var arr = date.split('-');
         frm.set_value('days',arr[2]) 
+    },
+    designation: function (frm) {
+        frm.trigger("get_mess_amount");
+    },
+    company: function (frm) {
+        frm.trigger("get_mess_amount");
+    },
+    get_mess_amount: async function(frm) {
+        let mess = 0;
+        if (frm.doc.designation && frm.doc.company) {
+            if (!((await frappe.db.get_value("Designation", frm.doc.designation, "no_mess_amount"))?.message?.no_mess_amount)) {
+                mess = (await frappe.db.get_value("Company", frm.doc.company, "mess_charge_per_month"))?.message?.mess_charge_per_month
+            }
+        }
+        cur_frm.set_value("mess", mess)
     },
     employee_count:function(frm){
         frappe.db.get_list("Salary Slip", {
