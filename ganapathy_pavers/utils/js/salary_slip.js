@@ -117,11 +117,11 @@ frappe.ui.form.on('Salary Slip',{
         }   
     },
     split_paid_amount: function(frm) {
-        if (!frm.doc.paid_amount) {
-            frm.scroll_to_field("paid_amount")
-            return
-        }
-        if ((frm.doc.paid_amount || 0)>(frm.doc.total_amount || 0)) {
+        // if (!frm.doc.paid_amount) {
+        //     frm.scroll_to_field("paid_amount")
+        //     return
+        // }
+        if ((frm.doc.paid_amount || 0)>((frm.doc.salary_balance || 0)+(frm.doc.total_amount || 0))) {
             frappe.show_alert({message: "Paid Amount can't be greater than Total Amount", indicator: "red"})
             frm.scroll_to_field("paid_amount")
             return
@@ -140,7 +140,8 @@ frappe.ui.form.on('Salary Slip',{
                 frappe.model.set_value(row.doctype, row.name, "paid_amount", data.amount)
                 amount-=data.amount
             }
-        })
+        });
+        frm.set_value('total_paid_amount', frm.doc.paid_amount)
     }
 })
 
