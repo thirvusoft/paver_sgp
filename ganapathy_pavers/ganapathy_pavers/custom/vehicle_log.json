@@ -1236,7 +1236,7 @@
    "label": "Purpose",
    "length": 0,
    "mandatory_depends_on": null,
-   "modified": "2022-12-22 20:14:55.673859",
+   "modified": "2022-12-28 20:14:55.673859",
    "modified_by": "Administrator",
    "name": "Vehicle Log-select_purpose",
    "no_copy": 0,
