@@ -368,7 +368,8 @@ override_whitelisted_methods = {
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
 override_doctype_dashboards = {
-	"Vehicle Log": "ganapathy_pavers.custom.py.dashboards.vehicle_log.get_data"
+	"Vehicle Log": "ganapathy_pavers.custom.py.dashboards.vehicle_log.get_data",
+	"Purchase Invoice": "ganapathy_pavers.custom.py.purchase_invoice_dashboard.get_data"
 }
 
 # exempt linked doctypes from being automatically cancelled
