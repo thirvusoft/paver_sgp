@@ -166,7 +166,7 @@ def validate_jw_qty(self):
 
     jw_items={}
     for row in self.job_worker:
-        if(row.item):
+        if(row.item and not row.other_work):
             if(row.item not  in jw_items):
                 jw_items[row.item]=0
             item_doc=frappe.get_doc('Item', row.item)
