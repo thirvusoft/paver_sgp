@@ -33,7 +33,10 @@ app_license = "MIT"
 
 # include js in doctype views
 
-doctype_list_js = {"Project" : "/custom/js/sw_quick_entry.js"}
+doctype_list_js = {
+	"Project" : "/custom/js/sw_quick_entry.js",
+	"Vehicle Log": "/custom/js/vehicle_log_list.js"
+	}
 
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -201,7 +204,7 @@ doc_events = {
 					  "ganapathy_pavers.custom.py.vehicle_log.onsubmit_hours",
 					  "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
 					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_draft",
-					#   "ganapathy_pavers.custom.py.vehicle_log.supplier_journal_entry",
+					  "ganapathy_pavers.custom.py.vehicle_log.supplier_journal_entry",
 					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_mileage"],
 		"on_cancel":["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 					 "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
