@@ -33,8 +33,14 @@ frappe.query_reports["Job Worker - Report"] = {
 			"width": "100"
 		},
 		{
+			"fieldname": "type",
+			"label":  __("Type"),
+			"fieldtype": "Select",
+			"options": "\nPavers\nCompound Wall"
+		},
+		{
 			"fieldname": "group_site_work",
-			"label": "Group Site Work",
+			"label": __("Group Site Work"),
 			"fieldtype": "Check",
 			"default": 1
 		}

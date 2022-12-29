@@ -8,12 +8,15 @@ def execute(filters=None):
     to_date = filters.get("to_date")
     employee = filters.get("employee")
     site_name = filters.get("site_name")
+    site_type = filters.get("type")
     group_by_site="group by jwd.name1, site.name ,jwd.sqft_allocated, jwd.start_date, jwd.end_date, jwd.description_for_other_work" if filters.get("group_site_work") else ""
     conditions = ""
     adv_conditions = ""
-    if from_date or to_date or employee or site_name:
+    if from_date or to_date or employee or site_name or site_type:
         conditions = " where 1=1"
         adv_conditions = "where 1 = 1"
+        if site_type:
+            conditions += " and site.type='{0}'".format(site_type)
         if from_date and to_date:
             conditions += "  and jwd.start_date between '{0}' and '{1}' ".format(from_date, to_date)
             adv_conditions += " and empadv.posting_date between '{0}' and '{1}' ".format(from_date, to_date)
