@@ -31,7 +31,7 @@ def get_total_stock(filters):
 	conditions = ""
 	columns = ""
 	if filters.get("item_name"):
-		conditions+=f" AND item.item_name like '%{filters.get('item_name')}%'"
+		conditions+=f" AND item.name='{filters.get('item_name')}'"
 	if filters.get("item_name_nl"):
 		conditions+=f" AND item.item_name not like '%{filters.get('item_name_nl')}%'"
 	if filters.get("group_by") == "Warehouse":

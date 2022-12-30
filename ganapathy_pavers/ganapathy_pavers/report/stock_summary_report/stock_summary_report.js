@@ -33,8 +33,9 @@ frappe.query_reports["Stock Summary Report"] = {
 		},
 		{
 			"fieldname": "item_name",
-			"label": __("Item Name (Like)"),
-			"fieldtype": "Data",
+			"label": __("Item Name"),
+			"fieldtype": "Link",
+			"options": "Item",
 			"width": "80",
 		},
 		{
