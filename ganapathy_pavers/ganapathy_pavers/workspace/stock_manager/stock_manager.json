@@ -13,9 +13,19 @@
  "is_default": 0,
  "is_standard": 1,
  "label": "STOCK MANAGER",
- "links": [],
- "modified": "2022-12-15 11:24:19.385333",
- "modified_by": "admin@gmail.com",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Batch-Wise Balance History",
+   "link_to": "Batch-Wise Balance History",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2022-12-30 10:41:32.023128",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "STOCK MANAGER",
  "onboarding": "",
