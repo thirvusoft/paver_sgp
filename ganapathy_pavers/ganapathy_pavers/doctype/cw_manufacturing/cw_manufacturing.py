@@ -3,11 +3,9 @@
 
 import frappe
 import json
-import pandas as pd
-import datetime
+
 from frappe.model.document import Document
-from collections import Counter
-from collections import defaultdict
+
 class CWManufacturing(Document):
     def before_submit(doc):
         manufacture = frappe.get_all("Stock Entry",filters={"cw_usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
