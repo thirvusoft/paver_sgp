@@ -3,10 +3,11 @@
 
 import frappe
 import json
+import pandas as pd
 import datetime
 from frappe.model.document import Document
-
-
+from collections import Counter
+from collections import defaultdict
 class CWManufacturing(Document):
     def before_submit(doc):
         manufacture = frappe.get_all("Stock Entry",filters={"cw_usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
@@ -92,9 +93,11 @@ def make_stock_entry_for_molding(doc):
     
     default_nos = frappe.db.get_singles_value(
         "CW Settings", "default_molding_uom") or throw_error('Molding UOM')
-
-
-    for item in doc.get("item_details") or []:
+   
+    list_item = frappe.db.sql(f"""select *,sum(produced_qty) as produced_qty,sum(ts_production_sqft) as ts_production_sqft,sum(damaged_qty) as damaged_qty from `tabCW Items` as items where items.parent = '{doc.get("name")}'  group by items.item""",as_dict=1)
+   
+    for item in list_item or []:
+        
         stock_entry = frappe.new_doc("Stock Entry")
         stock_entry.company = doc.get("company")
         stock_entry.from_bom = 1
@@ -111,14 +114,14 @@ def make_stock_entry_for_molding(doc):
                 frappe.throw(
                     f'Please choose {frappe.bold("Has Batch No")} for an item {item.get("item")}')
         
-    
+
         if (doc.get("items")):
             for i in doc.get("items"):
                 stock_entry.append('items', dict(
                     s_warehouse=(i.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"]*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), uom=i["uom"],
                     basic_rate=i['rate'],
-                     basic_rate_hidden=i['rate'],
-                   
+                        basic_rate_hidden=i['rate'],
+                    
                 ))
         else:
             frappe.throw("Kindly Enter Raw Materials")
@@ -128,7 +131,7 @@ def make_stock_entry_for_molding(doc):
             t_warehouse = target_warehouse, item_code=item.get("item"), qty= manufactue_qty, uom=default_nos, is_finished_item=1,
                 basic_rate=uom_conversion_for_rate(item.get("item"),"SQF",doc.get('total_cost_per_sqft'),default_nos),
                 basic_rate_hidden=uom_conversion_for_rate(item.get("item"),"SQF",doc.get('total_cost_per_sqft'),default_nos),
- 
+
         ))
         if item.get("damaged_qty") > 0:
             scrap_qty = uom_conversion(item.get("item"), 'Nos', item.get("damaged_qty"), default_nos)
