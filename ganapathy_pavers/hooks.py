@@ -325,7 +325,8 @@ scheduler_events = {
 
 	"daily":
 		[
-		"ganapathy_pavers.custom.py.purchase_order.purchasenotification"
+		"ganapathy_pavers.custom.py.purchase_order.purchasenotification",
+		"ganapathy_pavers.custom.py.site_work.update_delivered_qty"
 		],
 
 	

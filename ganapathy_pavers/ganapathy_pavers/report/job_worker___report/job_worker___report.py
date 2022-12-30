@@ -159,7 +159,7 @@ def get_employee_salary_balance(employee, from_date, to_date):
    
     salary_slip=frappe.db.sql("""select total_unpaid_amount from `tabSalary Slip` where posting_date between %(from)s and %(to)s and employee=%(emp)s and docstatus=1 order by posting_date desc,modified desc limit 1""",{"emp":employee, "from":from_date, "to":to_date},as_dict=True)
     salary_slip1=frappe.db.sql("""select total_unpaid_amount from `tabSalary Slip` where employee=%(emp)s and posting_date<=%(from)s  and docstatus=1 order by posting_date desc,modified desc limit 1""",{"emp":employee,"from":from_date},as_dict=True)
-    salary_slip2=frappe.db.sql("""select salary_balance from `tabEmployee` where name=%(emp)s and status="Active """,{"emp":employee},as_dict=True)
+    salary_slip2=frappe.db.sql("""select salary_balance from `tabEmployee` where name=%(emp)s """,{"emp":employee},as_dict=True)
     if salary_slip:
         return salary_slip[0]["total_unpaid_amount"]
 
