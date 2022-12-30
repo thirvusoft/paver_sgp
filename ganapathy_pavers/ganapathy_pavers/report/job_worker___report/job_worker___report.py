@@ -62,7 +62,7 @@ def execute(filters=None):
         data=list(data1.values())
     data = [list(i) for i in (report_data1 or [])] + data
 
-    [frappe.errprint(f"{i[6]}   {from_date}  {to_date}") for i in data]
+    
 
     for row in data:
         if row[0] and frappe.db.exists("Employee", row[0]):
@@ -70,7 +70,7 @@ def execute(filters=None):
             row[0]=frappe.db.get_value("Employee", row[0], "employee_name")
 
     data.sort(key = lambda x:x[0])
-    [frappe.errprint(f"{i[6]}   {from_date}  {to_date}") for i in data]
+   
     
     if(len(data)):
         start = 0
@@ -156,4 +156,14 @@ def get_columns(other_work):
 	return columns
 
 def get_employee_salary_balance(employee, from_date, to_date):
-    salary_slip=frappe.get_all("Salary Slip", {""})
+   
+    salary_slip=frappe.db.sql("""select total_unpaid_amount from `tabSalary Slip` where posting_date between %(from)s and %(to)s and employee=%(emp)s order by posting_date desc,modified desc limit 1""",{"emp":employee, "from":from_date, "to":to_date},as_dict=True)
+    salary_slip1=frappe.db.sql("""select total_unpaid_amount from `tabSalary Slip` where employee=%(emp)s order by posting_date desc,modified desc limit 1""",{"emp":employee},as_dict=True)
+    salary_slip2=frappe.db.sql("""select salary_balance from `tabEmployee` where name=%(emp)s and status="Active """,{"emp":employee},as_dict=True)
+    if salary_slip:
+        return salary_slip[0]["total_unpaid_amount"]
+
+    elif(salary_slip1):
+        return salary_slip1[0]["total_unpaid_amount"]
+    else:
+        return salary_slip2[0]["salary_balance"]
