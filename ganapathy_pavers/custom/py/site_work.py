@@ -257,3 +257,126 @@ def job_worker(self, event=None):
     for row in self.job_worker:
         if not row.other_work:
             row.description_for_other_work=""
+
+@frappe.whitelist()
+def update_delivered_qty(site_work=[]):
+    old_value=""
+    sw=""
+    log_content=""
+    try:
+        if isinstance(site_work, str):
+            site_work=json.loads(site_work)
+        
+        if not site_work:
+            site_work=frappe.get_all("Project", pluck="name")
+
+        for sw in site_work:
+            total_delivered_qty = frappe.db.sql(f""" select
+                                        child.item_code,
+                                        sum(child.stock_qty) as stock_qty,
+                                        sum(child.qty) as qty,
+                                        sum(child.ts_qty) as bundle,
+                                        sum(child.pieces) as pieces
+                                        from `tabDelivery Note` as doc
+                                        left outer join `tabDelivery Note Item` as child
+                                            on doc.name = child.parent
+                                        where doc.docstatus = 1 and doc.site_work = '{sw}'  and doc.is_return = 0
+                                        group by child.item_code
+                                        """, as_dict=True)
+            for data in total_delivered_qty:
+                if frappe.get_value("Item", data.get('item_code'), "item_group") in ["Pavers", "Compound Walls"]:
+                    old_value=frappe.db.sql(f"""
+                        SELECT delivered_stock_qty, delivered_bundle, delivered_pieces
+                        FROM `tabDelivery Status`
+                        WHERE  parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
+                    """, as_dict=True)
+                    if old_value and (old_value[0].get("delivered_stock_qty") != data.get("stock_qty") or old_value[0].get("delivered_bundle") != data.get("bundle") or old_value[0].get("delivered_pieces") != data.get("pieces")):
+                        log_content+=f"""
+                        Site Work: {sw}\n
+                        {data.get("item_code")} Delivered Stock Qty old: {old_value[0].get("delivered_stock_qty")}   new: {data.get("stock_qty")}\n
+                        {data.get("item_code")} Delivered Bundle old: {old_value[0].get("delivered_bundle")}   new: {data.get("bundle")}\n
+                        {data.get("item_code")} Delivered Pieces old: {old_value[0].get("delivered_pieces")}   new: {data.get("pieces")}\n\n\n
+                        """
+                        frappe.db.sql(f"""
+                            UPDATE `tabDelivery Status`
+                            SET 
+                                delivered_stock_qty = {data.get("stock_qty")}, 
+                                delivered_bundle = {data.get("bundle")},
+                                delivered_pieces = {data.get("pieces")},
+                                pending_qty__to_deliver = qty_to_deliver-{data.get("stock_qty")}
+                            WHERE parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
+                        """)
+                elif frappe.get_value("Item", data.get('item_code'), "item_group")=="Raw Material":
+                    old_value=frappe.db.sql(f"""
+                        SELECT delivered_quantity
+                        FROM `tabRaw Materials`
+                        WHERE  parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
+                    """, as_dict=True)
+                    if old_value and old_value[0].get("delivered_quantity") != data.get("qty"):
+                        log_content+=f"""
+                        Site Work: {sw}\n
+                        {data.get("item_code")} Delivered Raw Material old: {old_value[0].get("delivered_quantity")}   new: {data.get("qty")}\n\n\n
+                        """
+                        frappe.db.sql(f"""
+                            UPDATE `tabRaw Materials`
+                            SET 
+                                delivered_quantity = {data.get("qty")}
+                            WHERE parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
+                        """)
+
+            total_returned_qty = frappe.db.sql(f""" select
+                                        child.item_code,
+                                        sum(child.stock_qty) as stock_qty,
+                                        sum(child.qty) as qty,
+                                        sum(child.ts_qty) as bundle,
+                                        sum(child.pieces) as pieces
+                                        from `tabDelivery Note` as doc
+                                        left outer join `tabDelivery Note Item` as child
+                                            on doc.name = child.parent
+                                        where doc.docstatus = 1 and doc.site_work = '{sw}'  and doc.is_return = 1
+                                        group by child.item_code
+                                        """, as_dict=True)
+            for data in total_returned_qty:
+                if frappe.get_value("Item", data.get('item_code'), "item_group") in ["Pavers", "Compound Walls"]:
+                    old_value=frappe.db.sql(f"""
+                        SELECT returned_stock_qty, returned_bundle, returned_pieces
+                        FROM `tabDelivery Status`
+                        WHERE  parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
+                    """, as_dict=True)
+                    if old_value and (old_value[0].get("returned_stock_qty") != data.get("stock_qty") or old_value[0].get("returned_bundle") != data.get("bundle") or old_value[0].get("returned_pieces") != data.get("pieces")):
+                        log_content+=f"""
+                        Site Work: {sw}\n
+                        {data.get("item_code")} Returned Stock Qty old: {old_value[0].get("returned_stock_qty")}   new: {data.get("stock_qty")}\n
+                        {data.get("item_code")} Returned Bundle old: {old_value[0].get("returned_bundle")}   new: {data.get("bundle")}\n
+                        {data.get("item_code")} Returned Pieces old: {old_value[0].get("returned_pieces")}   new: {data.get("pieces")}\n\n\n
+                        """
+                        frappe.db.sql(f"""
+                            UPDATE `tabDelivery Status`
+                            SET 
+                                returned_stock_qty = {data.get("stock_qty")}, 
+                                returned_bundle = {data.get("bundle")},
+                                returned_pieces = {data.get("pieces")}
+                            WHERE parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
+                        """)
+                elif frappe.get_value("Item", data.get('item_code'), "item_group")=="Raw Material":
+                    old_value=frappe.db.sql(f"""
+                        SELECT returned_quantity
+                        FROM `tabRaw Materials`
+                        WHERE  parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
+                    """, as_dict=True)
+                    if old_value and old_value[0].get("returned_quantity") != data.get("qty"):
+                        log_content+=f"""
+                        Site Work: {sw}\n
+                        {data.get("item_code")} Returned Raw Material old: {old_value[0].get("returned_quantity")}   new: {data.get("qty")}\n\n\n
+                        """
+                        frappe.db.sql(f"""
+                            UPDATE `tabRaw Materials`
+                            SET 
+                                returned_quantity = {data.get("qty")}
+                            WHERE parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
+                        """)
+    except BaseException as e:
+        log_content+=f"""\n\n{e}\n\n{frappe.get_traceback()}\n\nSITE WORK: {sw}\n\n{old_value}"""
+    if log_content:
+        frappe.log_error(title=f"SITE WORK DELIVERY QTY MISMATCH  {frappe.utils.now()}", message=f"""{log_content}""")
+    return total_delivered_qty

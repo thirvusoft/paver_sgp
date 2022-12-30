@@ -39,7 +39,24 @@ frappe.ui.form.on("Project",{
     project_type:function(frm,cdt,cdn){
         setquery(frm,cdt,cdn)
     }, 
-    refresh:function(frm,cdt,cdn){
+    refresh: async function(frm,cdt,cdn){
+		await frm.add_custom_button("Update Delivery Details", function() {
+			if (!frm.is_dirty()) {
+				frappe.call({
+					method: "ganapathy_pavers.custom.py.site_work.update_delivered_qty",
+					args: {
+						site_work: [frm.doc.name]
+					},
+					freeze: true,
+					freeze_message: "Updating",
+					callback(r) {
+						frm.reload_doc()
+					}
+				});
+			} else {
+				frappe.show_alert({message: "Please Save this Form", indicator: "red"})
+			}
+		})
         if(!cur_frm.is_new()){
             cur_frm.set_df_property('is_multi_customer', 'read_only', 1)
             cur_frm.set_df_property('customer_name', 'read_only', 1)
