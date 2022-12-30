@@ -61,6 +61,7 @@ def execute(filters=None):
                 data1[_key][7]+=(data[idx][7] or 0)
         data=list(data1.values())
     data = [list(i) for i in (report_data1 or [])] + data
+    data.sort(key = lambda x:x[0])
     if(len(data)):
         start = 0
         for i in range(len(data)-1):
@@ -75,8 +76,8 @@ def execute(filters=None):
                 total[6] = sum((data[i][6] or 0) for i in range(start,i+1))
                 total[7] = f"<b>{'%.2f'%sum((data[i][7] or 0) for i in range(start,i+1))}</b>"
                 total[8] = adv
-                amount=sum((data[i][7] or 0) for i in range(start,len(data)))
-                salary_bal=sum((data[i][6] or 0) for i in range(start,len(data)))
+                amount=sum((data[i][7] or 0) for i in range(start,i+1))
+                salary_bal=sum((data[i][6] or 0) for i in range(start,i+1))
                 total[9] = f"<b>{round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)}</b>"
                 final_data[-1][6]=0
                 final_data.append(total)
