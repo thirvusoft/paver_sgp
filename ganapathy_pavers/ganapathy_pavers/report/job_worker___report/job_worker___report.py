@@ -67,7 +67,8 @@ def execute(filters=None):
         for i in range(len(data)-1):
             if (data[i][0] != data[i+1][0]):
                 adv=data[i][8]
-                data[i][8]=0
+                data[i][8]=None
+                data[i][9]=None
                 final_data.append(data[i])
                 total = [" " for i in range(10)]
                 total[2] = "<b style=color:orange;>""Total""</b>"
@@ -78,7 +79,7 @@ def execute(filters=None):
                 total[8] = adv
                 amount=sum((data[i][7] or 0) for i in range(start,i+1))
                 salary_bal=sum((data[i][6] or 0) for i in range(start,i+1))
-                total[9] = f"<b>{round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)}</b>"
+                total[9] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
                 final_data[-1][6]=0
                 final_data.append(total)
                 start = i+1	
@@ -103,7 +104,7 @@ def execute(filters=None):
         total[8] = adv
         amount=sum((data[i][7] or 0) for i in range(start,len(data)))
         salary_bal=sum((data[i][6] or 0) for i in range(start,len(data)))
-        total[9] = f"<b>{round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)}</b>"
+        total[9] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
         final_data[-1][6]=0
         final_data.append(total)
     other_work=0
