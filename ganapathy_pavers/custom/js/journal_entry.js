@@ -10,7 +10,7 @@ frappe.ui.form.on("Journal Entry", {
                 method:"ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.monthly_cost",
    
                 callback: async function(r){
-                    console.log(r.message)
+                   
                    var  a=r.message
                     for(var i=0;i<(r.message).length;i++){
                         if(a[i]["monthly_cost"])
