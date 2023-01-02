@@ -15,18 +15,33 @@ frappe.ui.form.on("Journal Entry", {
                     for(var i=0;i<(r.message).length;i++){
                         if(a[i]["monthly_cost"])
                      {
-                    
+
                         var row = frm.add_child("common_expenses");await cur_frm.fields_dict.common_expenses.refresh()
                         frappe.model.set_value(row.doctype, row.name, "account", a[i]["paver"][0] || "");
                         frappe.model.set_value(row.doctype, row.name, "debit", a[i]["monthly_cost"] || "");
-                        // row.account= r.message[i]["paver"]
-                        // row.debit= r.message[i]["monthly_cost"]
-                       
-                        
+                      if( a[i]["paver"][0])
+                      {
+                        frappe.model.set_value(row.doctype, row.name, "paver_account", a[i]["paver"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "paver", 1);
+                      }
+                      if( a[i]["cw"][0]){
+                        frappe.model.set_value(row.doctype, row.name, "cw_account", a[i]["cw"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "compound_wall", 1);
+
+                      }
+                      if( a[i]["lg"][0])
+                      {
+                        frappe.model.set_value(row.doctype, row.name, "lg_account", a[i]["lg"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "lego_block", 1);
+                      }
+                      if( a[i]["fp"][0]){
+                        frappe.model.set_value(row.doctype, row.name, "fp_account", a[i]["fp"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "fencing_post", 1);
+
                      }
 
-                    }
-                   
+                    }}
+
                     await cur_frm.fields_dict.common_expenses.refresh()
                 }
             })}
