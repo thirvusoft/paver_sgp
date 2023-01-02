@@ -1,12 +1,31 @@
 var month, paver, cw, lego, fp;
 
 frappe.ui.form.on("Journal Entry", {
-    refresh: function (frm) {
+    refresh: function (frm,cdt,cdn) {
         set_css();
         frm.set_query("account", "common_expenses", function () {
             return erpnext.journal_entry.account_query(cur_frm);
         });
         dashboard_data(cur_frm.doc.posting_date, cur_frm)
+      
+			frm.add_custom_button('Monthly Cost', function() {
+                let data = locals[cdt][cdn];
+                if (frm.doc.machine_3 || frm.doc.machine_12){
+				frappe.call({
+					method:"ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.monthly_cost",
+		
+					callback: function(r){
+                        trigger_allocate_amount(frm)
+						
+					}
+                })}
+                else{
+                    frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
+                }
+	
+			})
+		
+       
     },
     posting_date: function (frm) {
         dashboard_data(cur_frm.doc.posting_date, cur_frm)
@@ -198,6 +217,7 @@ function get_accounts(frm, cdt, cdn) {
             frappe.model.set_value(cdt, cdn, "cw_account", res["cw"] || "");
             frappe.model.set_value(cdt, cdn, "fp_account", res["fp"] || "");
             frappe.model.set_value(cdt, cdn, "lg_account", res["lg"] || "");
+            frappe.model.set_value(cdt, cdn, "lg_account", res["monthly_cost"] || "");
         }
     });
 }
