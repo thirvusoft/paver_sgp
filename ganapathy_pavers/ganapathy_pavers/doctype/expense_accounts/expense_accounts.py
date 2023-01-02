@@ -19,7 +19,7 @@ class ExpenseAccounts(Document):
 		elif self.fp_group==parent_acc:
 			res['fp']=account
 		for row in self.expense_account_common_groups:
-			if account in [row.paver_account, row.cw_account, row.fp_account, row.lg_account]:
+			if account in [row.paver_account, row.cw_account, row.fp_account, row.lg_account,row.monthly_cost]:
 				res["paver"], res["cw"], res["fp"], res["lg"]=[row.paver_account, row.cw_account, row.fp_account, row.lg_account]
 				return res
 		return res
@@ -89,3 +89,24 @@ def get_account_balance_on(account, company, from_date, to_date):
 	"""
 	balance=frappe.db.sql(query, as_list=True)
 	return balance[0][0]
+
+@frappe.whitelist()
+def monthly_cost():
+	cost=frappe.get_doc("Expense Accounts")
+	res1=[]
+	
+	
+	for i in cost.expense_account_common_groups:
+		res={}
+		res["paver"]=i.paver_account, 
+		res["cw"]=i.cw_account,
+		res["fp"]=i.fp_account,
+		  
+		res["lg"]=i.lg_account,
+		res["monthly_cost"]=i.monthly_cost
+		res1.append(res)
+		
+	return res1	
+		
+		
+	

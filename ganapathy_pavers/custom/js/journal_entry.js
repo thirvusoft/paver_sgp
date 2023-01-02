@@ -2,6 +2,42 @@ var month, paver, cw, lego, fp;
 
 frappe.ui.form.on("Journal Entry", {
     refresh: function (frm) {
+         
+        frm.add_custom_button('Monthly Cost', async function() {
+           
+            if (frm.doc.machine_3 || frm.doc.machine_12){
+            await frappe.call({
+                method:"ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.monthly_cost",
+   
+                callback: async function(r){
+                   
+                   var  a=r.message
+                    for(var i=0;i<(r.message).length;i++){
+                        if(a[i]["monthly_cost"])
+                     {
+                    
+                        var row = frm.add_child("common_expenses");await cur_frm.fields_dict.common_expenses.refresh()
+                        frappe.model.set_value(row.doctype, row.name, "account", a[i]["paver"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "debit", a[i]["monthly_cost"] || "");
+                        // row.account= r.message[i]["paver"]
+                        // row.debit= r.message[i]["monthly_cost"]
+                       
+                        
+                     }
+
+                    }
+                   
+                    await cur_frm.fields_dict.common_expenses.refresh()
+                }
+            })}
+            else{
+                frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
+            }
+
+        })
+   
+  
+
         set_css();
         frm.set_query("account", "common_expenses", function () {
             return erpnext.journal_entry.account_query(cur_frm);
