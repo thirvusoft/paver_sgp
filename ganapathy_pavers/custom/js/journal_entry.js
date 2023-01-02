@@ -15,8 +15,19 @@ frappe.ui.form.on("Journal Entry", {
 					method:"ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.monthly_cost",
 		
 					callback: function(r){
-                        trigger_allocate_amount(frm)
-						
+                        console.log(r.message)
+                       var  a=r.message
+                        for(var i=0;i<a.length;i++){
+                            console.log(a[0]['paver'])
+                            let row = frm.add_child("common_expenses");
+                            row.account= a[i]["paver"] || ""
+                            row.debit= a[i]["monthly_cost"] || ""
+                            frm.refresh_field("common_expenses");
+                           
+
+                        }
+                      
+                        
 					}
                 })}
                 else{
@@ -217,7 +228,7 @@ function get_accounts(frm, cdt, cdn) {
             frappe.model.set_value(cdt, cdn, "cw_account", res["cw"] || "");
             frappe.model.set_value(cdt, cdn, "fp_account", res["fp"] || "");
             frappe.model.set_value(cdt, cdn, "lg_account", res["lg"] || "");
-            frappe.model.set_value(cdt, cdn, "lg_account", res["monthly_cost"] || "");
+          
         }
     });
 }
