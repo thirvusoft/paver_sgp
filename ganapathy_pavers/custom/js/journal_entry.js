@@ -1,42 +1,48 @@
 var month, paver, cw, lego, fp;
 
 frappe.ui.form.on("Journal Entry", {
-    refresh: function (frm,cdt,cdn) {
+    refresh: function (frm) {
+         
+        frm.add_custom_button('Monthly Cost', async function() {
+           
+            if (frm.doc.machine_3 || frm.doc.machine_12){
+            await frappe.call({
+                method:"ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.monthly_cost",
+   
+                callback: async function(r){
+                    console.log(r.message)
+                   var  a=r.message
+                    for(var i=0;i<(r.message).length;i++){
+                        if(a[i]["monthly_cost"])
+                     {
+                    
+                        var row = frm.add_child("common_expenses");await cur_frm.fields_dict.common_expenses.refresh()
+                        frappe.model.set_value(row.doctype, row.name, "account", a[i]["paver"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "debit", a[i]["monthly_cost"] || "");
+                        // row.account= r.message[i]["paver"]
+                        // row.debit= r.message[i]["monthly_cost"]
+                       
+                        
+                     }
+
+                    }
+                   
+                    await cur_frm.fields_dict.common_expenses.refresh()
+                }
+            })}
+            else{
+                frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
+            }
+
+        })
+   
+  
+
         set_css();
         frm.set_query("account", "common_expenses", function () {
             return erpnext.journal_entry.account_query(cur_frm);
         });
         dashboard_data(cur_frm.doc.posting_date, cur_frm)
-      
-			frm.add_custom_button('Monthly Cost', function() {
-                let data = locals[cdt][cdn];
-                if (frm.doc.machine_3 || frm.doc.machine_12){
-				frappe.call({
-					method:"ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.monthly_cost",
-		
-					callback: function(r){
-                        console.log(r.message)
-                       var  a=r.message
-                        for(var i=0;i<a.length;i++){
-                            console.log(a[0]['paver'])
-                            let row = frm.add_child("common_expenses");
-                            row.account= a[i]["paver"] || ""
-                            row.debit= a[i]["monthly_cost"] || ""
-                            frm.refresh_field("common_expenses");
-                           
-
-                        }
-                      
-                        
-					}
-                })}
-                else{
-                    frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
-                }
-	
-			})
-		
-       
     },
     posting_date: function (frm) {
         dashboard_data(cur_frm.doc.posting_date, cur_frm)
@@ -228,7 +234,6 @@ function get_accounts(frm, cdt, cdn) {
             frappe.model.set_value(cdt, cdn, "cw_account", res["cw"] || "");
             frappe.model.set_value(cdt, cdn, "fp_account", res["fp"] || "");
             frappe.model.set_value(cdt, cdn, "lg_account", res["lg"] || "");
-          
         }
     });
 }
