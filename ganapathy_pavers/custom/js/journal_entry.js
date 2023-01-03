@@ -2,6 +2,57 @@ var month, paver, cw, lego, fp;
 
 frappe.ui.form.on("Journal Entry", {
     refresh: function (frm) {
+         
+        frm.add_custom_button('Monthly Cost', async function() {
+           
+            if (frm.doc.machine_3 || frm.doc.machine_12){
+            await frappe.call({
+                method:"ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.monthly_cost",
+   
+                callback: async function(r){
+                   
+                   var  a=r.message
+                    for(var i=0;i<(r.message).length;i++){
+                        if(a[i]["monthly_cost"])
+                     {
+
+                        var row = frm.add_child("common_expenses");await cur_frm.fields_dict.common_expenses.refresh()
+                        frappe.model.set_value(row.doctype, row.name, "account", a[i]["paver"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "debit", a[i]["monthly_cost"] || "");
+                      if( a[i]["paver"][0])
+                      {
+                        frappe.model.set_value(row.doctype, row.name, "paver_account", a[i]["paver"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "paver", 1);
+                      }
+                      if( a[i]["cw"][0]){
+                        frappe.model.set_value(row.doctype, row.name, "cw_account", a[i]["cw"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "compound_wall", 1);
+
+                      }
+                      if( a[i]["lg"][0])
+                      {
+                        frappe.model.set_value(row.doctype, row.name, "lg_account", a[i]["lg"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "lego_block", 1);
+                      }
+                      if( a[i]["fp"][0]){
+                        frappe.model.set_value(row.doctype, row.name, "fp_account", a[i]["fp"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "fencing_post", 1);
+
+                     }
+
+                    }}
+
+                    await cur_frm.fields_dict.common_expenses.refresh()
+                }
+            })}
+            else{
+                frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
+            }
+
+        })
+   
+  
+
         set_css();
         frm.set_query("account", "common_expenses", function () {
             return erpnext.journal_entry.account_query(cur_frm);
