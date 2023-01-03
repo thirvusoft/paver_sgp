@@ -20,7 +20,7 @@ def execute(filters=None):
 	end_km = 0
 	mileage = 0
 	try:
-		mileage_doc= frappe.get_last_doc("Vehicle Log",{"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,"mileage":['>',0]},order_by="date asc")
+		mileage_doc= frappe.get_last_doc("Vehicle Log",{"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,"mileage":['>',0]},order_by="date desc, creation desc")
 		mileage = mileage_doc.mileage
 	except:		
 		try:
