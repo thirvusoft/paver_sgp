@@ -1,0 +1,45 @@
+<h2 class="text-center"><b>{%= __("SRI GANAPATHY FLY ASH BRICKS -PAVER-WEEKLY  LAYER BILL ") %}</b></h2>
+
+
+
+
+<h5 class="text-center">
+	{%= frappe.datetime.str_to_user(filters.from_date) %}
+	{%= __("to") %}
+	{%= frappe.datetime.str_to_user(filters.to_date) %}
+</h5>
+<hr>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th style="width: 10%">{%= __("Job Worker") %}</th>
+			<th style="width: 10%">{%= __("Site Name") %}</th>
+			<th style="width: 10%">{%= __("Status") %}</th>
+			<th style="width: 10%">{%= __("Completed Sqft") %}</th>
+            <th style="width: 10%">{%= __("Other Work") %}</th>
+            <th style="width: 10%">{%= __("Other Work Description") %}</th>
+            <th style="width: 10%">{%= __("Salary Balance") %}</th>
+			<th style="width: 10%">{%= __("Amount") %}</th>
+			<th style="width: 10%">{%= __("Advance Amount") %}</th>
+            <th style="width: 20%">{%= __("Total Amount") %}</th>
+		</tr>
+	</thead>
+    <tbody>
+        {% for(var i=0, l=data.length; i<l; i++) { %}
+        <tr>
+            <td><b>{%= frappe.format(data[i].job_worker, {fieldtype: "Data"}) || "&nbsp;" %}</b></td>
+            <td>{%= frappe.format(data[i].site_name, {fieldtype: "Link"}) || "&nbsp;" %}</td>
+            <td>{%= frappe.format(data[i].status, {fieldtype: "Data"}) || "&nbsp;" %}</td>
+            <td>{%= frappe.format(data[i].completed_sqft, {fieldtype: "Data"}) || "&nbsp;" %}</td>
+            <td>{%= frappe.format(data[i].other_work, {fieldtype: "data"}) || "&nbsp;" %}</td>
+            <td>{%= frappe.format(data[i].other_work_description, {fieldtype: "data"}) || "&nbsp;" %}</td>
+            <td>{%= frappe.format(data[i].salary_balance, {fieldtype: "data"}) || "&nbsp;" %}</td>
+            <td>{%= frappe.format(data[i].amount, {fieldtype: "data"}) || "&nbsp;" %}</td>
+            <td>{%= frappe.format(data[i].advance_amount, {fieldtype: "data"}) || "&nbsp;" %}</td>
+            <td>{%= frappe.format(data[i].total_amount, {fieldtype: "data"}) || "&nbsp;" %}</td>
+        </tr>
+        {% } %}
+	</tbody>
+</table>
+
+	
