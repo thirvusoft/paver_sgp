@@ -13,7 +13,7 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "label": "TS Manufacturing",
+ "label": "SGP Manufacturing",
  "links": [
   {
    "hidden": 0,
@@ -157,10 +157,10 @@
    "type": "Link"
   }
  ],
- "modified": "2022-12-20 13:27:37.260207",
- "modified_by": "Administrator",
+ "modified": "2023-01-04 12:41:31.681247",
+ "modified_by": "admin@gmail.com",
  "module": "Ganapathy Pavers",
- "name": "TS Manufacturing",
+ "name": "SGP Manufacturing",
  "onboarding": "Manufacturing",
  "owner": "Administrator",
  "pin_to_bottom": 0,
