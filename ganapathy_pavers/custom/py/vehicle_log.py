@@ -129,6 +129,8 @@ def vehicle_log_mileage(self, event):
                 frappe.db.set(self, 'mileage', mileage)
 
 def validate_distance(self, event):
+    if self.select_purpose=="Service":
+        self.odometer=self.last_odometer
     self.today_odometer_value=(self.odometer or 0)-((self.fuel_odometer_value or 0) if self.select_purpose in ["Fuel", "Service"] else (self.last_odometer or 0))
 
 def total_cost(self, event):

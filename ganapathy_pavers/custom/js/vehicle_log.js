@@ -30,6 +30,9 @@ frappe.ui.form.on("Vehicle Log" ,{
     },
     select_purpose: function(frm){
         distance(frm)
+        if (frm.doc.select_purpose=="Service") {
+            frm.set_value("odometer", frm.doc.last_odometer)
+        }
     },
     fuel_odometer_value: function(frm){
         distance(frm)
@@ -66,7 +69,7 @@ frappe.ui.form.on("Vehicle Log" ,{
 
 
 function distance(frm){
-    frm.set_value('today_odometer_value', (frm.doc.odometer?frm.doc.odometer:0) - (["Fuel", "Service"].includes(frm.doc.select_purpose)?(frm.doc.fuel_odometer_value || 0):(frm.doc.last_odometer || 0)))
+    frm.set_value('today_odometer_value', (frm.doc.odometer?frm.doc.odometer:0) - (["Fuel"].includes(frm.doc.select_purpose)?(frm.doc.fuel_odometer_value || 0):(frm.doc.last_odometer || 0)))
 }
 function total_cost(frm){
     if(frm.doc.license_plate){
