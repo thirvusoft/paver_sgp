@@ -1,45 +1,64 @@
 <h2 class="text-center"><b>{%= __("SRI GANAPATHY FLY ASH BRICKS -PAVER-WEEKLY  LAYER BILL ") %}</b></h2>
-
-
-
-
-<h5 class="text-center">
+<h3 class="text-center">
 	{%= frappe.datetime.str_to_user(filters.from_date) %}
 	{%= __("to") %}
 	{%= frappe.datetime.str_to_user(filters.to_date) %}
-</h5>
+</h3>
 <hr>
+
 <table class="table table-bordered">
+	<!-- heading -->
 	<thead>
 		<tr>
-			<th style="width: 10%">{%= __("Job Worker") %}</th>
-			<th style="width: 10%">{%= __("Site Name") %}</th>
-			<th style="width: 10%">{%= __("Status") %}</th>
-			<th style="width: 10%">{%= __("Completed Sqft") %}</th>
-            <th style="width: 10%">{%= __("Other Work") %}</th>
-            <th style="width: 10%">{%= __("Other Work Description") %}</th>
-            <th style="width: 10%">{%= __("Salary Balance") %}</th>
-			<th style="width: 10%">{%= __("Amount") %}</th>
-			<th style="width: 10%">{%= __("Advance Amount") %}</th>
-            <th style="width: 20%">{%= __("Total Amount") %}</th>
+		<th> # </th>
+		{% for col in columns %}
+			{% if col.name && col._id !== "_check" && !col.hidden %}
+			<th
+				{% if col.minWidth %}
+					style="min-width: {{ col.minWidth }}px"
+				{% endif %}
+				{% if col.docfield && frappe.model.is_numeric_field(col.docfield) %}
+					class="text-right"
+				{% endif %}
+			>
+				{{ __(col.name) }}</th>
+			{% endif %}
+		{% endfor %}
 		</tr>
 	</thead>
-    <tbody>
-        {% for(var i=0, l=data.length; i<l; i++) { %}
-        <tr>
-            <td><b>{%= frappe.format(data[i].job_worker, {fieldtype: "Data"}) || "&nbsp;" %}</b></td>
-            <td>{%= frappe.format(data[i].site_name, {fieldtype: "Link"}) || "&nbsp;" %}</td>
-            <td>{%= frappe.format(data[i].status, {fieldtype: "Data"}) || "&nbsp;" %}</td>
-            <td>{%= frappe.format(data[i].completed_sqft, {fieldtype: "Data"}) || "&nbsp;" %}</td>
-            <td>{%= frappe.format(data[i].other_work, {fieldtype: "data"}) || "&nbsp;" %}</td>
-            <td>{%= frappe.format(data[i].other_work_description, {fieldtype: "data"}) || "&nbsp;" %}</td>
-            <td>{%= frappe.format(data[i].salary_balance, {fieldtype: "data"}) || "&nbsp;" %}</td>
-            <td>{%= frappe.format(data[i].amount, {fieldtype: "data"}) || "&nbsp;" %}</td>
-            <td>{%= frappe.format(data[i].advance_amount, {fieldtype: "data"}) || "&nbsp;" %}</td>
-            <td>{%= frappe.format(data[i].total_amount, {fieldtype: "data"}) || "&nbsp;" %}</td>
-        </tr>
-        {% } %}
+	<!-- body -->
+	<tbody>
+		{% for row in data %}
+			<tr style="height: 30px">
+			<td {% if row.bold == 1 %} style="font-weight: bold" {% endif %}>
+				<span> {{ row._index + 1 }} </span>
+			</td>
+			{% for col in columns %}
+				{% if col.name && col._id !== "_check" && !col.hidden %}
+
+					{% var value = col.fieldname ? row[col.fieldname] : row[col.id]; %}
+
+					<td {% if row.bold == 1 %} style="font-weight: bold" {% endif %}>
+						<span {% if col._index == 0 %} style="padding-left: {%= cint(row.indent) * 2 %}em" {% endif %}>
+							{% format_data = row.is_total_row && ["Currency", "Float"].includes(col.fieldtype) ? data[0] : row %}
+							{% if (row.is_total_row && col._index == 0) { %}
+								{{ __("Total") }}
+							{% } else { %}
+								{{
+									col.formatter
+										? col.formatter(row._index, col._index, value, col, format_data, true)
+										: col.format
+											? col.format(value, row, col, format_data)
+											: col.docfield
+												? frappe.format(value, col.docfield)
+												: value
+								}}
+							{% } %}
+						</span>
+					</td>
+				{% endif %}
+			{% endfor %}
+			</tr>
+		{% endfor %}
 	</tbody>
 </table>
-
-	
