@@ -210,24 +210,18 @@ def vehicle_maintenance_notification():
 
 
 def vehicle_common_groups(self,event):
+    vehicle_name=self.name
     list1=[]
     if self.vehicle_common_groups:
     
         for i in self.vehicle_common_groups:
             list1.append(i.__dict__)
-        
+       
         expense_account=frappe.db.get_values("Expense Account Common Groups",{"parent":"Expense Accounts"},"*",as_dict=True)
         if expense_account:
-            for j in expense_account:
-                if j["vehicle"]==self.name :
-                    expense_account.remove(j)
-          
-            # for accounts in expense_account:
+            frappe.db.sql("""delete from `tabExpense Account Common Groups` where parent="Expense Accounts" and vehicle='{0}'""".format(self.name))
+            
             doc=frappe.get_doc("Expense Accounts")
-            doc.update({"expense_account_common_groups":expense_account})
-            doc.save()
-            doc.reload()
-           
             for accounts in list1:
                 doc.append("expense_account_common_groups",{
                     "paver_account":accounts["paver_account"],
