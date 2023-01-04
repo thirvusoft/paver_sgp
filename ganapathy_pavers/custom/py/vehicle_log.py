@@ -124,7 +124,7 @@ def vehicle_log_draft(self, event):
 def vehicle_log_mileage(self, event):
     if((frappe.db.get_single_value('Vehicle Settings', 'vehicle_update'))==1):
         if (self.fuel_qty):
-                mileage=(self.fuel_odometer_value-self.odometer)/self.fuel_qty
+                mileage=(self.odometer-self.fuel_odometer_value)/self.fuel_qty
                 frappe.db.set_value("Vehicle", self.license_plate, "mileage",mileage)
                 frappe.db.set(self, 'mileage', mileage)
 
