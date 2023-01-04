@@ -162,8 +162,7 @@ def validate_jw_qty(self):
     for row in self.delivery_detail:
         if(row.item not  in delivered_item):
             delivered_item[row.item]=0
-        delivered_item[row.item]+=row.delivered_stock_qty
-
+        delivered_item[row.item]+=row.delivered_stock_qty+row.returned_stock_qty
     jw_items={}
     for row in self.job_worker:
         if(row.item and not row.other_work):
@@ -177,10 +176,10 @@ def validate_jw_qty(self):
     wrong_items=[]
     for item in jw_items:
         if((jw_items.get(item) or 0)>math.ceil(delivered_item.get(item) or 0)):
-            frappe.errprint(f"{jw_items.get(item)}   {math.ceil(delivered_item.get(item) or 0)}")
-            wrong_items.append(frappe.bold(item))
+            wrong_items.append({"item_code": item, "entered":jw_items.get(item), "delivered": math.ceil(delivered_item.get(item) or 0)})
     if(wrong_items):
-        frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+', '.join(wrong_items))
+        message="<ul>"+''.join([f"""<li><a href="/app/item/{item.get('item_code', '')}"><b>{item.get("item_code", "")}</b></a><div style="display: flex; width: 100%;"><div style="width: 50%;">Delivered Qty: {item.get("delivered", 0)}</div><div style="width: 50%;">Entered Qty: {item.get("entered", 0)}</div></div></li>""" for item in wrong_items])+"</ul>"
+        frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+ message)
 
     if(self.type == "Compound Wall"):
         delivered_qty = 0
