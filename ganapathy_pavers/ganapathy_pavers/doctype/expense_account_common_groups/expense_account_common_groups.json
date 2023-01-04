@@ -39,7 +39,14 @@
    "in_list_view": 1,
    "label": "Fencing Post Account",
    "options": "Account"
-  }
+  },
+  {
+    "fieldname": "monthly_cost",
+    "fieldtype": "Currency",
+    "in_list_view": 1,
+    "label": "Monthly Cost"
+    
+   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
