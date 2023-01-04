@@ -234,7 +234,8 @@ doc_events = {
 		
   	},
 	"Vehicle":{
-        "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
+        "validate":["ganapathy_pavers.custom.py.vehicle.reference_date",
+		            "ganapathy_pavers.custom.py.vehicle.vehicle_common_groups"]
     },
  	"Employee Checkin":{
         "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",

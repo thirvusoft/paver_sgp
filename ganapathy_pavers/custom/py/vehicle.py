@@ -205,3 +205,62 @@ def vehicle_maintenance_notification():
                 notification("Week Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')
             if(doc.day_before and str(doc.to_date) == add_days(nowdate(), 1)):
                 notification("Day Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')
+
+
+
+
+def vehicle_common_groups(self,event):
+    list1=[]
+    if self.vehicle_common_groups:
+    
+        for i in self.vehicle_common_groups:
+            list1.append(i.__dict__)
+        
+        expense_account=frappe.db.get_values("Expense Account Common Groups",{"parent":"Expense Accounts"},"*",as_dict=True)
+        if expense_account:
+            for j in expense_account:
+                if j["vehicle"]==self.name :
+                    expense_account.remove(j)
+          
+            # for accounts in expense_account:
+            doc=frappe.get_doc("Expense Accounts")
+            doc.update({"expense_account_common_groups":expense_account})
+            doc.save()
+            doc.reload()
+           
+            for accounts in list1:
+                doc.append("expense_account_common_groups",{
+                    "paver_account":accounts["paver_account"],
+                    "cw_account":accounts["cw_account"],
+                    "lg_Account":accounts["lg_account"],
+                    "fp_account":accounts["fp_account"],
+                    "monthly_cost":accounts["monthly_cost"],
+                    "vehicle":accounts["vehicle"]
+                })
+               
+                doc.save()
+                doc.reload()
+        else:
+            print("hhhhhhhhhh")
+            doc=frappe.get_doc("Expense Accounts")
+            for accounts in list1:
+                doc.append("expense_account_common_groups",{
+                    "paver_account":accounts["paver_account"],
+                    "cw_account":accounts["cw_account"],
+                    "lg_Account":accounts["lg_account"],
+                    "fp_account":accounts["fp_account"],
+                    "monthly_cost":accounts["monthly_cost"],
+                    "vehicle":accounts["vehicle"]
+                })
+                doc.save()
+               
+
+
+       
+          
+
+
+        
+
+
+  

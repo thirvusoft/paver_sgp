@@ -7,6 +7,57 @@ from erpnext.accounts.utils import get_children
 from frappe.model.document import Document
 
 class ExpenseAccounts(Document):
+	def validate(doc):
+		pass
+	# 	if doc.expense_account_common_groups:
+	# 		for i in doc.expense_account_common_groups:
+				
+	# 			if (i.__dict__["vehicle"]):
+					
+	# 				vehicle_doc=frappe.get_doc("Vehicle",i.__dict__["vehicle"])
+	# 				vehicle_common_group=frappe.db.get_values("Vehicle Common Groups",{"parent":vehicle_doc.name},"*",as_dict=True)
+					
+	# 				if vehicle_common_group:
+	# 					for accounts in vehicle_common_group:
+	# 						if accounts["vehicle"]==i.__dict__["vehicle"] or accounts["paver_account"]==i.__dict__["paver_account"] or accounts["cw_account"]==i.__dict__["cw_account"] or accounts["lp_account"]==i.__dict__["lp_account"] or accounts["fp_account"]==i.__dict__["fp_account"]  :
+	# 							vehicle_common_group.remove(accounts)
+							
+	# 							print("yyyyy")
+						
+	# 					vehicle_doc.update({"vehicle_common_groups":vehicle_common_group})
+	# 					print(vehicle_doc)
+	# 					vehicle_doc.save()
+	# 					# vehicle_doc.reload()
+	# 							# vehicle_doc.append("vehicle_common_groups",{
+	# 							# 	"paver_account":i.__dict__["paver_account"],
+	# 							# 	"cw_account":i.__dict__["cw_account"],
+	# 							# 	"lg_account":i.__dict__["lg_account"],
+	# 							# 	"fp_account":i.__dict__["fp_account"],
+	# 							# 	"monthly_cost":i.__dict__["monthly_cost"],
+	# 							# 	"vehicle":i.__dict__["vehicle"]
+	# 							# })
+	# 							# vehicle_doc.save()
+	# 							# vehicle_doc.reload()
+
+						
+
+	# 				else:
+						
+	# 					vehicle_doc.append("vehicle_common_groups",{
+	# 						"paver_account":i.__dict__["paver_account"],
+	# 						"cw_account":i.__dict__["cw_account"],
+	# 						"lg_account":i.__dict__["lg_account"],
+	# 						"fp_account":i.__dict__["fp_account"],
+	# 						"vehicle":i.__dict__["vehicle"],
+	# 						"monthly_cost":i.__dict__["monthly_cost"],
+
+	# 					})
+	# 					vehicle_doc.save()
+	# 					vehicle_doc.reload()
+
+
+
+
 	def get_common_account(self, account):
 		res={"paver": "", "cw": "", "fp": "", "lg": ""}
 		parent_acc=frappe.get_value("Account", account, "parent_account")
@@ -61,7 +112,7 @@ def get_filter(company=""):
 
 def get_filter_list(accounts, acc_list):
 	for acc in accounts:
-		print(acc.get('value'))
+		
 		if acc.get('expandable')==1:
 			acc_list=get_filter_list(acc.get('child_nodes'), acc_list)
 		else:
