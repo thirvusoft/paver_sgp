@@ -42,7 +42,7 @@ frappe.ui.form.on("Purchase Invoice", {
     }
 });
 
-async function create_vehicle_log(frm) {z
+async function create_vehicle_log(frm) {
     date = cur_frm.doc.posting_date
     if (frm.doc.vehicle) {
         await frappe.run_serially([
