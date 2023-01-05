@@ -273,6 +273,7 @@ doc_events = {
 	}
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
+              "ganapathy_pavers.custom.py.lead.new_status",
               "ganapathy_pavers.custom.py.property_setter.property_setter",
 			  "ganapathy_pavers.utils.py.vehicle.batch_customization",
 			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
