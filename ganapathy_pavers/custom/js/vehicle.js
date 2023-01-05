@@ -36,20 +36,3 @@ frappe.ui.form.on("Vehicle" ,{
    
 
 })
-// frappe.ui.form.on("Vehicle Common Groups", {
-//     after_save: function(frm, cdt, cdn) {
-//         console.log("ooooooooooooooo")
-//         frappe.call({
-           
-//             method: "ganapathy_pavers.custom.py.vehicle.vehicle_common_groups",
-//             args: {
-//                 vehicle_name: frm.doc.name
-//             },
-          
-           
-//             callback(r) {
-//                 console.log("hhhhhhhhhhh")
-//                 // frm.reload_doc()
-//             }
-//         });
-//     }})
