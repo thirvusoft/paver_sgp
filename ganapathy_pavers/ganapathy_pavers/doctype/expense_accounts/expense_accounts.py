@@ -10,11 +10,11 @@ class ExpenseAccounts(Document):
 	def validate(doc):
 		
 		if doc.expense_account_common_groups:
-			print("hhhhhhhhhhhh")		
+			
 			for i in doc.expense_account_common_groups:
-				print(i.__dict__["vehicle"])
+				
 				vehicle_doc=frappe.get_doc("Vehicle",i.__dict__["vehicle"])
-				print(vehicle_doc.name)
+				
 				vehicle_common_group=frappe.db.get_values("Expense Account Common Groups",{"parent":vehicle_doc.name},"*",as_dict=True)
 					
 				if vehicle_common_group:
