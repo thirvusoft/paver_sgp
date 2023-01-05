@@ -12,6 +12,8 @@ def execute(filters=None):
 	item=filters.get("item")
 	data = []
 	filters1={'from_time':["between",[from_date,to_date]] }
+	if filters.get("machine"):
+		filters1["work_station"] = ["in", filters.get("machine", [])]
 	if item:
 		filters1["item_to_manufacture"]=item
 	paver_list = frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
@@ -121,7 +123,7 @@ def execute(filters=None):
 			data += test_data
 		total_sqf=0
 		total_amt=0
-		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'))
+		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
 		if prod_details.get('paver'):
 			exp, total_sqf, total_amt=get_expense_data(prod_details.get('paver'), filters, production_qty[0]['production_sqft'], total_sqf, total_amt)
 			if exp:
