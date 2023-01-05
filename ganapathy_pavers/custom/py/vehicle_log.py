@@ -117,24 +117,21 @@ def vehicle_log_creation(self, event):
         vehicle_log.save()
 
 def vehicle_log_draft(self, event):
-    vehicle_draft=frappe.get_all("Vehicle Log",filters={"docstatus":0,"license_plate":self.license_plate})
+    vehicle_draft=frappe.get_all("Vehicle Log",filters={"docstatus":0,"license_plate":self.license_plate, "select_purpose": ["not in", ["Fuel", "Service"]]})
     for i in vehicle_draft:
         frappe.db.set_value("Vehicle Log",i.name,"last_odometer",self.odometer)
 
 def vehicle_log_mileage(self, event):
     if((frappe.db.get_single_value('Vehicle Settings', 'vehicle_update'))==1):
         if (self.fuel_qty):
-            a=frappe.get_all("Vehicle Log", 
-                filters={"fuel_qty": ['!=',0],"docstatus":1,"license_plate":self.license_plate},
-                fields=["fuel_qty","last_odometer","odometer",],order_by="creation desc",limit=2
-                )
-            if len(a)>=2:
-                mileage=(a[0]["last_odometer"]-a[1]['last_odometer'])/a[0]["fuel_qty"]
+                mileage=(self.odometer-self.fuel_odometer_value)/self.fuel_qty
                 frappe.db.set_value("Vehicle", self.license_plate, "mileage",mileage)
                 frappe.db.set(self, 'mileage', mileage)
 
 def validate_distance(self, event):
-    self.today_odometer_value=(self.odometer or 0)-(self.last_odometer or 0)
+    if self.select_purpose=="Service":
+        self.odometer=self.last_odometer
+    self.today_odometer_value=(self.odometer or 0)-((self.fuel_odometer_value or 0) if self.select_purpose in ["Fuel", "Service"] else (self.last_odometer or 0))
 
 def total_cost(self, event):
     if(self.fuel_qty and self.price):

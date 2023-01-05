@@ -23,8 +23,8 @@ class MaterialManufacturing(Document):
 			total_raw_material.append(i.total)
 			total_cement_2a.append(i.cm2_a)
 			total_ggbs2_a.append(i.ggbs2_a)
-			total_chips_a.append(i.bin1_a + i.bin2_a)
-			total_dust_a.append(i.bin3_a + i.bin4_a)
+			total_chips_a.append(i.bin2_t + i.bin3_a)
+			total_dust_a.append(i.bin2_a + i.bin4_a)
 		if len(total_raw_material) == 0:
 			doc.total_no_of_raw_material = 0
 			doc.total_no_of_dust=0

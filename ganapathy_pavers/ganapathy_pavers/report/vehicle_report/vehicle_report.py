@@ -60,14 +60,7 @@ def get_columns():
 			'label':'Compound Wall SQFT Cost',
 			'fieldtype':'Float',
 			'width':130,
-		},
-		{
-			'fieldname':'mileage',
-			'label':'Mileage',
-			'fieldtype':'Float',
-			'width':130,
-		},
-		
+		}		
 	]
 	return columns
 
@@ -164,7 +157,7 @@ def get_vehicle_mileage(vl_filt, vehicle, data):
 	vl_filt['license_plate'] = vehicle
 	vl_filt['mileage'] = ['>', 0]
 
-	mileage = frappe.db.get_all('Vehicle Log', vl_filt, 'mileage', order_by = 'date asc', limit=1)
+	mileage = frappe.db.get_all('Vehicle Log', vl_filt, 'mileage', order_by = 'date desc, creation desc', limit=1)
 	data['mileage'] = mileage[0]['mileage'] if(len(mileage)) else 0
 
 	return data
