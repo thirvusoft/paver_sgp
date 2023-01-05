@@ -208,14 +208,15 @@ def vehicle_maintenance_notification():
 
 
 
-
 def vehicle_common_groups(self,event):
-    vehicle_name=self.name
+    
     list1=[]
     if self.vehicle_common_groups:
     
         for i in self.vehicle_common_groups:
+            i.__dict__["vehicle"] = self.name
             list1.append(i.__dict__)
+        # self.vehicle_common_group=list1
        
         expense_account=frappe.db.get_values("Expense Account Common Groups",{"parent":"Expense Accounts"},"*",as_dict=True)
         if expense_account:
@@ -231,11 +232,10 @@ def vehicle_common_groups(self,event):
                     "monthly_cost":accounts["monthly_cost"],
                     "vehicle":accounts["vehicle"]
                 })
-               
                 doc.save()
-                doc.reload()
+             
         else:
-            print("hhhhhhhhhh")
+            print("tttttttttt")
             doc=frappe.get_doc("Expense Accounts")
             for accounts in list1:
                 doc.append("expense_account_common_groups",{
@@ -247,7 +247,7 @@ def vehicle_common_groups(self,event):
                     "vehicle":accounts["vehicle"]
                 })
                 doc.save()
-               
+     
 
 
        

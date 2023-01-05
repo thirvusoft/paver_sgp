@@ -1,6 +1,6 @@
 
 from frappe import _
-
+import frappe
 
 def get_data(data=None):
 	return {
@@ -40,3 +40,8 @@ def get_data(data=None):
 			},
 		]
 	}
+
+def tags_msg(self,events):
+	a=frappe.db.get_values("Purchase Invoice",{"name":self.name},"_user_tags",as_dict=True)
+	if a[0]["_user_tags"]==None:
+		frappe.msgprint("Select the tags")
