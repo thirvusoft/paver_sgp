@@ -209,46 +209,24 @@ def vehicle_maintenance_notification():
 
 
 def vehicle_common_groups(self,event):
-    
-    list1=[]
     if self.vehicle_common_groups:
-    
         for i in self.vehicle_common_groups:
-            i.__dict__["vehicle"] = self.name
-            list1.append(i.__dict__)
-        # self.vehicle_common_group=list1
-       
-        expense_account=frappe.db.get_values("Expense Account Common Groups",{"parent":"Expense Accounts"},"*",as_dict=True)
-        if expense_account:
-            frappe.db.sql("""delete from `tabExpense Account Common Groups` where parent="Expense Accounts" and vehicle='{0}'""".format(self.name))
-            
-            doc=frappe.get_doc("Expense Accounts")
-            for accounts in list1:
-                doc.append("expense_account_common_groups",{
-                    "paver_account":accounts["paver_account"],
-                    "cw_account":accounts["cw_account"],
-                    "lg_Account":accounts["lg_account"],
-                    "fp_account":accounts["fp_account"],
-                    "monthly_cost":accounts["monthly_cost"],
-                    "vehicle":accounts["vehicle"]
-                })
-                doc.save()
-             
-        else:
-            print("tttttttttt")
-            doc=frappe.get_doc("Expense Accounts")
-            for accounts in list1:
-                doc.append("expense_account_common_groups",{
-                    "paver_account":accounts["paver_account"],
-                    "cw_account":accounts["cw_account"],
-                    "lg_Account":accounts["lg_account"],
-                    "fp_account":accounts["fp_account"],
-                    "monthly_cost":accounts["monthly_cost"],
-                    "vehicle":accounts["vehicle"]
-                })
-                doc.save()
-     
-
+            i.vehicle = self.name
+        frappe.db.sql("""delete from `tabExpense Account Common Groups` where parent="Expense Accounts" and vehicle='{0}'""".format(self.name))
+        doc=frappe.get_doc("Expense Accounts")
+        doc.update({
+            "expense_account_common_groups": doc.expense_account_common_groups + [
+                {
+                    "paver_account":child_doc.paver_account,
+                    "cw_account":child_doc.cw_account,
+                    "lg_account":child_doc.lg_account,
+                    "fp_account":child_doc.fp_account,
+                    "vehicle":child_doc.vehicle,
+                    "monthly_cost":child_doc.monthly_cost
+                } for child_doc in self.vehicle_common_groups]
+        })
+        doc.run_method=lambda *args, **kwargs: 0
+        doc.save()
 
        
           

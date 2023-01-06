@@ -8,44 +8,27 @@ from frappe.model.document import Document
 
 class ExpenseAccounts(Document):
 	def validate(doc):
-		
-		if doc.expense_account_common_groups:
-			
-			for i in doc.expense_account_common_groups:
-				
-				vehicle_doc=frappe.get_doc("Vehicle",i.__dict__["vehicle"])
-				
-				vehicle_common_group=frappe.db.get_values("Expense Account Common Groups",{"parent":vehicle_doc.name},"*",as_dict=True)
-					
-				if vehicle_common_group:
-					frappe.db.sql("""delete from `tabExpense Account Common Groups` where parent='{0}' """.format(vehicle_doc.name))
-					vehicle_doc.append("vehicle_common_groups",{
-						"paver_account":i.__dict__["paver_account"],
-						"cw_account":i.__dict__["cw_account"],
-						"lg_account":i.__dict__["lg_account"],
-						"fp_account":i.__dict__["fp_account"],
-						"monthly_cost":i.__dict__["monthly_cost"],
-						"vehicle":i.__dict__["vehicle"]
-					})
-					vehicle_doc.save()
-					# vehicle_doc.reload()
-
-				else:
-					for i in doc.expense_account_common_groups:
-						vehicle_doc.append("vehicle_common_groups",{
-							"paver_account":i.__dict__["paver_account"],
-							"cw_account":i.__dict__["cw_account"],
-							"lg_account":i.__dict__["lg_account"],
-							"fp_account":i.__dict__["fp_account"],
-							"vehicle":i.__dict__["vehicle"],
-							"monthly_cost":i.__dict__["monthly_cost"],
-
-						})
-						# vehicle_doc.save()
-					
-
-
-
+		frappe.db.sql("""delete from `tabExpense Account Common Groups` where parenttype='Vehicle' """)
+		vehicle_accounts={}
+		for row in doc.expense_account_common_groups:
+			if row.vehicle:
+				if row.vehicle not in vehicle_accounts:
+					vehicle_accounts[row.vehicle]=[]
+				vehicle_accounts[row.vehicle].append({
+					"paver_account":row.paver_account,
+					"cw_account":row.cw_account,
+					"lg_account":row.lg_account,
+					"fp_account":row.fp_account,
+					"monthly_cost":row.monthly_cost,
+					"vehicle":row.vehicle
+				})
+		for row in vehicle_accounts:
+			vehicle_doc=frappe.get_doc("Vehicle", row)
+			vehicle_doc.update({
+				"vehicle_common_groups": vehicle_accounts[row]
+			})
+			vehicle_doc.run_method=lambda *args, **kwargs: 0
+			vehicle_doc.save()
 
 	def get_common_account(self, account):
 		res={"paver": "", "cw": "", "fp": "", "lg": ""}
