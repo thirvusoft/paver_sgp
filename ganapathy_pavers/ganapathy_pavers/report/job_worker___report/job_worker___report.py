@@ -34,7 +34,7 @@ def execute(filters=None):
                                             on emp.employee = jwd.name1
                                         {0}
                                     {2} order by jwd.sqft_allocated)as total_cal
-                                """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.sqft_allocated), sum(jwd.completed_bundle)" if filters.get("group_site_work") else "jwd.sqft_allocated", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
+                                """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.sqft_allocated), sum(jwd.completed_bundle)" if filters.get("group_site_work") else "jwd.sqft_allocated, jwd.completed_bundle", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
     
     report_data1 = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
                                         emp.salary_balance as salary_balance,{4} as amount,
@@ -46,7 +46,7 @@ def execute(filters=None):
                                             on emp.employee = jwd.name1
                                         {0}
                                     group by jwd.name1{2},jwd.sqft_allocated, jwd.start_date, jwd.end_date, jwd.description_for_other_work order by jwd.sqft_allocated)as total_cal
-                                """.format(conditions+" and jwd.other_work = 1",adv_conditions, "", "sum(jwd.sqft_allocated), sum(jwd.completed_bundle)" if filters.get("group_site_work") else "jwd.sqft_allocated", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
+                                """.format(conditions+" and jwd.other_work = 1",adv_conditions, "", "sum(jwd.sqft_allocated), sum(jwd.completed_bundle)" if filters.get("group_site_work") else "jwd.sqft_allocated,jwd.completed_bundle", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
     data = [list(i) for i in (report_data or tuple())]
     final_data = []
     c = 0
