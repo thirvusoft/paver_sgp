@@ -54,12 +54,12 @@ def execute(filters=None):
         data1={}
         for idx in range(len(data)):
             _key=f"{data[idx][0]}---{data[idx][1]}"
-            if _key not in data1 or data[idx][4+1]:
+            if _key not in data1 or data[idx][5]:
                 data1[_key]=data[idx]
             else:
                 data1[_key][3]+=(data[idx][3] or 0)
                 data1[_key][4]+=(data[idx][4] or 0)
-                data1[_key][7+1]+=(data[idx][7+1] or 0)
+                data1[_key][8]+=(data[idx][8] or 0)
         data=list(data1.values())
     data = [list(i) for i in (report_data1 or [])] + data
 
@@ -67,7 +67,7 @@ def execute(filters=None):
 
     for row in data:
         if row[0] and frappe.db.exists("Employee", row[0]):
-            row[6+1]=get_employee_salary_balance(employee=row[0], from_date=from_date, to_date=to_date)
+            row[7]=get_employee_salary_balance(employee=row[0], from_date=from_date, to_date=to_date)
             row[0]=frappe.db.get_value("Employee", row[0], "employee_name")
 
     data.sort(key = lambda x:x[0])
@@ -77,57 +77,57 @@ def execute(filters=None):
         start = 0
         for i in range(len(data)-1):
             if (data[i][0] != data[i+1][0]):
-                adv=data[i][8+1]
-                data[i][8+1]=None
-                data[i][9+1]=None
+                adv=data[i][9]
+                data[i][9]=None
+                data[i][10]=None
                 final_data.append(data[i])
-                total = [" " for i in range(10+1)]
+                total = [" " for i in range(11)]
                 total[2] = "<b style=color:orange;>""Total""</b>"
                 total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,i+1))}</b>"
                 total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,i+1))}</b>"
-                total[4+1]=0
-                total[6+1] = sum((data[i][6+1] or 0) for i in range(start,i+1))
-                total[7+1] = f"<b>{'%.2f'%sum((data[i][7+1] or 0) for i in range(start,i+1))}</b>"
-                total[8+1] = adv
-                amount=sum((data[i][7+1] or 0) for i in range(start,i+1))
-                salary_bal=sum((data[i][6+1] or 0) for i in range(start,i+1))
-                total[9+1] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
-                final_data[-1][6+1]=None
+                total[5]=0
+                total[7] = sum((data[i][7] or 0) for i in range(start,i+1))
+                total[8] = f"<b>{'%.2f'%sum((data[i][8] or 0) for i in range(start,i+1))}</b>"
+                total[9] = adv
+                amount=sum((data[i][8] or 0) for i in range(start,i+1))
+                salary_bal=sum((data[i][7] or 0) for i in range(start,i+1))
+                total[10] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
+                final_data[-1][7]=None
                 final_data.append(total)
                 start = i+1	
                 c=0
             else:
-                data[i][6+1]=None
-                data[i][9+1]=None
-                if(c==0):data[i][8+1]=None
-                else:data[i][8+1]=None
+                data[i][7]=None
+                data[i][10]=None
+                if(c==0):data[i][9]=None
+                else:data[i][9]=None
                 c+=1
                 final_data.append(data[i])
-        adv=data[-1][8+1]
-        data[-1][8+1]=None
-        data[-1][9+1]=None
+        adv=data[-1][9]
+        data[-1][9]=None
+        data[-1][10]=None
         final_data.append(data[-1])
-        total = [" " for i in range(10+1)]
+        total = [" " for i in range(11)]
         total[2] = "<b style=color:orange;>""Total""</b>"
         total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,len(data)))}</b>"
         total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,len(data)))}</b>"
-        total[4+1]=0
-        total[6+1] = sum((data[i][6+1] or 0) for i in range(start,len(data)))
-        total[7+1] = f"<b>{'%.2f'%sum((data[i][7+1] or 0) for i in range(start,len(data)))}</b>"
-        total[8+1] = adv
-        amount=sum((data[i][7+1] or 0) for i in range(start,len(data)))
-        salary_bal=sum((data[i][6+1] or 0) for i in range(start,len(data)))
-        total[9+1] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
-        final_data[-1][6+1]=None
+        total[5]=0
+        total[7] = sum((data[i][7] or 0) for i in range(start,len(data)))
+        total[8] = f"<b>{'%.2f'%sum((data[i][8] or 0) for i in range(start,len(data)))}</b>"
+        total[9] = adv
+        amount=sum((data[i][8] or 0) for i in range(start,len(data)))
+        salary_bal=sum((data[i][7] or 0) for i in range(start,len(data)))
+        total[10] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
+        final_data[-1][7]=None
         final_data.append(total)
     other_work=0
     for row in final_data:
-        if row[4+1]:
-            row[4+1]="Yes"
+        if row[5]:
+            row[5]="Yes"
             other_work=1
         else:
-            row[4+1]=""
-            row[5+1]=""
+            row[5]=""
+            row[6]=""
     columns = get_columns(other_work)
   
     return columns, [row+[None] for row in final_data]
