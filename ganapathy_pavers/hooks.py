@@ -230,11 +230,14 @@ doc_events = {
 		"on_cancel":[
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
-					 ],
+					],
 		
   	},
 	"Vehicle":{
-        "validate":"ganapathy_pavers.custom.py.vehicle.reference_date",
+        "validate":[
+					"ganapathy_pavers.custom.py.vehicle.reference_date",
+					"ganapathy_pavers.custom.py.vehicle.vehicle_common_groups"
+					],
     },
  	"Employee Checkin":{
         "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
@@ -244,6 +247,9 @@ doc_events = {
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
+	},
+	"Purchase Invoice":{
+		"on_submit":"ganapathy_pavers.custom.py.purchase_invoice_dashboard.tags_msg"
 	},
 	"Journal Entry": {
 		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry"

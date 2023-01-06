@@ -9,7 +9,9 @@
   "paver_account",
   "cw_account",
   "lg_account",
-  "fp_account"
+  "fp_account",
+  "monthly_cost",
+  "vehicle"
  ],
  "fields": [
   {
@@ -41,17 +43,23 @@
    "options": "Account"
   },
   {
-    "fieldname": "monthly_cost",
-    "fieldtype": "Currency",
-    "in_list_view": 1,
-    "label": "Monthly Cost"
-    
-   }
+   "fieldname": "monthly_cost",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Monthly Cost"
+  },
+  {
+   "fieldname": "vehicle",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vehicle ",
+   "options": "Vehicle"
+  }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-12-01 10:06:08.111098",
+ "modified": "2023-01-04 10:24:30.933086",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Expense Account Common Groups",

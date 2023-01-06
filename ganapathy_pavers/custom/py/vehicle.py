@@ -205,3 +205,34 @@ def vehicle_maintenance_notification():
                 notification("Week Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')
             if(doc.day_before and str(doc.to_date) == add_days(nowdate(), 1)):
                 notification("Day Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')
+
+
+
+def vehicle_common_groups(self,event):
+    if self.vehicle_common_groups:
+        for i in self.vehicle_common_groups:
+            i.vehicle = self.name
+        frappe.db.sql("""delete from `tabExpense Account Common Groups` where parent="Expense Accounts" and vehicle='{0}'""".format(self.name))
+        doc=frappe.get_doc("Expense Accounts")
+        doc.update({
+            "expense_account_common_groups": doc.expense_account_common_groups + [
+                {
+                    "paver_account":child_doc.paver_account,
+                    "cw_account":child_doc.cw_account,
+                    "lg_account":child_doc.lg_account,
+                    "fp_account":child_doc.fp_account,
+                    "vehicle":child_doc.vehicle,
+                    "monthly_cost":child_doc.monthly_cost
+                } for child_doc in self.vehicle_common_groups]
+        })
+        doc.run_method=lambda *args, **kwargs: 0
+        doc.save()
+
+       
+          
+
+
+        
+
+
+  
