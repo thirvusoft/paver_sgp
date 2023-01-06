@@ -16,4 +16,13 @@ frappe.ui.form.on("Quotation", {
             frm.trigger("party_name")
         }
     },
+    refresh: function (frm) {
+        frm.set_query("supervisor_name", function () { 
+            return {
+                filters: {
+                    designation: "Supervisor"
+                }
+            }
+        })
+    },
 })
