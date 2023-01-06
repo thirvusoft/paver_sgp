@@ -94,7 +94,7 @@ def validate_salary_slip(self, event):
         ssa=frappe.get_all("Salary Structure Assignment", filters={'employee':self.employee, 'docstatus':1,'designation':"Labour Worker"}, pluck="base")
         employee=frappe.get_value("Employee",self.employee,'reports_to')
         ccr=frappe.get_all("Contractor Commission Rate", filters={'name':employee},fields=['contractor','commission_rate'])
-        commission=ssa[0]-ccr[0]['commission_rate']
+        commission=(ssa[0] if ssa else 0)-(ccr[0]['commission_rate'] if ccr and ccr[0].get("commission_rate") else 0)
         basic=commission*self.total_working_hour
         if len(self.earnings)==0:
             self.update({'earnings':[{'salary_component':'Basic'}]})

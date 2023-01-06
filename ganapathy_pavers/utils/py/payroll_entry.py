@@ -26,7 +26,7 @@ class MessExpense(PayrollEntry):
                 }
             )
             if len(employees) > 30:
-                frappe.enqueue(create_salary_slips_for_employees, timeout=600, posting_date=self.posting_date,employees=employees,args=args,food_count=food_count)
+                frappe.enqueue(create_salary_slips_for_employees, timeout=600, posting_date=self.posting_date,start_date=self.start_date,end_date=self.end_date,employees=employees,args=args,food_count=food_count)
             else:
                 create_salary_slips_for_employees(self.posting_date,self.start_date,self.end_date,employees, args,food_count, publish_progress=False)
                 # since this method is called via frm.call this doc needs to be updated manually
