@@ -34,7 +34,7 @@ def execute(filters=None):
                                             on emp.employee = jwd.name1
                                         {0}
                                     {2} order by jwd.sqft_allocated)as total_cal
-                                """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.sqft_allocated), sum(jwd.completed_bundle)" if filters.get("group_site_work") else "jwd.sqft_allocated, jwd.completed_bundle", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
+                                """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.completed_bundle), sum(jwd.sqft_allocated)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
     
     report_data1 = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
                                         emp.salary_balance as salary_balance,{4} as amount,
@@ -46,7 +46,7 @@ def execute(filters=None):
                                             on emp.employee = jwd.name1
                                         {0}
                                     group by jwd.name1{2},jwd.sqft_allocated, jwd.start_date, jwd.end_date, jwd.description_for_other_work order by jwd.sqft_allocated)as total_cal
-                                """.format(conditions+" and jwd.other_work = 1",adv_conditions, "", "sum(jwd.sqft_allocated), sum(jwd.completed_bundle)" if filters.get("group_site_work") else "jwd.sqft_allocated,jwd.completed_bundle", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
+                                """.format(conditions+" and jwd.other_work = 1",adv_conditions, "", "sum(jwd.completed_bundle), sum(jwd.sqft_allocated)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
     data = [list(i) for i in (report_data or tuple())]
     final_data = []
     c = 0
@@ -137,13 +137,23 @@ def get_columns(other_work):
 		_("Job Worker") + ":Data/Employee:150",
 		_("Site Name") + ":Link/Project:100",
 		_("Status") + ":Data/Project:150",
-		_("Completed Sqft") + ":Data:150",
-        _("Completed Bundle") + ":Data:150",
+        {
+            "fieldname": "bundle",
+            "label": "Bundle",
+            "fieldtype": "Data",
+            "ts_right_align": "text-right"
+        },
+		{
+            "fieldname": "sfqt",
+            "label": "SQFT",
+            "fieldtype": "Data",
+            "ts_right_align": "text-right"
+        },
         {
             "fieldname": "other_work",
             "label": "Other Work",
             "fieldtype": "Data",
-            "hidden": not other_work
+            "hidden": not other_work,
         },
         {
             "fieldname": "other_work_description",
@@ -151,16 +161,37 @@ def get_columns(other_work):
             "fieldtype": "Data",
             "hidden": not other_work
         },
-		_("Salary Balance") + ":Data:150",
-		_("Amount") + ":Data:150",
-		_("Advance Deduction") + ":Data:150",
-		_("Total Amount") + ":Data:150",
+        {
+            "fieldname": "salary_balance",
+            "label": "Salary Balance",
+            "fieldtype": "Data",
+            "ts_right_align": "text-right"
+        },
+		{
+            "fieldname": "amount",
+            "label": "Amount",
+            "fieldtype": "Data",
+            "ts_right_align": "text-right"
+        },
+		{
+            "fieldname": "advance_deduction",
+            "label": "Advance Deduction",
+            "fieldtype": "Data",
+            "ts_right_align": "text-right"
+        },
+		{
+            "fieldname": "total_amount",
+            "label": "Total Amount",
+            "fieldtype": "Data",
+            "ts_right_align": "text-right"
+        },
         {
             "fieldname": "payment",
             "label": "Payment",
             "fieldtype": "Data",
             "default": None,
-            "width": 150
+            "width": 150,
+            "ts_right_align": "text-right"
         }
 		]
 	

@@ -2,56 +2,40 @@ var month, paver, cw, lego, fp;
 
 frappe.ui.form.on("Journal Entry", {
     refresh: function (frm) {
-         
-        frm.add_custom_button('Monthly Cost', async function() {
-           
-            if (frm.doc.machine_3 || frm.doc.machine_12){
-            await frappe.call({
-                method:"ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.monthly_cost",
-   
-                callback: async function(r){
-                   
-                   var  a=r.message
-                    for(var i=0;i<(r.message).length;i++){
-                        if(a[i]["monthly_cost"])
-                     {
-
-                        var row = frm.add_child("common_expenses");await cur_frm.fields_dict.common_expenses.refresh()
-                        frappe.model.set_value(row.doctype, row.name, "account", a[i]["paver"][0] || "");
-                        frappe.model.set_value(row.doctype, row.name, "debit", a[i]["monthly_cost"] || "");
-                      if( a[i]["paver"][0])
-                      {
-                        frappe.model.set_value(row.doctype, row.name, "paver_account", a[i]["paver"][0] || "");
-                        frappe.model.set_value(row.doctype, row.name, "paver", 1);
-                      }
-                      if( a[i]["cw"][0]){
-                        frappe.model.set_value(row.doctype, row.name, "cw_account", a[i]["cw"][0] || "");
-                        frappe.model.set_value(row.doctype, row.name, "compound_wall", 1);
-
-                      }
-                      if( a[i]["lg"][0])
-                      {
-                        frappe.model.set_value(row.doctype, row.name, "lg_account", a[i]["lg"][0] || "");
-                        frappe.model.set_value(row.doctype, row.name, "lego_block", 1);
-                      }
-                      if( a[i]["fp"][0]){
-                        frappe.model.set_value(row.doctype, row.name, "fp_account", a[i]["fp"][0] || "");
-                        frappe.model.set_value(row.doctype, row.name, "fencing_post", 1);
-
-                     }
-
-                    }}
-
-                    await cur_frm.fields_dict.common_expenses.refresh()
+        frm.add_custom_button('Get Monthly Costing', async function () {
+            if (frm.doc.machine_3 || frm.doc.machine_12) {
+                if (frm.doc.common_expenses?.length > 0) {
+                    frm.scroll_to_field("common_expenses");
+                    await frappe.confirm(
+                        `Do you want to erase the existing data in <b>Common Expenses</b> table<br>
+                        <div style="display:flex; flex-direction: column; align-items: center;">
+                            <div>
+                                <b>Yes</b> - Erases the existing table and then fill the data.<br>
+                                <b>No</b> - Append the data with existing table.
+                            </div>
+                        </div>`,
+                        async () => {
+                            await frm.clear_table("common_expenses");
+                            await frm.fields_dict.common_expenses?.refresh();
+                            await get_common_expenses(frm);
+                        },
+                        async () => {
+                            await get_common_expenses(frm);
+                        }
+                    )
+                } else {
+                    await get_common_expenses(frm);
                 }
-            })}
-            else{
+
+
+            }
+            else {
                 frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
             }
 
         })
-   
-  
+
+
 
         set_css();
         frm.set_query("account", "common_expenses", function () {
@@ -88,7 +72,7 @@ frappe.ui.form.on("Journal Entry", {
             },
             freeze: true,
             freeze_message: "Splitting Expenses",
-            async callback (r) {
+            async callback(r) {
                 let res = r.message || []
                 res.forEach(async row => {
                     let child = cur_frm.add_child("accounts");
@@ -105,18 +89,18 @@ frappe.ui.form.on("Journal Entry", {
     machine_12: async function (frm) {
         await dashboard_data(cur_frm.doc.posting_date, cur_frm)
         if (frm.doc.machine_12 == 1) {
-            frm.set_value("machine_3", 0);
-            trigger_allocate_amount(frm)
+            await frm.set_value("machine_3", 0);
+            await trigger_allocate_amount(frm)
         }
-        
+
     },
     machine_3: async function (frm) {
-        await  dashboard_data(cur_frm.doc.posting_date, cur_frm)
+        await dashboard_data(cur_frm.doc.posting_date, cur_frm)
         if (frm.doc.machine_3 == 1) {
-            frm.set_value("machine_12", 0);
-            trigger_allocate_amount(frm)
+            await frm.set_value("machine_12", 0);
+            await trigger_allocate_amount(frm)
         }
-        
+
     }
 });
 
@@ -178,16 +162,51 @@ frappe.ui.form.on("Common Expense JE", {
 function validate_common_accounts() {
     (cur_frm.doc.common_expenses || []).forEach(row => {
         if (row.paver && !row.paver_account) {
-            frappe.throw({ message: `<b>Paver Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res" });
+            frappe.throw({ message: `<b>Paver Account</b> is mandatory at <b>Common Expenses</b> #row ${row.idx}`, title: "Missing Fields", indicator: "red" });
         }
         if (row.compound_wall && !row.cw_account) {
-            frappe.throw({ message: `<b>Compound Wall Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res" });
+            frappe.throw({ message: `<b>Compound Wall Account</b> is mandatory at <b>Common Expenses</b> #row ${row.idx}`, title: "Missing Fields", indicator: "red" });
         }
         if (row.lego_block && !row.lg_account) {
-            frappe.throw({ message: `<b>Lego Block Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res" });
+            frappe.throw({ message: `<b>Lego Block Account</b> is mandatory at <b>Common Expenses</b> #row ${row.idx}`, title: "Missing Fields", indicator: "red" });
         }
         if (row.fencing_post && !row.fp_account) {
-            frappe.throw({ message: `<b>Fencing Post Account</b> is mandatory at <b>Common Expenses</b> #row${row.idx}`, title: "Missing Fields", indicator: "res" });
+            frappe.throw({ message: `<b>Fencing Post Account</b> is mandatory at <b>Common Expenses</b> #row ${row.idx}`, title: "Missing Fields", indicator: "red" });
+        }
+    });
+}
+
+async function get_common_expenses(frm) {
+    await frappe.call({
+        method: "ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.monthly_cost",
+        freeze: true,
+        freeze_message: "Fetching Data...",
+        callback: async function (r) {
+            var a = r.message
+            for (var i = 0; i < (r.message).length; i++) {
+                if (a[i]["monthly_cost"]) {
+                    var row = frm.add_child("common_expenses"); await cur_frm.fields_dict.common_expenses.refresh()
+                    frappe.model.set_value(row.doctype, row.name, "account", a[i]["paver"][0] || "");
+                    frappe.model.set_value(row.doctype, row.name, "debit", a[i]["monthly_cost"] || "");
+                    if (a[i]["paver"][0]) {
+                        frappe.model.set_value(row.doctype, row.name, "paver_account", a[i]["paver"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "paver", 1);
+                    }
+                    if (a[i]["cw"][0]) {
+                        frappe.model.set_value(row.doctype, row.name, "cw_account", a[i]["cw"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "compound_wall", 1);
+                    }
+                    if (a[i]["lg"][0]) {
+                        frappe.model.set_value(row.doctype, row.name, "lg_account", a[i]["lg"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "lego_block", 1);
+                    }
+                    if (a[i]["fp"][0]) {
+                        frappe.model.set_value(row.doctype, row.name, "fp_account", a[i]["fp"][0] || "");
+                        frappe.model.set_value(row.doctype, row.name, "fencing_post", 1);
+                    }
+                }
+            }
+            await cur_frm.fields_dict.common_expenses.refresh();
         }
     });
 }
