@@ -1,10 +1,27 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
 
+from erpnext.stock.stock_ledger import get_previous_sle
 import frappe
 from frappe.model.document import Document
-from erpnext.healthcare.doctype.clinical_procedure.clinical_procedure import get_stock_qty
+from frappe.utils.data import nowdate, nowtime
 from ganapathy_pavers import uom_conversion
+
+def get_stock_qty(item_code, warehouse):
+	qty = get_previous_sle({
+		'item_code': item_code,
+		'warehouse': warehouse,
+		'posting_date': nowdate(),
+		'posting_time': nowtime()
+	}).get('qty_after_transaction') or 0
+	return dsm_uom_conversion(item_code, qty)
+
+def dsm_uom_conversion(item, qty, uom=None):
+	to_uom=frappe.db.get_value("Item", item, "dsm_uom")
+	if not to_uom:
+		return qty
+	return uom_conversion(item=item, from_uom=uom, from_qty=qty, to_uom=to_uom)
+
 
 
 def daily_maintenance_print_format(doc):
