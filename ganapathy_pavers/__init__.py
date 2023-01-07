@@ -5,22 +5,24 @@ from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing
 import frappe
 
 def uom_conversion(item : str, from_uom='', from_qty=0, to_uom='') -> float:
-    if(not from_uom):
-        from_uom = frappe.get_value('Item', item, 'stock_uom')
-    item_doc = frappe.get_doc('Item', item)
-    from_conv = 0
-    to_conv = 0
-    for row in item_doc.uoms:
-        if(row.uom == from_uom):
-            from_conv = row.conversion_factor
-        if(row.uom == to_uom):
-            to_conv = row.conversion_factor
-    if(not from_conv):
-        throw_error(from_uom + " Conversion", item)
-    if(not to_conv):
-        throw_error(to_uom + " Conversion", item)
-    
-    return (float(from_qty) * from_conv) / to_conv
+	if (not to_uom):
+		return from_qty
+	if(not from_uom):
+		from_uom = frappe.get_value('Item', item, 'stock_uom')
+	item_doc = frappe.get_doc('Item', item)
+	from_conv = 0
+	to_conv = 0
+	for row in item_doc.uoms:
+		if(row.uom == from_uom):
+			from_conv = row.conversion_factor
+		if(row.uom == to_uom):
+			to_conv = row.conversion_factor
+	if(not from_conv):
+		throw_error(from_uom + " Conversion", item)
+	if(not to_conv):
+		throw_error(to_uom + " Conversion", item)
+
+	return (float(from_qty) * from_conv) / to_conv
 
 
 def get_valuation_rate(item_code : str, warehouse : str, posting_date=None) -> float:

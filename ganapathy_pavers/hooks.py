@@ -131,6 +131,11 @@ jenv = {
 }
 
 doc_events = {
+	"Item": {
+		"validate": [
+			"ganapathy_pavers.custom.py.item.validate_dsm_uom"
+		]
+	},
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
 		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset",
