@@ -34,11 +34,8 @@ def execute(filters=None):
 								sum(labour_expense) as labour_expense,
 								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
 								avg(shot_blast_per_sqft) as shot_blast_per_sqft,
-								sum(labour_cost_manufacture) as labour_cost_manufacture,
-								sum(labour_cost_in_rack_shift) as labour_cost_in_rack_shift,
-								sum(labour_cost_per_sqft) as labour_cost_per_sqft,
-								sum(operators_cost_in_manufacture) as operators_cost_in_manufacture,
-								sum(operators_cost_in_rack_shift) as operators_cost_in_rack_shift
+								AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense)/production_sqft) as labour_cost,
+								AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift)/production_sqft) as operator_cost
 								from `tabMaterial Manufacturing` where name  {0} """.format(condition),as_dict=1)
 
 		
@@ -90,7 +87,7 @@ def execute(filters=None):
 			"uom":None,
 			"rate":"<b>Total Labour Cost</b>",
 	 		"amount":None,
-			"cost_per_sqft":f"<b>₹{production_qty[0]['labour_cost_manufacture']/production_qty[0]['production_sqft'] + production_qty[0]['labour_cost_in_rack_shift']/production_qty[0]['production_sqft']+ production_qty[0]['labour_cost_per_sqft']:,.2f}</b>"
+			"cost_per_sqft":f"<b>₹{production_qty[0]['labour_cost']:,.2f}</b>"
 		})
 		test_data.append({
 			"material":None,
@@ -99,7 +96,7 @@ def execute(filters=None):
 			"uom":None,
 			"rate":"<b>Total Operator Cost</b>",
 	 		"amount":None,
-			"cost_per_sqft":f"<b>₹{production_qty[0]['operators_cost_in_manufacture']/production_qty[0]['production_sqft'] + production_qty[0]['operators_cost_in_rack_shift']/production_qty[0]['production_sqft']:,.2f}</b>"
+			"cost_per_sqft":f"<b>₹{production_qty[0]['operator_cost']:,.2f}</b>"
 		})
 
 
@@ -172,7 +169,8 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 			child, total_sqf, total_amt=get_expense_from_child(prod_sqft, i['child_nodes'], sqft, total_sqf, total_amt)
 			if child:
 				res.append(dic)
-				res+=child
+				if not filters.get("expense_summary"):
+					res+=child
 				res+=group_total(child)
 		else:
 			if i["balance"]:
