@@ -155,10 +155,28 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Labours&Operators Expenses Report",
+   "link_to": "",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Labours&Operators Expenses",
+   "link_to": "Labour & Operators Expenses",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2023-01-04 12:41:31.681247",
- "modified_by": "admin@gmail.com",
+ "modified": "2023-01-07 17:37:50.853808",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "SGP Manufacturing",
  "onboarding": "Manufacturing",
