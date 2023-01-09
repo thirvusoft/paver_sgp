@@ -146,8 +146,14 @@ doc_events = {
                       "on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary"
           },
 	"Salary Slip":{
-        		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update",
-				"on_cancel":"ganapathy_pavers.utils.py.salary_slip.employee_update",
+        		"on_submit":[
+					"ganapathy_pavers.utils.py.salary_slip.employee_update",
+					"ganapathy_pavers.utils.py.salary_slip.additional_salary_update",
+					],
+				"on_cancel":[
+					"ganapathy_pavers.utils.py.salary_slip.employee_update",
+					"ganapathy_pavers.utils.py.salary_slip.additional_salary_update",
+					],
 				'validate':"ganapathy_pavers.utils.py.salary_slip.validate_salaryslip"
 	},
 	"Driver":{
