@@ -39,10 +39,15 @@ frappe.ui.form.on("Purchase Invoice", {
                 create_vehicle_log(frm)
             }, "Create");
         }
+    },
+    on_submit: function(frm) {
+        if (cur_frm.tags.tags.tagsList.length===0) {
+            scroll_to_tags()
+        }
     }
 });
 
-async function create_vehicle_log(frm) {z
+async function create_vehicle_log(frm) {
     date = cur_frm.doc.posting_date
     if (frm.doc.vehicle) {
         await frappe.run_serially([
@@ -90,4 +95,14 @@ async function create_vehicle_log(frm) {z
         });
         d.show()
     }
+}
+
+function scroll_to_tags() {
+    let $el = cur_frm.tags.wrapper[0];
+    frappe.utils.scroll_to($el, true, 15);
+    $el.style.border="1px solid red"
+    setTimeout(() => {
+        $el.style.border="";
+        $el.focus();
+    }, 1000);
 }

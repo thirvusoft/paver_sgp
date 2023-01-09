@@ -131,6 +131,11 @@ jenv = {
 }
 
 doc_events = {
+	"Item": {
+		"validate": [
+			"ganapathy_pavers.custom.py.item.validate_dsm_uom"
+		]
+	},
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
 		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset",
@@ -141,8 +146,14 @@ doc_events = {
                       "on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary"
           },
 	"Salary Slip":{
-        		"on_submit":"ganapathy_pavers.utils.py.salary_slip.employee_update",
-				"on_cancel":"ganapathy_pavers.utils.py.salary_slip.employee_update",
+        		"on_submit":[
+					"ganapathy_pavers.utils.py.salary_slip.employee_update",
+					"ganapathy_pavers.utils.py.salary_slip.additional_salary_update",
+					],
+				"on_cancel":[
+					"ganapathy_pavers.utils.py.salary_slip.employee_update",
+					"ganapathy_pavers.utils.py.salary_slip.additional_salary_update",
+					],
 				'validate':"ganapathy_pavers.utils.py.salary_slip.validate_salaryslip"
 	},
 	"Driver":{
@@ -230,12 +241,14 @@ doc_events = {
 		"on_cancel":[
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
-					 ],
+					],
 		
   	},
 	"Vehicle":{
-        "validate":["ganapathy_pavers.custom.py.vehicle.reference_date",
-		            "ganapathy_pavers.custom.py.vehicle.vehicle_common_groups"]
+        "validate":[
+					"ganapathy_pavers.custom.py.vehicle.reference_date",
+					"ganapathy_pavers.custom.py.vehicle.vehicle_common_groups"
+					],
     },
  	"Employee Checkin":{
         "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",

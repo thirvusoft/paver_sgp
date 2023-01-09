@@ -104,9 +104,21 @@ frappe.ui.form.on('Salary Slip',{
     },
     start_date: function (frm) {
         cur_frm.trigger('employee')
+       frm.trigger("__days_calc");
     },
     end_date: function (frm) {
         cur_frm.trigger('employee')
+        frm.trigger("__days_calc");
+    },
+    __days_calc: function(frm) {
+        if (frm.doc.start_date && frm.doc.end_date) {
+            frm.set_value("days", moment(frm.doc.end_date).diff(frm.doc.start_date, "days")+1)
+        } else {
+            frm.set_value("days", 0)
+        }
+    },
+    days: function (frm) {
+        frm.trigger("__days_calc");
     },
     total_time_of_food_taken:function(frm){
         var emp = frm.doc.employee

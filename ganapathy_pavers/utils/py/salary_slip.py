@@ -1,8 +1,50 @@
-from time import time
-from frappe.utils import (getdate,flt)
-from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip
+from erpnext.hr.utils import validate_active_employee
+from frappe.utils import getdate
+from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip, get_salary_component_data
 import frappe
+from frappe import _
+from frappe.utils.data import flt
+
 class CustomSalary(SalarySlip):
+    def validate(self):
+        self.status = self.get_status()
+        validate_active_employee(self.employee)
+        self.validate_dates()
+        self.check_existing()
+        if not self.salary_slip_based_on_timesheet:
+            self.get_date_details()
+
+        if not (len(self.get("earnings")) or len(self.get("deductions"))):
+            # get details from salary structure
+            self.get_emp_and_working_day_details()
+        else:
+            self.get_working_days_details(lwp = self.leave_without_pay)
+
+        self.calculate_net_pay____()
+        self.compute_year_to_date()
+        self.compute_month_to_date()
+        self.compute_component_wise_year_to_date()
+        self.add_leave_balances()
+
+        if frappe.db.get_single_value("Payroll Settings", "max_working_hours_against_timesheet"):
+            max_working_hours = frappe.db.get_single_value("Payroll Settings", "max_working_hours_against_timesheet")
+            if self.salary_slip_based_on_timesheet and (self.total_working_hours > int(max_working_hours)):
+                frappe.msgprint(_("Total working hours should not be greater than max working hours {0}").
+                                format(max_working_hours), alert=True)
+
+    def calculate_net_pay____(self):
+        if self.salary_structure:
+            self.calculate_component_amounts("earnings")
+        self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1)
+        self.base_gross_pay = flt(flt(self.gross_pay) * flt(self.exchange_rate), self.precision('base_gross_pay'))
+
+        # if self.salary_structure:
+        #     self.calculate_component_amounts("deductions")
+
+        self.set_loan_repayment()
+        self.set_precision_for_component_amounts()
+        self.set_net_pay()
+
     def set_time_sheet(self):
         if self.salary_slip_based_on_timesheet:
             self.set("timesheets", [])
@@ -23,6 +65,19 @@ class CustomSalary(SalarySlip):
                 ot_hours+=data.overtime_hours
             self.total_overtime_hours=ot_hours
             self.days_worked=total_days
+    
+    def add_additional_salary_components(self, component_type):
+        additional_salaries = get_additional_salaries(self.employee,
+            self.start_date, self.end_date, component_type)
+
+        for additional_salary in additional_salaries:
+            self.update_component_row(
+                get_salary_component_data(additional_salary.component),
+                additional_salary.amount,
+                component_type,
+                additional_salary,
+                is_recurring = additional_salary.is_recurring
+            )
 
 @frappe.whitelist(allow_guest=True)
 def site_work_details(employee,start_date,end_date):
@@ -94,7 +149,7 @@ def validate_salary_slip(self, event):
         ssa=frappe.get_all("Salary Structure Assignment", filters={'employee':self.employee, 'docstatus':1,'designation':"Labour Worker"}, pluck="base")
         employee=frappe.get_value("Employee",self.employee,'reports_to')
         ccr=frappe.get_all("Contractor Commission Rate", filters={'name':employee},fields=['contractor','commission_rate'])
-        commission=ssa[0]-ccr[0]['commission_rate']
+        commission=(ssa[0] if ssa else 0)-(ccr[0]['commission_rate'] if ccr and ccr[0].get("commission_rate") else 0)
         basic=commission*self.total_working_hour
         if len(self.earnings)==0:
             self.update({'earnings':[{'salary_component':'Basic'}]})
@@ -174,3 +229,81 @@ def validate_contrator_welfare(self, event):
 
 
             
+@frappe.whitelist()
+def get_additional_salaries(employee, start_date, end_date, component_type):
+    comp_type = 'Earning' if component_type == 'earnings' else 'Deduction'
+
+    # additional_sal = frappe.qb.DocType('Additional Salary')
+    # component_field = additional_sal.salary_component.as_('component')
+    # overwrite_field = additional_sal.overwrite_salary_structure_amount.as_('overwrite')
+
+    # additional_salary_list = frappe.qb.from_(
+    #     additional_sal
+    # ).select(
+    #     additional_sal.name, component_field, additional_sal.type,
+    #     (additional_sal.amount - additional_sal.salary_slip_amount).as_("amount"), additional_sal.is_recurring, overwrite_field,
+    #     additional_sal.deduct_full_tax_on_selected_payroll_date
+    # ).where(
+    #     (additional_sal.employee == employee)
+    #     & (additional_sal.docstatus == 1)
+    #     & (additional_sal.type == comp_type)
+    #     & (additional_sal.salary_slip_amount < additional_sal.amount)
+    # ).where(
+    #     # additional_sal.payroll_date[start_date: end_date] |
+    #     ((additional_sal.payroll_date <= end_date))
+    # ).run(as_dict=True)
+
+
+    additional_salary_list=frappe.db.sql(f"""
+        select 
+            additional_sal.name, additional_sal.salary_component as component, additional_sal.type,
+            (additional_sal.amount - additional_sal.salary_slip_amount) as amount, additional_sal.is_recurring, additional_sal.overwrite_salary_structure_amount as overwrite,
+            additional_sal.deduct_full_tax_on_selected_payroll_date
+        from `tabAdditional Salary` additional_sal
+        where 
+            additional_sal.employee='{employee}' and additional_sal.docstatus = 1 and 
+            additional_sal.type = "{comp_type}" and additional_sal.salary_slip_amount < additional_sal.amount and
+            additional_sal.payroll_date <= "{end_date}"
+    """, as_dict=True)
+    
+    
+    additional_salaries = []
+    components_to_overwrite = []
+
+    for d in additional_salary_list:
+        if d.overwrite:
+            if d.component in components_to_overwrite:
+                frappe.throw(_("Multiple Additional Salaries with overwrite property exist for Salary Component {0} between {1} and {2}.").format(
+                    frappe.bold(d.component), start_date, end_date), title=_("Error"))
+
+            components_to_overwrite.append(d.component)
+
+        additional_salaries.append(d)
+    return additional_salaries
+
+def additional_salary_update(self, event=None):
+    for row in self.deductions:
+        if row.additional_salary:
+            previous_deduction=frappe.db.get_value("Additional Salary", row.additional_salary, "salary_slip_amount")
+            additional_salary=frappe.get_doc("Additional Salary", row.additional_salary)
+            if event=="on_submit":
+                if row.amount + previous_deduction > additional_salary.amount:
+                    frappe.throw(f"""Salary Deduction cannot be greater than Employee Advance or Additional Salary at #row {row.idx} for employee <b>{self.employee_name}{f" - {self.employee}" if self.employee!=self.employee_name else ""}</b>""")
+                add_row=True
+                for ss_row in additional_salary.salary_slip_reference:
+                    if ss_row.salary_slip==self.name:
+                        ss_row.amount+=row.amount
+                        add_row=False
+                if add_row:
+                    additional_salary.update({
+                        "salary_slip_reference": additional_salary.salary_slip_reference + [{"salary_slip": self.name, "amount": row.amount}]
+                    })
+                additional_salary.salary_slip_amount= row.amount + previous_deduction
+                
+            if event=="on_cancel" and (additional_salary.amount - row.amount)>=0:
+                for ss_row in additional_salary.salary_slip_reference:
+                        if ss_row.salary_slip==self.name:
+                            ss_row.amount-=row.amount
+                            add_row=False
+                additional_salary.salary_slip_amount= additional_salary.amount - row.amount
+            additional_salary.save('Update')
