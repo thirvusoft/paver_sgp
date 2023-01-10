@@ -49,11 +49,11 @@ def execute(filters=None):
 	
 def get_columns():
    columns = [
-	   ("Manufacturing") + ":Dta:200",
-	   ("Total Labour Cost ") + ":Data:200",
-	   ("Labour Cost Per SQF ") + ":Data:200",
-	   ("Total Operators Cost") + ":Data:200",
-	   ("Operator Cost Per SQF ") + ":Data:200",
+	   ("Manufacturing") + ":Dta:250",
+	   ("Total Labour Cost ") + ":Data:250",
+	   ("Labour Cost Per SQF ") + ":Data:250",
+	   ("Total Operators Cost") + ":Data:250",
+	   ("Operator Cost Per SQF ") + ":Data:250",
 	  
 	  
 	   ]
