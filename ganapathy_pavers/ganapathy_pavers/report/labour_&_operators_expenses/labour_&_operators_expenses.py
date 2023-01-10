@@ -22,7 +22,10 @@ def execute(filters=None):
 		cw_filt+=  " molding_date between '{0}' and '{1}' ".format(from_date,to_date)
 	
 	if filters.get("machine"):
-		pm_filt += " and work_station in {0} ".format(tuple(machine))
+		if len(machine) == 1:
+			pm_filt += " and work_station = '{0}' ".format(machine[0])
+		else:
+			pm_filt += " and work_station in {0} ".format(tuple(machine[0]))
 
 
 	final_list=[]
