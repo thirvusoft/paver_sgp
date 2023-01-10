@@ -86,22 +86,6 @@ frappe.ui.form.on('Salary Slip',{
             }         
         });
     },
-    pay_the_balance:function(frm){
-        if(frm.doc.pay_the_balance==1){
-            frm.set_value('total_paid_amount',frm.doc.total_paid_amount+frm.doc.salary_balance)
-            frm.set_value('total_amount',frm.doc.total_amount+frm.doc.salary_balance)
-            frm.set_value('salary_balance',0)
-        }
-        else{
-                frappe.db.get_value("Employee", {"name": frm.doc.employee}, "salary_balance", (r) => {
-                    salary_balance=r.salary_balance                    
-                });
-                frm.set_value('salary_balance',salary_balance)
-                frm.set_value('total_paid_amount',frm.doc.total_paid_amount-frm.doc.salary_balance)
-                frm.set_value('total_amount',frm.doc.total_amount-frm.doc.salary_balance)
-        }
-
-    },
     start_date: function (frm) {
         cur_frm.trigger('employee')
        frm.trigger("__days_calc");
@@ -149,7 +133,7 @@ frappe.ui.form.on('Salary Slip',{
         //     frm.scroll_to_field("paid_amount")
         //     return
         // }
-        if ((frm.doc.paid_amount || 0)>((frm.doc.salary_balance || 0)+(frm.doc.total_amount || 0))) {
+        if (roundNumber(frm.doc.paid_amount || 0)>roundNumber((frm.doc.salary_balance || 0)+(frm.doc.total_amount || 0))) {
             frappe.show_alert({message: "Paid Amount can't be greater than Total Amount", indicator: "red"})
             frm.scroll_to_field("paid_amount")
             return
@@ -183,13 +167,13 @@ frappe.ui.form.on('Site work Details',{
             amount_to_pay+=paid_data[value].paid_amount
         }
         frappe.model.set_value(row.doctype,row.name, "balance_amount",row.amount - row.paid_amount)
-        if(frm.doc.pay_the_balance){
+        // if(frm.doc.pay_the_balance){
 
-            frm.set_value('total_paid_amount',salary_balance+amount_to_pay)
-        }  
-        else{
-            frm.set_value('total_paid_amount',amount_to_pay)
-        } 
+        //     frm.set_value('total_paid_amount',salary_balance+amount_to_pay)
+        // }  
+        // else{
+        //     frm.set_value('total_paid_amount',amount_to_pay)
+        // } 
         
 }
 })
