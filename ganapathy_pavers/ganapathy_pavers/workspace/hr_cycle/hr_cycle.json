@@ -24,9 +24,18 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Additional Salary Deductions",
+   "link_to": "Additional Salary Deductions",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2022-10-10 10:51:32.548664",
+ "modified": "2023-01-11 11:13:45.239631",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "HR Cycle",

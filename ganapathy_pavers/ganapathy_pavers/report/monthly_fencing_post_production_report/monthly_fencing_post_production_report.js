@@ -18,5 +18,10 @@ frappe.query_reports["Monthly Fencing Post Production Report"] = {
 			"width": "80",
 			"reqd":1
 		},
+		{
+			"fieldname": "expense_summary",
+			"label": __("Expense Summary"),
+			"fieldtype": "Check",
+		}
 	]
 };

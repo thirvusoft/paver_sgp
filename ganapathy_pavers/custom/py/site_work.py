@@ -6,7 +6,7 @@ from frappe.utils import nowdate
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import get_bank_cash_account
 from ganapathy_pavers.custom.py.sales_order import get_item_rate
 from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
-from ganapathy_pavers import get_valuation_rate, get_buying_rate
+from ganapathy_pavers import get_valuation_rate, get_buying_rate, uom_conversion
 
 
 
@@ -158,21 +158,23 @@ def validate(self,event):
         })
 
 def validate_jw_qty(self):
+    bundle_uom="Bdl"
+    sqf_uom="SQF"
     delivered_item={}
     for row in self.delivery_detail:
         if(row.item not  in delivered_item):
             delivered_item[row.item]=0
-        delivered_item[row.item]+=row.delivered_stock_qty+row.returned_stock_qty
+        bundle_qty=uom_conversion(item=row.item, from_qty=row.delivered_stock_qty+row.returned_stock_qty, to_uom=bundle_uom)
+        delivered_item[row.item]+=round(bundle_qty)
     jw_items={}
     for row in self.job_worker:
         if(row.item and not row.other_work):
             if(row.item not  in jw_items):
                 jw_items[row.item]=0
-            item_doc=frappe.get_doc('Item', row.item)
-            conv_factor=[conv.conversion_factor for conv in item_doc.uoms if(conv.uom=="SQF")]
-            if(not conv_factor):
-                frappe.throw('Please enter Square Feet Conversion for an item: '+ frappe.bold(getlink('Item', row.item)))
-            jw_items[row.item]+=float(row.sqft_allocated or 0)*conv_factor[0]
+            
+            bundle_qty=uom_conversion(item=row.item, from_uom=sqf_uom, from_qty=row.sqft_allocated, to_uom=bundle_uom)
+            jw_items[row.item]+=round(bundle_qty)
+            
     wrong_items=[]
     for item in jw_items:
         if((jw_items.get(item) or 0)>math.ceil(delivered_item.get(item) or 0)):

@@ -19,6 +19,11 @@ frappe.query_reports["Monthly Compound Wall Production Report"] = {
 			"default": frappe.datetime.get_today(),
 			"width": "80",
 			"reqd":1
+		},
+		{
+			"fieldname": "expense_summary",
+			"label": __("Expense Summary"),
+			"fieldtype": "Check",
 		}
 	]
  };

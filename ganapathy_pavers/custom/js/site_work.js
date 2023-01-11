@@ -249,13 +249,11 @@ frappe.ui.form.on('TS Job Worker Details',{
 		let work= cur_frm.doc.job_worker?cur_frm.doc.job_worker:[]
 		var name
 		var start_date
-		let rate
 		var date
 		for(let row=0;row<work.length;row++){
 			if(row){
 				name = cur_frm.doc.job_worker[row-1].name1
 				start_date = cur_frm.doc.job_worker[row-1].end_date?cur_frm.doc.job_worker[row-1].end_date:cur_frm.doc.job_worker[row-1].start_date
-				rate = cur_frm.doc.job_worker[row-1].rate
 				date = frappe.datetime.add_days(start_date,1)
 			}
 			else{
@@ -265,7 +263,6 @@ frappe.ui.form.on('TS Job Worker Details',{
 		frappe.model.set_value(cdt,cdn,"name1",name)
 		frappe.model.set_value(cdt,cdn,"start_date",date)
 		frappe.model.set_value(cdt,cdn,"end_date",date)
-		frappe.model.set_value(cdt,cdn,"rate",rate)
 	},
 	no_of_person: function(frm, cdt, cdn) {
 		let data=locals[cdt][cdn]

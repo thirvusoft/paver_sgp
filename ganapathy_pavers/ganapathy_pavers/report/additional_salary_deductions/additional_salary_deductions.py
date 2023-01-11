@@ -17,7 +17,7 @@ def get_data(filters=None):
 		for row in additional_salaries:
 			conditions=f""" where ads.docstatus=1 and ads.name='{row.name}' and IFNULL(ssr.salary_slip, "")!="" and IFNULL(ssr.amount, 0)>0"""
 			if filters.get("employee"):
-				conditions+=f""" and ads.employee='{filters.get("employee")}"""
+				conditions+=f""" and ads.employee='{filters.get("employee")}'"""
 			ss_data=frappe.db.sql(f"""
 				select ssr.salary_slip, ssr.amount as salary_slip_amount
 				from `tabSalary Slip Reference` ssr left outer join `tabAdditional Salary` as ads
