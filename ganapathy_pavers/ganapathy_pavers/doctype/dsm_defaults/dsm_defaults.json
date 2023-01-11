@@ -17,6 +17,10 @@
   "column_break_11",
   "compound_wall",
   "cw_wh",
+  "section_break_12",
+  "warehouse_for_pavers_and_compound_walls",
+  "column_break_14",
+  "warehouse_for_colour_powder_items",
   "section_break_15",
   "items"
  ],
@@ -88,12 +92,32 @@
    "fieldtype": "Link",
    "label": "Machine3 Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "warehouse_for_pavers_and_compound_walls",
+   "fieldtype": "Link",
+   "label": "Warehouse for Pavers and Compound Walls",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warehouse_for_colour_powder_items",
+   "fieldtype": "Link",
+   "label": "Warehouse for Colour Powder Items",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-11-25 13:04:37.251810",
+ "modified": "2023-01-07 10:44:23.010354",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "DSM Defaults",

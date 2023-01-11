@@ -253,7 +253,8 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 			child, total_sqf, total_amt=get_expense_from_child(prod_sqft, i['child_nodes'], sqft, total_sqf, total_amt)
 			if child:
 				res.append(dic)
-				res+=child
+				if not filters.get("expense_summary"):
+					res+=child
 				res+=group_total(child)
 		else:
 			if i["balance"]:

@@ -2,6 +2,14 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Daily Maintenance', {
+	refresh: async function (frm) { 
+		if (frm.is_new()) {
+			let fi = await frappe.db.get_single_value("DSM Defaults", "warehouse_for_pavers_and_compound_walls"),
+				raw = await frappe.db.get_single_value("DSM Defaults", "warehouse_for_colour_powder_items")
+			frm.set_value("warehouse", fi);
+			frm.set_value("warehouse_colour", raw);
+		}
+	},
 	get_attendance_details: function (frm) {
 		frappe.call({
 			method: "ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.get_attendance_details",

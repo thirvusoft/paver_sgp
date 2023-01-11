@@ -14,7 +14,7 @@ def total_no_salary(doc,action):
         
 @frappe.whitelist()
 def operator_salary(operator):
-    salary = sum(frappe.get_all("Salary Structure Assignment", filters={'employee':operator}, pluck='base')) / 26
+    salary = sum(frappe.get_all("Salary Structure Assignment", filters={'employee':operator, 'docstatus': 1}, pluck='base')) / 26
     return salary
 
 
