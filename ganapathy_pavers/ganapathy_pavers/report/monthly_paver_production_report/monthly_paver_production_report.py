@@ -42,22 +42,11 @@ def execute(filters=None):
 		
 		test_data.append({
 			"material":"-",
-			"qty":f"""<b>Item:</b> {production_qty[0]['item_to_manufacture']  if filters.get("item_to_manufacture") else ""}""",
+			"qty":f"""<b>Item:</b> {production_qty[0]['item_to_manufacture']}"""   if filters.get("item") else "",
 			"sqft":f"<b>SQFT :</b> {production_qty[0]['production_sqft']:,.3f}",
 			"uom":f"<b>Production Cost per SQFT :</b> ₹{production_qty[0]['item_price']:,.3f}",
-			"rate":None,
-			"amount":None,
-			"cost_per_sqft":None
 		})
-		test_data.append({
-			"material":None,
-			"qty":None,
-			"sqft":None,
-			"uom":None,
-			"rate":None,
-			"amount":None,
-			"cost_per_sqft":None
-		})
+		test_data.append({})
 		total_cost_per_sqft = 0
 		for item in bom_item:
 			test_data.append({
@@ -72,49 +61,45 @@ def execute(filters=None):
 			total_cost_per_sqft += item[4] / production_qty[0]['production_sqft']
 
 		test_data.append({
-			"material":None,
-			"qty":None,
-			"sqft":None,
-			"uom":None,
-			"rate":"<b>Total Production Cost</b>",
+			"rate":"<b>Production Cost</b>",
 			"amount":f"<b>₹{production_qty[0]['rack_shifting_total_expense1'] + production_qty[0]['total_expense'] + production_qty[0]['labour_expense']:,.2f}</b>",
 			"cost_per_sqft":f"<b>₹{total_cost_per_sqft:,.3f}</b>"
 		})
 		test_data.append({
-			"material":None,
-			"qty":None,
-			"sqft":None,
-			"uom":None,
-			"rate":"<b>Total Labour Cost</b>",
-	 		"amount":None,
+			"rate":"<b>Labour Cost Per Sqft</b>",
 			"cost_per_sqft":f"<b>₹{production_qty[0]['labour_cost']:,.2f}</b>"
 		})
 		test_data.append({
-			"material":None,
-			"qty":None,
-			"sqft":None,
-			"uom":None,
-			"rate":"<b>Total Operator Cost</b>",
-	 		"amount":None,
+			"rate":"<b>Operator Cost Per Sqft</b>",
 			"cost_per_sqft":f"<b>₹{production_qty[0]['operator_cost']:,.2f}</b>"
+		})
+		test_data.append({
+			"rate":"<b style='color: orange;'>Labour Expense Per Sqft</b>",
+			"cost_per_sqft":f"<b style='color: orange;'>₹{(production_qty[0]['operator_cost']+production_qty[0]['labour_cost']):,.2f}</b>"
 		})
 
 
 		abstract_cost = {
-				
 				"Strapping Cost":production_qty[0]['strapping_cost_per_sqft'],
-				"Shot Blasting Cost":production_qty[0]['shot_blast_per_sqft']}
+				"Shot Blasting Cost":production_qty[0]['shot_blast_per_sqft']
+		}
 
 		for cost in abstract_cost:
 			test_data.append({
-				"material":None,
-				"qty":None,
-				"consumption":None,
-				"uom":None,
 				"rate":f"<b>{cost}</b>",
-				"amount":None,
 				"cost_per_sqft":f"<b>₹{abstract_cost[cost]:,.2f}</b>"
 			})
+
+		production_cost_per_sqft= (
+				total_cost_per_sqft+
+				production_qty[0]['labour_cost']+
+				production_qty[0]['operator_cost']+
+				sum([abstract_cost[cost] or 0 for cost in abstract_cost]))
+
+		test_data.append({
+			"rate":"<b style='color: orange;'>Total Production Cost</b>",
+			"cost_per_sqft":f"""<b style='color: orange;'>₹{(production_cost_per_sqft):,.3f}</b>"""
+		})
 
 		if len(test_data) > 2:
 			data += test_data
@@ -140,6 +125,8 @@ def execute(filters=None):
 					"sqft": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_sqf, 4)}</b>",
 					"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 4)}</b>"
 				})
+				if data and len(data)>0:
+					data[0]["uom"] = f"<b>Production Cost per SQFT :</b> ₹{((production_cost_per_sqft or 0)+(total_sqf or 0)):,.3f}"
 	columns = get_columns()
 	return columns, data
 
