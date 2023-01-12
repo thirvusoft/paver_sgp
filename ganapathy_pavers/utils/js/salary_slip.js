@@ -21,7 +21,7 @@ frappe.ui.form.on('Salary Slip',{
                         total_unpaid_amount=total_unpaid_amount+r.message[data][1]
                         var child = cur_frm.add_child("site_work_details");
                         frappe.model.set_value(child.doctype, child.name, "site_work_name", r.message[data][0])     
-                        // frappe.model.set_value(child.doctype, child.name, "amount",r.message[data][1] )
+                        frappe.model.set_value(child.doctype, child.name, "amount",r.message[data][1] )
                         // frappe.model.set_value(child.doctype, child.name, "balance_amount",r.message[data][1] )   
                     }
                     cur_frm.refresh_field("site_work_details")

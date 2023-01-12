@@ -120,7 +120,7 @@ def execute(filters=None):
 					"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 4)}</b>"
 				})
 		if data and len(data)>0:
-			data[0]['uom']=f"<b>Production Cost per SQFT :</b> ₹{(production_qty[0]['total_cost_per_sqft'] - production_qty[0]['raw_material_cost_per_sqft'] + total_cost_per_sqft + round(total_sqf, 4)):,.3f}"
+			data[0]['uom']=f"""<b>Production Cost per SQFT :</b> ₹{(production_qty[0]['total_cost_per_sqft'] - production_qty[0]['raw_material_cost_per_sqft'] + total_cost_per_sqft + round(total_sqf, 4) - (((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0))/2)):,.3f}"""
 	columns = get_columns()
 	return columns, data
  
