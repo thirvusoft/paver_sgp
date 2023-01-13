@@ -123,6 +123,7 @@ jenv = {
 		"get_bank_details:ganapathy_pavers.get_bank_details",
 		"uom_conversion:ganapathy_pavers.uom_conversion",
 		"item_list:ganapathy_pavers.utils.py.sitework_printformat.site_work",
+		"print_item_name:ganapathy_pavers.utils.py.sales_invoice_printformat.sales_invoice_print_format",
 		"bundle_sum:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.print_format",
 		"get_daily_maintenance_html:ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.daily_maintenance_print_format",
 		"get_raw_materials_for_print:ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.get_raw_materials_for_print",

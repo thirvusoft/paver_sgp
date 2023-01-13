@@ -20,6 +20,7 @@ def execute(filters=None):
 								select sum(production_sqft) as production_sqft,
 								avg(total_cost_per_sqft) as total_cost_per_sqft,
 								sum(total_expence) as total_expence,
+								sum(raw_material_cost) as raw_material_cost,
 								sum(total_expense_for_unmolding) as total_expense_for_unmolding,
 								sum(labour_expense_for_curing) as total_expense_for_curing,
 								avg(labour_cost_per_sqft) as labour_cost_per_sqft,
@@ -28,11 +29,17 @@ def execute(filters=None):
 								avg(additional_cost_per_sqft) as additional_cost_per_sqft,
 								avg(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name in {0} """.format(tuple(cw_list)),as_dict=1)
 
+		
+		total_cost_per_sqft = 0
+		for item in bom_item:
+			total_cost_per_sqft += item[4] / production_qty[0]['production_sqft']
+
+
 		test_data.append({
 			"material":"-",
 			"qty":"-",
 			"consumption":f"<b>SQFT :</b> {production_qty[0]['production_sqft']:,.3f}",
-			"uom":f"<b>Production Cost per SQFT :</b> ₹{production_qty[0]['total_cost_per_sqft']:,.3f}",
+			"uom":f"<b>Production Cost per SQFT :</b> ₹{(production_qty[0]['total_cost_per_sqft'] - production_qty[0]['raw_material_cost_per_sqft'] + total_cost_per_sqft):,.3f}",
 			"rate":None,
 			"amount":None,
 			"cost_per_sqft":None
@@ -65,13 +72,15 @@ def execute(filters=None):
 			"consumption":None,
 			"uom":None,
 			"rate":"<b>Total Production Cost</b>",
-			"amount":f"<b>₹{production_qty[0]['total_expence'] + production_qty[0]['total_expense_for_unmolding'] + production_qty[0]['total_expense_for_curing']:,.2f}</b>",
+			"amount": f"<b>₹{production_qty[0]['raw_material_cost']:,.2f}</b>",
+			# "amount":f"<b>₹{production_qty[0]['total_expence'] + production_qty[0]['total_expense_for_unmolding'] + production_qty[0]['total_expense_for_curing']:,.2f}</b>",
 			"cost_per_sqft":f"<b>₹{total_cost_per_sqft:,.3f}</b>"
 		})
 
-		abstract_cost = {"Total Raw Material Cost":production_qty[0]['raw_material_cost_per_sqft'],
+		abstract_cost = {#"Total Raw Material Cost":production_qty[0]['raw_material_cost_per_sqft'],
 				"Total Labour Cost":production_qty[0]["labour_cost_per_sqft"],
 				"Total Operator Cost":production_qty[0]['operator_cost_per_sqft'],
+				"<span style='color: orange;'>Avg of Labour and Operator Cost</span>": f"""<b style='color: orange;'>₹{(((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0))/2):,.2f}</b>""",
 				"Total Strapping Cost":production_qty[0]['strapping_cost_per_sqft'],
 				"Total Additional Cost":production_qty[0]['additional_cost_per_sqft']}
 
@@ -83,7 +92,7 @@ def execute(filters=None):
 				"uom":None,
 				"rate":f"<b>{cost}</b>",
 				"amount":None,
-				"cost_per_sqft":f"<b>₹{abstract_cost[cost]:,.2f}</b>"
+				"cost_per_sqft":f"<b>₹{abstract_cost[cost]:,.2f}</b>" if isinstance(abstract_cost[cost], int) or isinstance(abstract_cost[cost], float) else abstract_cost[cost]
 			})
 
 		if len(test_data) > 2:
@@ -110,6 +119,8 @@ def execute(filters=None):
 					"consumption": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_sqf, 4)}</b>",
 					"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 4)}</b>"
 				})
+		if data and len(data)>0:
+			data[0]['uom']=f"""<b>Production Cost per SQFT :</b> ₹{(production_qty[0]['total_cost_per_sqft'] - production_qty[0]['raw_material_cost_per_sqft'] + total_cost_per_sqft + round(total_sqf, 4) - (((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0))/2)):,.3f}"""
 	columns = get_columns()
 	return columns, data
  
@@ -131,7 +142,7 @@ def get_columns():
 		"fieldtype":"Data",
 		"fieldname":"consumption",
 		"label":"<b>Consumption</b>",
-		"width":200
+		"width":160
 		},
 		{
 		"fieldtype":"Data",
@@ -143,7 +154,7 @@ def get_columns():
 		"fieldtype":"Data",
 		"fieldname":"rate",
 		"label":"<b>Rate</b>",
-		"width":200
+		"width":230
 		},
 		{
 		"fieldtype":"Data",
