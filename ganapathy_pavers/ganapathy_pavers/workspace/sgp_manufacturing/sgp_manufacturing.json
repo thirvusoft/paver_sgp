@@ -4,7 +4,7 @@
  "charts": [],
  "creation": "2022-07-26 18:30:11.272651",
  "developer_mode_only": 0,
- "disable_user_customization": 1,
+ "disable_user_customization": 0,
  "docstatus": 0,
  "doctype": "Workspace",
  "extends_another_page": 0,
@@ -175,7 +175,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-01-07 17:37:50.853808",
+ "modified": "2023-01-11 10:50:45.442639",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "SGP Manufacturing",

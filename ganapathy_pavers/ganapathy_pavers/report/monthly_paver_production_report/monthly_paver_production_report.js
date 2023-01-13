@@ -10,7 +10,8 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today(),
 			"width": "80",
-			"reqd": 1
+			"reqd": 1,
+			on_change: on_change
 		},
 		{
 			"fieldname": "to_date",
@@ -18,7 +19,8 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today(),
 			"width": "80",
-			"reqd": 1
+			"reqd": 1,
+			on_change: on_change
 		},
 		{
 			"fieldname": "item",
@@ -32,6 +34,7 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"label": __("Machine"),
 			"fieldtype": "MultiSelectList",
 			"options": "Workstation",
+			on_change: on_change,
 			get_data: async function (txt) {
 				let ws = (await frappe.db.get_list("Material Manufacturing", { fields: ["work_station"] }))
 				let machines = []
@@ -44,6 +47,21 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 					name: ["in", machines]
 				});
 			}
+		},
+		{
+			"fieldname": "expense_summary",
+			"label": __("Expense Summary"),
+			"fieldtype": "Check",
 		}
 	]
 };
+
+async function on_change() {
+	await ganapathy_pavers.apply_paver_report_filters(
+		frappe.query_report.get_filter("from_date").get_value(),
+		frappe.query_report.get_filter("to_date").get_value(),
+		frappe.query_report.get_filter("machine").get_value(),
+		frappe.query_report.get_filter("item")
+		)
+	frappe.query_report.refresh()
+}
