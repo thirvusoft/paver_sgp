@@ -80,7 +80,7 @@ def execute(filters=None):
 		abstract_cost = {#"Total Raw Material Cost":production_qty[0]['raw_material_cost_per_sqft'],
 				"Total Labour Cost":production_qty[0]["labour_cost_per_sqft"],
 				"Total Operator Cost":production_qty[0]['operator_cost_per_sqft'],
-				"<span style='color: orange;'>Avg of Labour and Operator Cost</span>": f"""<b style='color: orange;'>₹{(((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0))/2):,.2f}</b>""",
+				"<span style='color:rgb(255 82 0);'>Avg of Labour and Operator Cost</span>": f"""<b style='color:rgb(255 82 0);'>₹{(((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0))/2):,.2f}</b>""",
 				"Total Strapping Cost":production_qty[0]['strapping_cost_per_sqft'],
 				"Total Additional Cost":production_qty[0]['additional_cost_per_sqft']}
 

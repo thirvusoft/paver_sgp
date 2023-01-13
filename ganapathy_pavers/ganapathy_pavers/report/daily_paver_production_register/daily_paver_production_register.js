@@ -10,7 +10,8 @@ frappe.query_reports["Daily Paver Production Register"] = {
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today(),
 			"width": "80",
-			"reqd":1
+			"reqd":1,
+			on_change: on_change
 		},
 		{
 			"fieldname":"to_date",
@@ -18,7 +19,8 @@ frappe.query_reports["Daily Paver Production Register"] = {
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today(),
 			"width": "80",
-			"reqd":1
+			"reqd":1,
+			on_change: on_change
 		},
 		{
 			"fieldname":"item",
@@ -34,6 +36,7 @@ frappe.query_reports["Daily Paver Production Register"] = {
 			"fieldtype": "MultiSelectList",
 			"options":"Workstation",
 			"width": "80",
+			on_change: on_change,
 			get_data: function(txt) {
 				return frappe.db.get_link_options('Workstation', txt);
 			}
@@ -41,3 +44,13 @@ frappe.query_reports["Daily Paver Production Register"] = {
 
 	]
 };
+
+async function on_change() {
+	await ganapathy_pavers.apply_paver_report_filters(
+		frappe.query_report.get_filter("from_date").get_value(),
+		frappe.query_report.get_filter("to_date").get_value(),
+		frappe.query_report.get_filter("machine").get_value(),
+		frappe.query_report.get_filter("item")
+		)
+	frappe.query_report.refresh()
+}

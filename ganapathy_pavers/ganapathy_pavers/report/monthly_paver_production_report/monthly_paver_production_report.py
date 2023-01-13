@@ -30,6 +30,7 @@ def execute(filters=None):
 								item_to_manufacture as item_to_manufacture,
 								avg(item_price) as item_price,
 								sum(rack_shifting_total_expense1) as rack_shifting_total_expense1,
+								sum(total_raw_material) as total_raw_material,
 								sum(total_expense) as total_expense,
 								sum(labour_expense) as labour_expense,
 								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
@@ -54,7 +55,7 @@ def execute(filters=None):
 				"qty":float(item[1]),
 				"sqft":f"{item[1] / production_qty[0]['production_sqft']:,.3f}",
 				"uom":item[2],
-				"rate":f'₹{item[4]:,.2f}',
+				"rate":f'₹{item[3]:,.2f}',
 				"amount":f'₹{item[4]:,.2f}',
 				"cost_per_sqft":f"₹{item[4] / production_qty[0]['production_sqft']:,.3f}",
 			})
@@ -62,7 +63,7 @@ def execute(filters=None):
 
 		test_data.append({
 			"rate":"<b>Production Cost</b>",
-			"amount":f"<b>₹{production_qty[0]['rack_shifting_total_expense1'] + production_qty[0]['total_expense'] + production_qty[0]['labour_expense']:,.2f}</b>",
+			"amount":f"<b>₹{production_qty[0]['total_raw_material']:,.2f}</b>",
 			"cost_per_sqft":f"<b>₹{total_cost_per_sqft:,.3f}</b>"
 		})
 		test_data.append({
@@ -74,8 +75,8 @@ def execute(filters=None):
 			"cost_per_sqft":f"<b>₹{production_qty[0]['operator_cost']:,.2f}</b>"
 		})
 		test_data.append({
-			"rate":"<b style='color: orange;'>Labour Expense Per Sqft</b>",
-			"cost_per_sqft":f"<b style='color: orange;'>₹{(production_qty[0]['operator_cost']+production_qty[0]['labour_cost']):,.2f}</b>"
+			"rate":"<b style='color:rgb(255 82 0);'>Labour Expense Per Sqft</b>",
+			"cost_per_sqft":f"<b style='color:rgb(255 82 0);'>₹{(production_qty[0]['operator_cost']+production_qty[0]['labour_cost']):,.2f}</b>"
 		})
 
 
@@ -89,7 +90,6 @@ def execute(filters=None):
 				"rate":f"<b>{cost}</b>",
 				"cost_per_sqft":f"<b>₹{abstract_cost[cost]:,.2f}</b>"
 			})
-
 		production_cost_per_sqft= (
 				total_cost_per_sqft+
 				production_qty[0]['labour_cost']+
@@ -97,8 +97,8 @@ def execute(filters=None):
 				sum([abstract_cost[cost] or 0 for cost in abstract_cost]))
 
 		test_data.append({
-			"rate":"<b style='color: orange;'>Total Production Cost</b>",
-			"cost_per_sqft":f"""<b style='color: orange;'>₹{(production_cost_per_sqft):,.3f}</b>"""
+			"rate":"<b style='color:rgb(255 82 0);'>Total Production Cost</b>",
+			"cost_per_sqft":f"""<b style='color:rgb(255 82 0);'>₹{(production_cost_per_sqft):,.3f}</b>"""
 		})
 
 		if len(test_data) > 2:
