@@ -35,8 +35,8 @@ def execute(filters=None):
 								sum(labour_expense) as labour_expense,
 								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
 								avg(shot_blast_per_sqft) as shot_blast_per_sqft,
-								AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense)/production_sqft) as labour_cost,
-								AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift)/production_sqft) as operator_cost
+								AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense))/AVG(production_sqft) as labour_cost,
+								AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(production_sqft) as operator_cost
 								from `tabMaterial Manufacturing` where name  {0} """.format(condition),as_dict=1)
 
 		

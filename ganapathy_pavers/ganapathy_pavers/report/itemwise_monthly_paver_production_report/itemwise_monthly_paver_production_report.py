@@ -113,8 +113,8 @@ def get_production_cost(filters, item):
     query=f"""
         SELECT 
             (
-                AVG((mm.operators_cost_in_manufacture+mm.operators_cost_in_rack_shift)/mm.production_sqft) + 
-                AVG((mm.labour_cost_manufacture+mm.labour_cost_in_rack_shift+mm.labour_expense)/mm.production_sqft)
+                AVG((mm.operators_cost_in_manufacture+mm.operators_cost_in_rack_shift))/AVG(mm.production_sqft) + 
+                AVG((mm.labour_cost_manufacture+mm.labour_cost_in_rack_shift+mm.labour_expense))/AVG(mm.production_sqft)
             ) as labour_operator_cost,
             (
                 AVG(mm.strapping_cost_per_sqft) +
