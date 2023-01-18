@@ -32,7 +32,7 @@ def get_data(filters=None):
 				data.append(row)
 				data+=ss_data
 				data.append({
-					"salary_slip": "</a><span style='color: orange;font-weight: bold;' data-name='Total Span'>Total<span><a>",
+					"salary_slip": "</a><span style='color:rgb(255 82 0);font-weight: bold;' data-name='Total Span'>Total<span><a>",
 					"amount": f"<b>{amount}</b>",
 					"salary_slip_amount": f"<b>{salary_slip_amount}</b>"
 				})
