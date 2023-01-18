@@ -197,4 +197,6 @@ frappe.ui.form.on("Salary Detail", {
     amount: function(frm, cdt, cdn) {
         frm.trigger('paid_amount')
     },
+
 })
+
