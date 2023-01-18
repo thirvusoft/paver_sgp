@@ -4,13 +4,13 @@
 import frappe
 from frappe import _
 
-def execute(filters=None):
+def execute(filters=None, _type=["Post", "Slab"]):
 	columns = get_columns()
 
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 
-	doc = frappe.get_all("CW Manufacturing", {"molding_date":["between", (from_date, to_date)],"type":["in",["Post", "Slab"]],"production_sqft":["!=",0],"docstatus":["!=",2]}, order_by = 'molding_date')
+	doc = frappe.get_all("CW Manufacturing", {"molding_date":["between", (from_date, to_date)],"type":["in",_type],"production_sqft":["!=",0],"docstatus":["!=",2]}, order_by = 'molding_date')
 	days_count = {}
 	data = []
 	final_data = []
