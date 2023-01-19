@@ -4,26 +4,17 @@ frappe.ui.form.on("Payment Entry",{
             frm.set_value("branch", "")
         }
     },
-    setup: function(frm){
-
+    party: function(frm){
+        if(frm.doc.party_type=="Customer" && frm.doc.party)
         cur_frm.set_query("site_work",function(){
-            if(cur_frm.doc.party_type=="Customer" && cur_frm.doc.party!=""){
-               console.log("lllllllllllllllllllllllllllllllll")
             let party=frm.doc.party
             return {
                 "filters": {
                     "customer":party
                 }
-            }
+            
         }
-        else{
-            cur_frm.set_query("site",function(){
-                
-                return {
-                    
-                }
-            })
-        }
+
         })
         
     
