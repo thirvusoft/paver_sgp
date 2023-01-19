@@ -5,14 +5,30 @@ frappe.ui.form.on("Payment Entry",{
         }
     },
     site_work: function(frm){
+
         frm.set_query("site",function(){
+            if(frm.doc.party_type=="Customer" && frm.doc.party!=""){
+               
             let party=frm.doc.party
             return {
                 "filters": {
                     "customer":party
                 }
             }
+        }
+        else{
+            frm.set_query("site",function(){
+                
+                return {
+                    
+                }
+            })
+        }
         })
+        
+    
+    
+    
         cur_frm.set_value('project', cur_frm.doc.site_work)
     },
     sales_taxes_and_charges_template: function(frm) {
