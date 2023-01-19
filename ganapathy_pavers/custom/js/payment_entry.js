@@ -4,11 +4,11 @@ frappe.ui.form.on("Payment Entry",{
             frm.set_value("branch", "")
         }
     },
-    site_work: function(frm){
+    setup: function(frm){
 
-        frm.set_query("site",function(){
-            if(frm.doc.party_type=="Customer" && frm.doc.party!=""){
-               
+        cur_frm.set_query("site_work",function(){
+            if(cur_frm.doc.party_type=="Customer" && cur_frm.doc.party!=""){
+               console.log("lllllllllllllllllllllllllllllllll")
             let party=frm.doc.party
             return {
                 "filters": {
@@ -17,7 +17,7 @@ frappe.ui.form.on("Payment Entry",{
             }
         }
         else{
-            frm.set_query("site",function(){
+            cur_frm.set_query("site",function(){
                 
                 return {
                     
