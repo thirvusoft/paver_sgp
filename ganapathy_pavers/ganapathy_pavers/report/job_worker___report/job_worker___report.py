@@ -82,7 +82,7 @@ def execute(filters=None):
                 data[i][10]=None
                 final_data.append(data[i])
                 total = [" " for i in range(11)]
-                total[2] = "<b style=color:orange;>""Total""</b>"
+                total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
                 total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,i+1))}</b>"
                 total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,i+1))}</b>"
                 total[5]=0
@@ -108,7 +108,7 @@ def execute(filters=None):
         data[-1][10]=None
         final_data.append(data[-1])
         total = [" " for i in range(11)]
-        total[2] = "<b style=color:orange;>""Total""</b>"
+        total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
         total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,len(data)))}</b>"
         total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,len(data)))}</b>"
         total[5]=0
