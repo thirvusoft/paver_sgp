@@ -12,100 +12,79 @@ def execute(filters=None, _type=["Post", "Slab"]):
 
 	doc = frappe.get_all("CW Manufacturing", {"molding_date":["between", (from_date, to_date)],"type":["in",_type],"production_sqft":["!=",0],"docstatus":["!=",2]}, order_by = 'molding_date')
 	days_count = {}
-	data = []
-	final_data = []
+	data = {}
 
 	if doc:
 		for doc_name in doc:		
 			doc_details = frappe.get_doc("CW Manufacturing",doc_name.name)
-			if not data:
-				for material in doc_details.item_details:
-					
-					matched_item  = 0
-					if(f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}' not in days_count):days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] = 1
-					else:days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] += 1
-					for item in	data:
-						if item["item"] == material.item and item["month"] == doc_details.molding_date.strftime("%B"):
-							matched_item  = 1
-							item["production_sqft"] += material.production_sqft
-							item["production_cost"] += ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing)
-							item["expense"] += doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing)
-							item["total_cost_per_sqft"] += doc_details.total_cost_per_sqft
-							item["total_item_count"] += 1
-
-					if not matched_item:
-						
-						data.append({
+			for material in doc_details.item_details:
+				
+				if(f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}' not in days_count):days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] = 1
+				else:days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] += 1
+				data_key=f"""{material.item}----{doc_details.molding_date.strftime("%B")}"""
+				if data_key not in data:
+					data[data_key]={
 						"month":doc_details.molding_date.strftime("%B"),
 						"item":material.item,
 						"production_sqft":material.production_sqft,
-						"days":None,
+						"no_of_days":None,
 						"production_cost":((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing),
 						"expense":doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing),
 						"total_cost_per_sqft":doc_details.total_cost_per_sqft,
 						"total_item_count":1
-					})
-					
+					}
+				else:
+					data[data_key]["production_sqft"] += material.production_sqft
+					data[data_key]["production_cost"] += ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing)
+					data[data_key]["expense"] += doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing)
+					data[data_key]["total_cost_per_sqft"] += doc_details.total_cost_per_sqft
+					data[data_key]["total_item_count"] += 1
 
-			else:
-
-				for material in doc_details.item_details:
-					matched_item  = 0
-					if(f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}' not in days_count):days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] = 1
-					else:days_count[f'{doc_details.molding_date.strftime("%B")}{material.item}.+.+.+.{material.parent}'] += 1
-					for item in	data:
-						if item["item"] == material.item and item["month"] == doc_details.molding_date.strftime("%B"):
-							matched_item  = 1
-							item["production_sqft"] += material.production_sqft
-							item["production_cost"] += ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing)
-							item["expense"] += doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing)
-							item["total_cost_per_sqft"] += doc_details.total_cost_per_sqft
-							item["total_item_count"] += 1
-
-					if not matched_item:
-						
-						data.append({
-						"month":doc_details.molding_date.strftime("%B"),
-						"item":material.item,
-						"production_sqft":material.production_sqft,
-						"days":None,
-						"production_cost":((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing),
-						"expense":doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing),
-						"total_cost_per_sqft":doc_details.total_cost_per_sqft,
-						"total_item_count":1
-					})
-
+		data=list(data.values())
 		for row in data:
 			
 			row["production_cost"] = row["production_cost"] / row["total_item_count"]
 			row["expense"] = row["expense"] / row["total_item_count"]
 			row["total_cost_per_sqft"] = row["total_cost_per_sqft"] / row["total_item_count"]
 			
-			final_data.append(list(row.values()))
 	days_count=sorted(days_count, key=lambda x:x)
 	key = {i.split('.+.+.+.')[0]:0 for i in days_count}
-
 	for i in days_count:
 		key[i.split('.+.+.+.')[0]] += 1
-	for i in final_data:
-		i[3] = key[i[0]+i[1]]
-	return columns, final_data
+	for i in data:
+		i["no_of_days"] = key[i["month"]+i["item"]]
+	return columns, data
 
 def get_columns():
 
 	columns = [
 		_("Month") + ":Data:100",
 		_("Item") + ":Link/Item:250",
-		_("Sqft") + ":Float:100",
+		{
+			"fieldname":"production_sqft",
+			"label":"Sqft",
+			"width":100,
+			"fieldtype":"Float"
+		},
 		{
 			"fieldname":"no_of_days",
 			"label":"No Of Days",
 			"width":100,
 			"fieldtype":"Int"
 		},
-		_("Prod Cost") + ":Currency:100",
-		_("Expense Cost") + ":Currency:150",
-		_("Total Cost") + ":Currency:100"
+		{
+			"fieldname":"production_cost",
+			"label":_("Prod Cost"),
+			"width":100,
+			"fieldtype":"Currency"
+		},
+		_("Expense") + ":Currency:150",
+		{
+			"fieldname":"total_cost_per_sqft",
+			"label":_("Total Cost"),
+			"width":100,
+			"fieldtype":"Currency"
+		}
 	]
 
 	return columns
