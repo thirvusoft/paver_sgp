@@ -270,13 +270,31 @@ class PartyLedgerSummaryReport(object):
 			if self.filters.get("invoiced_delivery"):
 				dn_names1 = frappe.get_all('Delivery Note', filters, pluck='name')
 				dn_with_si = frappe.get_all('Sales Invoice Item', filters={'delivery_note':['in', dn_names1]}, pluck='delivery_note')
+				sales_invoice = frappe.get_all('Sales Invoice Item', filters={'delivery_note':['in', dn_names1]}, pluck='parent')
+				sales_invoice=list(set(sales_invoice))
+				for i in sales_invoice:
+					a=  frappe.get_all('Sales Invoice', filters={'name': i}, fields=['status','total','name'])
+					for j in a:
+						if j['status']=="Paid" or j['status']=="Partly Paid":
+							payment_doc=frappe.get_all('Payment Entry Reference', filters={'reference_name': j['name']}, pluck='parent')
+							for k in payment_doc:
+								payment_amount= frappe.get_all('Payment Entry', filters={'name': k}, fields=['paid_amount'])
+								for l in payment_amount:
+									customer['paid_amount']=customer.get("paid_amount", 0) - l['paid_amount']
+					
+
+
+				
 				dn_names = [i for i in dn_names1 if(i not in dn_with_si)]
 				filters['name'] = ['in', dn_names]
-
+			
+			print(filters)
 			delivery_amount = sum(frappe.get_all('Delivery Note', filters, pluck='rounded_total'))
+			print(delivery_amount)
 			delivered=delivery_amount
 			customer['out_delivery_amount']=delivery_amount
 			bls=(delivered-customer.get('paid_amount', 0))
+			print(bls)
 			customer['outstanding_amount']=bls
 			if customer.get("out_delivery_amount", 0) or customer.get("paid_amount", 0) or customer.get("outstanding_amount", 0) or customer.get("invoiced_amount", 0):
 				out.append(customer)
