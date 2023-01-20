@@ -3,6 +3,8 @@
 
 import frappe
 from frappe import _
+from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
+
 
 def execute(filters=None, _type=["Post", "Slab"]):
 	columns = get_columns()
@@ -27,6 +29,7 @@ def execute(filters=None, _type=["Post", "Slab"]):
 						"month":doc_details.molding_date.strftime("%B"),
 						"item":material.item,
 						"production_sqft":material.production_sqft,
+						"pieces":0,
 						"no_of_days":None,
 						"production_cost":((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing),
 						"expense":doc_details.total_cost_per_sqft - ((doc_details.raw_material_cost / doc_details.production_sqft) + doc_details.strapping_cost_per_sqft + doc_details.labour_cost_per_sqft_curing),
@@ -42,7 +45,7 @@ def execute(filters=None, _type=["Post", "Slab"]):
 
 		data=list(data.values())
 		for row in data:
-			
+			row['pieces']=uom_conversion(item=row['item'], from_uom="SQF", from_qty=row['production_sqft'], to_uom="Nos")
 			row["production_cost"] = row["production_cost"] / row["total_item_count"]
 			row["expense"] = row["expense"] / row["total_item_count"]
 			row["total_cost_per_sqft"] = row["total_cost_per_sqft"] / row["total_item_count"]
@@ -53,6 +56,8 @@ def execute(filters=None, _type=["Post", "Slab"]):
 		key[i.split('.+.+.+.')[0]] += 1
 	for i in data:
 		i["no_of_days"] = key[i["month"]+i["item"]]
+	print(columns)
+	print(data)
 	return columns, data
 
 def get_columns():
@@ -66,6 +71,7 @@ def get_columns():
 			"width":100,
 			"fieldtype":"Float"
 		},
+		_("pieces") + ":Float:100",
 		{
 			"fieldname":"no_of_days",
 			"label":"No Of Days",

@@ -3,6 +3,7 @@
 
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
 from ganapathy_pavers.ganapathy_pavers.report.monthly_paver_production_report.monthly_paver_production_report import get_expense_data
+from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
 import frappe 
 from frappe import _
 
@@ -33,6 +34,12 @@ def get_columns(filters):
             "label": _("Sqft"),
             "fieldtype": "Float",
             "fieldname": "sqft",
+            "width": 100
+        },
+         {
+            "label": _("Pieces"),
+            "fieldtype": "Float",
+            "fieldname": "pieces",
             "width": 100
         },
         {
@@ -88,14 +95,18 @@ def get_data(filters):
         else:
             data[f"{i.item_to_manufacture} {i.month}"]['sqft']+=f["sqft"]
             data[f"{i.item_to_manufacture} {i.month}"]['no_of_days']+=1
+        # data['pieces']=0
     data=list(data.values())
     prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
     expense_cost=get_sqft_expense(filters)
+    
     for row in data:
+
+        row['pieces']=uom_conversion(item=row['item'], from_uom="SQF", from_qty=row['sqft'], to_uom="Nos")
         row["expense_cost"]=(expense_cost or 0) if not expense_cost else (expense_cost*(row['sqft'] or 0))/(prod_details.get("paver") or 1)/(prod_details.get("paver") or 1)
         row["expense_cost"]=(expense_cost or 0) if not expense_cost else (expense_cost)/(prod_details.get("paver") or 1)
         row["total_cost"]=(row["prod_cost"] or 0) + (row["expense_cost"] or 0) + (row["labour_operator_cost"] or 0)
-
+   
     return data
 	
 
