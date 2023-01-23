@@ -156,7 +156,7 @@ def get_sqft_expense(filters):
     total_sqf=0
     for i in paver_exp_tree:
         if i.get("child_nodes"):
-            total_sqf+=get_expense_from_child(i['child_nodes'], total_sqf)
+            total_sqf+=get_expense_from_child(i['child_nodes'], 0)
         else:
             if i["balance"]:
                 total_sqf+=i["balance"] or 0
@@ -165,7 +165,7 @@ def get_sqft_expense(filters):
 def get_expense_from_child(account, total_sqf):
     for i in account:
         if i['child_nodes']:
-            total_sqf+=(get_expense_from_child(i['child_nodes'], total_sqf))
+            total_sqf+=(get_expense_from_child(i['child_nodes'], 0))
         elif i["balance"]:
             total_sqf+=i["balance"] or 0
     return total_sqf
