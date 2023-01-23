@@ -4,15 +4,22 @@ frappe.ui.form.on("Payment Entry",{
             frm.set_value("branch", "")
         }
     },
-    site_work: function(frm){
-        frm.set_query("site",function(){
+    party: function(frm){
+        if(frm.doc.party_type=="Customer" && frm.doc.party)
+        cur_frm.set_query("site_work",function(){
             let party=frm.doc.party
             return {
                 "filters": {
                     "customer":party
                 }
-            }
+            
+        }
+
         })
+        
+    
+    
+    
         cur_frm.set_value('project', cur_frm.doc.site_work)
     },
     sales_taxes_and_charges_template: function(frm) {

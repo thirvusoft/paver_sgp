@@ -4,6 +4,8 @@
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
 import frappe
 from frappe import _
+from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
+
 
 def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group="cw_group"):
 	columns = get_columns()
@@ -19,6 +21,7 @@ def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group=
 	sqf_exp=get_sqft_expense(filters, exp_group)
 	prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
 	for row in  data:
+    row['pieces']=uom_conversion(item=row['item'], from_uom="SQF", from_qty=row['production_sqft'], to_uom="Nos")
 		row["expense"]=sqf_exp/prod_details.get(prod_exp_sqft, 1)
 		row['total_cost_per_sqft']=(row.get("labour_operator_cost", 0) or 0)+(row.get("prod_cost", 0) or 0)+(row.get("strapping_cost", 0) or 0)+(row.get("additional_cost", 0) or 0)+(row.get("expense", 0) or 0)
 	return columns, data
@@ -97,6 +100,7 @@ def get_columns():
 			"width":120,
 			"fieldtype":"Float"
 		},
+		_("pieces") + ":Float:100",
 		{
 			"fieldname":"no_of_days",
 			"label":_("No Of Days"),
