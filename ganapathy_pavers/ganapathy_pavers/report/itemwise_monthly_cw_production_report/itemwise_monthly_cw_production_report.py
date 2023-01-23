@@ -19,7 +19,7 @@ def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group=
 	sqf_exp=get_sqft_expense(filters, exp_group)
 	prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
 	for row in  data:
-		row["expense"]=sqf_exp/prod_details.get(prod_exp_sqft, 0)
+		row["expense"]=sqf_exp/prod_details.get(prod_exp_sqft, 1)
 		row['total_cost_per_sqft']=(row.get("labour_operator_cost", 0) or 0)+(row.get("prod_cost", 0) or 0)+(row.get("strapping_cost", 0) or 0)+(row.get("additional_cost", 0) or 0)+(row.get("expense", 0) or 0)
 	return columns, data
 
