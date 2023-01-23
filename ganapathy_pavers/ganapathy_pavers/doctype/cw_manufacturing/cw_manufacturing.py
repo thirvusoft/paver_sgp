@@ -388,15 +388,13 @@ def uom_conversion(item, from_uom='', from_qty=0, to_uom=''):
     for row in item_doc.uoms:
         if(row.uom == from_uom):
             from_conv = row.conversion_factor
-            print(from_conv)
         if(row.uom == to_uom):
             to_conv = row.conversion_factor
-            print(to_conv)
     if(not from_conv):
         throw_error(from_uom + " Conversion", item)
     if(not to_conv):
         throw_error(to_uom + " Conversion", item)
-    print((float(from_qty) * from_conv) / to_conv)
+
     return (float(from_qty) * from_conv) / to_conv
 
 

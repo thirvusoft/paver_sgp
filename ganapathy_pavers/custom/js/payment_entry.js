@@ -4,23 +4,18 @@ frappe.ui.form.on("Payment Entry",{
             frm.set_value("branch", "")
         }
     },
-    party: function(frm){
-        if(frm.doc.party_type=="Customer" && frm.doc.party)
+    refresh: function(frm){
         cur_frm.set_query("site_work",function(){
             let party=frm.doc.party
-            return {
-                "filters": {
-                    "customer":party
+            if(frm.doc.party_type=="Customer" && frm.doc.party) {
+                return {
+                    "filters": {
+                        "customer":party
+                    }        
                 }
-            
-        }
-
+            }
         })
-        
-    
-    
-    
-        cur_frm.set_value('project', cur_frm.doc.site_work)
+     cur_frm.set_value('project', cur_frm.doc.site_work)
     },
     sales_taxes_and_charges_template: function(frm) {
         if(frm.doc.branch) {
