@@ -8,7 +8,8 @@
  "field_order": [
   "service_item",
   "type",
-  "expense_amount"
+  "expense_amount",
+  "description"
  ],
  "fields": [
   {
@@ -33,11 +34,17 @@
    "in_list_view": 1,
    "label": "Expense",
    "reqd": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Long Text",
+   "in_list_view": 1,
+   "label": "Description"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2022-07-26 17:24:09.777681",
+ "modified": "2023-01-23 18:24:13.132358",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Log Service",
