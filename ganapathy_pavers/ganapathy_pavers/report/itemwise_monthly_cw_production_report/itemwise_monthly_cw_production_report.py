@@ -1,10 +1,11 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
 
+from ganapathy_pavers.custom.py.journal_entry import get_production_details
 import frappe
 from frappe import _
 
-def execute(filters=None, _type=["Post", "Slab"]):
+def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group="cw_group"):
 	columns = get_columns()
 
 	from_date = filters.get("from_date")
@@ -15,9 +16,11 @@ def execute(filters=None, _type=["Post", "Slab"]):
 
 	if doc:
 		data = get_cw_cost(doc)
-	
+	sqf_exp=get_sqft_expense(filters, exp_group)
+	prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
 	for row in  data:
-		row['total_cost_per_sqft']=row.get("labour_operator_cost", 0)+row.get("prod_cost", 0)+row.get("strapping_cost", 0)+row.get("additional_cost", 0)
+		row["expense"]=sqf_exp/prod_details.get(prod_exp_sqft, 0)
+		row['total_cost_per_sqft']=(row.get("labour_operator_cost", 0) or 0)+(row.get("prod_cost", 0) or 0)+(row.get("strapping_cost", 0) or 0)+(row.get("additional_cost", 0) or 0)+(row.get("expense", 0) or 0)
 	return columns, data
 
 def get_cw_cost(doc_list):
@@ -52,8 +55,25 @@ def get_cw_cost(doc_list):
 	res=frappe.db.sql(query, as_dict=True)
 	return res
 
-def get_expense_cost(doc_list):
-	return {}
+def get_sqft_expense(filters, exp_group):
+	exp=frappe.get_single("Expense Accounts")
+	paver_exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.get(exp_group))
+	total_sqf=0
+	for i in paver_exp_tree:
+		if i.get("child_nodes"):
+			total_sqf+=get_expense_from_child(i['child_nodes'], 0)
+		else:
+			if i["balance"]:
+				total_sqf+=i["balance"] or 0
+	return total_sqf
+
+def get_expense_from_child(account, total_sqf):
+	for i in account:
+		if i['child_nodes']:
+			total_sqf+=(get_expense_from_child(i['child_nodes'], 0))
+		elif i["balance"]:
+			total_sqf+=i["balance"] or 0
+	return total_sqf
 
 def get_columns():
 
