@@ -15,7 +15,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 
 	if cw_list:
 		bom_item = frappe.db.sql(""" 
-								select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent in {0} group by item_code """.format(tuple(cw_list)),as_list=1)
+								select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent {0} group by item_code """.format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_list=1)
 		production_qty = frappe.db.sql(""" 
 								select sum(production_sqft) as production_sqft,
 								avg(total_cost_per_sqft) as total_cost_per_sqft,
@@ -27,7 +27,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 								AVG(total_operator_wages)/AVG(production_sqft) as operator_cost_per_sqft,
 								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
 								avg(additional_cost_per_sqft) as additional_cost_per_sqft,
-								avg(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name in {0} """.format(tuple(cw_list)),as_dict=1)
+								avg(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name {0}""".format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_dict=1)
 
 		
 		total_cost_per_sqft = 0
