@@ -140,8 +140,7 @@ def get_production_cost(filters, item):
                 AVG((mm.operators_cost_in_manufacture+mm.operators_cost_in_rack_shift))/AVG(mm.production_sqft) + 
                 AVG((mm.labour_cost_manufacture+mm.labour_cost_in_rack_shift+mm.labour_expense))/AVG(mm.production_sqft)
             ) as labour_operator_cost, 
-            (
-                
+            ( 
                 (
                     SELECT SUM(bi.amount) from `tabBOM Item` bi
                     WHERE bi.parent in (
@@ -161,8 +160,6 @@ def get_production_cost(filters, item):
         """
     res=frappe.db.sql(query, as_dict=1)
     if res and res[0]:
-        
-        print(res[0].get("prod_cost", 0))
         return res[0].get("prod_cost", 0), res[0].get("labour_operator_cost", 0),res[0].get("strapping", 0),res[0].get("shot_blasting", 0)
     return 0, 0
 
