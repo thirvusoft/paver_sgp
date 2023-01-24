@@ -2,6 +2,7 @@
 # Line  160 to 180
 def make_entry(args, adv_adj, update_outstanding, from_repost=False):
 	gle = frappe.new_doc("GL Entry")
+	gle.update(args)
 	try:
 		if gle.voucher_type in ['Payment Entry','Sales Invoice','Sales Order','Journal Entry'] and frappe.db.get_value(gle.voucher_type,gle.voucher_no,'type'):
 			gle.update({'type':frappe.db.get_value(gle.voucher_type,gle.voucher_no,'type')})
@@ -12,7 +13,6 @@ def make_entry(args, adv_adj, update_outstanding, from_repost=False):
 				})
 	except:
 		pass
-	gle.update(args)
 	gle.flags.ignore_permissions = 1
 	gle.flags.from_repost = from_repost
 	gle.flags.adv_adj = adv_adj
