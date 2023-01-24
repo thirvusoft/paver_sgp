@@ -7,8 +7,9 @@ def sales_invoice_print_format(docname):
        
     for row in sales_doc:
         if row.print_item_name:
-            if f"""{row.get("print_item_name")} {row.get("rate")}  {row.get("uom")}""" not in data:
-                data[f"""{row.get("print_item_name")} {row.get("rate")}  {row.get("uom")}"""]={
+            _key=f"""{row.get("print_item_name")} {row.get("rate")}  {row.get("uom")}"""
+            if _key not in data:
+                data[_key]={
                 "item_name": row.get("print_item_name"),
                 "uom": row.get("uom"),
                 "rate": row.get("rate"),
@@ -17,11 +18,12 @@ def sales_invoice_print_format(docname):
                 "qty": row.get("qty")
             }
             else:
-                data[f"""{row.get("print_item_name")} {row.get("rate")}  {row.get("uom")}"""]["amount"] += row.get("amount")
-                data[f"""{row.get("print_item_name")} {row.get("rate")}  {row.get("uom")}"""]["qty"] += row.get("qty")
+                data[_key]["amount"] += row.get("amount")
+                data[_key]["qty"] += row.get("qty")
         else:
-            if f"""{row.get("item_name")} {row.get("rate")}  {row.get("uom")}""" not in data:
-                data[f"""{row.get("item_name")} {row.get("rate")}  {row.get("uom")}"""]={
+            _key=f"""{row.get("item_name")} {row.get("rate")}  {row.get("uom")}"""
+            if _key not in data:
+                data[_key]={
                 "item_name": row.get("item_name"),
                 "uom": row.get("uom"),
                 "rate": row.get("rate"),
@@ -30,8 +32,8 @@ def sales_invoice_print_format(docname):
                 "qty": row.get("qty")
             }
             else:
-                data[f"""{row.get("item_name")} {row.get("rate")}  {row.get("uom")}"""]["amount"] += row.get("amount")
-                data[f"""{row.get("item_name")} {row.get("rate")}  {row.get("uom")}"""]["qty"] += row.get("qty")
+                data[_key]["amount"] += row.get("amount")
+                data[_key]["qty"] += row.get("qty")
 
     data=list(data.values())
     return data
