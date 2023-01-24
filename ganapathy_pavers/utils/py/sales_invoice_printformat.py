@@ -1,11 +1,9 @@
 
 import frappe
 
-def sales_invoice_print_format(docname):
+def sales_invoice_print_format(doc):
     data={}
-    sales_doc=frappe.db.get_all('Sales Invoice Item', filters={'parent':docname}, fields=['print_item_name','item_name',"gst_hsn_code","qty","uom","rate","amount"])
-       
-    for row in sales_doc:
+    for row in doc.items:
         if row.print_item_name:
             _key=f"""{row.get("print_item_name")} {row.get("rate")}  {row.get("uom")}"""
             if _key not in data:
