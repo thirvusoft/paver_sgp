@@ -79,16 +79,16 @@ class CustomSalary(SalarySlip):
                 is_recurring = additional_salary.is_recurring
             )
 
-# @frappe.whitelist(allow_guest=True)
-# def site_work_details(employee,start_date,end_date):
-#     job_worker = frappe.db.get_all('TS Job Worker Details',fields=['name1','parent','amount','start_date','end_date'])
-#     site_work=[]
-#     start_date=getdate(start_date)
-#     end_date=getdate(end_date)
-#     for data in job_worker:
-#             if data.name1 == employee and (data.start_date and data.start_date >= start_date) and (data.start_date and data.start_date <= end_date) and (data.end_date and data.end_date >= start_date) and (data.end_date and data.end_date <= end_date):
-#                 site_work.append([data.parent,data.amount])
-#     return site_work
+@frappe.whitelist(allow_guest=True)
+def site_work_details(employee,start_date,end_date):
+    job_worker = frappe.db.get_all('TS Job Worker Details',fields=['name1','parent','amount','start_date','end_date'])
+    site_work=[]
+    start_date=getdate(start_date)
+    end_date=getdate(end_date)
+    for data in job_worker:
+            if data.name1 == employee and (data.start_date and data.start_date >= start_date) and (data.start_date and data.start_date <= end_date) and (data.end_date and data.end_date >= start_date) and (data.end_date and data.end_date <= end_date):
+                site_work.append([data.parent,data.amount])
+    return site_work
 
 def employee_update(doc,action):
     employee_doc = frappe.get_doc('Employee',doc.employee)
