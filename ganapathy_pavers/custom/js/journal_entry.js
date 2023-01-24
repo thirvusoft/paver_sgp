@@ -2,40 +2,37 @@ var month, paver, cw, lego, fp;
 
 frappe.ui.form.on("Journal Entry", {
     refresh: function (frm) {
-        frm.add_custom_button('Get Monthly Costing', async function () {
-            if (frm.doc.machine_3 || frm.doc.machine_12) {
-                if (frm.doc.common_expenses?.length > 0) {
-                    frm.scroll_to_field("common_expenses");
-                    await frappe.confirm(
-                        `Do you want to erase the existing data in <b>Common Expenses</b> table<br>
-                        <div style="display:flex; flex-direction: column; align-items: center;">
-                            <div>
-                                <b>Yes</b> - Erases the existing table and then fill the data.<br>
-                                <b>No</b> - Append the data with existing table.
-                            </div>
-                        </div>`,
-                        async () => {
-                            await frm.clear_table("common_expenses");
-                            await frm.fields_dict.common_expenses?.refresh();
-                            await get_common_expenses(frm);
-                        },
-                        async () => {
-                            await get_common_expenses(frm);
-                        }
-                    )
-                } else {
-                    await get_common_expenses(frm);
+        if (!frm.doc.docstatus) {
+            frm.add_custom_button('Get Monthly Costing', async function () {
+                if (frm.doc.machine_3 || frm.doc.machine_12) {
+                    if (frm.doc.common_expenses?.length > 0) {
+                        frm.scroll_to_field("common_expenses");
+                        await frappe.confirm(
+                            `Do you want to erase the existing data in <b>Common Expenses</b> table<br>
+                            <div style="display:flex; flex-direction: column; align-items: center; justify-content: center;">
+                                <div>
+                                    <b>Yes</b> - Erases the existing table and then fill the data.<br>
+                                    <b>No</b> - Append the data with existing table.
+                                </div>
+                            </div>`,
+                            async () => {
+                                await frm.clear_table("common_expenses");
+                                await frm.fields_dict.common_expenses?.refresh();
+                                await get_common_expenses(frm);
+                            },
+                            async () => {
+                                await get_common_expenses(frm);
+                            }
+                        )
+                    } else {
+                        await get_common_expenses(frm);
+                    }
                 }
-
-
-            }
-            else {
-                frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
-            }
-
-        })
-
-
+                else {
+                    frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
+                }
+            })
+        }
 
         set_css();
         frm.set_query("account", "common_expenses", function () {
