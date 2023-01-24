@@ -56,7 +56,15 @@ frappe.query_reports["Delivery Report"] = {
 			"fieldname":"project",
 			"label": __("Site Work"),
 			"fieldtype": "Link",
-			"options": "Project"
+			"options": "Project",
+			"get_query": function() {
+				var party = frappe.query_report.get_filter_value('party');
+				return{
+					filters: {
+						"customer":party
+					}
+				};
+			}
 		},
 		{
 			"fieldname":"sw_status",
