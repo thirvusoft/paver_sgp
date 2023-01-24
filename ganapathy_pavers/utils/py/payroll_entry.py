@@ -249,7 +249,7 @@ def get_emp_list(sal_struct, cond, end_date, payroll_payable_account):
                 t1.name = t2.employee
                 and t2.docstatus = 1
                 and t1.status != 'Inactive'
-        %s order by t2.from_date desc , t1.employee_name asc
+        %s order by t1.employee_name asc, t2.from_date desc
         """ % cond, {"sal_struct": tuple(sal_struct), "from_date": end_date, "payroll_payable_account": payroll_payable_account}, as_dict=True)
     return a
 
