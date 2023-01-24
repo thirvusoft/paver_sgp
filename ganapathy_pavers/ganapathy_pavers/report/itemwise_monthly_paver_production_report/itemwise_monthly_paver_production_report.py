@@ -54,6 +54,18 @@ def get_columns(filters):
             "fieldname": "prod_cost",
             "width": 100
         },
+         {
+            "label": _("Strapping Cost"),
+            "fieldtype": "Float",
+            "fieldname": "strapping_cost",
+            "width": 100
+        },
+         {
+            "label": _("Shot Blasting Cost"),
+            "fieldtype": "Float",
+            "fieldname": "shot_blasting_cost",
+            "width": 100
+        },
         {
             "label": _("Labour Operator Cost"),
             "fieldtype": "Float",
@@ -89,23 +101,24 @@ def get_data(filters):
         if not i.production_sqft:
             continue
         f={"month":i.from_time.strftime("%B"),"item":i.item_to_manufacture,"sqft":i.production_sqft,"no_of_days":1}
-        f["prod_cost"], f["labour_operator_cost"]=get_production_cost(filters, i.item_to_manufacture)
+        f["prod_cost"], f["labour_operator_cost"], f["strapping"], f["shot_blasting"]=get_production_cost(filters, i.item_to_manufacture)
         if f"{i.item_to_manufacture} {i.month}" not in data:
             data[f"{i.item_to_manufacture} {i.month}"] =f
         else:
+            
             data[f"{i.item_to_manufacture} {i.month}"]['sqft']+=f["sqft"]
             data[f"{i.item_to_manufacture} {i.month}"]['no_of_days']+=1
         # data['pieces']=0
     data=list(data.values())
     prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
     expense_cost=get_sqft_expense(filters)
-    
     for row in data:
-
+        row["strapping_cost"]=(row["strapping"] or 0)
+        row["shot_blasting_cost"]=(row["shot_blasting"] or 0)
         row['pieces']=uom_conversion(item=row['item'], from_uom="SQF", from_qty=row['sqft'], to_uom="Nos")
         row["expense_cost"]=(expense_cost or 0) if not expense_cost else (expense_cost*(row['sqft'] or 0))/(prod_details.get("paver") or 1)/(prod_details.get("paver") or 1)
         row["expense_cost"]=(expense_cost or 0) if not expense_cost else (expense_cost)/(prod_details.get("paver") or 1)
-        row["total_cost"]=(row["prod_cost"] or 0) + (row["expense_cost"] or 0) + (row["labour_operator_cost"] or 0)
+        row["total_cost"]=(row["prod_cost"] or 0) + (row["strapping"] or 0) + (row["expense_cost"] or 0) + (row["shot_blasting"] or 0) + (row["labour_operator_cost"] or 0)
    
     return data
 	
@@ -126,10 +139,8 @@ def get_production_cost(filters, item):
             (
                 AVG((mm.operators_cost_in_manufacture+mm.operators_cost_in_rack_shift))/AVG(mm.production_sqft) + 
                 AVG((mm.labour_cost_manufacture+mm.labour_cost_in_rack_shift+mm.labour_expense))/AVG(mm.production_sqft)
-            ) as labour_operator_cost,
-            (
-                AVG(mm.strapping_cost_per_sqft) +
-                AVG(mm.shot_blast_per_sqft) + 
+            ) as labour_operator_cost, 
+            ( 
                 (
                     SELECT SUM(bi.amount) from `tabBOM Item` bi
                     WHERE bi.parent in (
@@ -138,7 +149,10 @@ def get_production_cost(filters, item):
                         {conditions.replace("mm", "mmm") + " AND mmm.item_to_manufacture=mm.item_to_manufacture"}
                     )
                 )/SUM(mm.production_sqft)
-            ) as prod_cost
+            ) as prod_cost,
+        AVG(mm.strapping_cost_per_sqft) as strapping,
+        AVG(mm.shot_blast_per_sqft) as shot_blasting
+
         FROM `tabMaterial Manufacturing` as mm
         {conditions} 
         GROUP BY mm.item_to_manufacture
@@ -146,7 +160,7 @@ def get_production_cost(filters, item):
         """
     res=frappe.db.sql(query, as_dict=1)
     if res and res[0]:
-        return res[0].get("prod_cost", 0), res[0].get("labour_operator_cost", 0)
+        return res[0].get("prod_cost", 0), res[0].get("labour_operator_cost", 0),res[0].get("strapping", 0),res[0].get("shot_blasting", 0)
     return 0, 0
 
 
