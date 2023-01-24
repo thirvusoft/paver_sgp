@@ -65,7 +65,9 @@ class DailyMaintenance(Document):
 	pass
 @frappe.whitelist()
 def paver_item(warehouse, date, warehouse_colour):
-	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name')
+	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name',order_by='name')
+	print("111111111111111111111111111111111")
+	print(item)
 	# print(item)
 	items_stock=[]
 	total_stock={}
@@ -102,8 +104,10 @@ def paver_item(warehouse, date, warehouse_colour):
 	for i in item:
 		item_2=frappe.db.get_all("Item", filters=[
 										['variant_of','=',i],
-										["Item Variant Attribute","attribute_value",'=','Shot Blast'],
+										["Item Variant Attribute","attribute_value",'=','Shot Blast']
 																			])
+		print("heloooooooooooooooooooooooooooooooooo")
+		print(item_2)
 		if item_2:
 			template_1={'short_name':i, 'type': 'Shot Blast'}
 			for sb in item_2:
@@ -111,8 +115,10 @@ def paver_item(warehouse, date, warehouse_colour):
 
 				attribute=frappe.get_doc("Item",sb.name)
 				colour_sb=frappe.db.sql(f"""
-					select attribute_value from `tabItem Variant Attribute` where parent='{sb.name}' and parenttype='Item' and attribute='Colour'
+					select attribute_value from `tabItem Variant Attribute` where parent='{sb.name}' and parenttype='Item' and attribute='Colour' order by attribute_value 
 				""")
+				print("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq")
+				print(colour_sb)
 				if colour_sb and colour_sb[0]:
 					colour_sb=colour_sb[0][0].lower()
 				else:
@@ -153,7 +159,9 @@ def paver_item(warehouse, date, warehouse_colour):
   	#machine_details
 	production=[]
 	paver=frappe.db.sql(f"""select item_to_manufacture as item, work_station as machine, sum(production_sqft) as sqft,
-	sum(no_of_racks) as rack from `tabMaterial Manufacturing` where date(from_time) = '{date}' group by item_to_manufacture, work_station""", as_dict=True)
+	sum(no_of_racks) as rack from `tabMaterial Manufacturing` where date(from_time) = '{date}' group by item_to_manufacture, work_station order by item_to_manufacture""", as_dict=True)
+	print("999999999999999999999999999999999999")
+	print(paver)
 	if paver:
 		production+=paver
 		production+=frappe.db.sql(f"""select "Total Stock" as item, sum(production_sqft) as sqft,
@@ -170,9 +178,10 @@ def paver_item(warehouse, date, warehouse_colour):
 	
 
 	#compound_wall_items
-	compound_item=frappe.db.get_all("Item", filters={'item_group':"Compound Walls","compound_wall_type":"Post",'item_name':['like',"%FEET%"]},pluck='name')
+	compound_item=frappe.db.get_all("Item", filters={'item_group':"Compound Walls","compound_wall_type":"Post",'item_name':['like',"%FEET%"]},pluck='name',order_by='name')
+	print("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+	print(compound_item)
 	post_item={}
-	# print(compound_item)
 	if compound_item:
 		# for i in compound_item:
 			ci_wo= frappe.db.get_all("Item", filters=[['item_name','like','%WITHOUT%'],['item_name','not like','%CORNER%'],['item_name','not like','%FENCING%'],['name','in',compound_item],['disabled','=',0]])
@@ -190,8 +199,8 @@ def paver_item(warehouse, date, warehouse_colour):
 					else:
 						post_item[post + "Normal"]={'wo_bolt':get_stock_qty(j.name, warehouse) or 0, 'post_length':post, 'type':'Normal'}
 			# print(post_item)		
-			ci_w= frappe.db.get_all("Item", filters=[['item_name','not like','%WITHOUT%'], ['item_name','not like','%CORNER%'],['item_name','not like','%FENCING%'], ['name','in',compound_item],['disabled', '=', 0]])
-			print(ci_w)
+			ci_w= frappe.db.get_all("Item", filters=[['item_name','not like','%WITHOUT%'], ['item_name','not like','%CORNER%'],['item_name','not like','%FENCING%'], ['name','in',compound_item],['disabled', '=', 0]],order_by='item_name')
+			
 			if ci_w:
 				for j in ci_w:
 					post=j['name'].split('FEET')[0]+ 'FEET'
@@ -269,10 +278,12 @@ def paver_item(warehouse, date, warehouse_colour):
 			
 	#colour powder items
 	colour_item=frappe.db.get_all("Item", filters={'item_group':"Raw Material",'has_variants':1},pluck='name')
+	
 	colour_details={}
 	template={}
 	for col in colour_item:
-		item_col=frappe.db.get_all("Item", filters=[['name','like','%Pigment%'],['variant_of','in',col]])
+		item_col=frappe.db.get_all("Item", filters=[['name','like','%Pigment%'],['variant_of','in',col]],order_by='name')
+
 		if item_col:
 			
 			for j in item_col:
@@ -317,12 +328,14 @@ def paver_item(warehouse, date, warehouse_colour):
 	# print(slab_item)
  
 	#pavers size details 
-	paver_item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name')
+	paver_item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name',order_by="name")
+
 	# print(paver_item)
 	for i in paver_item:
 		normal=frappe.db.get_all("Item", filters=[
 										['variant_of','=',i],
-										["Item Variant Attribute","attribute_value",'=','Normal']], pluck='name')
+										["Item Variant Attribute","attribute_value",'=','Normal']], pluck='name',order_by='name')
+	
 		# print(normal)
 		for j in normal:
 			# print(f""" select name from `tabItem` WHERE name regexp '[0-9][mM][Mm]' and 'disabled'=0 name in {tuple(normal)}""")
@@ -361,9 +374,7 @@ def raw_material_stock_details():
 	m12_warehouse_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.m12top, "Machine 1&2", "TOPLAYER"), (dsm.m12pan, "Machine 1&2", "PANMIX"), (dsm.m12ggbs, "Machine 1&2", "PAVER")]]
 	m3_warehouse_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.m3wh, "Machine 3", "PAVER")]]
 	cw_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.cw_wh, "Compound Wall", "C.WALL")]]
-	print(m12_warehouse_stock)
-	print(m3_warehouse_stock)
-	print(cw_stock)
+	
 	total_stock=[]
 	for item in m12_warehouse_stock:
 		total_stock+=list(item)
@@ -387,7 +398,12 @@ def get_stock_details_from_warehosue(warehouse, machine="", prefix=""):
 		condition=f' and bin.item_code in {tuple(item_filters)}'
 	elif item_filters:
 		condition=f' and bin.item_code="{item_filters[0]}"'
+	condition=condition+" order by item asc"
+	
+	print(condition)
 	stock=frappe.db.sql(f"""select concat('{_prefix}', bin.item_code) as item, bin.actual_qty as qty, '{prefix}' as type, '{machine}' as machine from `tabBin` as bin
 		left outer join `tabItem` as item on item.item_code=bin.item_code where item.item_group='Raw Material'
-		and bin.warehouse='{warehouse}' and bin.actual_qty>0 {condition};""", as_dict=True)
+		and bin.warehouse='{warehouse}' and bin.actual_qty>0 {condition}; """, as_dict=True)
+	
+	print(stock)
 	return stock
