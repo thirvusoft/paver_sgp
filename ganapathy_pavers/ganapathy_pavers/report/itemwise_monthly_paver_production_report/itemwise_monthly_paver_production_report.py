@@ -152,7 +152,7 @@ def get_production_cost(filters, item):
                 )/SUM(mm.production_sqft)
             ) as prod_cost,
         AVG(mm.strapping_cost_per_sqft) as strapping,
-         AVG(mm.shot_blast_per_sqft) as shot_blasting
+        AVG(mm.shot_blast_per_sqft) as shot_blasting
 
         FROM `tabMaterial Manufacturing` as mm
         {conditions} 
