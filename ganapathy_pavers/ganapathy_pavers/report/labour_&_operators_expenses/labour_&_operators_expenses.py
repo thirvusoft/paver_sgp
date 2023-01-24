@@ -4,58 +4,111 @@ import frappe
 def execute(filters=None):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
-	machine=filters.get("machine")
-	print(machine)
-	pm_filt = "where docstatus!=2 and"
-	cw_filt = "where docstatus!=2 and"
-	sum_labour_cost=0
-	sum_operator_cost=0
-	if(filters.get('from_date') and (not filters.get('to_date'))):
-		pm_filt += " from_time >= '{0}' ".format(from_date)
-		cw_filt+=  " molding_date '>=' '{0}' ".format(from_date)
-	elif(filters.get('to_date') and (not filters.get('from_date'))):
-		pm_filt += " from_time >= '{0}' ".format(to_date)
-		cw_filt+=  " molding_date >= '{0}' ".format(to_date)
+	machine=filters.get("machine", [])
+	pm_filt = "where docstatus!=2"
+	cw_filt = "where docstatus!=2 and IFNULL(type, '')!='' "
+
+	if from_date:
+		pm_filt += " and from_time >= '{0}' ".format(from_date)
+		cw_filt+=  " and molding_date>='{0}' ".format(from_date)
+	if to_date:
+		pm_filt += " and from_time <= '{0}' ".format(to_date + " 23:59:59")
+		cw_filt+=  " and molding_date <= '{0}' ".format(to_date)
 		
-	elif(filters.get('from_date') and filters.get('to_date')):
-		pm_filt += " from_time between '{0}' and '{1}' ".format(from_date,to_date)
-		cw_filt+=  " molding_date between '{0}' and '{1}' ".format(from_date,to_date)
-	
-	if filters.get("machine"):
+	if machine:
 		if len(machine) == 1:
 			pm_filt += " and work_station = '{0}' ".format(machine[0])
 		else:
 			pm_filt += " and work_station in {0} ".format(tuple(machine[0]))
 
 
-	final_list=[]
-	pw_manufacturing=frappe.db.sql("""select "Paver" as type,sum(labour_cost_manufacture) + sum(labour_cost_in_rack_shift) + sum(labour_expense) as total_labour_cost ,sum(operators_cost_in_rack_shift) + sum(operators_cost_in_manufacture) as total_operator_cost,((sum(labour_cost_manufacture) + sum(labour_cost_in_rack_shift) + sum(labour_expense))/production_Sqft) as avg_sqf,count(name) as avg_count,(sum(operators_cost_in_rack_shift) + sum(operators_cost_in_manufacture)/production_sqft) as operator_avg_cost from `tabMaterial Manufacturing` {0}""".format(pm_filt),as_dict=1)
-  
-	cw_manufacturing=frappe.db.sql("""select type as type,sum(total_labour_wages) + sum(labour_expense_for_curing) as total_labour_cost ,sum(total_operator_wages) as total_operator_cost,sum(labour_cost_per_sqft) as labour_cost_per_sqft,sum(operator_cost_per_sqft) as operator_cost_per_sqft,count(name) as avg_count from `tabCW Manufacturing` {0} group by type""".format(cw_filt),as_dict=1)
-	for j in cw_manufacturing:
-		if j['type'] == 'Post' or j['type'] == 'Slab':
-			sum_labour_cost+=round(j['total_labour_cost'],2)
-			sum_operator_cost+=round(j['total_operator_cost'],2)
-		else:
-			final_list.append([j['type'],round(j['total_labour_cost'],2),round(j['labour_cost_per_sqft']/j['avg_count'],2),round(j['total_operator_cost'],2),round(j['operator_cost_per_sqft']/j['avg_count'],2)])
-		final_list.append(["Compound Wall",sum_labour_cost,round(j['labour_cost_per_sqft']/j['avg_count'],2),sum_operator_cost,round(j['operator_cost_per_sqft']/j['avg_count'],2)])
+	data=[]
+	pw_manufacturing=frappe.db.sql("""
+	select 
+		"Paver" as type,
+		SUM(labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense) as total_labour_cost,
+		SUM(operators_cost_in_manufacture+operators_cost_in_rack_shift) as total_operator_cost,
+		AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense))/AVG(production_sqft) as labour_cost,
+		AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(production_sqft) as operator_cost,
+		SUM(production_sqft) as production_sqft
+		from `tabMaterial Manufacturing` {0}""".format(pm_filt), as_dict=1)
 	
-	for i in pw_manufacturing:
-		if i['total_labour_cost']:
-			final_list.append([i['type'],round(i['total_labour_cost'],2),round(i['avg_sqf']/i['avg_count'],2),round(i['total_operator_cost'],2),round(i['operator_avg_cost']/i['avg_count'],2)])
+	cw_manufacturing=frappe.db.sql("""
+	select 
+		CASE 
+			WHEN type not in ("Post", "Slab") 
+			THEN type 
+			ELSE "Compound Wall" 
+		END as type,
+		SUM(total_labour_wages + labour_expense_for_curing) as total_labour_cost,
+		SUM(total_operator_wages) as total_operator_cost,
+		AVG(total_labour_wages + labour_expense_for_curing)/AVG(production_sqft) as labour_cost,
+		AVG(total_operator_wages)/AVG(production_sqft) as operator_cost,
+		SUM(production_sqft) as production_sqft
+		from `tabCW Manufacturing` {0}
+		GROUP BY CASE
+            WHEN type not in ('Post', 'Slab') 
+			THEN type
+        END
+		""".format(cw_filt), as_dict=1)
+	
+	post_slab={}
+	for row in cw_manufacturing:
+		if row.get("type") in []:
+			if not post_slab:
+				post_slab=row
+				post_slab["type"]="Compound Wall"
+			else:
+				post_slab["total_labour_cost"] += row.get("total_labour_cost", 0)
+				post_slab["labour_cost"] = (post_slab.get("labour_cost", 0)+row.get("labour_cost", 0))/2
+				post_slab["total_operator_cost"] += row.get("total_operator_cost", 0)
+				post_slab["operator_cost"] = (post_slab.get("operator_cost", 0)+row.get("operator_cost", 0))/2
+				post_slab["production_sqft"] = post_slab.get("production_sqft", 0)+row.get("production_sqft", 0)
+			continue
+		data.append(row)
+	
+	if post_slab:
+		data.append(post_slab)
+	
+	if pw_manufacturing and pw_manufacturing[0]:
+		data.append(pw_manufacturing[0])
 		
 	columns = get_columns()
-	return columns,final_list
+	data.sort(key = lambda row: row.get("type", ""))
+	return columns, data
 	
 def get_columns():
    columns = [
-	   ("Manufacturing") + ":Dta:200",
-	   ("Total Labour Cost ") + ":Data:200",
-	   ("Labour Cost Per SQF ") + ":Data:200",
-	   ("Total Operators Cost") + ":Data:200",
-	   ("Operator Cost Per SQF ") + ":Data:200",
-	  
-	  
-	   ]
+	   {
+		"fieldname": "type",
+		"label": "Manufacturing",
+		"fieldtype": "Data"
+	   },
+	   {
+		"fieldname": "total_labour_cost",
+		"label": "Total Labour Cost",
+		"fieldtype": "Currency"
+	   },
+	   {
+		"fieldname": "labour_cost",
+		"label": "Labour Cost Per SQF",
+		"fieldtype": "Currency"
+	   },
+	   {
+		"fieldname": "total_operator_cost",
+		"label": "Total Operator Cost",
+		"fieldtype": "Currency"
+	   },
+	   {
+		"fieldname": "operator_cost",
+		"label": "Operator Cost Per SQF",
+		"fieldtype": "Currency"
+	   },
+	   {
+		"fieldname": "production_sqft",
+		"label": "Production Sqft",
+		"fieldtype": "Float"
+	   }
+	]
   
    return columns
