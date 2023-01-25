@@ -111,7 +111,8 @@ override_doctype_class = {
 	"Payroll Entry":"ganapathy_pavers.utils.py.payroll_entry.MessExpense",
 	"Opening Invoice Creation Tool":"ganapathy_pavers.custom.py.opening_invoice.OpeningInvoice",
 	"Stock Entry" : "ganapathy_pavers.custom.py.stock_entry.Tsstockentry",
-	"Vehicle Log" : "ganapathy_pavers.custom.py.vehicle_overwrite.odometer"
+	"Vehicle Log" : "ganapathy_pavers.custom.py.vehicle_overwrite.odometer",
+	"Journal Entry": "ganapathy_pavers.custom.py.journal_entry_override._JournalEntry",
 }
 
 # Document Events

@@ -8,22 +8,14 @@ frappe.ui.form.on("Journal Entry", {
                     if (frm.doc.common_expenses?.length > 0) {
                         frm.scroll_to_field("common_expenses");
                         await frappe.confirm(
-                            `Do you want to erase the existing data in <b>Common Expenses</b> table<br>
-                            <div style="display:flex; flex-direction: column; align-items: center; justify-content: center;">
-                                <div>
-                                    <b>Yes</b> - Erases the existing table and then fill the data.<br>
-                                    <b>No</b> - Append the data with existing table.
-                                </div>
-                            </div>`,
+                            `Do you want to erase the existing data in <b>Common Expenses</b> table`,
                             async () => {
                                 await frm.clear_table("common_expenses");
                                 await frm.fields_dict.common_expenses?.refresh();
                                 await get_common_expenses(frm);
                             },
-                            async () => {
-                                await get_common_expenses(frm);
-                            }
-                        )
+                            () => { }
+                        );
                     } else {
                         await get_common_expenses(frm);
                     }
@@ -31,7 +23,7 @@ frappe.ui.form.on("Journal Entry", {
                 else {
                     frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
                 }
-            })
+            });
         }
 
         set_css();
@@ -74,7 +66,9 @@ frappe.ui.form.on("Journal Entry", {
                 res.forEach(async row => {
                     let child = cur_frm.add_child("accounts");
                     child.account = row.account;
+                    child.vehicle = row.vehicle;
                     child.debit_in_account_currency = row.debit;
+                    child.debit = row.debit;
                     child.from_common_entry = 1;
                     await frm.fields_dict.accounts.refresh();
                 });
@@ -97,7 +91,6 @@ frappe.ui.form.on("Journal Entry", {
             await frm.set_value("machine_12", 0);
             await trigger_allocate_amount(frm)
         }
-
     }
 });
 
@@ -109,18 +102,16 @@ async function calculate_debit(frm) {
             credit_acc_count += 1;
         }
     });
-    frm.set_value("total_debit", total_debit)
     if (credit_acc_count === 1) {
         (frm.doc.accounts || []).forEach(async row => {
             if (!row.debit_in_account_currency) {
+                await frappe.model.set_value(row.doctype, row.name, "credit", total_debit);
                 await frappe.model.set_value(row.doctype, row.name, "credit_in_account_currency", total_debit);
                 return
             }
         });
-    } else {
-
     }
-
+    frm.cscript.update_totals(frm.doc)
 }
 
 async function trigger_allocate_amount(frm) {
@@ -183,22 +174,23 @@ async function get_common_expenses(frm) {
             for (var i = 0; i < (r.message).length; i++) {
                 if (a[i]["monthly_cost"]) {
                     var row = frm.add_child("common_expenses"); await cur_frm.fields_dict.common_expenses.refresh()
-                    frappe.model.set_value(row.doctype, row.name, "account", a[i]["paver"][0] || "");
+                    frappe.model.set_value(row.doctype, row.name, "account", a[i]["paver"] || "");
+                    frappe.model.set_value(row.doctype, row.name, "vehicle", a[i]["vehicle"] || "");
                     frappe.model.set_value(row.doctype, row.name, "debit", a[i]["monthly_cost"] || "");
-                    if (a[i]["paver"][0]) {
-                        frappe.model.set_value(row.doctype, row.name, "paver_account", a[i]["paver"][0] || "");
+                    if (a[i]["paver"]) {
+                        frappe.model.set_value(row.doctype, row.name, "paver_account", a[i]["paver"] || "");
                         frappe.model.set_value(row.doctype, row.name, "paver", 1);
                     }
-                    if (a[i]["cw"][0]) {
-                        frappe.model.set_value(row.doctype, row.name, "cw_account", a[i]["cw"][0] || "");
+                    if (a[i]["cw"]) {
+                        frappe.model.set_value(row.doctype, row.name, "cw_account", a[i]["cw"] || "");
                         frappe.model.set_value(row.doctype, row.name, "compound_wall", 1);
                     }
-                    if (a[i]["lg"][0]) {
-                        frappe.model.set_value(row.doctype, row.name, "lg_account", a[i]["lg"][0] || "");
+                    if (a[i]["lg"]) {
+                        frappe.model.set_value(row.doctype, row.name, "lg_account", a[i]["lg"] || "");
                         frappe.model.set_value(row.doctype, row.name, "lego_block", 1);
                     }
-                    if (a[i]["fp"][0]) {
-                        frappe.model.set_value(row.doctype, row.name, "fp_account", a[i]["fp"][0] || "");
+                    if (a[i]["fp"]) {
+                        frappe.model.set_value(row.doctype, row.name, "fp_account", a[i]["fp"] || "");
                         frappe.model.set_value(row.doctype, row.name, "fencing_post", 1);
                     }
                 }

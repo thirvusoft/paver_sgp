@@ -18,6 +18,8 @@
   "lg_group",
   "column_break_8",
   "fp_group",
+  "vehicle_expense_account_groups_section",
+  "vehicle_expense",
   "section_break_10",
   "paver_uom",
   "column_break_12",
@@ -38,12 +40,12 @@
   {
    "fieldname": "section_break_2",
    "fieldtype": "Section Break",
-   "label": "Groups"
+   "label": "Production Expense Account Groups"
   },
   {
    "fieldname": "paver_group",
    "fieldtype": "Link",
-   "label": "Paver Group",
+   "label": "Paver Production Group",
    "options": "Account"
   },
   {
@@ -53,7 +55,7 @@
   {
    "fieldname": "cw_group",
    "fieldtype": "Link",
-   "label": "Compound Wall Group",
+   "label": "Compound Production Wall Group",
    "options": "Account"
   },
   {
@@ -63,7 +65,7 @@
   {
    "fieldname": "lg_group",
    "fieldtype": "Link",
-   "label": "Lego Block Group",
+   "label": "Lego Block Production Group",
    "options": "Account"
   },
   {
@@ -73,7 +75,7 @@
   {
    "fieldname": "fp_group",
    "fieldtype": "Link",
-   "label": "Fencing Post Group",
+   "label": "Fencing Post Production Group",
    "options": "Account"
   },
   {
@@ -142,12 +144,23 @@
   {
    "fieldname": "column_break_3",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vehicle_expense_account_groups_section",
+   "fieldtype": "Section Break",
+   "label": "Vehicle Expense Account Groups"
+  },
+  {
+   "fieldname": "vehicle_expense",
+   "fieldtype": "Link",
+   "label": "Vehicle Expense Group",
+   "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-03 17:51:36.749161",
+ "modified": "2023-01-25 17:15:16.426456",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Expense Accounts",
