@@ -36,7 +36,7 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"options": "Workstation",
 			on_change: on_change,
 			get_data: async function (txt) {
-				let ws = (await frappe.db.get_list("Material Manufacturing", { fields: ["work_station"] }))
+				let ws = (await frappe.db.get_list("Material Manufacturing", { fields: ["work_station"], limit: 0}))
 				let machines = []
 				ws.forEach(data => {
 					if (!machines.includes(data.work_station)) {
