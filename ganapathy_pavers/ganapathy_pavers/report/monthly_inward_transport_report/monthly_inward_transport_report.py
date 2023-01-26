@@ -148,7 +148,7 @@ def execute(filters=None):
 def get_expense_data(total_purchase_unit, filters):
 	exp=frappe.get_single("Expense Accounts")
 	if not exp.vehicle_expense:
-		return [], 0, 0
+		return []
 	exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.vehicle_expense, vehicle=filters.get("vehicle_no"))
 	res=[]
 	for i in exp_tree:

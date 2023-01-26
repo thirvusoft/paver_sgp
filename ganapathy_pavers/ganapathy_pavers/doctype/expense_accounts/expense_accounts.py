@@ -74,22 +74,25 @@ def get_filter(company=""):
 	exp=frappe.get_single("Expense Accounts")
 	accounts={'paver': exp.paver_group, 'cw': exp.cw_group, 'fp': exp.fp_group, 'lg': exp.lg_group}
 	res={}
+	acc_group_list=[]
 	for account in accounts:
 		if accounts[account]:
 			tree=tree_node(company, accounts[account])
 			acc_list=[]
-			ret_acc_list=get_filter_list(tree, acc_list)
+			acc_groups=[]
+			ret_acc_list, acc_groups=get_filter_list(tree, acc_list, acc_groups)
+			acc_group_list+=acc_groups+[accounts[account]]
 			res[account]=ret_acc_list
-	return res
+	return {"exp_accounts": res, "exp_groups": acc_group_list}
 
-def get_filter_list(accounts, acc_list):
+def get_filter_list(accounts, acc_list, acc_groups=[]):
 	for acc in accounts:
-		
 		if acc.get('expandable')==1:
-			acc_list=get_filter_list(acc.get('child_nodes'), acc_list)
+			acc_list, acc_groups=get_filter_list(acc.get('child_nodes'), acc_list, acc_groups)
+			acc_groups.append(acc.get('value'))
 		else:
 			acc_list.append(acc.get('value'))
-	return acc_list
+	return acc_list, acc_groups
 
 @frappe.whitelist()
 def get_common_account(account):
@@ -133,6 +136,8 @@ def monthly_cost():
 		res1.append(res)
 		
 	return res1	
-		
-		
+
+@frappe.whitelist()	
+def vehicle_expense_filter(doctype, txt, searchfield, start, page_len, filters):
+	return []		
 	
