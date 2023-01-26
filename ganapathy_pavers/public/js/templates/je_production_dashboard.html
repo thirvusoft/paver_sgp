@@ -1,0 +1,90 @@
+<div class="close-dialog">
+    <span></span>
+    <div class="production-heading">PRODUCTION DETAILS OF {{month}} MONTH</div>
+    <span class="close-x" onclick="cur_frm.dashboard.clear_comment(); return false;">x</span>
+</div>
+<div class="production-info">
+    <div class="production-info-data">
+        <div class="production-info-data-div">Paver: {{paver}}</div>
+    </div>
+    <div class="production-info-data">
+        <div class="production-info-data-div">Compound Wall: {{cw}}</div>
+    </div>
+    <div class="production-info-data">
+        <div class="production-info-data-div">Lego Block: {{lego}}</div>
+    </div>
+    <div class="production-info-data">
+        <div class="production-info-data-div">Fencing Post: {{fp}}</div>
+    </div>
+</div>
+<style>
+    .production-heading {
+        width: 100%;
+        font-size: 130%;
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 3mm;
+    }
+    .production-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: 20px;
+        flex-wrap: nowrap;
+    }
+    .production-info div {
+        font-size: 110%;
+        padding: 10px;
+        display: flex;
+        flex-wrap: nowrap;
+        width: 25%;
+        background: rgb(91 86 86 / 50%);
+        border-radius: 10px;
+        color: rgb(0 0 0);
+    }
+    .production-info-data-div {
+        width: 100% !important;
+        align-items: center;
+        border-radius: 50px !important;
+        background: rgb(255 251 251 / 40%) !important;
+        font-weight: 700;
+        justify-content: center;
+        pointer-events: auto;
+    }
+    .production-info-data {
+        pointer-events: none;
+        transition: transform 0.2s;
+    }
+    .production-info-data:hover {
+        -webkit-transform: scale(1.5);
+        transform: scale(1.1);
+        cursor: pointer;
+    }
+    .close-dialog {
+        display: flex;
+        width: 100%;
+        align-items: right;
+        justify-content: space-between;
+        font-size: 125%;
+    }
+    .close-dialog :hover {
+        cursor: pointer;
+    }
+    .close-x {
+        background: rgb(0 0 0 / 29%) !important;
+        height: 25px;
+        width: 25px;
+        text-align: center !important;
+        border-radius: 50%;
+        display: inline-block;
+        color: black;
+        transition: transform 0.2s;
+    }
+    .close-x:hover {
+        -webkit-transform: scale(1.5);
+        transform: scale(1.2);
+        border-radius: 30%;
+        background: rgb(0 0 0 / 47%) !important;
+    }
+</style>

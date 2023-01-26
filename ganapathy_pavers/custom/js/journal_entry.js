@@ -45,7 +45,7 @@ frappe.ui.form.on("Journal Entry", {
             return;
         }
         validate_common_accounts()
-        frappe.dom.freeze('.......');
+        frappe.dom.freeze(frappe.render_template("je_loading"));
         (cur_frm.fields_dict.accounts.grid.grid_rows || []).forEach(async row => {
             if (row.doc.from_common_entry) {
                 row.doc.__checked = 1;
@@ -142,6 +142,10 @@ frappe.ui.form.on("Common Expense JE", {
         get_accounts(frm, cdt, cdn);
         allocate_amount(frm, cdt, cdn);
     },
+    vehicle: function (frm, cdt, cdn) {
+        get_accounts(frm, cdt, cdn);
+        allocate_amount(frm, cdt, cdn);
+    },
     debit: function (frm, cdt, cdn) {
         allocate_amount(frm, cdt, cdn);
     },
@@ -202,6 +206,13 @@ async function get_common_expenses(frm) {
 
 async function allocate_amount(frm, cdt, cdn) {
     let data = locals[cdt][cdn];
+    if (data.vehicle) {
+        ['paver_amount', 'cw_amount', 'lg_amount', 'fp_amount',
+            'paver', 'compound_wall', 'fencing_post', 'lego_block'].forEach(async field => {
+                await frappe.model.set_value(cdt, cdn, field, 0);
+            });
+        return;
+    }
     let total_production = 0;
     if (data.paver) {
         total_production += (paver || 0);
@@ -243,7 +254,11 @@ async function allocate_amount(frm, cdt, cdn) {
 
 function get_accounts(frm, cdt, cdn) {
     let data = locals[cdt][cdn];
-    if (!data.account) {
+    if (!data.account || data.vehicle) {
+        frappe.model.set_value(cdt, cdn, "paver_account", "");
+        frappe.model.set_value(cdt, cdn, "cw_account", "");
+        frappe.model.set_value(cdt, cdn, "fp_account", "");
+        frappe.model.set_value(cdt, cdn, "lg_account", "");
         return
     }
     frappe.call({
@@ -271,7 +286,7 @@ function set_css(frm) {
 
 async function dashboard_data(date, frm) {
     if (!date || (!frm.doc.machine_12 && !frm.doc.machine_3)) {
-        cur_frm.dashboard.clear_comment();
+        frm.dashboard.clear_comment();
         return;
     }
     let machines = [];
@@ -294,110 +309,15 @@ async function dashboard_data(date, frm) {
             cw = res.cw || 0;
             lego = res.lego || 0;
             fp = res.fp || 0;
-            let msg = `
-                <div class="close-dialog">
-                    <span></span>
-                    <div class="production-heading">
-                    PRODUCTION DETAILS OF ${month.toUpperCase()} MONTH
-                </div>
-                    <span class="close-x" onclick="cur_frm.dashboard.clear_comment(); return false;">x</span>
-                </div>
-                <div class="production-info">
-                    <div class="production-info-data">
-                        <div class="production-info-data-div">
-                            Paver: ${roundNumber(paver)}
-                        </div>
-                    </div>
-                    <div class="production-info-data">
-                        <div class="production-info-data-div">
-                            Compound Wall: ${roundNumber(cw)}
-                        </div>
-                    </div>
-                    <div class="production-info-data">
-                        <div class="production-info-data-div">
-                            Lego Block: ${roundNumber(lego)}
-                        </div>
-                    </div>
-                    <div class="production-info-data">
-                        <div class="production-info-data-div">
-                            Fencing Post: ${roundNumber(fp)}
-                        </div>
-                    </div>
-                </div>
-                <style>
-                    .production-heading {
-                        width: 100%;
-                        font-size: 130%;
-                        text-align: center;
-                        font-weight: bold;
-                        margin-bottom: 3mm;
-                    }
-                    .production-info {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        width: 100%;
-                        gap: 20px;
-                        flex-wrap: nowrap;
-                    }
-                    .production-info div {
-                        font-size: 110%;
-                        padding: 10px;
-                        display: flex;
-                        flex-wrap: nowrap;
-                        width: 25%;
-                        background: rgb(91 86 86 / 50%);
-                        border-radius: 10px;
-                        color: rgb(0 0 0);
-                    }
-                    .production-info-data-div {
-                        width: 100% !important;
-                        align-items: center;
-                        border-radius: 50px !important;
-                        background: rgb(255 251 251 / 40%) !important;
-                        font-weight: 700;
-                        justify-content: center;
-                        pointer-events: auto;
-                    }
-                    .production-info-data {
-                        pointer-events: none;
-                        transition: transform .2s;
-                    }
-                    .production-info-data:hover {
-                        -webkit-transform: scale(1.5);
-                        transform: scale(1.1);
-                        cursor: pointer;
-                    }
-                    .close-dialog {
-                        display: flex;
-                        width: 100%;
-                        align-items: right;
-                        justify-content: space-between;
-                        font-size: 125%;
-                    }
-                    .close-dialog :hover {
-                        cursor: pointer;
-                    }
-                    .close-x {
-                        background: rgb(0 0 0 / 29%) !important;
-                        height: 25px;
-                        width: 25px;
-                        text-align: center !important;
-                        border-radius: 50%;
-                        display: inline-block;
-                        color: black;
-                        transition: transform .2s;
-                    }
-                    .close-x:hover {
-                        -webkit-transform: scale(1.5);
-                        transform: scale(1.2);
-                        border-radius: 30%;
-                        background: rgb(0 0 0 / 47%) !important;
-                    }
-                </style>
-            `
-            cur_frm.dashboard.clear_comment();
-            cur_frm.dashboard.add_comment(msg, 'yellow', 1);
+
+            frm.dashboard.clear_comment();
+            frm.dashboard.add_comment(frappe.render_template("je_production_dashboard", {
+                month: month.toUpperCase(),
+                paver: roundNumber(paver),
+                cw: roundNumber(cw),
+                lego: roundNumber(lego),
+                fp: roundNumber(fp)
+            }), 'yellow', 1);
         }
     });
 }

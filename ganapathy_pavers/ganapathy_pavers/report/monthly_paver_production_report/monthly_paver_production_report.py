@@ -184,7 +184,7 @@ def get_expense_from_child(prod_sqft, account, sqft, total_sqf, total_amt):
 			total_amt+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
 			res.append(dic)
 		if i['child_nodes']:
-			res1, total_sqf, total_amt=(get_expense_from_child(i['child_nodes'], sqft, total_sqf, total_amt))
+			res1, total_sqf, total_amt=(get_expense_from_child(prod_sqft, i['child_nodes'], sqft, total_sqf, total_amt))
 			res+=res1
 	return res, total_sqf, total_amt
 

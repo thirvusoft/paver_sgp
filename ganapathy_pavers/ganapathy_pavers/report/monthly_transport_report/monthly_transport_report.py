@@ -349,6 +349,6 @@ def get_expense_from_child(total_delivery_sqft, account, paver_sqft, cw_sqft):
 
 			res.append(sub_list)
 		if i['child_nodes']:
-			res1=(get_expense_from_child(i['child_nodes'], paver_sqft, cw_sqft))
+			res1=(get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft))
 			res+=res1
 	return res
