@@ -218,6 +218,9 @@ def execute(filters=None):
 
 	for j in expense_details:
 		if total_sqft:
+      total_amt_pavers += round((pavers_total / total_sqft)*j['expense'],2)
+			total_amt_cw += round((cw_total / total_sqft)*j['expense'],2)
+      continue
 			data.append(
 				{
 					"item":j['maintenance'],
@@ -228,58 +231,37 @@ def execute(filters=None):
 				}
 			)
 
-			total_amt_pavers += round((pavers_total / total_sqft)*j['expense'],2)
-			total_amt_cw += round((cw_total / total_sqft)*j['expense'],2)
-			
-	data.append(
-		{
-			"item":i.maintanence
-		}
-	)
-	
-	data.append({
-		"item":"<b>Total Amount</b>",
-		"2":f'<b>{total_amt_pavers}</b>',
-		"3":f'<b>{total_amt_cw}</b>'
-		})
-	
-	
-	data.append({
-		"item":"<b>Total SQFT</b>",
-		"2":f'<b>{pavers_total}</b>',
-		"3":f'<b>{cw_total}</b>'
-		})
-	if pavers_total and cw_total:
-		data.append({
-		"item":"<b>Total Cost</b>",
-		"2":f'<b>{round(total_amt_pavers/pavers_total,2)}</b>',
-		"3":f'<b>{round(total_amt_cw/cw_total,2)}</b>'
-		})
+	expense_details = get_expense_data((pavers_total+cw_total) or 1, filters, pavers_total, cw_total)
+	data+=(expense_details)
+	paver_total_amount=round(sum([i[3] or 0 for i in expense_details]), 2)
+	cw_total_amount=round(sum([i[4] or 0 for i in expense_details]), 2)
 
+	data.append({})
 
-	elif not pavers_total and not cw_total:
-		data.append({
-			"item":"<b>Total Cost</b>",
-			"2":f'<b> 0.0 </b>',
-			"3":f'<b> 0.0 </b>'
-		})
-		
+	sub_list = []
+	sub_list.append("<b>Total Amount</b>")
+	sub_list.append(f'<b>{round(sum([i[1] or 0 for i in expense_details]), 2)}</b>')
+	sub_list.append(f'<b>{round(sum([i[2] or 0 for i in expense_details]), 2)}</b>')
+	sub_list.append(f'<b>{paver_total_amount}</b>')
+	sub_list.append(f'<b>{cw_total_amount}</b>')
+	data.append(sub_list)
 
-	elif pavers_total and not cw_total:
-		data.append({
-			"item":"Total Cost",
-			"2":f'<b>{round(total_amt_pavers/pavers_total,2)}</b>',
-			"3":f'<b> 0.0 </b>'
-		})
-	
+	sub_list = []
+	sub_list.append("<b>Total SQFT</b>")
+	sub_list.append("")
+	sub_list.append("")
+	sub_list.append(f'<b>{pavers_total}</b>')
+	sub_list.append(f'<b>{cw_total}</b>')
+	data.append(sub_list)
 
-	elif not pavers_total and cw_total:
-		data.append({
-			"item":"Total Cost",
-			"2":f'<b> 0.0 </b>',
-			"3":f'<b>{round(total_amt_cw/cw_total,2)}</b>'
-		})
-		
+	sub_list = []
+	sub_list.append("<b>Total Cost</b>")
+	sub_list.append("")
+	sub_list.append("")
+	sub_list.append(f'<b>{round(paver_total_amount/pavers_total,2) if pavers_total else "0.0"}</b>')
+	sub_list.append(f'<b>{round(cw_total_amount/cw_total,2) if cw_total else "0.0"}</b>')
+	data.append(sub_list)
+
 	return columns, data
 
 
@@ -320,3 +302,46 @@ def get_columns():
 	
 	]
 	return columns
+
+def get_expense_data(total_delivery_sqft, filters, paver_sqft, cw_sqft):
+	exp=frappe.get_single("Expense Accounts")
+	if not exp.vehicle_expense:
+		return [], 0, 0
+	exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.vehicle_expense, vehicle=filters.get("vehicle_no"))
+	res=[]
+	for i in exp_tree:
+		if i.get("expandable"):
+			child=get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft)
+			if child:
+				if not filters.get("expense_summary"):
+					res+=child
+		else:
+			if i["balance"]:
+				sub_list=[]
+				
+				sub_list.append(i['value'])
+				sub_list.append(i["balance"])
+				sub_list.append((i["balance"]/total_delivery_sqft) or 0)
+				sub_list.append((i["balance"])*(paver_sqft/total_delivery_sqft) or 0)
+				sub_list.append((i["balance"])*(cw_sqft/total_delivery_sqft) or 0)
+
+				res.append(sub_list)	
+	return res
+
+def get_expense_from_child(total_delivery_sqft, account, paver_sqft, cw_sqft):
+	res=[]
+	for i in account:
+		if i["balance"]:
+			sub_list=[]
+			
+			sub_list.append(i['value'])
+			sub_list.append(i["balance"])
+			sub_list.append((i["balance"]/total_delivery_sqft) or 0)
+			sub_list.append((i["balance"])*(paver_sqft/total_delivery_sqft) or 0)
+			sub_list.append((i["balance"])*(cw_sqft/total_delivery_sqft) or 0)
+
+			res.append(sub_list)
+		if i['child_nodes']:
+			res1=(get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft))
+			res+=res1
+	return res
