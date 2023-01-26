@@ -136,8 +136,3 @@ def monthly_cost():
 		res1.append(res)
 		
 	return res1	
-
-@frappe.whitelist()	
-def vehicle_expense_filter(doctype, txt, searchfield, start, page_len, filters):
-	return []		
-	
