@@ -58,24 +58,20 @@ def execute(filters=None):
 
 	if  transport_based_on == "Report":
 		data.append({
-		"item":"<b>Pavers Report</b>"
+			"item":"<b>Pavers Report</b>"
 		})
 	else:
-		data.append({
-		
-		})
+		data.append({})
 		
 
 	if  transport_based_on == "Report":
 		data.append({
-		"item":"<b>Item</b>",
-		"qty":"<b>Total pavers</b>",
-		"1":"<b>Total Sqrft</b>"
-			})
+			"item":"<b>Item</b>",
+			"qty":"<b>Total pavers</b>",
+			"1":"<b>Total Sqrft</b>"
+		})
 
 
-	dn_item_list=[]
-	si_item_list=[]
 	dn_item=frappe.get_all("Delivery Note Item",{"parent":['in',dn_doc]},['item_code','item_group','sum(stock_qty) as stock_qty', 'stock_uom'],group_by='item_code')
 	si_item=frappe.get_all("Sales Invoice Item",{"parent":['in',si_doc]},['item_code','item_group','sum(stock_qty) as stock_qty', 'stock_uom'],group_by='item_code')
 
@@ -89,46 +85,39 @@ def execute(filters=None):
 		
 			if transport_based_on == "Report":
 				data.append({
-				"item":j.item_code,
-				"qty":round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"Nos"),2),
-				"1":round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"SQF"),2),
-				
+					"item":j.item_code,
+					"qty":round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"Nos"),2),
+					"1":round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"SQF"),2),
 				})
 	
 	if  transport_based_on == "Report":
 		data.append({
-	
-		"qty":"<b>Total Sqrft :</b>",
-		"1":f"<b>{pavers_total}</b>"
-			})
+			"qty":"<b>Total Sqrft :</b>",
+			"1":f"<b>{pavers_total}</b>"
+		})
 		
 		
 	else:
 		data.append({
-		"item":"<b>Pavers Sqrft :</b>",
-		"1":f"<b>{pavers_total}</b>"
-			})
-		
-	data.append({
-
+			"item":"<b>Pavers Sqrft :</b>",
+			"1":f"<b>{pavers_total}</b>"
 		})
+		
+	data.append({})
 	
 
 				
 	if  transport_based_on == "Report":
 		data.append({
-	
-		"item":"<b>Compound Wall Report</b>",
-		
-			})
+			"item":"<b>Compound Wall Report</b>",
+		})
 	
 
 	if  transport_based_on == "Report":
 		data.append({
-	
-		"item":"<b>Item</b>",
-		"qty":"<b>Total Qty</b>",
-		"1":"<b>Total Sqrft</b>"
+			"item":"<b>Item</b>",
+			"qty":"<b>Total Qty</b>",
+			"1":"<b>Total Sqrft</b>"
 		})
 		
 	
@@ -139,76 +128,64 @@ def execute(filters=None):
 	
 			if  transport_based_on == "Report":
 				data.append({
-				"item":j.item_code,
-				"qty":round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"Nos"),2),
-				"1":round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"SQF"),2),
-				
+					"item":j.item_code,
+					"qty":round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"Nos"),2),
+					"1":round(uom_conversion(j.item_code,j.stock_uom,j.stock_qty+si_qty(j.item_code),"SQF"),2),
 				})
 	
 				
 	
 	if  transport_based_on == "Report":
 		data.append({
-			
 			"qty":"<b>Total Sqrft :</b>",
 			"1":f"<b>{cw_total}</b>"
 		})
 	
 	else:
-		sub_list = []
 		data.append({
-		"item":"<b>Compund Wall Total Sqrft :</b>",
-		"1":f"<b>{cw_total}</b>",
+			"item":"<b>Compund Wall Total Sqrft :</b>",
+			"1":f"<b>{cw_total}</b>",
+		})
 		
-	})
-		
-	data.append(
-	{}
-    )
+	data.append({})
 
 	if  transport_based_on == "Report":
 		data.append({
-		"item":"<b>Others</b>",	
-	})
+			"item":"<b>Others</b>",	
+		})
 		
 		data.append({
-		"item":"<b>Item</b>",
-		"qty":"<b>Qty</b>",
-		"1":"<b>Uom</b>"
+			"item":"<b>Item</b>",
+			"qty":"<b>Qty</b>",
+			"1":"<b>Uom</b>"
 	    })
 
 		for j in dn_item:
 			if j.item_group not in ["Compound Walls" , "Pavers"]:
 				data.append({
-				"item":j.item_code,
-				"qty":round(j.stock_qty,2),
-				"1":j.stock_uom
+					"item":j.item_code,
+					"qty":round(j.stock_qty,2),
+					"1":j.stock_uom
 				})
 				
-		data.append(
-			{}
-		)
+		data.append({})
 
 	total_sqft = 0
 	if pavers_total or cw_total:
 		total_sqft = pavers_total + cw_total
-		data[1][4] = data[1][4] + str(pavers_total + cw_total)
+		data[1]["3"] = data[1]["3"] + str(pavers_total + cw_total)
     
-	data.append(
-		{
-			"item":"<b>Expenses Details</b>"
-		}
-	)
+	data.append({
+		"item":"<b>Expenses Details</b>"
+	})
 
-	data.append(
-		{
-			"item":"<b>Expenses Name</b>",
-			"qty":"<b>Amount</b>",
-			"1":"<b>Per Sqrft</b>",
-			"2":"<b>Amount Pavers</b> ",
-			"3":"<b>Amount CW</b>"
-		}
-	)
+	data.append({
+		"item":"<b>Expenses Name</b>",
+		"qty":"<b>Amount</b>",
+		"1":"<b>Per Sqrft</b>",
+		"2":"<b>Amount Pavers</b> ",
+		"3":"<b>Amount CW</b>"
+	})
 	
 
 	expense_details = frappe.db.sql(""" select child.maintenance as maintenance, sum(child.expense) as expense from `tabVehicle Log` as parent left outer join `tabMaintenance Details` as child on child.parent = parent.name where child.maintenance is not null and parent.date between '{0}' and '{1}' and parent.license_plate = '{2}' group by child.maintenance """.format(from_date,to_date,vehicle_no), as_dict= True)
@@ -218,56 +195,49 @@ def execute(filters=None):
 
 	for j in expense_details:
 		if total_sqft:
-      total_amt_pavers += round((pavers_total / total_sqft)*j['expense'],2)
+			total_amt_pavers += round((pavers_total / total_sqft)*j['expense'],2)
 			total_amt_cw += round((cw_total / total_sqft)*j['expense'],2)
-      continue
-			data.append(
-				{
-					"item":j['maintenance'],
-					"qty":round(j['expense'],2),
-					"1":round(j['expense']/total_sqft,3),
-					"2":round((pavers_total / total_sqft)*j['expense'],2),
-					"3":round((cw_total / total_sqft)*j['expense'],2)
-				}
-			)
+			continue
+			data.append({
+				"item":j['maintenance'],
+				"qty":round(j['expense'],2),
+				"1":round(j['expense']/total_sqft,3),
+				"2":round((pavers_total / total_sqft)*j['expense'],2),
+				"3":round((cw_total / total_sqft)*j['expense'],2)
+			})
 
 	expense_details = get_expense_data((pavers_total+cw_total) or 1, filters, pavers_total, cw_total)
 	data+=(expense_details)
-	paver_total_amount=round(sum([i[3] or 0 for i in expense_details]), 2)
-	cw_total_amount=round(sum([i[4] or 0 for i in expense_details]), 2)
+	paver_total_amount=round(sum([i["2"] or 0 for i in expense_details]), 2)
+	cw_total_amount=round(sum([i["3"] or 0 for i in expense_details]), 2)
 
 	data.append({})
 
-	sub_list = []
-	sub_list.append("<b>Total Amount</b>")
-	sub_list.append(f'<b>{round(sum([i[1] or 0 for i in expense_details]), 2)}</b>')
-	sub_list.append(f'<b>{round(sum([i[2] or 0 for i in expense_details]), 2)}</b>')
-	sub_list.append(f'<b>{paver_total_amount}</b>')
-	sub_list.append(f'<b>{cw_total_amount}</b>')
-	data.append(sub_list)
+	data.append({
+		"item":"<b>Total Amount</b>",
+		"qty":f'<b>{round(sum([i["qty"] or 0 for i in expense_details]), 2)}</b>',
+		"1":f'<b>{round(sum([i["1"] or 0 for i in expense_details]), 2)}</b>',
+		"2":f'<b>{paver_total_amount}</b>',
+		"3":f'<b>{cw_total_amount}</b>'
+	})
 
-	sub_list = []
-	sub_list.append("<b>Total SQFT</b>")
-	sub_list.append("")
-	sub_list.append("")
-	sub_list.append(f'<b>{pavers_total}</b>')
-	sub_list.append(f'<b>{cw_total}</b>')
-	data.append(sub_list)
+	data.append({
+		"item":"<b>Total SQFT</b>",
+		"2":f'<b>{pavers_total}</b>',
+		"3":f'<b>{cw_total}</b>'
+	})
 
-	sub_list = []
-	sub_list.append("<b>Total Cost</b>")
-	sub_list.append("")
-	sub_list.append("")
-	sub_list.append(f'<b>{round(paver_total_amount/pavers_total,2) if pavers_total else "0.0"}</b>')
-	sub_list.append(f'<b>{round(cw_total_amount/cw_total,2) if cw_total else "0.0"}</b>')
-	data.append(sub_list)
+	data.append({
+		"item":"<b>Total Cost</b>",
+		"2":f'<b>{round(paver_total_amount/pavers_total,2) if pavers_total else "0.0"}</b>',
+		"3":f'<b>{round(cw_total_amount/cw_total,2) if cw_total else "0.0"}</b>'
+	})
 
 	return columns, data
 
 
 def get_columns():
 	columns = [
-		
         {
             "label": _("<b>Item</b>"),
             "fieldtype": "Link",
@@ -299,7 +269,6 @@ def get_columns():
             "fieldname": "3",
             "width": 150
         },
-	
 	]
 	return columns
 
@@ -317,30 +286,26 @@ def get_expense_data(total_delivery_sqft, filters, paver_sqft, cw_sqft):
 					res+=child
 		else:
 			if i["balance"]:
-				sub_list=[]
-				
-				sub_list.append(i['value'])
-				sub_list.append(i["balance"])
-				sub_list.append((i["balance"]/total_delivery_sqft) or 0)
-				sub_list.append((i["balance"])*(paver_sqft/total_delivery_sqft) or 0)
-				sub_list.append((i["balance"])*(cw_sqft/total_delivery_sqft) or 0)
-
-				res.append(sub_list)	
+				res.append({
+					"item": i['value'],
+					"qty": i["balance"],
+					"1": (i["balance"]/total_delivery_sqft) or 0,
+					"2": (i["balance"])*(paver_sqft/total_delivery_sqft) or 0,
+					"3": (i["balance"])*(cw_sqft/total_delivery_sqft) or 0,
+				})	
 	return res
 
 def get_expense_from_child(total_delivery_sqft, account, paver_sqft, cw_sqft):
 	res=[]
 	for i in account:
 		if i["balance"]:
-			sub_list=[]
-			
-			sub_list.append(i['value'])
-			sub_list.append(i["balance"])
-			sub_list.append((i["balance"]/total_delivery_sqft) or 0)
-			sub_list.append((i["balance"])*(paver_sqft/total_delivery_sqft) or 0)
-			sub_list.append((i["balance"])*(cw_sqft/total_delivery_sqft) or 0)
-
-			res.append(sub_list)
+			res.append({
+				"item": i['value'],
+				"qty": i["balance"],
+				"1": (i["balance"]/total_delivery_sqft) or 0,
+				"2": (i["balance"])*(paver_sqft/total_delivery_sqft) or 0,
+				"3": (i["balance"])*(cw_sqft/total_delivery_sqft) or 0,
+			})
 		if i['child_nodes']:
 			res1=(get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft))
 			res+=res1

@@ -46,31 +46,18 @@ def execute(filters=None):
 		"item": f"Starting KM :{start_km}",
 		"qty": f"End KM :{end_km}",
 		"1": f"Total KM :{end_km-start_km}",
-		"2": None,
 		"3": f"Mileage :{mileage}",
 	})
-	data.append({
-		"item": None,
-		"qty": None,
-		"1": None,
-		"2": None,
-		"3": None,
-	})
+	data.append({})
 
 	data.append({
 		"item": "<b>Inward Report</b>",
-		"qty": None,
-		"1": None,
-		"2": None,
-		"3": None,
 	})
 
 	data.append({
 		"item": "<b>Item</b>",
 		"qty": "<b>Total Load</b>",
 		"1": "<b>Total Unit</b>",
-		"2": None,
-		"3": None,
 	})
 
 	pr_item=frappe.get_all("Purchase Receipt Item",{"parent":['in',pr_doc],"uom":"Unit"},['item_code','count(item_code) as count','sum(stock_qty) as stock_qty','stock_uom'],group_by='item_code')
@@ -102,42 +89,29 @@ def execute(filters=None):
 			"item": j,
 			"qty": purchase_count[j],
 			"1": round(uom_conversion(j,purchase_uom[j],purchase_qty[j],"Unit"),2),
-			"2": None,
-			"3": None,
 		})
 
 	data.append({
 		"item": "<b>Total</b>",
 		"qty": f"{total_load}",
 		"1": f"{total_unit}",
-		"2": None,
-		"3": None,
 	})
 
 	data.append({
 		"item": "<b>Total Amount</b>",
-		"qty": None,
 		"1": f"<b>{receipt_grand_total[0]+invoice_grand_total[0] }</b>",
-		"2": None,
-		"3": None,
 	})
 
 	data.append({})
 
 	data.append({
 		"item": "<b>Expenses Details</b>",
-		"qty": None,
-		"1": None,
-		"2": None,
-		"3": None,
 	})
 
 	data.append({
 		"item": "<b>Expenses Name</b>",
 		"qty": "<b>Amount</b>",
 		"1": "<b>Per Unit</b>",
-		"2": None,
-		"3": None,
 	})
 
 	expense_details = frappe.db.sql(""" select child.maintenance as maintenance, sum(child.expense) as expense from `tabVehicle Log` as parent left outer join `tabMaintenance Details` as child on child.parent = parent.name where child.maintenance is not null and parent.date between '{0}' and '{1}' and parent.license_plate = '{2}' group by child.maintenance """.format(from_date,to_date,vehicle_no), as_dict= True)
@@ -152,8 +126,6 @@ def execute(filters=None):
 				"item": j['maintenance'],
 				"qty": round(j['expense'],2),
 				"1": round(j['expense']/total_unit,3),
-				"2": None,
-				"3": None,
 			})
 	expense_details = get_expense_data(total_unit or 1, filters) or []
 	total_amount=sum([i['qty'] for i in expense_details])
@@ -163,18 +135,12 @@ def execute(filters=None):
 
 	data.append({
 		"item": "<b>Total Amount</b>",
-		"qty": None,
 		"1": f"<b>{total_amount}</b>",
-		"2": None,
-		"3": None,
 	})
 
 	data.append({
 		"item": "<b>Profit</b>",
-		"qty": None,
 		"1": f"<b>{(receipt_grand_total[0]+invoice_grand_total[0])-total_amount}</b>",
-		"2": None,
-		"3": None,
 	})
 
 	return columns, data
@@ -197,8 +163,6 @@ def get_expense_data(total_purchase_unit, filters):
 					"item": i['value'],
 					"qty": i["balance"],
 					"1": (i["balance"]/total_purchase_unit) or 0,
-					"2": None,
-					"3": None,
 				})	
 	return res
 
@@ -210,8 +174,6 @@ def get_expense_from_child(total_purchase_unit, account):
 				"item": i['value'],
 				"qty": i["balance"],
 				"1": (i["balance"]/total_purchase_unit) or 0,
-				"2": None,
-				"3": None,
 			})
 		if i['child_nodes']:
 			res1=(get_expense_from_child(total_purchase_unit, i['child_nodes']))
