@@ -14,15 +14,19 @@ def execute(filters=None):
 	filters1={'from_time':["between",[from_date,to_date]] }
 	if filters.get("machine"):
 		filters1["work_station"] = ["in", filters.get("machine", [])]
+	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
 	if item:
 		filters1["item_to_manufacture"]=item
 	paver_list = frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
 	test_data = []
 
 	if paver_list:
+		lo_condition=f" in {tuple(lo_paver_list)}"
 		condition=f" in {tuple(paver_list)}"
 		if len(paver_list)==1:
 			condition=f" = '{paver_list[0]}'"
+		if len(lo_paver_list)==1:
+			lo_condition=f" = '{lo_paver_list[0]}'"
 		bom_item = frappe.db.sql(""" 
 								select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent {0} group by item_code """.format(condition),as_list=1)
 		production_qty = frappe.db.sql(""" 
@@ -35,9 +39,17 @@ def execute(filters=None):
 								sum(labour_expense) as labour_expense,
 								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
 								avg(shot_blast_per_sqft) as shot_blast_per_sqft,
-								AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense))/AVG(production_sqft) as labour_cost,
-								AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(production_sqft) as operator_cost
-								from `tabMaterial Manufacturing` where name  {0} """.format(condition),as_dict=1)
+								(
+									SELECT AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense))/AVG(production_sqft)
+									from `tabMaterial Manufacturing`
+									WHERE name {1}
+								) as labour_cost,
+								(
+									SELECT AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(production_sqft)
+									from `tabMaterial Manufacturing`
+									WHERE name {1}
+								) as operator_cost
+								from `tabMaterial Manufacturing` where name  {0} """.format(condition, lo_condition),as_dict=1)
 
 		
 		
