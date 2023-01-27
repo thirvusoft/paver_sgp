@@ -9,6 +9,7 @@ frappe.query_reports["Monthly Lego Block Production Report"] = {
 			"label": __("From Date"),
 			"fieldtype": "Date",
 			"width": "80",
+			"default": frappe.datetime.month_start(),
 			"reqd":1
 		},
 		{
@@ -16,6 +17,7 @@ frappe.query_reports["Monthly Lego Block Production Report"] = {
 			"label": __("To Date"),
 			"fieldtype": "Date",
 			"width": "80",
+			"default": frappe.datetime.month_end(),
 			"reqd":1
 		},
 		{

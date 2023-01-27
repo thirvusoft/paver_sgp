@@ -157,8 +157,7 @@ def get_expense_data(total_purchase_unit, filters):
 		if i.get("expandable"):
 			child=get_expense_from_child(total_purchase_unit, i['child_nodes'])
 			if child:
-				if not filters.get("expense_summary"):
-					res+=child
+				res+=child
 		else:
 			if i["balance"]:
 				res.append({

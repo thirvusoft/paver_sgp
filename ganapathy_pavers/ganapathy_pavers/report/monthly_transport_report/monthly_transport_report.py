@@ -207,7 +207,8 @@ def execute(filters=None):
 			})
 
 	expense_details = get_expense_data((pavers_total+cw_total) or 1, filters, pavers_total, cw_total)
-	data+=(expense_details)
+	if transport_based_on=="Report":
+		data+=(expense_details)
 	paver_total_amount=round(sum([i["2"] or 0 for i in expense_details]), 2)
 	cw_total_amount=round(sum([i["3"] or 0 for i in expense_details]), 2)
 
@@ -282,8 +283,7 @@ def get_expense_data(total_delivery_sqft, filters, paver_sqft, cw_sqft):
 		if i.get("expandable"):
 			child=get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft)
 			if child:
-				if not filters.get("expense_summary"):
-					res+=child
+				res+=child
 		else:
 			if i["balance"]:
 				res.append({
