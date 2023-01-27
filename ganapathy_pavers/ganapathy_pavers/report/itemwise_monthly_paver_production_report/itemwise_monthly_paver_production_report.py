@@ -136,16 +136,12 @@ def get_production_cost(filters, item):
         conditions+=f""" AND mm.work_station = '{filters.get("machine")[0]}'"""
     query=f"""
         SELECT 
-              (
-                    SELECT AVG((lomm.operators_cost_in_manufacture+lomm.operators_cost_in_rack_shift))/AVG(lomm.production_sqft) + 
-                    AVG((lomm.labour_cost_manufacture+lomm.labour_cost_in_rack_shift+lomm.labour_expense))/AVG(lomm.production_sqft)
-                    FROM `tabMaterial Manufacturing` as lomm
-                    {conditions.replace("mm", "lomm").replace(F"AND lomm.item_to_manufacture='{item}'", " ")}
-                ) as labour_operator_cost,
             (
-                AVG((mm.operators_cost_in_manufacture+mm.operators_cost_in_rack_shift))/AVG(mm.production_sqft) + 
-                AVG((mm.labour_cost_manufacture+mm.labour_cost_in_rack_shift+mm.labour_expense))/AVG(mm.production_sqft)
-            ) as labour_opesrator_cost, 
+                SELECT AVG((lomm.operators_cost_in_manufacture+lomm.operators_cost_in_rack_shift))/AVG(lomm.production_sqft) + 
+                AVG((lomm.labour_cost_manufacture+lomm.labour_cost_in_rack_shift+lomm.labour_expense))/AVG(lomm.production_sqft)
+                FROM `tabMaterial Manufacturing` as lomm
+                {conditions.replace("mm", "lomm").replace(F"AND lomm.item_to_manufacture='{item}'", " ")}
+            ) as labour_operator_cost,
             ( 
                 (
                     SELECT SUM(bi.amount) from `tabBOM Item` bi
