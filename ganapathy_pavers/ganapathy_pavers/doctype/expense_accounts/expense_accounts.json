@@ -18,6 +18,8 @@
   "lg_group",
   "column_break_8",
   "fp_group",
+  "vehicle_expense_account_groups_section",
+  "vehicle_expense",
   "section_break_10",
   "paver_uom",
   "column_break_12",
@@ -27,7 +29,9 @@
   "column_break_16",
   "fp_uom",
   "section_break_18",
-  "expense_account_common_groups"
+  "expense_account_common_groups",
+  "vehicle_expense_accounts_section",
+  "vehicle_expense_accounts"
  ],
  "fields": [
   {
@@ -38,12 +42,12 @@
   {
    "fieldname": "section_break_2",
    "fieldtype": "Section Break",
-   "label": "Groups"
+   "label": "Production Expense Account Groups"
   },
   {
    "fieldname": "paver_group",
    "fieldtype": "Link",
-   "label": "Paver Group",
+   "label": "Paver Production Group",
    "options": "Account"
   },
   {
@@ -53,7 +57,7 @@
   {
    "fieldname": "cw_group",
    "fieldtype": "Link",
-   "label": "Compound Wall Group",
+   "label": "Compound Production Wall Group",
    "options": "Account"
   },
   {
@@ -63,7 +67,7 @@
   {
    "fieldname": "lg_group",
    "fieldtype": "Link",
-   "label": "Lego Block Group",
+   "label": "Lego Block Production Group",
    "options": "Account"
   },
   {
@@ -73,7 +77,7 @@
   {
    "fieldname": "fp_group",
    "fieldtype": "Link",
-   "label": "Fencing Post Group",
+   "label": "Fencing Post Production Group",
    "options": "Account"
   },
   {
@@ -127,7 +131,7 @@
   {
    "fieldname": "section_break_18",
    "fieldtype": "Section Break",
-   "label": "Common Entry Accounts"
+   "label": "Production Expense Accounts"
   },
   {
    "fieldname": "sb",
@@ -142,12 +146,33 @@
   {
    "fieldname": "column_break_3",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vehicle_expense_account_groups_section",
+   "fieldtype": "Section Break",
+   "label": "Vehicle Expense Account Groups"
+  },
+  {
+   "fieldname": "vehicle_expense",
+   "fieldtype": "Link",
+   "label": "Vehicle Expense Group",
+   "options": "Account"
+  },
+  {
+   "fieldname": "vehicle_expense_accounts_section",
+   "fieldtype": "Section Break",
+   "label": "Vehicle Expense Accounts"
+  },
+  {
+   "fieldname": "vehicle_expense_accounts",
+   "fieldtype": "Table",
+   "options": "Vehicle Expense Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-03 17:51:36.749161",
+ "modified": "2023-01-27 10:02:30.187480",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Expense Accounts",

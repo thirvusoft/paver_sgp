@@ -8,15 +8,15 @@ frappe.query_reports["Labour & Operators Expenses"] = {
 			"fieldname": "from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",
-			"default": frappe.datetime.get_today(),
+			"default": frappe.datetime.month_start(),
 			"width": "80",
 			"reqd": 1
 		},
 		{
 			"fieldname": "to_date",
 			"label": __("To Date"),
-			"fieldtype": "Date",
-			"default": frappe.datetime.get_today(),
+			"fieldtype": "Date",			
+			"default": frappe.datetime.month_end(),
 			"width": "80",
 			"reqd": 1
 		},

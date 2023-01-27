@@ -80,7 +80,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 		abstract_cost = {#"Total Raw Material Cost":production_qty[0]['raw_material_cost_per_sqft'],
 				"Total Labour Cost":production_qty[0]["labour_cost_per_sqft"],
 				"Total Operator Cost":production_qty[0]['operator_cost_per_sqft'],
-				"<span style='color:rgb(255 82 0);'>Avg of Labour and Operator Cost</span>": f"""<b style='color:rgb(255 82 0);'>₹{(((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0))/2):,.2f}</b>""",
+				"<span style='color:rgb(255 82 0);'>Labour and Operator Cost</span>": f"""<b style='color:rgb(255 82 0);'>₹{(((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0))):,.2f}</b>""",
 				"Total Strapping Cost":production_qty[0]['strapping_cost_per_sqft'],
 				"Total Additional Cost":production_qty[0]['additional_cost_per_sqft']}
 
@@ -120,7 +120,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 					"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 4)}</b>"
 				})
 		if data and len(data)>0:
-			data[0]['uom']=f"""<b>Production Cost per SQFT :</b> ₹{(production_qty[0]['strapping_cost_per_sqft'] + production_qty[0]['additional_cost_per_sqft'] + total_cost_per_sqft + round(total_sqf, 4) + (((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0))/2)):,.3f}"""
+			data[0]['uom']=f"""<b>Production Cost per SQFT :</b> ₹{(production_qty[0]['strapping_cost_per_sqft'] + production_qty[0]['additional_cost_per_sqft'] + total_cost_per_sqft + round(total_sqf, 4) + (((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0)))):,.3f}"""
 	columns = get_columns()
 	return columns, data
  
@@ -216,7 +216,7 @@ def get_expense_from_child(prod_sqft, account, sqft, total_sqf, total_amt):
 			total_sqf+=(dic["consumption"] or 0)
 			res.append(dic)
 		if i['child_nodes']:
-			res1, total_sqf, total_amt=(get_expense_from_child(i['child_nodes'], sqft, total_sqf, total_amt))
+			res1, total_sqf, total_amt=(get_expense_from_child(prod_sqft, i['child_nodes'], sqft, total_sqf, total_amt))
 			res+=res1
 	return res, total_sqf, total_amt
 
