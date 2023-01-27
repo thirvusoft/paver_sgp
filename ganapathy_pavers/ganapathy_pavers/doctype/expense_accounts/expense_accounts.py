@@ -8,17 +8,14 @@ from frappe.model.document import Document
 
 class ExpenseAccounts(Document):
 	def validate(doc):
-		frappe.db.sql("""delete from `tabExpense Account Common Groups` where parenttype='Vehicle' """)
+		frappe.db.sql("""delete from `tabVehicle Expense Account` where parenttype='Vehicle' """)
 		vehicle_accounts={}
-		for row in doc.expense_account_common_groups:
+		for row in doc.vehicle_expense_accounts:
 			if row.vehicle:
 				if row.vehicle not in vehicle_accounts:
 					vehicle_accounts[row.vehicle]=[]
 				vehicle_accounts[row.vehicle].append({
-					"paver_account":row.paver_account,
-					"cw_account":row.cw_account,
-					"lg_account":row.lg_account,
-					"fp_account":row.fp_account,
+					"expense_account": row.expense_account,
 					"monthly_cost":row.monthly_cost,
 					"vehicle":row.vehicle
 				})
@@ -95,6 +92,17 @@ def get_filter_list(accounts, acc_list, acc_groups=[]):
 	return acc_list, acc_groups
 
 @frappe.whitelist()
+def get_child_under_vehicle_expense():
+	exp=frappe.get_single("Expense Accounts")
+	if not exp.vehicle_expense:
+		return []
+	vehicle_expense=tree_node(parent=exp.vehicle_expense)
+	acc_list=[]
+	acc_groups=[]
+	ret_acc_list, acc_groups=get_filter_list(vehicle_expense, acc_list, acc_groups)
+	return ret_acc_list
+
+@frappe.whitelist()
 def get_common_account(account):
 	exp=frappe.get_single("Expense Accounts")
 	return exp.get_common_account(account)
@@ -132,6 +140,12 @@ def monthly_cost():
 		res["fp"]=i.fp_account
 		res["vehicle"]=i.vehicle
 		res["lg"]=i.lg_account
+		res["monthly_cost"]=i.monthly_cost
+		res1.append(res)
+	for i in cost.vehicle_expense_accounts:
+		res={}
+		res["account"]=i.expense_account 
+		res["vehicle"]=i.vehicle
 		res["monthly_cost"]=i.monthly_cost
 		res1.append(res)
 		

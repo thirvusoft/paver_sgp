@@ -178,7 +178,7 @@ async function get_common_expenses(frm) {
             for (var i = 0; i < (r.message).length; i++) {
                 if (a[i]["monthly_cost"]) {
                     var row = frm.add_child("common_expenses"); await cur_frm.fields_dict.common_expenses.refresh()
-                    frappe.model.set_value(row.doctype, row.name, "account", a[i]["paver"] || "");
+                    frappe.model.set_value(row.doctype, row.name, "account", a[i]["account"] || a[i]["paver"] || "");
                     frappe.model.set_value(row.doctype, row.name, "vehicle", a[i]["vehicle"] || "");
                     frappe.model.set_value(row.doctype, row.name, "debit", a[i]["monthly_cost"] || "");
                     if (a[i]["paver"]) {

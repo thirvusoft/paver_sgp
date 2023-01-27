@@ -1,7 +1,7 @@
 // Copyright (c) 2022, Thirvusoft and contributors
 // For license information, please see license.txt
 
-var acc_filters = [], vehicle_expense_filters = [];
+var acc_filters = [], vehicle_expense_filters = [], vehicle_filters = [];
 frappe.ui.form.on('Expense Accounts', {
 	refresh: async function (frm) {
 		["paver_group", "cw_group", "lg_group", "fp_group"].forEach(field => frm.set_query(field, function () {
@@ -69,6 +69,22 @@ frappe.ui.form.on('Expense Accounts', {
 				}
 			}
 		});
+
+		await frappe.call({
+			method: "ganapathy_pavers.ganapathy_pavers.doctype.expense_accounts.expense_accounts.get_child_under_vehicle_expense",
+			callback(r) {
+				vehicle_filters = r.message;
+			}
+		});
+		frm.set_query("expense_account", "vehicle_expense_accounts", function () {
+			return {
+				filters: {
+					name: ['in', vehicle_filters],
+					is_group: 0
+				}
+			}
+		});
+
 	},
 	paver_group: function (frm) {
 		frm.trigger("refresh");

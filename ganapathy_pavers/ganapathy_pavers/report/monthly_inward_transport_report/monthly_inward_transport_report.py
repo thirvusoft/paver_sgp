@@ -129,18 +129,20 @@ def execute(filters=None):
 			})
 	expense_details = get_expense_data(total_unit or 1, filters) or []
 	total_amount=sum([i['qty'] for i in expense_details])
+	total_per_unit=sum([i['1'] for i in expense_details])
 	data += expense_details
 
 	data.append({})
 
 	data.append({
 		"item": "<b>Total Amount</b>",
-		"1": f"<b>{total_amount}</b>",
+		"qty": f"<b>{total_amount}</b>",
+		"1": f"{total_per_unit}",
 	})
 
 	data.append({
 		"item": "<b>Profit</b>",
-		"1": f"<b>{(receipt_grand_total[0]+invoice_grand_total[0])-total_amount}</b>",
+		"qty": f"<b>{(receipt_grand_total[0]+invoice_grand_total[0])-total_amount}</b>",
 	})
 
 	return columns, data
@@ -186,27 +188,32 @@ def get_columns():
 			"fieldname": "item",
 			"label": _("<b>Item</b>"),
 			"fieldtype": "Link",
-			"options": "Item"
+			"options": "Item",
+			"width": 150
 		},
 		{
 			"fieldname": "qty",
 			"label": _("<b>Qty</b>"),
 			"fieldtype": "Data",
+			"width": 150
 		},
 		{
 			"fieldname": "1",
 			"label": _("<b>1</b>"),
 			"fieldtype": "Data",
+			"width": 150
 		},
 		{
 			"fieldname": "2",
 			"label": _("<b>2</b>"),
 			"fieldtype": "Data",
+			"width": 150
 		},
 		{
 			"fieldname": "3",
 			"label": _("<b>3</b>"),
 			"fieldtype": "Data",
+			"width": 150
 		},
 	]
 	return columns
