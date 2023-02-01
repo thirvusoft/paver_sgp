@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
 
+import datetime
 import frappe
 from frappe import _
 def execute(filters=None):
@@ -24,7 +25,7 @@ def execute(filters=None):
             conditions += " and jwd.name1 ='{0}' ".format(employee)
         if site_name:
             conditions += " and site.name = '{0}' ".format(site_name)
-    report_data = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
+    report_data = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount)  from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
                                         emp.salary_balance as salary_balance,{4} as amount,
                                         (select sum(empadv.advance_amount) from `tabEmployee Advance` as empadv {1} and empadv.employee = jwd.name1 and docstatus = 1) as advance_amount
                                         from `tabProject` as site
@@ -35,7 +36,7 @@ def execute(filters=None):
                                         {0}
                                     {2} order by jwd.sqft_allocated)as total_cal
                                 """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.completed_bundle), sum(jwd.sqft_allocated)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
-    
+ 
     report_data1 = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
                                         emp.salary_balance as salary_balance,{4} as amount,
                                         (select sum(empadv.advance_amount) from `tabEmployee Advance` as empadv {1} and empadv.employee = jwd.name1 and docstatus = 1) as advance_amount
@@ -62,13 +63,11 @@ def execute(filters=None):
                 data1[_key][8]+=(data[idx][8] or 0)
         data=list(data1.values())
     data = [list(i) for i in (report_data1 or [])] + data
-
     
 
     for row in data:
         if row[0] and frappe.db.exists("Employee", row[0]):
             row[7]=get_employee_salary_balance(employee=row[0], from_date=from_date, to_date=to_date)
-            row[0]=frappe.db.get_value("Employee", row[0], "employee_name")
 
     data.sort(key = lambda x:x[0])
    
@@ -80,23 +79,27 @@ def execute(filters=None):
                 adv=data[i][9]
                 data[i][9]=None
                 data[i][10]=None
+                employee_id=data[i][0]
+                data[i][0]=frappe.db.get_value("Employee", data[i][0], "employee_name")
                 final_data.append(data[i])
-                total = [" " for i in range(11)]
+                total = [" " for i in range(12)]
                 total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
                 total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,i+1))}</b>"
                 total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,i+1))}</b>"
                 total[5]=0
                 total[7] = sum((data[i][7] or 0) for i in range(start,i+1))
                 total[8] = f"<b>{'%.2f'%sum((data[i][8] or 0) for i in range(start,i+1))}</b>"
-                total[9] = adv
+                total[9] = get_employee_salary_slip_advance_deduction(employee_id, from_date, to_date, adv)
                 amount=sum((data[i][8] or 0) for i in range(start,i+1))
                 salary_bal=sum((data[i][7] or 0) for i in range(start,i+1))
                 total[10] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
+                total[11]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
                 final_data[-1][7]=None
                 final_data.append(total)
                 start = i+1	
                 c=0
             else:
+                data[i][0]=frappe.db.get_value("Employee", data[i][0], "employee_name")
                 data[i][7]=None
                 data[i][10]=None
                 if(c==0):data[i][9]=None
@@ -106,18 +109,21 @@ def execute(filters=None):
         adv=data[-1][9]
         data[-1][9]=None
         data[-1][10]=None
+        employee_id=data[-1][0]
+        data[-1][0]=frappe.db.get_value("Employee", data[-1][0], "employee_name")
         final_data.append(data[-1])
-        total = [" " for i in range(11)]
+        total = [" " for i in range(12)]
         total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
         total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,len(data)))}</b>"
         total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,len(data)))}</b>"
         total[5]=0
         total[7] = sum((data[i][7] or 0) for i in range(start,len(data)))
         total[8] = f"<b>{'%.2f'%sum((data[i][8] or 0) for i in range(start,len(data)))}</b>"
-        total[9] = adv
+        total[9] = get_employee_salary_slip_advance_deduction(employee_id, from_date, to_date, adv)
         amount=sum((data[i][8] or 0) for i in range(start,len(data)))
         salary_bal=sum((data[i][7] or 0) for i in range(start,len(data)))
         total[10] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
+        total[11]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
         final_data[-1][7]=None
         final_data.append(total)
     other_work=0
@@ -198,14 +204,49 @@ def get_columns(other_work):
 	return columns
 
 def get_employee_salary_balance(employee, from_date, to_date):
-   
-    salary_slip=frappe.db.sql("""select total_unpaid_amount from `tabSalary Slip` where posting_date between %(from)s and %(to)s and employee=%(emp)s and docstatus=1 order by posting_date desc,modified desc limit 1""",{"emp":employee, "from":from_date, "to":to_date},as_dict=True)
-    salary_slip1=frappe.db.sql("""select total_unpaid_amount from `tabSalary Slip` where employee=%(emp)s and posting_date<=%(from)s  and docstatus=1 order by posting_date desc,modified desc limit 1""",{"emp":employee,"from":from_date},as_dict=True)
-    salary_slip2=frappe.db.sql("""select salary_balance from `tabEmployee` where name=%(emp)s """,{"emp":employee},as_dict=True)
+    last_ss_date=frappe.db.sql(f"""
+    SELECT MAX(ss.end_date) 
+    FROM `tabSalary Slip` ss
+    WHERE ss.employee = '{employee}' AND ss.docstatus=1
+    """)
+    amount=0
+    salary_slip=frappe.db.sql("""select total_unpaid_amount from `tabSalary Slip` where start_date >= %(from)s and end_date <=%(to)s and employee=%(emp)s and docstatus=1 order by posting_date desc,modified desc limit 1""",{"emp":employee, "from":from_date, "to":to_date},as_dict=True)
+    salary_slip1=frappe.db.sql("""select total_unpaid_amount from `tabSalary Slip` where employee=%(emp)s and end_date<=%(to)s  and docstatus=1 order by posting_date desc,modified desc limit 1""",{"emp":employee,"from":from_date, "to":to_date},as_dict=True)
+    conditions=f"""
+    where jwd.name1='{employee}' and jwd.end_date < '{from_date}' 
+    """
+    if last_ss_date[0][0]:
+        conditions+=f""" and jwd.start_date > '{datetime.datetime.strftime(last_ss_date[0][0], "%Y-%m-%d")}'"""
+    if not last_ss_date[0][0] or datetime.datetime.strptime(from_date, "%Y-%m-%d").date()>last_ss_date[0][0]:
+        amount=frappe.db.sql(f"""
+        SELECT sum(jwd.amount)
+        from `tabProject` as site
+        left outer join `tabTS Job Worker Details` as jwd
+            on site.name = jwd.parent
+        {conditions}
+        """)[0][0] or 0
     if salary_slip:
-        return salary_slip[0]["total_unpaid_amount"]
+        return salary_slip[0]["total_unpaid_amount"]+amount
 
     elif(salary_slip1):
-        return salary_slip1[0]["total_unpaid_amount"]
-    else:
-        return salary_slip2[0]["salary_balance"]
+        return salary_slip1[0]["total_unpaid_amount"]+amount
+
+def get_employee_salary_slip_amount(employee, from_date, to_date):
+    query=f"""
+        SELECT SUM(ss.paid_amount)
+        FROM `tabSalary Slip` ss
+        WHERE ss.docstatus=1 AND ss.employee='{employee}' AND ss.start_date >= '{from_date}' AND ss.end_date <= '{to_date}'
+    """
+    res=frappe.db.sql(query)[0][0]
+    return res
+
+def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv):
+    if frappe.db.get_all('Salary Slip', {'employee': employee, 'start_date': [">=", from_date], 'end_date': ["<=", to_date], "docstatus": 1}):
+        query=f"""
+            SELECT SUM(ss.total_deduction)
+            FROM `tabSalary Slip` ss
+            WHERE ss.docstatus=1 AND ss.employee='{employee}' AND ss.start_date >= '{from_date}' AND ss.end_date <= '{to_date}'
+        """
+        res=frappe.db.sql(query)[0][0]
+        return res
+    return adv
