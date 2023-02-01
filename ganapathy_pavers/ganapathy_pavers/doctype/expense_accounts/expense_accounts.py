@@ -44,15 +44,15 @@ class ExpenseAccounts(Document):
 				return res
 		return res
 	
-	def get_tree(self,root, company, from_date, to_date, vehicle=None):
+	def get_tree(self,root, company, from_date, to_date, vehicle=None, machine=None):
 		for i in root:
-			child = self.get_tree(get_children('Account', i.value, company), company, from_date, to_date, vehicle)
-			i['child_nodes']=get_account_balances(child, company, from_date, to_date, vehicle)
+			child = self.get_tree(get_children('Account', i.value, company), company, from_date, to_date, vehicle, machine)
+			i['child_nodes']=get_account_balances(child, company, from_date, to_date, vehicle, machine)
 		return root
 
-	def tree_node(self, from_date, to_date, company=erpnext.get_default_company(), parent = "", doctype='Account', vehicle=None) -> list:
-		root = get_account_balances(get_children(doctype, parent or company, company), company, from_date, to_date, vehicle)
-		return (self.get_tree(root, company, from_date, to_date, vehicle))
+	def tree_node(self, from_date, to_date, company=erpnext.get_default_company(), parent = "", doctype='Account', vehicle=None, machine=None) -> list:
+		root = get_account_balances(get_children(doctype, parent or company, company), company, from_date, to_date, vehicle, machine)
+		return (self.get_tree(root, company, from_date, to_date, vehicle, machine))
 
 
 def get_tree(root, company):
@@ -107,24 +107,27 @@ def get_common_account(account):
 	exp=frappe.get_single("Expense Accounts")
 	return exp.get_common_account(account)
 
-def get_account_balances(accounts, company, from_date, to_date, vehicle=None):
+def get_account_balances(accounts, company, from_date, to_date, vehicle=None, machine=None):
 	for account in accounts:
-		balance, gl_vehicle=get_account_balance_on(account, company, from_date, to_date, vehicle)
+		balance, gl_vehicle=get_account_balance_on(account, company, from_date, to_date, vehicle, machine)
 		account['balance']=balance or 0
 		account['vehicle']=gl_vehicle
 	return accounts
 
-def get_account_balance_on(account, company, from_date, to_date, vehicle=None):
+def get_account_balance_on(account, company, from_date, to_date, vehicle=None, machine=None):
 	if(account.get('expandable')):
 		return 0, ""
 	conditions=""
 	if vehicle:
-		conditions+=f" and IFNULL(vehicle, '')!='' and vehicle='{vehicle}'"
-	
+		conditions+=f" and IFNULL(gl.vehicle, '')!='' and gl.vehicle='{vehicle}'"
+	if machine:
+		conditions+=f"""
+		 and (SELECT MAX(je.{machine}) from `tabJournal Entry` je WHERE je.name=gl.voucher_no and gl.voucher_type='Journal Entry' )=1
+		"""
 	query=f"""
-		select sum(debit) as debit, vehicle from `tabGL Entry` where company='{company}' and
-		date(posting_date)>='{from_date}' and date(posting_date)<='{to_date}' and is_cancelled=0
-		and account='{account['value']}'
+		select sum(gl.debit) as debit, gl.vehicle from `tabGL Entry` gl where gl.company='{company}' and
+		date(gl.posting_date)>='{from_date}' and date(gl.posting_date)<='{to_date}' and gl.is_cancelled=0
+		and gl.account="{account['value']}"
 	"""+conditions
 	balance=frappe.db.sql(query, as_list=True)
 	return balance[0][0], balance[0][1] or ""

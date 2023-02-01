@@ -168,7 +168,14 @@ def get_production_cost(filters, item):
 
 def get_sqft_expense(filters):
     exp=frappe.get_single("Expense Accounts")
-    paver_exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group)
+    machine=None
+    if ("Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", [])) and "Machine3" in filters.get("machine", []):
+        pass
+    elif "Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", []):
+        machine="machine_12"
+    elif filters.get("machine", []):
+        machine="machine_3"
+    paver_exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine)
     total_sqf=0
     for i in paver_exp_tree:
         if i.get("child_nodes"):
