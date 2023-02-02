@@ -5,6 +5,7 @@ frappe.ui.form.on("Journal Entry", {
         if (!frm.doc.docstatus) {
             frm.add_custom_button('Get Monthly Costing', async function () {
                 if (frm.doc.machine_3 || frm.doc.machine_12) {
+
                     if (frm.doc.common_expenses?.length > 0) {
                         frm.scroll_to_field("common_expenses");
                         await frappe.confirm(
@@ -13,11 +14,13 @@ frappe.ui.form.on("Journal Entry", {
                                 await frm.clear_table("common_expenses");
                                 await frm.fields_dict.common_expenses?.refresh();
                                 await get_common_expenses(frm);
+                                await get_fuel_and_odometer_expenses(frm);
                             },
                             () => { }
                         );
                     } else {
                         await get_common_expenses(frm);
+                        await get_fuel_and_odometer_expenses(frm)
                     }
                 }
                 else {
@@ -199,6 +202,38 @@ async function get_common_expenses(frm) {
                     }
                 }
             }
+            await cur_frm.fields_dict.common_expenses.refresh();
+        }
+    });
+}
+
+async function get_fuel_and_odometer_expenses(frm) {
+    await frappe.call({
+        method: "ganapathy_pavers.custom.py.vehicle.fuel_and_tyers_cost",
+        args: {
+            date:frm.doc.posting_date
+        },
+        freeze: true,
+        freeze_message: "Fetching Data...",
+        callback: async function (r) {
+           
+            var a = r.message
+           
+            for (var i = 0; i < (r.message).length; i++) {
+                if(a[i]){
+                if(a[i]["total"] && a[i]["account"])
+                {
+                   
+                    var row = frm.add_child("common_expenses"); await cur_frm.fields_dict.common_expenses.refresh()
+                    frappe.model.set_value(row.doctype, row.name, "account", a[i]["account"]|| ""); 
+                    frappe.model.set_value(row.doctype, row.name, "debit", a[i]["total"] || ""); 
+                    
+                    frappe.model.set_value(row.doctype, row.name, "vehicle", a[i]["vehicle"] || ""); 
+                }
+            }
+            }
+            
+           
             await cur_frm.fields_dict.common_expenses.refresh();
         }
     });
