@@ -289,3 +289,9 @@ def remove_payrolled_employees(emp_list, start_date, end_date):
 			new_emp_list.append(employee_details)
 
 	return new_emp_list
+
+@frappe.whitelist()
+def create_salary_slips_from_pe(name):
+     doc=frappe.get_doc("Payroll Entry", name)
+     doc.create_salary_slips()
+     

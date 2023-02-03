@@ -24,6 +24,13 @@ frappe.ui.form.on('Material Manufacturing', {
 		}
 		set_css(frm);
 	},
+	validate: function(frm) {
+		(frm.doc.items || []).forEach(row => {
+			if (row.layer_type == 'Panmix') {
+				row.no_of_batches = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0;
+			}
+		});
+	},
 	item_to_manufacture: function(frm){
 		if(frm.doc.item_to_manufacture){
 		if(frm.doc.item_to_manufacture.includes("SHOT BLAST")){
