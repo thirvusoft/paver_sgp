@@ -20,6 +20,12 @@
   "fp_group",
   "vehicle_expense_account_groups_section",
   "vehicle_expense",
+  "column_break_15",
+  "default_fuel_account",
+  "column_break_17",
+  "default_tyre_account",
+  "column_break_19",
+  "default_type_cost_per_km",
   "section_break_10",
   "paver_uom",
   "column_break_12",
@@ -167,12 +173,41 @@
    "fieldname": "vehicle_expense_accounts",
    "fieldtype": "Table",
    "options": "Vehicle Expense Account"
+  },
+  {
+   "fieldname": "default_fuel_account",
+   "fieldtype": "Link",
+   "label": "Default Fuel Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "default_tyre_account",
+   "fieldtype": "Link",
+   "label": "Default Tyre Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "default_type_cost_per_km",
+   "fieldtype": "Currency",
+   "label": "Default Type Cost per Km"
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-01-27 10:02:30.187480",
+ "modified": "2023-02-02 19:09:11.224805",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Expense Accounts",

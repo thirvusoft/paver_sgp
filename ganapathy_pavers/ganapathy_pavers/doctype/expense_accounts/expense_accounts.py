@@ -145,11 +145,5 @@ def monthly_cost():
 		res["lg"]=i.lg_account
 		res["monthly_cost"]=i.monthly_cost
 		res1.append(res)
-	for i in cost.vehicle_expense_accounts:
-		res={}
-		res["account"]=i.expense_account 
-		res["vehicle"]=i.vehicle
-		res["monthly_cost"]=i.monthly_cost
-		res1.append(res)
 		
 	return res1	

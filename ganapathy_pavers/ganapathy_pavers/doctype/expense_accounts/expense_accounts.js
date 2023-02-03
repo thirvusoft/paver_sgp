@@ -76,6 +76,14 @@ frappe.ui.form.on('Expense Accounts', {
 				vehicle_filters = r.message;
 			}
 		});
+		["default_fuel_account", "default_tyre_account"].forEach(field => frm.set_query(field, function () {
+			return {
+				filters: {
+					name: ['in', vehicle_filters],
+					is_group: 0
+				}
+			}
+		}));
 		frm.set_query("expense_account", "vehicle_expense_accounts", function () {
 			return {
 				filters: {

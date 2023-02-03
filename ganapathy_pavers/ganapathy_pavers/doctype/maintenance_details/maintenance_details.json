@@ -7,11 +7,13 @@
  "engine": "InnoDB",
  "field_order": [
   "maintenance",
+  "expense_account",
   "from_date",
   "files",
   "column_break_4",
   "reference_no",
   "to_date",
+  "expense_calculation_per_sqft",
   "expense",
   "notifications_section",
   "month_before",
@@ -81,12 +83,28 @@
    "fieldname": "notifications_section",
    "fieldtype": "Section Break",
    "label": "Notifications"
+  },
+  {
+   "fetch_from": "maintenance.expense_account",
+   "fetch_if_empty": 1,
+   "fieldname": "expense_account",
+   "fieldtype": "Link",
+   "label": "Expense Account",
+   "options": "Account"
+  },
+  {
+   "default": "0",
+   "fetch_from": "maintenance.expense_calculation_per_sqft",
+   "fieldname": "expense_calculation_per_sqft",
+   "fieldtype": "Check",
+   "label": "Expense calculation per sqft",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-12-22 20:11:36.158639",
+ "modified": "2023-02-02 20:20:36.485828",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Maintenance Details",

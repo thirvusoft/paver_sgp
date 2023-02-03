@@ -7,21 +7,40 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "maintenance_type"
+  "maintenance_type",
+  "expense_account",
+  "expense_calculation_per_sqft"
  ],
  "fields": [
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "maintenance_type",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Maintenance Type",
    "reqd": 1,
    "unique": 1
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "expense_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Expense Account",
+   "options": "Account"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "default": "0",
+   "fieldname": "expense_calculation_per_sqft",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Expense calculation per sqft"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-10-10 10:30:07.774443",
+ "modified": "2023-02-02 20:17:56.328435",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Maintenance type",
