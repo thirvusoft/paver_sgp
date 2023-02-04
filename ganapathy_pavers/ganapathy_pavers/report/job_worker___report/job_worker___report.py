@@ -200,6 +200,7 @@ def get_columns(other_work):
             "fieldtype": "Float",
             "ts_right_align": "text-right"
         },
+        
         {
             "fieldname": "other_work",
             "label": "Other Work",
@@ -243,7 +244,13 @@ def get_columns(other_work):
             "default": None,
             "width": 150,
             "ts_right_align": "text-right"
-        }
+        },
+        {
+            "fieldname": "rate",
+            "label": "Rate",
+            "fieldtype": "Data",
+            "ts_right_align": "text-right"
+        },
 		]
 	
 	return columns
