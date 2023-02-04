@@ -9,7 +9,10 @@
  "field_order": [
   "maintenance_type",
   "expense_account",
-  "expense_calculation_per_sqft"
+  "expense_calculation_per_km",
+  "vehicle_log_purpose_per_km",
+  "expense_calculation_per_vehicle_log",
+  "vehicle_log_purpose_per_log"
  ],
  "fields": [
   {
@@ -32,15 +35,37 @@
   {
    "allow_in_quick_entry": 1,
    "default": "0",
-   "fieldname": "expense_calculation_per_sqft",
+   "fieldname": "expense_calculation_per_km",
    "fieldtype": "Check",
    "in_list_view": 1,
-   "label": "Expense calculation per sqft"
+   "label": "Expense calculation per km"
+  },
+  {
+   "default": "0",
+   "fieldname": "expense_calculation_per_vehicle_log",
+   "fieldtype": "Check",
+   "label": "Expense calculation per vehicle log"
+  },
+  {
+   "depends_on": "eval: doc.expense_calculation_per_vehicle_log",
+   "fieldname": "vehicle_log_purpose_per_log",
+   "fieldtype": "Table",
+   "label": "Vehicle Log Purpose (per log)",
+   "mandatory_depends_on": "eval: doc.expense_calculation_per_vehicle_log",
+   "options": "Vehicle Log Purpose"
+  },
+  {
+   "depends_on": "eval:doc.expense_calculation_per_km",
+   "fieldname": "vehicle_log_purpose_per_km",
+   "fieldtype": "Table",
+   "label": "Vehicle Log Purpose (per km)",
+   "mandatory_depends_on": "eval:doc.expense_calculation_per_km",
+   "options": "Vehicle Log Purpose"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-02-02 20:17:56.328435",
+ "modified": "2023-02-04 20:07:35.794903",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Maintenance type",

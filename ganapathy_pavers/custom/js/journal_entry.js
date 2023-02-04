@@ -14,13 +14,11 @@ frappe.ui.form.on("Journal Entry", {
                                 await frm.clear_table("common_expenses");
                                 await frm.fields_dict.common_expenses?.refresh();
                                 await get_common_expenses(frm);
-                                await get_fuel_and_odometer_expenses(frm);
                             },
                             () => { }
                         );
                     } else {
                         await get_common_expenses(frm);
-                        await get_fuel_and_odometer_expenses(frm)
                     }
                 }
                 else {
@@ -39,19 +37,17 @@ frappe.ui.form.on("Journal Entry", {
                     await frappe.confirm(
                         `Do you want to erase the existing data in <b>Accounting Entries</b> table`,
                         async () => {
-                            (cur_frm.fields_dict.accounts.grid.grid_rows || []).forEach(async row => {
-                                if (row.doc.vehicle) {
-                                    row.doc.__checked = 1;
-                                }
-                            });
-                            await cur_frm.fields_dict.accounts.grid.delete_rows();
+                            frm.fields_dict.accounts.grid.grid_pagination.go_to_page(1);
+                            for (let i = 0; i < cur_frm.fields_dict.accounts.grid.grid_rows.length; i++) {
+                                frm.fields_dict.accounts.grid.grid_rows[0]?.remove();
+                            }
                             await frm.fields_dict.accounts.refresh();
-                            await get_fuel_and_odometer_expenses(frm);
+                            await get_vehicle_expenses(frm);
                         },
                         () => { }
                     );
                 } else {
-                    await get_fuel_and_odometer_expenses(frm)
+                    await get_vehicle_expenses(frm)
                 }
             });
         }
@@ -76,12 +72,10 @@ frappe.ui.form.on("Journal Entry", {
         }
         validate_common_accounts()
         frappe.dom.freeze(frappe.render_template("je_loading"));
-        (cur_frm.fields_dict.accounts.grid.grid_rows || []).forEach(async row => {
-            if (row.doc.from_common_entry) {
-                row.doc.__checked = 1;
-            }
-        });
-        await cur_frm.fields_dict.accounts.grid.delete_rows();
+        frm.fields_dict.accounts.grid.grid_pagination.go_to_page(1);
+        for (let i = 0; i < cur_frm.fields_dict.accounts.grid.grid_rows.length; i++) {
+            frm.fields_dict.accounts.grid.grid_rows[0]?.remove();
+        }
         await frm.fields_dict.accounts.refresh();
         await frappe.call({
             method: "ganapathy_pavers.custom.py.journal_entry.split_expenses",
@@ -233,24 +227,24 @@ async function get_common_expenses(frm) {
     });
 }
 
-async function get_fuel_and_odometer_expenses(frm) {
+async function get_vehicle_expenses(frm) {
     await frappe.call({
-        method: "ganapathy_pavers.custom.py.vehicle.fuel_and_tyers_cost",
+        method: "ganapathy_pavers.custom.py.vehicle.get_vehicle_expenses",
         args: {
             date: frm.doc.posting_date
         },
         freeze: true,
         freeze_message: "Fetching Data...",
         callback: async function (r) {
-            var a = r.message
-            for (var idx = 0; idx < (r.message).length; idx++) {
+            var a = r.message || []
+            for (var idx = 0; idx < a.length; idx++) {
                 if (a[idx]) {
-                    if (a[idx]["total"] && a[idx]["account"]) {
+                    if (a[idx]["amount"] && a[idx]["account"]) {
                         var row = frm.add_child("accounts");
                         await cur_frm.fields_dict.accounts.refresh();
                         frappe.model.set_value(row.doctype, row.name, "account", a[idx]["account"] || "");
-                        frappe.model.set_value(row.doctype, row.name, "debit_in_account_currency", a[idx]["total"] || "");
-                        frappe.model.set_value(row.doctype, row.name, "debit", a[idx]["total"] || "");
+                        frappe.model.set_value(row.doctype, row.name, "debit_in_account_currency", a[idx]["amount"] || "");
+                        frappe.model.set_value(row.doctype, row.name, "debit", a[idx]["amount"] || "");
                         frappe.model.set_value(row.doctype, row.name, "vehicle", a[idx]["vehicle"] || "");
                     }
                 }

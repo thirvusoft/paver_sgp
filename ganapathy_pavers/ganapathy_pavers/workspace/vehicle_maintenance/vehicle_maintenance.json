@@ -50,8 +50,8 @@
    "type": "Link"
   }
  ],
- "modified": "2022-11-18 19:30:37.543965",
- "modified_by": "ponnusamyv434@gmail.com",
+ "modified": "2023-02-04 18:43:14.734922",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Maintenance",
  "owner": "Administrator",
@@ -74,6 +74,12 @@
    "doc_view": "List",
    "label": "Vehicle Settings",
    "link_to": "Vehicle Settings",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Maintenance type",
+   "link_to": "Maintenance type",
    "type": "DocType"
   }
  ]

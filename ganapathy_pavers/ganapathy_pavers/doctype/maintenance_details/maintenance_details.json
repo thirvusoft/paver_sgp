@@ -7,13 +7,17 @@
  "engine": "InnoDB",
  "field_order": [
   "maintenance",
+  "default_expense_account",
   "expense_account",
   "from_date",
   "files",
   "column_break_4",
   "reference_no",
   "to_date",
-  "expense_calculation_per_sqft",
+  "expense_calculation_per_km",
+  "vehicle_log_purpose_per_km",
+  "expense_calculation_per_vehicle_log",
+  "vehicle_log_purpose_per_log",
   "expense",
   "notifications_section",
   "month_before",
@@ -85,7 +89,6 @@
    "label": "Notifications"
   },
   {
-   "fetch_from": "maintenance.expense_account",
    "fetch_if_empty": 1,
    "fieldname": "expense_account",
    "fieldtype": "Link",
@@ -93,18 +96,47 @@
    "options": "Account"
   },
   {
+   "depends_on": "eval: !doc.expense_account",
+   "description": "From Maintenance Type",
+   "fetch_from": "maintenance.expense_account",
+   "fieldname": "default_expense_account",
+   "fieldtype": "Link",
+   "label": "Default Expense Account",
+   "options": "Account",
+   "read_only": 1
+  },
+  {
    "default": "0",
-   "fetch_from": "maintenance.expense_calculation_per_sqft",
-   "fieldname": "expense_calculation_per_sqft",
+   "fetch_from": "maintenance.expense_calculation_per_km",
+   "fieldname": "expense_calculation_per_km",
    "fieldtype": "Check",
-   "label": "Expense calculation per sqft",
+   "label": "Expense calculation per km",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vehicle_log_purpose_per_km",
+   "fieldtype": "Data",
+   "label": "Vehicle Log Purposes (per km)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vehicle_log_purpose_per_log",
+   "fieldtype": "Data",
+   "label": "Vehicle Log Purposes (per log)",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "expense_calculation_per_vehicle_log",
+   "fieldtype": "Check",
+   "label": "Expense calculation per vehicle log",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-02-02 20:20:36.485828",
+ "modified": "2023-02-04 21:12:21.814464",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Maintenance Details",

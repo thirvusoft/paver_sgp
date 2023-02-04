@@ -84,15 +84,6 @@ frappe.ui.form.on('Expense Accounts', {
 				}
 			}
 		}));
-		frm.set_query("expense_account", "vehicle_expense_accounts", function () {
-			return {
-				filters: {
-					name: ['in', vehicle_filters],
-					is_group: 0
-				}
-			}
-		});
-
 	},
 	paver_group: function (frm) {
 		frm.trigger("refresh");

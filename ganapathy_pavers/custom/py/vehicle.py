@@ -207,65 +207,80 @@ def vehicle_maintenance_notification():
                 notification("Day Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')
 
 
-
-def vehicle_common_groups(self,event):
-    for i in self.vehicle_common_groups:
-        i.vehicle = self.name
-    frappe.db.sql("""delete from `tabVehicle Expense Account` where parent="Expense Accounts" and vehicle='{0}'""".format(self.name))
-    doc=frappe.get_doc("Expense Accounts")
-    doc.update({
-        "vehicle_expense_accounts": doc.vehicle_expense_accounts + [
-            {
-                "expense_account": child_doc.expense_account,
-                "vehicle":child_doc.vehicle,
-                "monthly_cost":child_doc.monthly_cost
-            } for child_doc in self.vehicle_common_groups]
-    })
-    doc.run_method=lambda *args, **kwargs: 0
-    doc.save()
-
 @frappe.whitelist()
-def fuel_and_tyers_cost(date):
-    tyre_cost_details=[]
-    fuel_cost_details=[]
-    vehicle_list=frappe.get_all("Vehicle",pluck="name")
+def get_vehicle_expenses(date):
     month_start_date = get_first_day(date)
     month_end_date = get_last_day(date)
-    for vehicle in vehicle_list:
-        fuel_cost_details.append(frappe.db.sql("""
-            select 
-                sum(vl.total_fuel) as total,
-                v.fuel_account as account,
-                v.license_plate as vehicle 
-            from `tabVehicle Log` vl,`tabVehicle` v 
-            where 
-                vl.license_plate='{0}' 
-                and v.name='{0}' 
-                and vl.select_purpose="Fuel" 
-                and vl.date between '{1}' and '{2}' 
-                and vl.docstatus=1 
-            group by vl.license_plate
-        """.format(vehicle, month_start_date, month_end_date), as_dict=1)) 
-        tyre_cost_details+=frappe.db.sql("""
-            select 
-                (sum(vl.today_odometer_value)/v.tyer_cost) as total,
-                vl.license_plate as vehicle,
-                v.tyer_account as account  
-            from `tabVehicle Log` vl,`tabVehicle` v 
-            where 
-                vl.license_plate='{0}' 
-                and v.name='{0}' 
-                and vl.select_purpose not in ("Fuel","Service") 
-                and vl.date between '{1}' and '{2}' 
-                and vl.docstatus=1 
-            group by vl.license_plate
-        """.format(vehicle,month_start_date,month_end_date),as_dict=1)
-    cost=frappe.get_single("Expense Accounts")
-    res1=[]
-    for i in cost.vehicle_expense_accounts:
-        res={}
-        res["account"]=i.expense_account 
-        res["vehicle"]=i.vehicle
-        res["total"]=i.monthly_cost
-        res1.append(res)
-    return res1+tyre_cost_details+fuel_cost_details
+    fuel_query=f"""
+        SELECT 
+            IFNULL(veh.fuel_account, (SELECT value FROM `tabSingles` sin WHERE sin.doctype='Expense Accounts' and sin.field='default_fuel_account')) AS account,
+            veh.name AS vehicle,
+            (
+                SELECT 
+                    SUM(vl.total_fuel)
+                FROM `tabVehicle Log` vl
+                WHERE
+                    vl.docstatus=1
+                    AND vl.select_purpose="Fuel"
+                    AND vl.license_plate=veh.name
+                    AND vl.date between '{month_start_date}' and '{month_end_date}' 
+            ) AS amount
+        FROM `tabVehicle` veh
+    """
+    vehicle_expense_query=f"""
+        SELECT 
+            IFNULL(md.expense_account, md.default_expense_account) AS account,
+            CASE
+                WHEN md.expense_calculation_per_km=1
+                    THEN md.expense * (
+                        SELECT 
+                            SUM(vl.today_odometer_value)
+                        FROM `tabVehicle Log` vl
+                        WHERE
+                            vl.docstatus=1
+                            AND vl.select_purpose IN (
+                                SELECT vlp.select_purpose
+                                FROM `tabVehicle Log Purpose` vlp
+                                WHERE vlp.parent=md.maintenance and vlp.parentfield="vehicle_log_purpose_per_km"
+                            ) 
+                            AND vl.license_plate=md.parent
+                            AND vl.date between '{month_start_date}' and '{month_end_date}' 
+                    )
+                WHEN md.expense_calculation_per_vehicle_log=1
+                    THEN md.expense * (
+                        SELECT 
+                            COUNT(*)
+                        FROM `tabVehicle Log` vl
+                        WHERE
+                            vl.docstatus=1
+                            AND vl.select_purpose IN (
+                                SELECT vlp.select_purpose
+                                FROM `tabVehicle Log Purpose` vlp
+                                WHERE vlp.parent=md.maintenance and vlp.parentfield="vehicle_log_purpose_per_log"
+                            ) 
+                            AND vl.license_plate=md.parent
+                            AND vl.date between '{month_start_date}' and '{month_end_date}' 
+                    )
+                ELSE md.expense
+            END
+            AS amount,
+            md.parent AS vehicle
+        FROM `tabMaintenance Details` md
+        WHERE
+            md.parenttype="Vehicle"
+            AND md.expense>0
+            AND IFNULL(md.expense_account, IFNULL(md.default_expense_account, ''))!=''
+            AND CASE
+                    WHEN IFNULL(md.from_date, '')!=''
+                        THEN md.from_date<='{month_start_date}'
+                    ELSE 1
+                    END
+            AND CASE
+                    WHEN IFNULL(md.to_date, '')!=''
+                        THEN md.to_date>='{month_end_date}'
+                    ELSE 1
+                    END
+    """
+    fuel_expenses=frappe.db.sql(fuel_query, as_dict=True)
+    vehicle_expenses=frappe.db.sql(vehicle_expense_query, as_dict=True)
+    return sorted(fuel_expenses+vehicle_expenses, key=lambda x: x.get("vehicle", ""))

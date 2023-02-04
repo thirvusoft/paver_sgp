@@ -7,26 +7,6 @@ from erpnext.accounts.utils import get_children
 from frappe.model.document import Document
 
 class ExpenseAccounts(Document):
-	def validate(doc):
-		frappe.db.sql("""delete from `tabVehicle Expense Account` where parenttype='Vehicle' """)
-		vehicle_accounts={}
-		for row in doc.vehicle_expense_accounts:
-			if row.vehicle:
-				if row.vehicle not in vehicle_accounts:
-					vehicle_accounts[row.vehicle]=[]
-				vehicle_accounts[row.vehicle].append({
-					"expense_account": row.expense_account,
-					"monthly_cost":row.monthly_cost,
-					"vehicle":row.vehicle
-				})
-		for row in vehicle_accounts:
-			vehicle_doc=frappe.get_doc("Vehicle", row)
-			vehicle_doc.update({
-				"vehicle_common_groups": vehicle_accounts[row]
-			})
-			vehicle_doc.run_method=lambda *args, **kwargs: 0
-			vehicle_doc.save()
-
 	def get_common_account(self, account):
 		res={"paver": "", "cw": "", "fp": "", "lg": ""}
 		parent_acc=frappe.get_value("Account", account, "parent_account")
