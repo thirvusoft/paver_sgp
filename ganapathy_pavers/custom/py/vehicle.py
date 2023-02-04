@@ -1,5 +1,5 @@
 import frappe
-from frappe.utils import add_months, add_days, nowdate
+from frappe.utils import add_months, add_days, nowdate,get_first_day,get_last_day
 
 
 @frappe.whitelist()
@@ -207,28 +207,80 @@ def vehicle_maintenance_notification():
                 notification("Day Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')
 
 
-
-def vehicle_common_groups(self,event):
-    for i in self.vehicle_common_groups:
-        i.vehicle = self.name
-    frappe.db.sql("""delete from `tabVehicle Expense Account` where parent="Expense Accounts" and vehicle='{0}'""".format(self.name))
-    doc=frappe.get_doc("Expense Accounts")
-    doc.update({
-        "vehicle_expense_accounts": doc.vehicle_expense_accounts + [
-            {
-                "expense_account": child_doc.expense_account,
-                "vehicle":child_doc.vehicle,
-                "monthly_cost":child_doc.monthly_cost
-            } for child_doc in self.vehicle_common_groups]
-    })
-    doc.run_method=lambda *args, **kwargs: 0
-    doc.save()
-
-       
-          
-
-
-        
-
-
-  
+@frappe.whitelist()
+def get_vehicle_expenses(date):
+    month_start_date = get_first_day(date)
+    month_end_date = get_last_day(date)
+    fuel_query=f"""
+        SELECT 
+            IFNULL(veh.fuel_account, (SELECT value FROM `tabSingles` sin WHERE sin.doctype='Expense Accounts' and sin.field='default_fuel_account')) AS account,
+            veh.name AS vehicle,
+            (
+                SELECT 
+                    SUM(vl.total_fuel)
+                FROM `tabVehicle Log` vl
+                WHERE
+                    vl.docstatus=1
+                    AND vl.select_purpose="Fuel"
+                    AND vl.license_plate=veh.name
+                    AND vl.date between '{month_start_date}' and '{month_end_date}' 
+            ) AS amount
+        FROM `tabVehicle` veh
+    """
+    vehicle_expense_query=f"""
+        SELECT 
+            IFNULL(md.expense_account, md.default_expense_account) AS account,
+            CASE
+                WHEN md.expense_calculation_per_km=1
+                    THEN md.expense * (
+                        SELECT 
+                            SUM(vl.today_odometer_value)
+                        FROM `tabVehicle Log` vl
+                        WHERE
+                            vl.docstatus=1
+                            AND vl.select_purpose IN (
+                                SELECT vlp.select_purpose
+                                FROM `tabVehicle Log Purpose` vlp
+                                WHERE vlp.parent=md.maintenance and vlp.parentfield="vehicle_log_purpose_per_km"
+                            ) 
+                            AND vl.license_plate=md.parent
+                            AND vl.date between '{month_start_date}' and '{month_end_date}' 
+                    )
+                WHEN md.expense_calculation_per_vehicle_log=1
+                    THEN md.expense * (
+                        SELECT 
+                            COUNT(*)
+                        FROM `tabVehicle Log` vl
+                        WHERE
+                            vl.docstatus=1
+                            AND vl.select_purpose IN (
+                                SELECT vlp.select_purpose
+                                FROM `tabVehicle Log Purpose` vlp
+                                WHERE vlp.parent=md.maintenance and vlp.parentfield="vehicle_log_purpose_per_log"
+                            ) 
+                            AND vl.license_plate=md.parent
+                            AND vl.date between '{month_start_date}' and '{month_end_date}' 
+                    )
+                ELSE md.expense
+            END
+            AS amount,
+            md.parent AS vehicle
+        FROM `tabMaintenance Details` md
+        WHERE
+            md.parenttype="Vehicle"
+            AND md.expense>0
+            AND IFNULL(md.expense_account, IFNULL(md.default_expense_account, ''))!=''
+            AND CASE
+                    WHEN IFNULL(md.from_date, '')!=''
+                        THEN md.from_date<='{month_start_date}'
+                    ELSE 1
+                    END
+            AND CASE
+                    WHEN IFNULL(md.to_date, '')!=''
+                        THEN md.to_date>='{month_end_date}'
+                    ELSE 1
+                    END
+    """
+    fuel_expenses=frappe.db.sql(fuel_query, as_dict=True)
+    vehicle_expenses=frappe.db.sql(vehicle_expense_query, as_dict=True)
+    return sorted(fuel_expenses+vehicle_expenses, key=lambda x: x.get("vehicle", ""))
