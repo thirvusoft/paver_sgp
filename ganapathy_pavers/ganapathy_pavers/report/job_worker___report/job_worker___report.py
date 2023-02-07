@@ -34,7 +34,7 @@ def execute(filters=None):
                                             on emp.employee = jwd.name1
                                         {0}
                                     {2} order by jwd.sqft_allocated)as total_cal
-                                """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.completed_bundle), sum(jwd.sqft_allocated),sum(jwd.rate)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated,jwd.rate", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
+                                """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.completed_bundle), sum(jwd.sqft_allocated)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
     
     report_data1 = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
                                         emp.salary_balance as salary_balance,{4} as amount,
@@ -46,7 +46,7 @@ def execute(filters=None):
                                             on emp.employee = jwd.name1
                                         {0}
                                     group by jwd.name1{2},jwd.sqft_allocated, jwd.start_date, jwd.end_date, jwd.description_for_other_work order by jwd.sqft_allocated)as total_cal
-                                """.format(conditions+" and jwd.other_work = 1",adv_conditions, "", "sum(jwd.completed_bundle), sum(jwd.sqft_allocated),sum(jwd.rate)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated,jwd.rate", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
+                                """.format(conditions+" and jwd.other_work = 1",adv_conditions, "", "sum(jwd.completed_bundle), sum(jwd.sqft_allocated)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
     data = [list(i) for i in (report_data or tuple())]
     final_data = []
     c = 0
@@ -71,7 +71,8 @@ def execute(filters=None):
             row[0]=frappe.db.get_value("Employee", row[0], "employee_name")
 
     data.sort(key = lambda x:x[0])
-        
+   
+    
     if(len(data)):
         start = 0
         for i in range(len(data)-1):
@@ -80,7 +81,7 @@ def execute(filters=None):
                 data[i][9]=None
                 data[i][10]=None
                 final_data.append(data[i])
-                total = [" " for i in range(12)]
+                total = [" " for i in range(11)]
                 total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
                 total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,i+1))}</b>"
                 total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,i+1))}</b>"
@@ -90,7 +91,6 @@ def execute(filters=None):
                 total[9] = adv
                 amount=sum((data[i][8] or 0) for i in range(start,i+1))
                 salary_bal=sum((data[i][7] or 0) for i in range(start,i+1))
-                total[11]=sum((data[i][5] or 0) for i in range(start,i+1))
                 total[10] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
                 final_data[-1][7]=None
                 final_data.append(total)
@@ -107,7 +107,7 @@ def execute(filters=None):
         data[-1][9]=None
         data[-1][10]=None
         final_data.append(data[-1])
-        total = [" " for i in range(12)]
+        total = [" " for i in range(11)]
         total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
         total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,len(data)))}</b>"
         total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,len(data)))}</b>"
@@ -118,7 +118,6 @@ def execute(filters=None):
         amount=sum((data[i][8] or 0) for i in range(start,len(data)))
         salary_bal=sum((data[i][7] or 0) for i in range(start,len(data)))
         total[10] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
-        total[11]=sum((data[i][5] or 0) for i in range(start,len(data)))
         final_data[-1][7]=None
         final_data.append(total)
     other_work=0
@@ -132,9 +131,7 @@ def execute(filters=None):
     columns = get_columns(other_work)
   
     return columns, [row+[None] for row in final_data]
-   
-    
-   
+
 def get_columns(other_work):
 	columns = [
 		_("Job Worker") + ":Data/Employee:150",
@@ -152,7 +149,6 @@ def get_columns(other_work):
             "fieldtype": "Data",
             "ts_right_align": "text-right"
         },
-        
         {
             "fieldname": "other_work",
             "label": "Other Work",
@@ -196,13 +192,7 @@ def get_columns(other_work):
             "default": None,
             "width": 150,
             "ts_right_align": "text-right"
-        },
-        {
-            "fieldname": "rate",
-            "label": "Rate",
-            "fieldtype": "Data",
-            "ts_right_align": "text-right"
-        },
+        }
 		]
 	
 	return columns
@@ -219,77 +209,3 @@ def get_employee_salary_balance(employee, from_date, to_date):
         return salary_slip1[0]["total_unpaid_amount"]
     else:
         return salary_slip2[0]["salary_balance"]
-
-
-
-
-
-
-#  if(len(data)):
-#         print(data)
-#         start = 0
-#         for i in range(len(data)-1):
-#             if (data[i][0] != data[i+1][0]):
-#                 adv=data[i][9]
-#                 data[i][9]=None
-#                 data[i][10]=None
-#                 final_data.append(data[i])
-#                 total = [" " for i in range(12)]
-#                 total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
-#                 total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,i+1))}</b>"
-#                 total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,i+1))}</b>"
-#                 total[5]=f"<b>{'%.2f'%sum((data[i][5] or 0) for i in range(start,i+1))}</b>"
-               
-#                 total[8] =sum((data[i][7] or 0) for i in range(start,i+1))
-              
-#                 total[9] = f"<b>{'%.2f'%sum((data[i][8] or 0) for i in range(start,i+1))}</b>"
-#                 total[10] = adv
-#                 amount=sum((data[i][7] or 0) for i in range(start,i+1))
-#                 salary_bal=sum((data[i][7] or 0) for i in range(start,i+1))
-#                 total[11] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
-#                 print("kkkkkk")
-#                 print(final_data[-1][7])
-#                 final_data[-1][7]=None
-#                 final_data.append(total)
-#                 start = i+1	
-#                 c=0
-#             else:
-#                 data[i][7]=None
-#                 data[i][8]=None
-#                 data[i][10]=None
-#                 if(c==0):data[i][9]=None
-#                 else:data[i][9]=None
-#                 c+=1
-#                 final_data.append(data[i])
-#         adv=data[-1][9]
-#         data[-1][9]=None
-#         data[-1][10]=None
-#         final_data.append(data[-1])
-#         total = [" " for i in range(12)]
-#         total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
-#         total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,len(data)))}</b>"
-#         total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,len(data)))}</b>"
-#         total[5]=f"<b>{'%.2f'%sum((data[i][5] or 0) for i in range(start,len(data)))}</b>"
-#         print(total[5])
-#         total[8] =f"<b>{'%.2f'%sum((data[i][5] or 0) for i in range(start,len(data)))}</b>"
-        
-#         print(data[i][8])
-#         total[9] = f"<b>{'%.2f'%sum((data[i][8] or 0) for i in range(start,len(data)))}</b>"
-#         total[10] = adv
-#         amount=sum((data[i][8] or 0) for i in range(start,len(data)))
-#         salary_bal=sum((data[i][7] or 0) for i in range(start,len(data)))
-#         total[11] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
-#         final_data[-1][7]=None
-#         final_data.append(total)
-#     other_work=0
-#     for row in final_data:
-#         if row[6]:
-#             row[6]="Yes"
-#             other_work=1
-#         else:
-#             row[6]=""
-#             row[7]=""
-
-#     columns = get_columns(other_work)
-  
-#     return columns, [row+[None] for row in final_data]
