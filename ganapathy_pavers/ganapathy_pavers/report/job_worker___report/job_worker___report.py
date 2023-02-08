@@ -15,7 +15,7 @@ def execute(filters=None):
     adv_conditions = ""
     if from_date or to_date or employee or site_name or site_type:
         conditions = " where 1=1"
-        adv_conditions = "where 1 = 1"
+        adv_conditions = "where empadv.repay_unclaimed_amount_from_salary=1"
         if site_type:
             conditions += " and site.type='{0}'".format(site_type)
         if from_date and to_date:
@@ -64,24 +64,24 @@ def execute(filters=None):
         data=list(data1.values())
     data = [list(i) for i in (report_data1 or [])] + data
     
-
+    data+=get_employees_to_add(filters, [row[0] for row in data])
     for row in data:
         if row[0] and frappe.db.exists("Employee", row[0]):
             row[7]=get_employee_salary_balance(employee=row[0], from_date=from_date, to_date=to_date)
 
     data.sort(key = lambda x:x[0])
-   
+    
     
     if(len(data)):
         start = 0
         for i in range(len(data)-1):
             if (data[i][0] != data[i+1][0]):
-                adv=data[i][9]
+                adv=get_employee_salary_slip_advance_deduction(data[i][0], from_date, to_date, data[i][9])
                 data[i][9]=None
                 data[i][10]=None
                 employee_id=data[i][0]
                 data[i][0]=frappe.db.get_value("Employee", data[i][0], "employee_name")
-                final_data.append(data[i])
+                final_data.append(data[i]+[None])
                 total = [" " for i in range(12)]
                 total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
                 total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,i+1))}</b>"
@@ -89,7 +89,7 @@ def execute(filters=None):
                 total[5]=0
                 total[7] = sum((data[i][7] or 0) for i in range(start,i+1))
                 total[8] = f"<b>{'%.2f'%sum((data[i][8] or 0) for i in range(start,i+1))}</b>"
-                total[9] = get_employee_salary_slip_advance_deduction(employee_id, from_date, to_date, adv)
+                total[9] = adv
                 amount=sum((data[i][8] or 0) for i in range(start,i+1))
                 salary_bal=sum((data[i][7] or 0) for i in range(start,i+1))
                 total[10] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
@@ -105,13 +105,13 @@ def execute(filters=None):
                 if(c==0):data[i][9]=None
                 else:data[i][9]=None
                 c+=1
-                final_data.append(data[i])
-        adv=data[-1][9]
+                final_data.append(data[i]+[None])
+        adv=get_employee_salary_slip_advance_deduction(data[-1][0], from_date, to_date, data[-1][9])
         data[-1][9]=None
         data[-1][10]=None
         employee_id=data[-1][0]
         data[-1][0]=frappe.db.get_value("Employee", data[-1][0], "employee_name")
-        final_data.append(data[-1])
+        final_data.append(data[-1]+[None])
         total = [" " for i in range(12)]
         total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
         total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,len(data)))}</b>"
@@ -119,7 +119,7 @@ def execute(filters=None):
         total[5]=0
         total[7] = sum((data[i][7] or 0) for i in range(start,len(data)))
         total[8] = f"<b>{'%.2f'%sum((data[i][8] or 0) for i in range(start,len(data)))}</b>"
-        total[9] = get_employee_salary_slip_advance_deduction(employee_id, from_date, to_date, adv)
+        total[9] = adv
         amount=sum((data[i][8] or 0) for i in range(start,len(data)))
         salary_bal=sum((data[i][7] or 0) for i in range(start,len(data)))
         total[10] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
@@ -135,8 +135,7 @@ def execute(filters=None):
             row[5]=""
             row[6]=""
     columns = get_columns(other_work)
-  
-    return columns, [row+[None] for row in final_data]
+    return columns, [row for row in final_data]
 
 def get_columns(other_work):
 	columns = [
@@ -249,4 +248,27 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
         """
         res=frappe.db.sql(query)[0][0]
         return res
-    return adv
+    planned_deduction=0
+    planned_deduction=frappe.db.sql(f"""
+        SELECT 
+            SUM(dp.amount)
+        FROM `tabDeduction Planning` dp
+        LEFT OUTER JOIN `tabEmployee Advance` ea
+            ON ea.name=dp.parent
+        WHERE 
+            ea.docstatus=1 
+            AND ea.employee='{employee}'
+            AND dp.date between '{from_date}' and '{to_date}'
+            AND ea.repay_unclaimed_amount_from_salary=1
+    """)[0][0]
+    return planned_deduction or adv
+
+def get_employees_to_add(filters, employees):
+    employees=list(set(employees))
+    emp_filters={"status": ["!=", "Inactive"], "name": ["not in", employees], "designation": "Job Worker"}
+    if filters.get("employee") and filters.get("employee") in employees:
+        return[]
+    elif filters.get("employee"):
+        emp_filters["name"] = filters.get("employee")
+    rem = frappe.get_all("Employee", emp_filters, pluck='name')
+    return [[emp]+ [None for i in range(10)] for emp in rem]

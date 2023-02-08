@@ -326,7 +326,8 @@ doctype_js = {
 
 	     		"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
 				"Quotation": "/custom/js/quotation.js",
-				"Payroll Entry": "/utils/js/payroll_entry.js"
+				"Payroll Entry": "/utils/js/payroll_entry.js",
+				"Employee Advance": "/utils/js/employee_advance.js",
 			 }
 # Scheduled Tasks
 # ---------------
