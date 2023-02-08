@@ -261,7 +261,21 @@ def get_vehicle_expenses(date):
                             AND vl.license_plate=md.parent
                             AND vl.date between '{month_start_date}' and '{month_end_date}' 
                     )
-                ELSE md.expense
+                WHEN md.expense_calculation_per_day=1
+                    THEN md.expense * (
+                        SELECT 
+                            COUNT(DISTINCT(vl.date))
+                        FROM `tabVehicle Log` vl
+                        WHERE
+                            vl.docstatus=1
+                            AND vl.select_purpose IN (
+                                SELECT vlp.select_purpose
+                                FROM `tabVehicle Log Purpose` vlp
+                                WHERE vlp.parent=md.maintenance and vlp.parentfield="vehicle_log_purpose_per_day"
+                            ) 
+                            AND vl.license_plate=md.parent
+                            AND vl.date between '{month_start_date}' and '{month_end_date}'
+                    )
             END
             AS amount,
             md.parent AS vehicle

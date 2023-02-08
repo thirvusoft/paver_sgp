@@ -12,7 +12,14 @@
   "expense_calculation_per_km",
   "vehicle_log_purpose_per_km",
   "expense_calculation_per_vehicle_log",
-  "vehicle_log_purpose_per_log"
+  "vehicle_log_purpose_per_log",
+  "expense_calculation_per_day",
+  "vehicle_log_purpose_per_day",
+  "expense_calculation_based_on_field",
+  "choose_fields",
+  "vl_fieldname",
+  "vl_doctype",
+  "vl_tab_doctype"
  ],
  "fields": [
   {
@@ -35,6 +42,7 @@
   {
    "allow_in_quick_entry": 1,
    "default": "0",
+   "description": "Based on Vehicle Log",
    "fieldname": "expense_calculation_per_km",
    "fieldtype": "Check",
    "in_list_view": 1,
@@ -42,8 +50,10 @@
   },
   {
    "default": "0",
+   "description": "Based on Vehicle Log",
    "fieldname": "expense_calculation_per_vehicle_log",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Expense calculation per vehicle log"
   },
   {
@@ -61,11 +71,63 @@
    "label": "Vehicle Log Purpose (per km)",
    "mandatory_depends_on": "eval:doc.expense_calculation_per_km",
    "options": "Vehicle Log Purpose"
+  },
+  {
+   "default": "0",
+   "description": "Based on Vehicle Log",
+   "fieldname": "expense_calculation_per_day",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Expense calculation per day"
+  },
+  {
+   "depends_on": "eval: doc.expense_calculation_per_day",
+   "fieldname": "vehicle_log_purpose_per_day",
+   "fieldtype": "Table",
+   "label": "Vehicle Log Purpose (per day)",
+   "mandatory_depends_on": "eval: doc.expense_calculation_per_day",
+   "options": "Vehicle Log Purpose"
+  },
+  {
+   "depends_on": "eval:doc.expense_calculation_based_on_field",
+   "fieldname": "choose_fields",
+   "fieldtype": "HTML",
+   "label": "Vehicle Expense Fields"
+  },
+  {
+   "depends_on": "eval:doc.expense_calculation_based_on_field",
+   "fieldname": "vl_fieldname",
+   "fieldtype": "Data",
+   "label": "VL Field",
+   "mandatory_depends_on": "eval:doc.expense_calculation_based_on_field",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.expense_calculation_based_on_field",
+   "fieldname": "vl_doctype",
+   "fieldtype": "Data",
+   "label": "VL Doctype",
+   "mandatory_depends_on": "eval:doc.expense_calculation_based_on_field",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "expense_calculation_based_on_field",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Expense calculation based on field"
+  },
+  {
+   "fieldname": "vl_tab_doctype",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "vl_tab_doctype",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-02-04 20:07:35.794903",
+ "modified": "2023-02-07 18:37:58.917754",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Maintenance type",
