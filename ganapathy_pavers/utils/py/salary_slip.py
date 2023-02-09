@@ -4,8 +4,20 @@ from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip, get_sala
 import frappe
 from frappe import _
 from frappe.utils.data import flt
+from frappe.utils import date_diff
 
 class CustomSalary(SalarySlip):
+    def validate_days_calc(self, event=None):
+        if (self.start_date and self.end_date):
+            self.days=date_diff(self.end_date, self.start_date) + 1
+        
+        mess = 0
+        if (self.designation and self.company):
+            if not (frappe.get_value("Designation", self.designation, "no_mess_amount")):
+                mess = frappe.get_value("Company", self.company, "mess_charge_per_month")
+        self.mess=mess
+        return self
+
     def validate(self):
         self.status = self.get_status()
         validate_active_employee(self.employee)
@@ -13,7 +25,7 @@ class CustomSalary(SalarySlip):
         self.check_existing()
         if not self.salary_slip_based_on_timesheet:
             self.get_date_details()
-
+        self.validate_days_calc()
         if not (len(self.get("earnings")) or len(self.get("deductions"))):
             # get details from salary structure
             self.get_emp_and_working_day_details()
@@ -149,7 +161,7 @@ def validate_salary_slip(self, event):
         ssa=frappe.get_all("Salary Structure Assignment", filters={'employee':self.employee, 'docstatus':1,'designation':"Labour Worker"}, pluck="base")
         employee=frappe.get_value("Employee",self.employee,'reports_to')
         ccr=frappe.get_all("Contractor Commission Rate", filters={'name':employee},fields=['contractor','commission_rate'])
-        commission=(ssa[0] if ssa else 0)-(ccr[0]['commission_rate'] if ccr and ccr[0].get("commission_rate") else 0)
+        commission=(ssa[0] if ssa else 0)-(ccr[0]['commission_rate'] if ccr and len(ccr)>0 and ccr[0].get("commission_rate") else 0)
         basic=commission*self.total_working_hour
         if len(self.earnings)==0:
             self.update({'earnings':[{'salary_component':'Basic'}]})
@@ -198,13 +210,16 @@ def validate_contrator_welfare(self, event):
             total_working_hour=total_working_hour[0]['time']
         else:
             total_working_hour=0
-        total_commission_rate=total_working_hour*ccr[0]['commission_rate']
+        frappe.errprint(f"{self.employee}   {self.employee_name}")
+        total_commission_rate=0
+        if ccr and len(ccr)>0 and ccr[0]['commission_rate']:
+            total_commission_rate=total_working_hour*ccr[0]['commission_rate']
 
         earning_total=0
         for i in self.earnings:
             if i.salary_component=='Contractor Welfare':
                 pass
-            else:
+            elif(total_commission_rate):
                 self.append('earnings',dict(salary_component='Contractor Welfare', amount=round(total_commission_rate)))
             earning_total=earning_total+i.amount
             self.gross_pay=earning_total

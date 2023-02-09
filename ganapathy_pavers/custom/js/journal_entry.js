@@ -14,17 +14,40 @@ frappe.ui.form.on("Journal Entry", {
                                 await frm.clear_table("common_expenses");
                                 await frm.fields_dict.common_expenses?.refresh();
                                 await get_common_expenses(frm);
-                                await get_fuel_and_odometer_expenses(frm);
                             },
                             () => { }
                         );
                     } else {
                         await get_common_expenses(frm);
-                        await get_fuel_and_odometer_expenses(frm)
                     }
                 }
                 else {
                     frappe.show_alert({ message: __('Please Select Machine'), indicator: 'red' });
+                }
+            });
+            frm.add_custom_button('Get Vehicle Costing', async function () {
+                let vehicle_acc_length = 0;
+                (frm.doc.accounts || []).forEach(row => {
+                    if (row.vehicle) {
+                        vehicle_acc_length++;
+                    }
+                });
+                if (vehicle_acc_length > 0) {
+                    frm.scroll_to_field("accounts");
+                    await frappe.confirm(
+                        `Do you want to erase the existing data in <b>Accounting Entries</b> table`,
+                        async () => {
+                            frm.fields_dict.accounts.grid.grid_pagination.go_to_page(1);
+                            for (let i = 0; i < cur_frm.fields_dict.accounts.grid.grid_rows.length; i++) {
+                                frm.fields_dict.accounts.grid.grid_rows[0]?.remove();
+                            }
+                            await frm.fields_dict.accounts.refresh();
+                            await get_vehicle_expenses(frm);
+                        },
+                        () => { }
+                    );
+                } else {
+                    await get_vehicle_expenses(frm)
                 }
             });
         }
@@ -49,14 +72,11 @@ frappe.ui.form.on("Journal Entry", {
         }
         validate_common_accounts()
         frappe.dom.freeze(frappe.render_template("je_loading"));
-        (cur_frm.fields_dict.accounts.grid.grid_rows || []).forEach(async row => {
-            if (row.doc.from_common_entry) {
-                row.doc.__checked = 1;
-            }
-        });
-        await cur_frm.fields_dict.accounts.grid.delete_rows();
+        frm.fields_dict.accounts.grid.grid_pagination.go_to_page(1);
+        for (let i = 0; i < cur_frm.fields_dict.accounts.grid.grid_rows.length; i++) {
+            frm.fields_dict.accounts.grid.grid_rows[0]?.remove();
+        }
         await frm.fields_dict.accounts.refresh();
-        await new Promise(r => setTimeout(r, 1000));
         await frappe.call({
             method: "ganapathy_pavers.custom.py.journal_entry.split_expenses",
             args: {
@@ -178,26 +198,26 @@ async function get_common_expenses(frm) {
         freeze_message: "Fetching Data...",
         callback: async function (r) {
             var a = r.message
-            for (var i = 0; i < (r.message).length; i++) {
-                if (a[i]["monthly_cost"]) {
+            for (var idx = 0; idx < (r.message).length; idx++) {
+                if (a[idx]["monthly_cost"]) {
                     var row = frm.add_child("common_expenses"); await cur_frm.fields_dict.common_expenses.refresh()
-                    frappe.model.set_value(row.doctype, row.name, "account", a[i]["account"] || a[i]["paver"] || "");
-                    frappe.model.set_value(row.doctype, row.name, "vehicle", a[i]["vehicle"] || "");
-                    frappe.model.set_value(row.doctype, row.name, "debit", a[i]["monthly_cost"] || "");
-                    if (a[i]["paver"]) {
-                        frappe.model.set_value(row.doctype, row.name, "paver_account", a[i]["paver"] || "");
+                    frappe.model.set_value(row.doctype, row.name, "account", a[idx]["account"] || a[idx]["paver"] || "");
+                    frappe.model.set_value(row.doctype, row.name, "vehicle", a[idx]["vehicle"] || "");
+                    frappe.model.set_value(row.doctype, row.name, "debit", a[idx]["monthly_cost"] || "");
+                    if (a[idx]["paver"]) {
+                        frappe.model.set_value(row.doctype, row.name, "paver_account", a[idx]["paver"] || "");
                         frappe.model.set_value(row.doctype, row.name, "paver", 1);
                     }
-                    if (a[i]["cw"]) {
-                        frappe.model.set_value(row.doctype, row.name, "cw_account", a[i]["cw"] || "");
+                    if (a[idx]["cw"]) {
+                        frappe.model.set_value(row.doctype, row.name, "cw_account", a[idx]["cw"] || "");
                         frappe.model.set_value(row.doctype, row.name, "compound_wall", 1);
                     }
-                    if (a[i]["lg"]) {
-                        frappe.model.set_value(row.doctype, row.name, "lg_account", a[i]["lg"] || "");
+                    if (a[idx]["lg"]) {
+                        frappe.model.set_value(row.doctype, row.name, "lg_account", a[idx]["lg"] || "");
                         frappe.model.set_value(row.doctype, row.name, "lego_block", 1);
                     }
-                    if (a[i]["fp"]) {
-                        frappe.model.set_value(row.doctype, row.name, "fp_account", a[i]["fp"] || "");
+                    if (a[idx]["fp"]) {
+                        frappe.model.set_value(row.doctype, row.name, "fp_account", a[idx]["fp"] || "");
                         frappe.model.set_value(row.doctype, row.name, "fencing_post", 1);
                     }
                 }
@@ -207,34 +227,29 @@ async function get_common_expenses(frm) {
     });
 }
 
-async function get_fuel_and_odometer_expenses(frm) {
+async function get_vehicle_expenses(frm) {
     await frappe.call({
-        method: "ganapathy_pavers.custom.py.vehicle.fuel_and_tyers_cost",
+        method: "ganapathy_pavers.custom.py.vehicle.get_vehicle_expenses",
         args: {
-            date:frm.doc.posting_date
+            date: frm.doc.posting_date
         },
         freeze: true,
         freeze_message: "Fetching Data...",
         callback: async function (r) {
-           
-            var a = r.message
-           
-            for (var i = 0; i < (r.message).length; i++) {
-                if(a[i]){
-                if(a[i]["total"] && a[i]["account"])
-                {
-                   
-                    var row = frm.add_child("common_expenses"); await cur_frm.fields_dict.common_expenses.refresh()
-                    frappe.model.set_value(row.doctype, row.name, "account", a[i]["account"]|| ""); 
-                    frappe.model.set_value(row.doctype, row.name, "debit", a[i]["total"] || ""); 
-                    
-                    frappe.model.set_value(row.doctype, row.name, "vehicle", a[i]["vehicle"] || ""); 
+            var a = r.message || []
+            for (var idx = 0; idx < a.length; idx++) {
+                if (a[idx]) {
+                    if (a[idx]["amount"] && a[idx]["account"]) {
+                        var row = frm.add_child("accounts");
+                        await cur_frm.fields_dict.accounts.refresh();
+                        frappe.model.set_value(row.doctype, row.name, "account", a[idx]["account"] || "");
+                        frappe.model.set_value(row.doctype, row.name, "debit_in_account_currency", a[idx]["amount"] || "");
+                        frappe.model.set_value(row.doctype, row.name, "debit", a[idx]["amount"] || "");
+                        frappe.model.set_value(row.doctype, row.name, "vehicle", a[idx]["vehicle"] || "");
+                    }
                 }
             }
-            }
-            
-           
-            await cur_frm.fields_dict.common_expenses.refresh();
+            await cur_frm.fields_dict.accounts.refresh();
         }
     });
 }

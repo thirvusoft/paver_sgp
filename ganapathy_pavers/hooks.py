@@ -249,7 +249,9 @@ doc_events = {
 	"Vehicle":{
         "validate":[
 					"ganapathy_pavers.custom.py.vehicle.reference_date",
-					"ganapathy_pavers.custom.py.vehicle.vehicle_common_groups"
+					],
+		"on_update": [
+					"ganapathy_pavers.ganapathy_pavers.doctype.maintenance_type.maintenance_type.update_select_purpose",
 					],
     },
  	"Employee Checkin":{
@@ -323,8 +325,9 @@ doctype_js = {
 				"Work Order" : "/utils/js/workorder.js",
 
 	     		"BOM" : [ "/utils/js/bom.js", "/custom/js/bom.js"],
-				"Quotation": "/custom/js/quotation.js"
-
+				"Quotation": "/custom/js/quotation.js",
+				"Payroll Entry": "/utils/js/payroll_entry.js",
+				"Employee Advance": "/utils/js/employee_advance.js",
 			 }
 # Scheduled Tasks
 # ---------------

@@ -20,6 +20,8 @@
   "fp_group",
   "vehicle_expense_account_groups_section",
   "vehicle_expense",
+  "column_break_15",
+  "default_fuel_account",
   "section_break_10",
   "paver_uom",
   "column_break_12",
@@ -29,9 +31,7 @@
   "column_break_16",
   "fp_uom",
   "section_break_18",
-  "expense_account_common_groups",
-  "vehicle_expense_accounts_section",
-  "vehicle_expense_accounts"
+  "expense_account_common_groups"
  ],
  "fields": [
   {
@@ -159,20 +159,20 @@
    "options": "Account"
   },
   {
-   "fieldname": "vehicle_expense_accounts_section",
-   "fieldtype": "Section Break",
-   "label": "Vehicle Expense Accounts"
+   "fieldname": "default_fuel_account",
+   "fieldtype": "Link",
+   "label": "Default Fuel Account",
+   "options": "Account"
   },
   {
-   "fieldname": "vehicle_expense_accounts",
-   "fieldtype": "Table",
-   "options": "Vehicle Expense Account"
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-01-27 10:02:30.187480",
+ "modified": "2023-02-04 11:56:24.721924",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Expense Accounts",

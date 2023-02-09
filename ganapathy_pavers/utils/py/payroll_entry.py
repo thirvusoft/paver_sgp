@@ -1,3 +1,5 @@
+from frappe.utils.data import date_diff, get_link_to_form
+from erpnext.hr.doctype.employee.employee import InactiveEmployeeStatusError
 from erpnext.payroll.doctype.payroll_entry.payroll_entry import ( PayrollEntry,get_existing_salary_slips)
 from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip
 import frappe
@@ -289,3 +291,28 @@ def remove_payrolled_employees(emp_list, start_date, end_date):
 			new_emp_list.append(employee_details)
 
 	return new_emp_list
+
+@frappe.whitelist()
+def create_salary_slips_from_pe(name):
+     doc=frappe.get_doc("Payroll Entry", name)
+     for row in doc.employees:
+          validate_active_employee(row.employee)
+          validate_joining_dates(row.employee, doc.start_date, doc.end_date)
+     doc.create_salary_slips()
+     
+
+def validate_active_employee(employee):
+	if frappe.db.get_value("Employee", employee, "status") == "Inactive":
+		frappe.throw(_("Transactions cannot be created for an Inactive Employee {0}.").format(
+			get_link_to_form("Employee", employee)), InactiveEmployeeStatusError)
+            
+def validate_joining_dates(employee, start_date, end_date):
+    employee=frappe.get_doc("Employee", employee)
+    if date_diff(end_date, start_date) < 0:
+        frappe.throw(_("To date cannot be before From date"))
+
+    if date_diff(end_date, employee.date_of_joining) < 0:
+        frappe.throw(_(f"Cannot create Salary Slip for Employee joining after Payroll Period for Employee {employee.name}:{employee.employee_name}"))
+
+    if employee.relieving_date and date_diff(employee.relieving_date, start_date) < 0:
+        frappe.throw(_(f"Cannot create Salary Slip for Employee  {employee.name}:{employee.employee_name} who has left before Payroll Period"))
