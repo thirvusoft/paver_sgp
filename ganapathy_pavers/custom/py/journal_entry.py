@@ -50,9 +50,9 @@ def get_production_details(date=None, from_date=None, to_date=None, machines=[])
             pm_filt["work_station"] = ["in", machines]
 
         res['paver'] = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='production_sqft'))
-        res['cw'] = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))
-        res['lego'] = sum(frappe.db.get_all('CW Manufacturing', filters=lg_filt, pluck='production_sqft'))
-        res['fp'] = sum(frappe.db.get_all('CW Manufacturing', filters=fp_filt, pluck='production_sqft'))
+        res['cw'] = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='ts_production_sqft'))
+        res['lego'] = sum(frappe.db.get_all('CW Manufacturing', filters=lg_filt, pluck='ts_production_sqft'))
+        res['fp'] = sum(frappe.db.get_all('CW Manufacturing', filters=fp_filt, pluck='ts_production_sqft'))
     except:
         pass
     return res
