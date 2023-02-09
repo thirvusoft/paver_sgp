@@ -1,5 +1,6 @@
-<h2 class="text-center"><b>{%= __("SRI GANAPATHY FLY ASH BRICKS - PAVER - WEEKLY LAYER BILL") %}</b></h2>
+<h2 class="text-center"><b>{%= __("SRI GANAPATHY FLY ASH BRICKS")%} {%= __(filters.type) %} {%= __("WEEKLY LAYER BILL") %}</b></h2>
 <h3 class="text-center">
+	
 	{%= frappe.datetime.str_to_user(filters.from_date) %}
 	{%= __("to") %}
 	{%= frappe.datetime.str_to_user(filters.to_date) %}
