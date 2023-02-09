@@ -230,9 +230,16 @@ def get_vehicle_expenses(date):
     vehicle_expense_query=f"""
         SELECT 
             IFNULL(md.expense_account, md.default_expense_account) AS account,
+            CASE 
+                WHEN IFNULL(md.from_date, "")!="" AND IFNULL(md.to_date, "")!=""
+                    THEN 
+                        md.expense / (SELECT TIMESTAMPDIFF(MONTH, md.from_date, md.to_date))
+                ELSE md.expense
+            END
+            *
             CASE
                 WHEN md.expense_calculation_per_km=1
-                    THEN md.expense * (
+                    THEN (
                         SELECT 
                             SUM(vl.today_odometer_value)
                         FROM `tabVehicle Log` vl
@@ -247,7 +254,7 @@ def get_vehicle_expenses(date):
                             AND vl.date between '{month_start_date}' and '{month_end_date}' 
                     )
                 WHEN md.expense_calculation_per_vehicle_log=1
-                    THEN md.expense * (
+                    THEN (
                         SELECT 
                             COUNT(*)
                         FROM `tabVehicle Log` vl
@@ -261,7 +268,22 @@ def get_vehicle_expenses(date):
                             AND vl.license_plate=md.parent
                             AND vl.date between '{month_start_date}' and '{month_end_date}' 
                     )
-                ELSE md.expense
+                WHEN md.expense_calculation_per_day=1
+                    THEN (
+                        SELECT 
+                            COUNT(DISTINCT(vl.date))
+                        FROM `tabVehicle Log` vl
+                        WHERE
+                            vl.docstatus=1
+                            AND vl.select_purpose IN (
+                                SELECT vlp.select_purpose
+                                FROM `tabVehicle Log Purpose` vlp
+                                WHERE vlp.parent=md.maintenance and vlp.parentfield="vehicle_log_purpose_per_day"
+                            ) 
+                            AND vl.license_plate=md.parent
+                            AND vl.date between '{month_start_date}' and '{month_end_date}'
+                    )
+                ELSE 1
             END
             AS amount,
             md.parent AS vehicle
