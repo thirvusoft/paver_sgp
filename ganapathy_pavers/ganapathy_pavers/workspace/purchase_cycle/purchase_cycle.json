@@ -3,7 +3,7 @@
  "charts": [],
  "creation": "2022-03-25 14:20:34.045961",
  "developer_mode_only": 0,
- "disable_user_customization": 1,
+ "disable_user_customization": 0,
  "docstatus": 0,
  "doctype": "Workspace",
  "extends_another_page": 0,
@@ -97,8 +97,8 @@
    "type": "Link"
   }
  ],
- "modified": "2022-11-18 19:36:55.595249",
- "modified_by": "ponnusamyv434@gmail.com",
+ "modified": "2023-02-10 11:52:58.747390",
+ "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Purchase Cycle",
  "onboarding": "",

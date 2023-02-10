@@ -4,7 +4,7 @@
  "charts": [],
  "creation": "2022-04-20 14:59:09.716513",
  "developer_mode_only": 0,
- "disable_user_customization": 1,
+ "disable_user_customization": 0,
  "docstatus": 0,
  "doctype": "Workspace",
  "extends_another_page": 0,
@@ -35,7 +35,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-01-11 11:13:45.239631",
+ "modified": "2023-02-10 11:53:32.199341",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "HR Cycle",

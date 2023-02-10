@@ -3,7 +3,7 @@
  "charts": [],
  "creation": "2022-04-21 16:03:25.253367",
  "developer_mode_only": 0,
- "disable_user_customization": 1,
+ "disable_user_customization": 0,
  "docstatus": 0,
  "doctype": "Workspace",
  "extends_another_page": 0,
@@ -24,7 +24,7 @@
    "type": "Link"
   }
  ],
- "modified": "2022-12-30 10:41:32.023128",
+ "modified": "2023-02-10 11:53:32.256501",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "STOCK MANAGER",
