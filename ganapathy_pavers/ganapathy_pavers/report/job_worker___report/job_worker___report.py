@@ -53,7 +53,7 @@ def execute(filters=None):
     c = 0
     if filters.get("group_site_work"):
         data1={}
-        count=0
+        count={}
         for idx in range(len(data)):
             _key=f"{data[idx][0]}---{data[idx][1]}"
             if _key not in data1 or data[idx][6]:
@@ -62,11 +62,16 @@ def execute(filters=None):
                 data1[_key][3]+=(data[idx][3] or 0)
                 data1[_key][4]+=(data[idx][4] or 0)
                 data1[_key][5]+=(data[idx][5] or 0)
-                count+=1
+                if _key not in count:
+                    count[_key]=0
+                count[_key]+=1
                 data1[_key][9]+=(data[idx][9] or 0)
+        
+        # for _key in data1:
+        #     data1[_key][5] = (data1[_key][5] / count[_key]) if count[_key] else data1[_key][5]
         data=list(data1.values())
-        for i in data:
-            i[5] = (i[5] / count) if count else i[5]
+        # for i in data:
+        #     i[5] = (i[5] / count) if count else i[5]
     data = [list(i) for i in (report_data1 or [])] + data
     
     data+=get_employees_to_add(filters, [row[0] for row in data])
@@ -281,7 +286,8 @@ def get_undeducted_advances(employee, from_date, to_date):
     res= frappe.db.sql(f"""
         SELECT SUM(ads.amount - ifnull(ads.salary_slip_amount, 0))
         FROM `tabAdditional Salary` ads
-        WHERE ads.employee="{employee}"
+        WHERE ads.docstatus=1 
+        AND ads.employee="{employee}"
         AND ads.payroll_date <= '{to_date}'
     """)[0][0]
     return res or 0
