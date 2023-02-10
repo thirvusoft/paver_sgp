@@ -56,22 +56,20 @@ def execute(filters=None):
         count={}
         for idx in range(len(data)):
             _key=f"{data[idx][0]}---{data[idx][1]}"
+            if _key not in count:
+                count[_key]=0
+            count[_key]+=1
             if _key not in data1 or data[idx][6]:
                 data1[_key]=data[idx]
             else:
                 data1[_key][3]+=(data[idx][3] or 0)
                 data1[_key][4]+=(data[idx][4] or 0)
                 data1[_key][5]+=(data[idx][5] or 0)
-                if _key not in count:
-                    count[_key]=0
-                count[_key]+=1
                 data1[_key][9]+=(data[idx][9] or 0)
-        
-        # for _key in data1:
-        #     data1[_key][5] = (data1[_key][5] / count[_key]) if count[_key] else data1[_key][5]
+
+        for _key in data1:
+            data1[_key][5] = (data1[_key][5] / count[_key]) if count[_key] else data1[_key][5]
         data=list(data1.values())
-        # for i in data:
-        #     i[5] = (i[5] / count) if count else i[5]
     data = [list(i) for i in (report_data1 or [])] + data
     
     data+=get_employees_to_add(filters, [row[0] for row in data])
@@ -130,7 +128,7 @@ def execute(filters=None):
         total[5] = f"<b>{'%.2f'%sum((data[i][5] or 0) for i in range(start,len(data)))}</b>"
         total[6]=0
         total[8] = sum((data[i][8] or 0) for i in range(start,len(data)))
-        total[9] = f"<b>{'%.2f'%sum((data[i][8] or 0) for i in range(start,len(data)))}</b>"
+        total[9] = f"<b>{'%.2f'%sum((data[i][9] or 0) for i in range(start,len(data)))}</b>"
         total[10] = adv
         amount=sum((data[i][9] or 0) for i in range(start,len(data)))
         salary_bal=sum((data[i][8] or 0) for i in range(start,len(data)))
@@ -296,9 +294,37 @@ def get_employees_to_add(filters, employees):
     employees=list(set(employees))
     emp_filters={"status": ["!=", "Inactive"], "name": ["not in", employees], "designation": "Job Worker"}
     if filters.get("employee") and filters.get("employee") in employees:
-        return[]
+        return []
+    
     elif filters.get("employee"):
         emp_filters["name"] = filters.get("employee")
+
+    elif filters.get("site_name"):
+        emp_list=[]
+        emp=frappe.db.sql(f"""
+            SELECT jw.name1
+            FROM `tabTS Job Worker Details` jw
+            WHERE jw.parenttype="Project" 
+            AND jw.parent="{filters.get('site_name')}"
+        """)
+        for row in emp:
+            emp_list.append(row[0])
+        emp_filters["name"] = ["in", emp_list]
+
+    elif filters.get("type"):
+        emp_list=[]
+        emp=frappe.db.sql(f"""
+            SELECT jw.name1
+            FROM `tabTS Job Worker Details` jw
+            LEFT OUTER JOIN `tabProject` pr
+            ON pr.name=jw.parent
+            WHERE jw.parenttype="Project" 
+            AND pr.type="{filters.get("type")}"
+        """)
+        for row in emp:
+            emp_list.append(row[0])
+        emp_filters["name"] = ["in", emp_list]
+
     rem = frappe.get_all("Employee", emp_filters, pluck='name')
     return [[emp]+ [None for i in range(11)] for emp in rem if (
         get_undeducted_advances(emp, filters.get("from_date"), filters.get("to_date")) or
