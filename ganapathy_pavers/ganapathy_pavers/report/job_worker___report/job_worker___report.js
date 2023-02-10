@@ -46,7 +46,15 @@ frappe.query_reports["Job Worker - Report"] = {
 			"fieldtype": "Check",
 			"default": 1
 		}
-	]
+	],
+	"formatter": function(value, row, column, data, default_formatter) {
+		value = default_formatter(value, row, column, data);
+		if (data && (data.status=="Total" || data.job_worker=="Total" || data.bold)) {
+			value = `<b>${value}</b>`;
+
+		}
+		return value;
+	},
 };
 
 

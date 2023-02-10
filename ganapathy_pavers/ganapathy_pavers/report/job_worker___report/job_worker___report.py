@@ -91,13 +91,14 @@ def execute(filters=None):
                 data[i][0]=frappe.db.get_value("Employee", data[i][0], "employee_name")
                 final_data.append(data[i]+[None])
                 total = [" " for i in range(13)]
-                total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
-                total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,i+1))}</b>"
-                total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,i+1))}</b>"
-                total[5] = f"<b>{'%.2f'%sum((data[i][5] or 0) for i in range(start,i+1))}</b>"
+                total[0] = f"""<b style="font-size: 20px;text-align: center; color:green">{data[i][0]}</b>"""
+                total[2] = "Total"
+                total[3] = sum((data[i][3] or 0) for i in range(start,i+1))
+                total[4] = sum((data[i][4] or 0) for i in range(start,i+1))
+                total[5] = sum((data[i][5] or 0) for i in range(start,i+1))
                 total[6]=0
                 total[8] = sum((data[i][8] or 0) for i in range(start,i+1))
-                total[9] = f"<b>{'%.2f'%sum((data[i][9] or 0) for i in range(start,i+1))}</b>"
+                total[9] = sum((data[i][9] or 0) for i in range(start,i+1))
                 total[10] = adv
                 amount=sum((data[i][9] or 0) for i in range(start,i+1))
                 salary_bal=sum((data[i][8] or 0) for i in range(start,i+1))
@@ -122,13 +123,14 @@ def execute(filters=None):
         data[-1][0]=frappe.db.get_value("Employee", data[-1][0], "employee_name")
         final_data.append(data[-1]+[None])
         total = [" " for i in range(13)]
-        total[2] = "<b style=color:rgb(255 82 0);>""Total""</b>"
-        total[3] = f"<b>{'%.2f'%sum((data[i][3] or 0) for i in range(start,len(data)))}</b>"
-        total[4] = f"<b>{'%.2f'%sum((data[i][4] or 0) for i in range(start,len(data)))}</b>"
-        total[5] = f"<b>{'%.2f'%sum((data[i][5] or 0) for i in range(start,len(data)))}</b>"
+        total[0] = f"""<b style="font-size: 20px;text-align: center; color:green">{data[-1][0]}</b>"""
+        total[2] = "Total"
+        total[3] = sum((data[i][3] or 0) for i in range(start,len(data)))
+        total[4] = sum((data[i][4] or 0) for i in range(start,len(data)))
+        total[5] = sum((data[i][5] or 0) for i in range(start,len(data)))
         total[6]=0
         total[8] = sum((data[i][8] or 0) for i in range(start,len(data)))
-        total[9] = f"<b>{'%.2f'%sum((data[i][9] or 0) for i in range(start,len(data)))}</b>"
+        total[9] = sum((data[i][9] or 0) for i in range(start,len(data)))
         total[10] = adv
         amount=sum((data[i][9] or 0) for i in range(start,len(data)))
         salary_bal=sum((data[i][8] or 0) for i in range(start,len(data)))
@@ -145,7 +147,26 @@ def execute(filters=None):
             row[6]=""
             row[7]=""
     columns = get_columns(other_work)
-    return columns, [row for row in final_data]
+    return columns, add_total_row(final_data)
+
+def add_total_row(data):
+    res=[]
+    if data and data[0]:
+        res=[0 for i in range(len(data[0]))]
+        for row in data:
+            if res and row[2]=="Total":
+                res=add_list(row, res)
+        res[0]="Total"
+    return data+[res] if res else data
+
+def add_list(a, b):
+    ret_list1 = []
+    for i in range(len(a)):
+        if((isinstance(a[i], int) or isinstance(a[i], float)) and (isinstance(b[i], int) or isinstance(b[i], float))):
+            ret_list1.append(a[i] + b[i])
+        else:
+            ret_list1.append(None)
+    return ret_list1
 
 def get_columns(other_work):
 	columns = [
@@ -155,19 +176,19 @@ def get_columns(other_work):
         {
             "fieldname": "bundle",
             "label": "Bundle",
-            "fieldtype": "Data",
+            "fieldtype": "Float",
             "ts_right_align": "text-right"
         },
 		{
             "fieldname": "sfqt",
             "label": "SQFT",
-            "fieldtype": "Data",
+            "fieldtype": "Float",
             "ts_right_align": "text-right"
         },
         {
             "fieldname": "rate",
             "label": "Rate",
-            "fieldtype": "Data",
+            "fieldtype": "Float",
             "ts_right_align": "text-right"
         },
         {
@@ -191,25 +212,25 @@ def get_columns(other_work):
 		{
             "fieldname": "amount",
             "label": "Amount",
-            "fieldtype": "Data",
+            "fieldtype": "Float",
             "ts_right_align": "text-right"
         },
 		{
             "fieldname": "advance_deduction",
             "label": "Advance Deduction",
-            "fieldtype": "Data",
+            "fieldtype": "Float",
             "ts_right_align": "text-right"
         },
 		{
             "fieldname": "total_amount",
             "label": "Total Amount",
-            "fieldtype": "Data",
+            "fieldtype": "Float",
             "ts_right_align": "text-right"
         },
         {
             "fieldname": "payment",
             "label": "Payment",
-            "fieldtype": "Data",
+            "fieldtype": "Float",
             "default": None,
             "width": 150,
             "ts_right_align": "text-right"
@@ -245,7 +266,7 @@ def get_employee_salary_balance(employee, from_date, to_date):
 
     elif(salary_slip1):
         return salary_slip1[0]["total_unpaid_amount"]+amount
-    return amount
+    return round((amount or 0), 2)
 
 def get_employee_salary_slip_amount(employee, from_date, to_date):
     query=f"""
@@ -254,7 +275,7 @@ def get_employee_salary_slip_amount(employee, from_date, to_date):
         WHERE ss.docstatus=1 AND ss.employee='{employee}' AND ss.start_date >= '{from_date}' AND ss.end_date <= '{to_date}'
     """
     res=frappe.db.sql(query)[0][0]
-    return res
+    return round((res or 0), 2)
 
 def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv):
     if frappe.db.get_all('Salary Slip', {'employee': employee, 'start_date': [">=", from_date], 'end_date': ["<=", to_date], "docstatus": 1}):
@@ -278,7 +299,7 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
             AND dp.date between '{from_date}' and '{to_date}'
             AND ea.repay_unclaimed_amount_from_salary=1
     """)[0][0]
-    return planned_deduction or get_undeducted_advances(employee, from_date, to_date)
+    return round((planned_deduction or 0), 2) or get_undeducted_advances(employee, from_date, to_date)
 
 def get_undeducted_advances(employee, from_date, to_date):
     res= frappe.db.sql(f"""
@@ -288,7 +309,7 @@ def get_undeducted_advances(employee, from_date, to_date):
         AND ads.employee="{employee}"
         AND ads.payroll_date <= '{to_date}'
     """)[0][0]
-    return res or 0
+    return round((res or 0), 2)
 
 def get_employees_to_add(filters, employees):
     employees=list(set(employees))

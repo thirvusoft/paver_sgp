@@ -37,7 +37,7 @@
 
 					{% var value = col.fieldname ? row[col.fieldname] : row[col.id]; %}
 
-					<td {% if row.bold == 1 %} style="font-weight: bold" {% endif %} {% if col.ts_right_align%} class="text-right" {% endif %}>
+					<td {% if row.bold == 1 || row.status=="<b>Total</b>"%} style="font-weight: bold" {% endif %} {% if col.ts_right_align%} class="text-right" {% endif %}>
 						<span {% if col._index == 0 %} style="padding-left: {%= cint(row.indent) * 2 %}em" {% endif %}>
 							{% format_data = row.is_total_row && ["Currency", "Float"].includes(col.fieldtype) ? data[0] : row %}
 							{% if (row.is_total_row && col._index == 0) { %}
