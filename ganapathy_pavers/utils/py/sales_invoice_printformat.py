@@ -1,14 +1,15 @@
 
 import frappe
 
-def sales_invoice_print_format(doc):
+def sales_invoice_print_format(doc, field_name="item_name"):
     data={}
     for row in doc.items:
-        if row.print_item_name:
-            _key=f"""{row.get("print_item_name")} {row.get("rate")}  {row.get("uom")}"""
+        if row.get(field_name):
+            _key=f"""{row.get(field_name)} {row.get("rate")}  {row.get("uom")}"""
             if _key not in data:
                 data[_key]={
-                "item_name": row.get("print_item_name"),
+                "item_name": row.get(field_name),
+                field_name: row.get(field_name),
                 "uom": row.get("uom"),
                 "rate": row.get("rate"),
                 "hsn_code":row.get("gst_hsn_code"),
@@ -23,6 +24,7 @@ def sales_invoice_print_format(doc):
             if _key not in data:
                 data[_key]={
                 "item_name": row.get("item_name"),
+                field_name: row.get(field_name),
                 "uom": row.get("uom"),
                 "rate": row.get("rate"),
                 "hsn_code":row.get("gst_hsn_code"),
