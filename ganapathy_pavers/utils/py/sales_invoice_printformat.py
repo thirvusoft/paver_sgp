@@ -8,7 +8,7 @@ def sales_invoice_print_format(doc, field_name="item_name"):
             _key=f"""{row.get(field_name)} {row.get("rate")}  {row.get("uom")}"""
             if _key not in data:
                 data[_key]={
-                "item_name": row.get(field_name),
+                "item_name": row.get("item_name"),
                 field_name: row.get(field_name),
                 "uom": row.get("uom"),
                 "rate": row.get("rate"),
