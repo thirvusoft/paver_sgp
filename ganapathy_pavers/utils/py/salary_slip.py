@@ -1,3 +1,4 @@
+import datetime
 from erpnext.hr.utils import validate_active_employee
 from frappe.utils import getdate
 from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip, get_salary_component_data
@@ -5,6 +6,8 @@ import frappe
 from frappe import _
 from frappe.utils.data import flt
 from frappe.utils import date_diff
+from frappe.custom.doctype.property_setter.property_setter import make_property_setter
+from ganapathy_pavers.ganapathy_pavers.doctype.employee_advance_tool.employee_advance_tool import create_employee_advance
 
 class CustomSalary(SalarySlip):
     def validate_days_calc(self, event=None):
@@ -49,9 +52,6 @@ class CustomSalary(SalarySlip):
             self.calculate_component_amounts("earnings")
         self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1)
         self.base_gross_pay = flt(flt(self.gross_pay) * flt(self.exchange_rate), self.precision('base_gross_pay'))
-
-        # if self.salary_structure:
-        #     self.calculate_component_amounts("deductions")
 
         self.set_loan_repayment()
         self.set_precision_for_component_amounts()
@@ -100,7 +100,48 @@ def site_work_details(employee,start_date,end_date):
     for data in job_worker:
             if data.name1 == employee and (data.start_date and data.start_date >= start_date) and (data.start_date and data.start_date <= end_date) and (data.end_date and data.end_date >= start_date) and (data.end_date and data.end_date <= end_date):
                 site_work.append([data.parent,data.amount])
-    return site_work
+    employee_sal_bal=get_employee_salary_balance(employee, start_date)
+    return {"site_work": site_work, "unbilled_salary_balance": employee_sal_bal[0], "last_salary_slip_date": employee_sal_bal[1], "undeducted_advances": get_undeducted_advances(start_date, end_date, employee)}
+
+def get_undeducted_advances(start_date, end_date, employee, comp_type="Deduction"):
+    additional_salary=frappe.db.sql(f"""
+        select 
+           SUM(additional_sal.amount - additional_sal.salary_slip_amount) as amount 
+        from `tabAdditional Salary` additional_sal
+        where 
+            additional_sal.employee='{employee}' and additional_sal.docstatus = 1 and 
+            additional_sal.type = "{comp_type}" and additional_sal.salary_slip_amount < additional_sal.amount and
+            additional_sal.payroll_date <= "{end_date}"
+    """)
+    if additional_salary and additional_salary[0] and additional_salary[0][0]:
+        return additional_salary[0][0]
+    return 0
+
+@frappe.whitelist(allow_guest=True)
+def get_employee_salary_balance(employee, from_date):
+    last_ss_date=frappe.db.sql(f"""
+    SELECT MAX(ss.end_date) 
+    FROM `tabSalary Slip` ss
+    WHERE ss.employee = '{employee}' AND ss.docstatus=1
+    """)
+    amount=0
+    conditions=f"""
+    where jwd.name1='{employee}' and jwd.end_date < '{from_date}' 
+    """
+    if last_ss_date[0][0]:
+        conditions+=f""" and jwd.start_date > '{datetime.datetime.strftime(last_ss_date[0][0], "%Y-%m-%d")}'"""
+    date=from_date
+    if isinstance(date, str):
+        date=datetime.datetime.strptime(from_date, "%Y-%m-%d").date()
+    if not last_ss_date[0][0] or date>last_ss_date[0][0]:
+        amount=frappe.db.sql(f"""
+        SELECT sum(jwd.amount)
+        from `tabProject` as site
+        left outer join `tabTS Job Worker Details` as jwd
+            on site.name = jwd.parent
+        {conditions}
+        """)[0][0] or 0
+    return amount, last_ss_date[0][0]
 
 def employee_update(doc,action):
     employee_doc = frappe.get_doc('Employee',doc.employee)
@@ -110,20 +151,27 @@ def employee_update(doc,action):
         employee_doc.salary_balance=employee_doc.salary_balance-(doc.total_amount-doc.total_paid_amount)
     employee_doc.save()
 
-# def round_off(doc,action):
-#         net_pay=(round(doc.net_pay))%10
-#         # if(net_pay<=2):
-#         #     frappe.db.set_value('Salary Slip',doc.name,'rounded_total',round(doc.net_pay)-net_pay)
-#         #     frappe.db.set_value('Salary Slip',doc.name,'net_pay',round(doc.net_pay)-net_pay)
-        
-#         # elif(net_pay>2):
-#         #     value = 10- net_pay
-#         #     frappe.db.set_value('Salary Slip',doc.name,'rounded_total',round(doc.net_pay)+value)
-#         #     frappe.db.set_value('Salary Slip',doc.name,'net_pay',round(doc.net_pay)+value)
-def validate_salaryslip(self, event):
+def validate_salaryslip(self, event=None):
     set_net_pay(self, event)
     validate_salary_slip(self, event)
     validate_contrator_welfare(self, event)
+
+def employee_advance(self, event):
+    if self.excess_amount_to_create_advance:
+        if not self.branch:
+            frappe.throw(f"""Field <b>Branch</b> is required for creating <b>Employee Advance</b> in <a href="/app/salary-slip/{self.name}"><b>{self.name}</b></a>""")
+        if not self.advance_payment_mode:
+            frappe.throw(f"""Field <b>Mode of Payment</b> is required for creating <b>Employee Advance</b> in <a href="/app/salary-slip/{self.name}"><b>{self.name}</b></a>""")
+        adv=create_employee_advance(
+            self.employee
+            , flt(self.excess_amount_to_create_advance, 2)
+            , self.posting_date
+            , "Deduct from Salary"
+            , self.advance_payment_mode
+            , self.branch
+            )
+    frappe.db.set_value("Salary Slip", self.name, "employee_advance", adv.name)
+    self.reload()
 
 
 def set_net_pay(self,event):
@@ -210,7 +258,6 @@ def validate_contrator_welfare(self, event):
             total_working_hour=total_working_hour[0]['time']
         else:
             total_working_hour=0
-        frappe.errprint(f"{self.employee}   {self.employee_name}")
         total_commission_rate=0
         if ccr and len(ccr)>0 and ccr[0]['commission_rate']:
             total_commission_rate=total_working_hour*ccr[0]['commission_rate']
@@ -271,9 +318,24 @@ def get_additional_salaries(employee, start_date, end_date, component_type):
 
     additional_salary_list=frappe.db.sql(f"""
         select 
-            additional_sal.name, additional_sal.salary_component as component, additional_sal.type,
-            (additional_sal.amount - additional_sal.salary_slip_amount) as amount, additional_sal.is_recurring, additional_sal.overwrite_salary_structure_amount as overwrite,
-            additional_sal.deduct_full_tax_on_selected_payroll_date
+            additional_sal.name
+            , additional_sal.salary_component as component
+            , additional_sal.type
+            , CASE
+                WHEN additional_sal.ref_doctype = "Employee Advance"  AND IFNULL(additional_sal.ref_docname, "") != ""
+                    THEN (
+                        SELECT 
+                            SUM(dp.amount)
+                        FROM `tabDeduction Planning` dp
+                        WHERE dp.date <= '{end_date}'
+                        AND dp.date >= '{start_date}'
+                        AND dp.parenttype='Employee Advance'
+                        AND dp.parent=additional_sal.ref_docname
+                    )
+            END as amount
+            , additional_sal.is_recurring
+            , additional_sal.overwrite_salary_structure_amount as overwrite
+            , additional_sal.deduct_full_tax_on_selected_payroll_date
         from `tabAdditional Salary` additional_sal
         where 
             additional_sal.employee='{employee}' and additional_sal.docstatus = 1 and 
@@ -322,3 +384,6 @@ def additional_salary_update(self, event=None):
                             add_row=False
                 additional_salary.salary_slip_amount= additional_salary.amount - row.amount
             additional_salary.save('Update')
+
+def remove_branch_read_only():
+    make_property_setter("Salary Slip", "branch", "read_only", 0, "Check")

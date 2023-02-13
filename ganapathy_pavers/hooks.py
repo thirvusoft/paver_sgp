@@ -149,6 +149,7 @@ doc_events = {
           },
 	"Salary Slip":{
         		"on_submit":[
+					"ganapathy_pavers.utils.py.salary_slip.employee_advance",
 					"ganapathy_pavers.utils.py.salary_slip.employee_update",
 					"ganapathy_pavers.utils.py.salary_slip.additional_salary_update",
 					],
@@ -296,7 +297,8 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
 			  "ganapathy_pavers.utils.py.vehicle_log.batch_customization",
 			  "ganapathy_pavers.utils.py.quotation.batch_property_setter",
 			  "ganapathy_pavers.utils.py.purchase_invoice.batch_property_setter",
-			  "ganapathy_pavers.utils.py.payment_entry.payment_entry_property_setter"
+			  "ganapathy_pavers.utils.py.payment_entry.payment_entry_property_setter",
+			  "ganapathy_pavers.utils.py.salary_slip.remove_branch_read_only"
 			  ]
 
 

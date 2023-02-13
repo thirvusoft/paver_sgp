@@ -34,6 +34,7 @@ def create_employee_advance(name,amount,date,payment_type,mode_of_payment,branch
 		advance_doc.save()
 		advance_doc.submit()
 		frappe.db.commit()
+		return advance_doc
 
 @frappe.whitelist()
 def employee_finder_attendance(designation='', department=''):
