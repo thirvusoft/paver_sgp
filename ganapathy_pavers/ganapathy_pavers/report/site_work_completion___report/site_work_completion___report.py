@@ -131,7 +131,7 @@ def get_columns():
 		_("Item") + ":Link/Item:150",
 		_("Bundles") + ":Data:80",
 		_("Completed Sqft") + ":Data:130",
-		_("Rate") + ":Currency:100",
+		_("Rate") + ":Float:100",
 		_("Amount") + ":Data:150",
 		]
 	

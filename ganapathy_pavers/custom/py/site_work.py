@@ -80,7 +80,8 @@ def add_total_amount(items):
 
 
 def autoname(self, event):
-    self.name= self.project_name
+    self.name= (self.project_name or "").title()
+
 
 def create_status():
     print('Creating Property Setter for Site Work Status')
