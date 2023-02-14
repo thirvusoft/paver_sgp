@@ -20,7 +20,7 @@ def employee_finder(advance1="", location=""):
 	return employee_names
 
 @frappe.whitelist()
-def create_employee_advance(name,amount,date,payment_type,mode_of_payment,branch):
+def create_employee_advance(name,amount,date,payment_type,mode_of_payment,branch, salary_slip=""):
 		advance_doc=frappe.new_doc('Employee Advance')
 		advance_doc.employee = name
 		advance_doc.advance_amount = amount
@@ -28,6 +28,7 @@ def create_employee_advance(name,amount,date,payment_type,mode_of_payment,branch
 		advance_doc.exchange_rate = 1.0
 		advance_doc.branch=branch
 		advance_doc.mode_of_payment=mode_of_payment
+		advance_doc.salary_slip=salary_slip
 		if payment_type=="Deduct from Salary":
 			advance_doc.repay_unclaimed_amount_from_salary=1
 		advance_doc.insert()
