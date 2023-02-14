@@ -39,6 +39,7 @@
   "cement_item",
   "setting_oil_item_name",
   "total_no_of_batches",
+  "bottom_layer_batches",
   "column_break_4",
   "average_of_raw_material",
   "average_of_cement",
@@ -994,12 +995,17 @@
    "fieldtype": "Data",
    "label": "Panmix Operator Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "bottom_layer_batches",
+   "fieldtype": "Float",
+   "label": "Total no of Batches for Bottom Layer"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-10-12 13:09:54.023527",
+ "modified": "2023-02-14 18:25:48.601689",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
