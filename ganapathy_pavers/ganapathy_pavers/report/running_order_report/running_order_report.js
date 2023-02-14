@@ -11,6 +11,9 @@ frappe.query_reports["Running Order Report"] = {
             "options": "Project",
             "get_query": function () {
                 var customer = frappe.query_report.get_filter_value('customer');
+                if (!customer) {
+                    return {}
+                }
                 return {
                     filters: {
                         "customer": customer
@@ -36,9 +39,8 @@ frappe.query_reports["Running Order Report"] = {
             "fieldname": "status",
             "label": __("Status"),
             "fieldtype": "Select",
-
             'options': frappe.get_meta('Project').fields.filter(df => df.fieldname === 'status')[0].options,
-            'default': frappe.get_meta('Project').fields.filter(df => df.fieldname === 'status')[0].options.includes('Open')
+            'default': frappe.get_meta('Project').fields.filter(df => df.fieldname === 'status')[0].options.includes('Open')?"Open":""
         }
     ]
 };
