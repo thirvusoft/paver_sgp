@@ -1,57 +1,65 @@
 // Copyright (c) 2022, Thirvusoft and contributors
 // For license information, please see license.txt
 /* eslint-disable */
- 
+
 frappe.query_reports["Site Work Wise Delivery Report"] = {
 	"filters": [
 		{
-			"fieldname":"from_date",
+			"fieldname": "from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.add_days(frappe.datetime.get_today(), -7),
 			"width": "80"
 		},
 		{
-			"fieldname":"to_date",
+			"fieldname": "to_date",
 			"label": __("To Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today(),
 			"width": "80"
 		},
 		{
-			"fieldname":"site_name",
+			"fieldname": "site_name",
 			"label": __("Site Name"),
 			"fieldtype": "Link",
 			"options": "Project",
 			"width": "100",
-			// "filters":  {
-			// 			"customer": frappe.query_report.get_filter_value("customer")
-			// 		}
-				
+			"get_query": function () {
+				var customer = frappe.query_report.get_filter_value('customer');
+				if (!customer) {
+					return {}
+				}
+				return {
+					filters: {
+						"customer": customer
+					}
+				};
+			}
+
 		},
 		{
-			"fieldname":"sales_type",
+			"fieldname": "sales_type",
 			"label": __("Sales Type"),
 			"fieldtype": "Select",
 			"options": "\nPavers\nCompound Wall",
 			"width": "100"
 		},
 		{
-			"fieldname":"customer",
+			"fieldname": "customer",
 			"label": __("Custome Name"),
 			"fieldtype": "Link",
 			"options": "Customer",
 			"width": "100"
 		},
 		{
-			"fieldname":"item_code",
+			"fieldname": "item_code",
 			"label": __("Item Code"),
 			"fieldtype": "Link",
 			"options": "Item",
 			"width": "100"
 		},
 		{
-			"fieldname":"group_by",
+			"fieldname": "group_by",
 			"label": __("Group By"),
 			"fieldtype": "Select",
 			"options": "Date\nItem Wise\nCustomer Wise",
@@ -59,11 +67,24 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 			"width": "100"
 		},
 		{
-			"fieldname":"group_total",
+			"fieldname": "item_group",
+			"label": __("Item Group"),
+			"fieldtype": "MultiSelectList",
+			get_data: async function (txt) {
+				let r = [];
+				let item_groups = (await frappe.db.get_list("Delivery Note Item", { fields: ['item_group'], limit: 0 }))
+				item_groups.forEach(t => {
+					if (!r.includes(t.item_group)) { r.push(t.item_group) }
+				})
+				return frappe.db.get_link_options("Item Group", txt, {name: ["in", r]})
+			},
+			"width": "100"
+		},
+		{
+			"fieldname": "group_total",
 			"label": __("Group Total"),
 			"fieldtype": "Check",
 			"default": "1",
 		}
 	]
- };
- 
+};

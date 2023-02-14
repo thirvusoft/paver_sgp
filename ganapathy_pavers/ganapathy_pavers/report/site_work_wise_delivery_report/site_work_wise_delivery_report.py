@@ -1,8 +1,6 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
  
-from operator import add
-from unittest.result import failfast
 import frappe
 from frappe import _
  
@@ -14,6 +12,7 @@ def execute(filters=None):
     sales_type = filters.get("sales_type")
     group_by = filters.get("group_by")
     item_code = filters.get("item_code")
+    item_group = filters.get("item_group")
     conditions = " where doc.docstatus = 1"
     if from_date or to_date or customer or site_name or sales_type or group_by or item_code:
         if from_date and to_date:
@@ -26,6 +25,8 @@ def execute(filters=None):
             conditions += " and doc.type = '{0}' ".format(sales_type)
         if item_code:
             conditions += " and child.item_code ='{0}' ".format(item_code)
+        if item_group:
+            conditions += f" and child.item_group in {tuple(item_group)}" if len(item_group)>1 else f" and child.item_group = '{item_group[0]}'"
         
     report_data = frappe.db.sql(""" select
                                 doc.posting_date,
@@ -34,6 +35,7 @@ def execute(filters=None):
                                 doc.type,
                                 doc.site_work,
                                 child.item_code,
+                                child.warehouse,
                                 child.ts_qty,
                                 child.qty,
                                 child.uom,
@@ -53,9 +55,9 @@ def execute(filters=None):
     for i in range (0,len(data)-1,1):
         if data[i][1] == data[i+1][1]:
             matched_item = data[i][1]
-            data[i+1][12]=None
+            data[i+1][13]=None
         elif matched_item == data[i+1][1]:
-            data[i+1][12]=None
+            data[i+1][13]=None
         else:
             matched_item=""
 
@@ -93,6 +95,7 @@ def get_columns():
         _("Sales Type") + ":Data:100",
         _("Site Name") + ":Link/Project:150",
         _("Item Name") + ":Link/Item:350",
+        _("Warehouse") + ":Link/Warehouse:150",
         _("Bundle") + ":Data:80",
         _("Qty") + ":Data:80",
         _("UOM") + ":Link/UOM:100",
@@ -112,15 +115,15 @@ def group_total(filters = {}, data = []):
     else:
         if(filters.get("group_by") == "Date"):
             ret_list = []
-            total = [0] * 13
-            data.append([None]*13)
+            total = [0] * 14
+            data.append([None]*14)
             for row in range(len(data)):
                 if(data[row][0] and row!=0 or row == len(data)-1):
                     total[3] = "Group Total"
                     ret_list.append([frappe.bold(str(i)) if(i!=None) else '' for i in total])
-                    ret_list.append([None] * 13)
+                    ret_list.append([None] * 14)
                     ret_list.append(data[row])
-                    total = [0] * 13
+                    total = [0] * 14
                     total = add_list(total, data[row])
                 else:
                     ret_list.append(data[row])
@@ -129,15 +132,15 @@ def group_total(filters = {}, data = []):
 
         elif(filters.get("group_by") == "Customer Wise"):
             ret_list = []
-            total = [0] * 13
-            data.append([None]*13)
+            total = [0] * 14
+            data.append([None]*14)
             for row in range(len(data)):
                 if(row!=0  and data[row][2]!=data[row-1][2]):
                     total[3] = "Group Total"
                     ret_list.append([frappe.bold(str(i)) if(i!=None) else '' for i in total])
-                    ret_list.append([None] * 13)
+                    ret_list.append([None] * 14)
                     ret_list.append(data[row])
-                    total = [0] * 13
+                    total = [0] * 14
                     total = add_list(total, data[row])
                 else:
                     ret_list.append(data[row])
@@ -146,15 +149,15 @@ def group_total(filters = {}, data = []):
 
         else:
             ret_list = []
-            total = [0] * 13
-            data.append([None]*13)
+            total = [0] * 14
+            data.append([None]*14)
             for row in range(len(data)):
                 if( row!=0 and data[row][5]!=data[row-1][5]):
                     total[3] = "Group Total"
                     ret_list.append([frappe.bold(str(i)) if(i!=None) else '' for i in total])
-                    ret_list.append([None] * 13)
+                    ret_list.append([None] * 14)
                     ret_list.append(data[row])
-                    total = [0] * 13
+                    total = [0] * 14
                     total = add_list(total, data[row])
                 else:
                     ret_list.append(data[row])
