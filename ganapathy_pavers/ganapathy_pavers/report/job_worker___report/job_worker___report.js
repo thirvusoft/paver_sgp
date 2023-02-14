@@ -5,7 +5,7 @@
 frappe.query_reports["Job Worker - Report"] = {
 	"filters": [
 		{
-			"fieldname":"from_date",
+			"fieldname": "from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.add_days(frappe.datetime.get_today(), -7),
@@ -13,7 +13,7 @@ frappe.query_reports["Job Worker - Report"] = {
 			"reqd": 1
 		},
 		{
-			"fieldname":"to_date",
+			"fieldname": "to_date",
 			"label": __("To Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today(),
@@ -21,35 +21,70 @@ frappe.query_reports["Job Worker - Report"] = {
 			"reqd": 1
 		},
 		{
-			"fieldname":"site_name",
+			"fieldname": "site_name",
 			"label": __("Site Name"),
 			"fieldtype": "Link",
 			"options": "Project",
 			"width": "100"
 		},
 		{
-			"fieldname":"employee",
+			"fieldname": "employee",
 			"label": __("Job Worker"),
 			"fieldtype": "Link",
 			"options": "Employee",
-			"width": "100"
+			"width": "100",
+			get_query: function() {
+				return {
+					filters: {
+						designation: "Job Worker"
+					}
+				}
+			}
 		},
 		{
 			"fieldname": "type",
-			"label":  __("Type"),
+			"label": __("Type"),
 			"fieldtype": "Select",
 			"options": "\nPavers\nCompound Wall"
+		},
+		{
+			"fieldname": "payment_date",
+			"label": __("Payment Date"),
+			"fieldtype": "Date",
+			on_change: function () { }
 		},
 		{
 			"fieldname": "group_site_work",
 			"label": __("Group Site Work"),
 			"fieldtype": "Check",
 			"default": 1
-		}
+		},
+		{
+			"fieldname": "show_only_other_work",
+			"label": __("Show Only Other Work"),
+			"fieldtype": "Check",
+			on_change: function () {
+				if (frappe.query_report.get_filter('show_only_other_work').get_value()) {
+					frappe.query_report.get_filter('hide_other_work').set_value(!frappe.query_report.get_filter('show_only_other_work').get_value())
+				}
+				frappe.query_report.refresh();
+			}
+		},
+		{
+			"fieldname": "hide_other_work",
+			"label": __("Don't Show Other Work"),
+			"fieldtype": "Check",
+			on_change: function () {
+				if (frappe.query_report.get_filter('hide_other_work').get_value()) {
+					frappe.query_report.get_filter('show_only_other_work').set_value(!frappe.query_report.get_filter('hide_other_work').get_value())
+				}
+				frappe.query_report.refresh();
+			}
+		},
 	],
-	"formatter": function(value, row, column, data, default_formatter) {
+	"formatter": function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
-		if (data && (data.status=="Total" || data.job_worker=="Total" || data.bold)) {
+		if (data && (data.status == "Total" || data.job_worker == "Total" || data.bold)) {
 			value = `<b>${value}</b>`;
 
 		}
@@ -58,7 +93,7 @@ frappe.query_reports["Job Worker - Report"] = {
 };
 
 
-frappe.query_report.print_report=function print_report(print_settings) {
+frappe.query_report.print_report = function print_report(print_settings) {
 	const custom_format = frappe.query_report.report_settings.html_format || null;
 	const filters_html = frappe.query_report.get_filters_html_for_print();
 	const landscape = print_settings.orientation == 'Landscape';
@@ -78,7 +113,7 @@ frappe.query_report.print_report=function print_report(print_settings) {
 	});
 }
 
-frappe.query_report.pdf_report=function pdf_report(print_settings) {
+frappe.query_report.pdf_report = function pdf_report(print_settings) {
 	const base_url = frappe.urllib.get_base_url();
 	const print_css = frappe.boot.print_css;
 	const landscape = print_settings.orientation == 'Landscape';

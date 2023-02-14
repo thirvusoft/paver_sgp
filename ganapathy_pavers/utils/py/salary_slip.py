@@ -169,9 +169,8 @@ def employee_advance(self, event):
             , "Deduct from Salary"
             , self.advance_payment_mode
             , self.branch
+            , salary_slip = self.name
             )
-    frappe.db.set_value("Salary Slip", self.name, "employee_advance", adv.name)
-    self.reload()
 
 
 def set_net_pay(self,event):

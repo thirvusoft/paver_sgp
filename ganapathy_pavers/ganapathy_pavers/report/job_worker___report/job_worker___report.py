@@ -18,6 +18,7 @@ def execute(filters=None):
         adv_conditions = "where empadv.repay_unclaimed_amount_from_salary=1"
         if site_type:
             conditions += " and site.type='{0}'".format(site_type)
+            conditions += " and emp.paver=1" if site_type=="Pavers" else " and emp.compound_wall=1"
         if from_date and to_date:
             conditions += "  and jwd.end_date >= '{0}'".format(from_date, to_date)
             adv_conditions += " and empadv.posting_date between '{0}' and '{1}' ".format(from_date, to_date)
@@ -25,7 +26,10 @@ def execute(filters=None):
             conditions += " and jwd.name1 ='{0}' ".format(employee)
         if site_name:
             conditions += " and site.name = '{0}' ".format(site_name)
-    report_data = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount)  from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
+    if filters.get('show_only_other_work'):
+        report_data=[]
+    else:
+        report_data = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount)  from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
                                         emp.salary_balance as salary_balance,{4} as amount,
                                         (select sum(empadv.advance_amount) from `tabEmployee Advance` as empadv {1} and empadv.employee = jwd.name1 and docstatus = 1) as advance_amount
                                         from `tabProject` as site
@@ -37,7 +41,10 @@ def execute(filters=None):
                                     {2} order by jwd.sqft_allocated)as total_cal
                                 """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.completed_bundle), sum(jwd.sqft_allocated), avg(jwd.rate)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated, jwd.rate", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
  
-    report_data1 = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
+    if filters.get("hide_other_work"):
+        report_data1=[]
+    else:
+        report_data1 = frappe.db.sql(""" select *,(amount + salary_balance - advance_amount) from (select jwd.name1 as jobworker,site.name,site.status,{3},jwd.other_work, jwd.description_for_other_work,
                                         emp.salary_balance as salary_balance,{4} as amount,
                                         (select sum(empadv.advance_amount) from `tabEmployee Advance` as empadv {1} and empadv.employee = jwd.name1 and docstatus = 1) as advance_amount
                                         from `tabProject` as site
@@ -72,7 +79,9 @@ def execute(filters=None):
         data=list(data1.values())
     data = [list(i) for i in (report_data1 or [])] + data
     
-    data+=get_employees_to_add(filters, [row[0] for row in data])
+    if not filters.get('show_only_other_work'):
+        data+=get_employees_to_add(filters, [row[0] for row in data])
+    
     for row in data:
         if row[0] and frappe.db.exists("Employee", row[0]):
             row[8]=get_employee_salary_balance(employee=row[0], from_date=from_date, to_date=to_date)
@@ -333,18 +342,10 @@ def get_employees_to_add(filters, employees):
         emp_filters["name"] = ["in", emp_list]
 
     elif filters.get("type"):
-        emp_list=[]
-        emp=frappe.db.sql(f"""
-            SELECT jw.name1
-            FROM `tabTS Job Worker Details` jw
-            LEFT OUTER JOIN `tabProject` pr
-            ON pr.name=jw.parent
-            WHERE jw.parenttype="Project" 
-            AND pr.type="{filters.get("type")}"
-        """)
-        for row in emp:
-            emp_list.append(row[0])
-        emp_filters["name"] = ["in", emp_list]
+        if filters.get("type")=="Pavers":
+            emp_filters["paver"] = 1
+        else:
+            emp_filters["compound_wall"] = 1
 
     rem = frappe.get_all("Employee", emp_filters, pluck='name')
     return [[emp]+ [None for i in range(11)] for emp in rem if (
