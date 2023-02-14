@@ -164,7 +164,8 @@ doc_events = {
 	},
 
 	"Employee Advance":{
-		"on_submit":"ganapathy_pavers.utils.py.employee_advance.create_payment_entry"
+		"on_submit":"ganapathy_pavers.utils.py.employee_advance.create_payment_entry",
+		"on_cancel": "ganapathy_pavers.custom.py.site_work.reduce_advance_amount"
 	},
 	"Project":{
 		"autoname":"ganapathy_pavers.custom.py.site_work.autoname",

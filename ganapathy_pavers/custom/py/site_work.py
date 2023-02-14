@@ -219,6 +219,14 @@ def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, ex
     doc.save()
     doc.submit()
 
+def reduce_advance_amount(self, event=None):
+    if self.project:
+        doc=frappe.get_doc("Project", self.project)
+        doc.update({
+            "total_advance_amount": doc.total_advance_amount - self.advance_amount
+        })
+        doc.db_update()
+
 def update_status(doc, events):
     frappe.db.set_value("Project", doc.name, "previous_state", doc.status)
     doc.reload()
