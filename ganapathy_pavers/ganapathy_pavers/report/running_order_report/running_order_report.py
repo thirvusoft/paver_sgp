@@ -6,97 +6,78 @@ import frappe
 def execute(filters=None):
 	customer = filters.get("customer")
 	sitework= filters.get("site_name")
-	type=filters.get("type")
+	_type=filters.get("type")
 	status=filters.get("status")
-	filters={"type":type,"status":status}
+	
 	data=[]
+	sw_filters={}
+
+	if _type:
+		sw_filters["type"] = _type
+	if status:
+		sw_filters["status"] = status
 	if customer:
-		filters.update({"customer":customer})
+		sw_filters["customer"] = customer
 	if sitework:
-		filters.update({"project_name":sitework})
+		sw_filters["name"] = sitework
+	
+	sw_list=frappe.get_all("Project", filters=sw_filters)
+	
+	table_name='tabPavers' if _type=="Pavers" else 'tabCompound Wall'
+	field_name='required_area' if _type=="Pavers" else 'allocated_ft'
+	
+	jw_filter=""
+	if not filters.get("include_other_works"):
+		jw_filter=""" AND jw.other_work=0"""
 
-
-	if type == "Pavers":
-		paver_list=frappe.get_all("Project",filters=filters)
-
-		for i in paver_list:
-
-			paver=frappe.db.sql("""
-			select 
+	for sw in sw_list:
+		site_data=frappe.db.sql(f"""
+			SELECT 
 				sw.name as site_name,
 				(
 				SELECT 
 					GROUP_CONCAT(
 					IF(
-						parent='{0}'
+						parent='{sw.name}'
 						, item
 						, NULL
 					) 
 					SEPARATOR ', '
 					) 
-				FROM `tabPavers`
-				) as paver_design, 
-			
-				
-				(select sum(ps.required_area) from `tabPavers` as ps where ps.parent='{0}') as po_qty,
-				(select sum(ds.delivered_stock_qty) from `tabDelivery Status` as ds where ds.parent='{0}') as total_paver_delivery,
-				(select sum(jw.sqft_allocated) from `tabTS Job Worker Details` as jw where jw.parent='{0}') as total_lying,
-				((select sum(ds.delivered_stock_qty) from `tabDelivery Status` as ds where ds.parent='{0}') - (select sum(jw.sqft_allocated) from `tabTS Job Worker Details` as jw where jw.parent='{0}')) as paver_stock_site 
-			from `tabProject` as sw 
-			where sw.name='{0}' """.format(i.name),as_dict=1)
-			raw_material=frappe.db.sql("""select rw.item as raw_material,rw.qty as raw_material_fixed,rw.delivered_quantity as raw_material_delivered from `tabRaw Materials` as rw where rw.parent='{0}' 
-			""".format(i.name),as_dict=1)
-
-			if raw_material:
-				for i in range(0,len(raw_material),1):
-					if i==0:
-						paver[0].update(raw_material[0])
-					else:
-						paver.append(raw_material[i])
-
-
-			for j in paver:
-
-				data.append(j)
-	if type == "Compound Wall":
-		paver_list=frappe.get_all("Project",filters=filters)
-
-		for i in paver_list:
-
-			paver=frappe.db.sql("""
-			select 
-				sw.name as site_name,
+				FROM `{table_name}`
+				) as design,
+				(SELECT sum(ps.{field_name}) FROM `{table_name}` as ps WHERE ps.parent='{sw.name}') as po_qty,
+				(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as total_paver_delivery,
+				(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}) as total_laying,
 				(
-				SELECT 
-						GROUP_CONCAT(
-						IF(
-							parent='{0}'
-							, item
-							, NULL
-						) 
-						SEPARATOR ', '
-						) 
-					FROM `tabCompound Wall`
-				) as paver_design, 
-				(select sum(cw.allocated_ft) from `tabCompound Wall` as cw where cw.parent='{0}') as po_qty,	
-				(select sum(ds.delivered_stock_qty) from `tabDelivery Status` as ds where ds.parent='{0}') as total_paver_delivery,
-				(select sum(jw.sqft_allocated) from `tabTS Job Worker Details` as jw where jw.parent='{0}') as total_lying,
-				((select sum(ds.delivered_stock_qty) from `tabDelivery Status` as ds where ds.parent='{0}') - (select sum(jw.sqft_allocated) from `tabTS Job Worker Details` as jw where jw.parent='{0}')) as paver_stock_site 
-			from `tabProject` as sw  where sw.name='{0}' """.format(i.name),as_dict=1)
-			raw_material=frappe.db.sql("""select rw.item as raw_material,rw.qty as raw_material_fixed,rw.delivered_quantity as raw_material_delivered from `tabRaw Materials` as rw where rw.parent='{0}' 
-			""".format(i.name),as_dict=1)
-			if raw_material:
-				for i in range(0,len(raw_material),1):
-					if i==0:
-						paver[0].update(raw_material[0])
-					else:
-						paver.append(raw_material[i])
-			for j in paver:
-				data.append(j)
+					(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}')
+					- (SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter})
+				) as paver_stock_site 
+			FROM `tabProject` as sw 
+			WHERE sw.name='{sw.name}' 
+		""", as_dict=1)
 
+		raw_material=frappe.db.sql(f"""
+			SELECT 
+				rw.item as raw_material
+				, rw.qty as raw_material_fixed
+				, (rw.delivered_quantity + rw.returned_quantity) as raw_material_delivered 
+			FROM `tabRaw Materials` as rw 
+			WHERE rw.parent='{sw.name}'
+		""", as_dict=1)
+
+		if raw_material and site_data:
+			for rm_idx in range(0, len(raw_material), 1):
+				if rm_idx==0:
+					site_data[0].update(raw_material[0])
+				else:
+					site_data.append(raw_material[rm_idx])
+		if site_data:
+			data += site_data or []
 
 	columns=get_columns()
 	return columns,data
+	
 
 def get_columns():
 
@@ -106,12 +87,12 @@ def get_columns():
 			"fieldtype": "Link",
 			"fieldname": "site_name",
 			"options":"Project",
-			"width": 380
+			"width": 350
 		},
 		{
-			"label": ("Paver Design"),
+			"label": ("Design"),
 			"fieldtype": "Data",
-			"fieldname": "paver_design",
+			"fieldname": "design",
 			"width": 380
 		},
 		{
@@ -124,30 +105,30 @@ def get_columns():
 			"label": ("Total Paver Delivery"),
 			"fieldtype": "Float",
 			"fieldname": "total_paver_delivery",
-			"width": 110
+			"width": 150
 		},
 		{
 			"label": ("Raw Material"),
 			"fieldtype": "Data",
 			"fieldname": "raw_material",
-			"width": 110
+			"width": 150
 		},
 		{
 			"label": ("Raw Material Fixed"),
 			"fieldtype": "Data",
 			"fieldname": "raw_material_fixed",
-			"width": 110
+			"width": 150
 		},
 		{
 			"label": ("Raw Material Delivered"),
 			"fieldtype": "Data",
 			"fieldname": "raw_material_delivered",
-			"width": 120
+			"width": 170
 		},
 		{
-			"label": ("Total Lying"),
+			"label": ("Total Laying"),
 			"fieldtype": "Data",
-			"fieldname": "total_lying",
+			"fieldname": "total_laying",
 			"width": 100
 		},
 		{
