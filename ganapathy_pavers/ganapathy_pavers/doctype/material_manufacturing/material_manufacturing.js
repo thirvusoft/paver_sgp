@@ -98,9 +98,8 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value("shot_blasted_bundle",frm.doc.no_of_bundle)
 	},
 	shot_blasted_bundle: function(frm){
-		if(frm.doc.shot_blasted_bundle == 0){
+		if(frm.doc.shot_blasted_bundle == 0 && frm.doc.is_shot_blasting){
 			cur_frm.set_value("status1","Completed")
-			frm.save()
 		}
 	},
 	additional_cost: function(frm){

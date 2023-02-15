@@ -333,6 +333,7 @@ def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
    while(int(total_qty) > int(uom_qty)):
        total_qty = total_qty - uom_qty
        set_qty = set_qty+1
+   total_qty=(total_qty/uom_nos if uom_nos else 0)
    if set_qty:
        for j in range (len(remaining_qty)):
            if remaining_qty[j].name == cur_doc:
@@ -340,8 +341,9 @@ def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
            else:
                frappe.db.set_value("Material Manufacturing",remaining_qty[j].name,'remaining_qty', 0)
                # frappe.db.set_value("Batch",remaining_qty[j].batch_no_manufacture,'batch_qty', 0)
-               emp_batch.append(remaining_qty[j].batch_no_manufacture)
-       frappe.db.commit()
+               if remaining_qty[j].remaining_qty:
+                  emp_batch.append(remaining_qty[j].batch_no_manufacture)
+    #    frappe.db.commit()
        return set_qty,emp_batch,total_qty
    return 0,[],0
 
