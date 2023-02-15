@@ -5,6 +5,9 @@ var uom_bundle = 0
 frappe.ui.form.on('Material Manufacturing', {
 	refresh: function(frm){
 		if(cur_frm.is_new() == 1){
+			if (frm.doc.is_shot_blasting) {
+				default_value("shot_blast_per_sqft","shot_blast_per_sqft")
+			}
 			default_value("labour_cost_per_sqft","labour_cost_per_sqft")
 			default_value("strapping_cost_per_sqft","strapping_cost_per_sqft")
 			default_value("default_manufacture_operation","operation")
@@ -25,6 +28,9 @@ frappe.ui.form.on('Material Manufacturing', {
 		set_css(frm);
 	},
 	validate: function(frm) {
+		if (frm.doc.is_shot_blasting && !frm.doc.shot_blast_per_sqft) {
+			frappe.throw({title: "Mandatory Fields", message: "Please enter value for <b>Shot Blast per Sqft</b>"})
+		}
 		(frm.doc.items || []).forEach(row => {
 			if (row.layer_type == 'Panmix') {
 				row.no_of_batches = frm.doc.bottom_layer_batches
@@ -48,9 +54,11 @@ frappe.ui.form.on('Material Manufacturing', {
     },
 	is_shot_blasting: function(frm){
 		if(frm.doc.is_shot_blasting == 1){
+			default_value("shot_blast_per_sqft","shot_blast_per_sqft")
 			default_value("default_curing_target_warehouse_for_setting","curing_target_warehouse")
 		}
 		else{
+			frm.set_value("shot_blast_per_sqft", 0)
 			default_value("default_curing_target_warehouse","curing_target_warehouse")
 		}
 	},

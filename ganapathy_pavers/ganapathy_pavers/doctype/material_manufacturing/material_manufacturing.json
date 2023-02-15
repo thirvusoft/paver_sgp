@@ -765,7 +765,8 @@
   {
    "fieldname": "shot_blast_per_sqft",
    "fieldtype": "Float",
-   "label": "Shot Blast per Sqft"
+   "label": "Shot Blast per Sqft",
+   "mandatory_depends_on": "eval: doc.is_shot_blasting"
   },
   {
    "fieldname": "section_break_105",
@@ -1005,7 +1006,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-02-14 18:25:48.601689",
+ "modified": "2023-02-15 13:02:30.513730",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

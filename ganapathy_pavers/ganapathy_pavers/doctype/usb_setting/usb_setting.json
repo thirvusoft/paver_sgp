@@ -42,7 +42,8 @@
   "ggbs",
   "labour_costing_details_section",
   "labour_cost_per_sqft",
-  "strapping_cost_per_sqft"
+  "strapping_cost_per_sqft",
+  "shot_blast_per_sqft"
  ],
  "fields": [
   {
@@ -247,12 +248,17 @@
    "fieldname": "strapping_cost_per_sqft",
    "fieldtype": "Currency",
    "label": "Strapping Cost Per Sqft"
+  },
+  {
+   "fieldname": "shot_blast_per_sqft",
+   "fieldtype": "Currency",
+   "label": "Shot Blast Cost Per Sqft"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-08-18 17:23:20.943431",
+ "modified": "2023-02-15 15:12:41.212178",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "USB Setting",
