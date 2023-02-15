@@ -63,6 +63,7 @@ def total_hrs(from_time = None,to = None):
    if(from_time and to):
        time_in_mins = time_diff_in_hours(to,from_time)
        return time_in_mins
+   
 @frappe.whitelist()
 def total_expense(workstation,operators_cost,labour_cost,tot_work_hrs,tot_item,tot_hrs):
    sum_of_wages, hour_rate=frappe.get_value("Workstation",workstation,["sum_of_wages_per_hours","hour_rate"])
@@ -76,6 +77,7 @@ def total_expense(workstation,operators_cost,labour_cost,tot_work_hrs,tot_item,t
        else:
            frappe.throw("Kindly Enter Total Working Hrs")
    return hour_rate+float(labour_cost),float(amount_split)
+
 @frappe.whitelist()
 def add_item(bom_no,doc):
    items=[]
@@ -91,6 +93,7 @@ def add_item(bom_no,doc):
             row['source_warehouse']=ws_warehosue
          items.append(row)
    return items
+
 @frappe.whitelist()
 def std_item(doc):
    items=[]
@@ -168,6 +171,7 @@ def item_data(item_code):
    if(item_code):
        item_code,stock_uom,last_purchase_rate,valuation_rate = frappe.get_value("Item",item_code,['item_code','stock_uom','last_purchase_rate','valuation_rate'])
        return item_code,stock_uom,last_purchase_rate or valuation_rate
+   
 @frappe.whitelist()
 def make_stock_entry(doc,type1):
    doc=json.loads(doc)
@@ -310,6 +314,7 @@ def make_stock_entry(doc,type1):
            return "Completed"
    elif doc.get("status1") == "Shot Blast":
        return "Completed"
+   
 def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
    emp_batch=[]
    uom =frappe.get_doc("Item",item_code)
@@ -339,6 +344,7 @@ def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
        frappe.db.commit()
        return set_qty,emp_batch,total_qty
    return 0,[],0
+
 @frappe.whitelist()
 def find_batch(name):
    manufacture=""

@@ -27,7 +27,7 @@ frappe.ui.form.on('Material Manufacturing', {
 	validate: function(frm) {
 		(frm.doc.items || []).forEach(row => {
 			if (row.layer_type == 'Panmix') {
-				row.no_of_batches = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0;
+				row.no_of_batches = frm.doc.bottom_layer_batches
 			}
 		});
 	},
@@ -320,6 +320,16 @@ frappe.ui.form.on('Material Manufacturing', {
 		}
 		refresh_field("items")
 	},
+	bottom_layer_batches: function(frm){
+		for(let row = 0; row<(frm.doc.items?frm.doc.items.length:0); row++){
+			let cdt = frm.doc.items[row].doctype, cdn = frm.doc.items[row].name;
+			let data = locals[cdt][cdn]
+			if(data.layer_type == "Panmix"){
+				frappe.model.set_value(cdt, cdn, 'no_of_batches', (frm.doc.bottom_layer_batches?frm.doc.bottom_layer_batches:0))
+			}
+		}
+		refresh_field("items")
+	},
 	no_of_labours: function(frm){
 		cur_frm.set_value('labour_cost_manufacture',frm.doc.labour_cost_in_manufacture*frm.doc.ts_total_hours*frm.doc.no_of_labours)
 	},
@@ -418,7 +428,7 @@ function add_total_raw_material(frm){
 	cur_frm.set_value('top_layer_cost', top_layer);
 	cur_frm.set_value('bottom_layer_cost', bottom_layer);
 	if(frm.doc.setting_oil_item_name){
-		cur_frm.set_value('total_setting_oil_qty',(frm.doc.raw_material_consumption.length*frm.doc.setting_oil_qty)/1000)
+		cur_frm.set_value('total_setting_oil_qty',((frm.doc.bottom_layer_batches || 0)*frm.doc.setting_oil_qty)/1000)
 		}
 	if(frm.doc.ts_total_hours > 0 && frm.doc.docstatus == 0){
 		cur_frm.set_value('total_manufacturing_expense', frm.doc.labour_cost_manufacture+frm.doc.operators_cost_in_manufacture);
@@ -461,7 +471,7 @@ function std_item(frm){
 								row.item_code = d.item_code;
 								row.qty = d.qty;
 								row.layer_type = 'Panmix'
-								row.no_of_batches = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0;
+								row.no_of_batches = frm.doc.bottom_layer_batches ? frm.doc.bottom_layer_batches.length : 0;
 								row.ts_qty = d.qty;
 								row.bom_qty = r.message['bom_qty'][d.item_code];
 								row.average_consumption = d.average_consumption;
