@@ -19,10 +19,6 @@ frappe.ui.form.on('Material Manufacturing', {
 			default_value("default_rack_shift_target_warehouse","rack_shift_target_warehouse")
 			default_value("default_curing_source_warehouse","curing_source_warehouse")
 			default_value("default_curing_target_warehouse","curing_target_warehouse")
-			default_value("cement","cement_item")
-			default_value("ggbs","ggbs_item")
-			default_value("chips","chips_item_name")
-			default_value("dust","dust_item_name")
 			default_value("setting_oil","setting_oil_item_name")
 		}
 		set_css(frm);
@@ -263,14 +259,7 @@ frappe.ui.form.on('Material Manufacturing', {
 				]
 			}
 		})
-		frm.set_query("cement_item",function(){
-			return {
-				"filters": {
-					item_group:"Raw Material"
-				}
-			}
-		})
-		frm.set_query("ggbs_item",function(){
+		frm.set_query("item_code", "bin_items", function(){
 			return {
 				"filters": {
 					item_group:"Raw Material"
@@ -478,7 +467,7 @@ function std_item(frm){
 								row.item_code = d.item_code;
 								row.qty = d.qty;
 								row.layer_type = 'Panmix'
-								row.no_of_batches = frm.doc.bottom_layer_batches ? frm.doc.bottom_layer_batches.length : 0;
+								row.no_of_batches = frm.doc.bottom_layer_batches ? frm.doc.bottom_layer_batches : 0;
 								row.ts_qty = d.qty;
 								row.bom_qty = r.message['bom_qty'][d.item_code];
 								row.average_consumption = d.average_consumption;
