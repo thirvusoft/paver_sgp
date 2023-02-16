@@ -347,17 +347,12 @@ def size_details(items, _type):
 
 def raw_material_stock_details():
 	dsm=frappe.get_single("DSM Defaults")
-	m12_warehouse_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.m12top, "Machine 1&2", "TOPLAYER"), (dsm.m12pan, "Machine 1&2", "PANMIX"), (dsm.m12ggbs, "Machine 1&2", "PAVER")]]
-	m3_warehouse_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.m3wh, "Machine 3", "PAVER")]]
-	cw_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.cw_wh, "Compound Wall", "C.WALL")]]
+	raw_material_stock = [get_stock_details_from_warehosue(item.warehouse, item.machine or "", item.type or "") for item in dsm.raw_material_details]
 	
 	total_stock=[]
-	for item in m12_warehouse_stock:
+	for item in raw_material_stock:
 		total_stock+=list(item)
-	for item in m3_warehouse_stock:
-		total_stock+=list(item)
-	for item in cw_stock:
-		total_stock+=list(item)
+	
 	total_stock.sort(key=lambda x: x.get("item", "") or "")
 	return total_stock
 	

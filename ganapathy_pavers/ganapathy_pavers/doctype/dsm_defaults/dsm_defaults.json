@@ -7,6 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "raw_material_warehouses_section",
+  "raw_material_details",
+  "section_break_3",
   "m12",
   "m12top",
   "m12pan",
@@ -34,19 +36,22 @@
    "fieldname": "m12top",
    "fieldtype": "Link",
    "label": "Machine1&2 Top Layer Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "read_only": 1
   },
   {
    "fieldname": "m12pan",
    "fieldtype": "Link",
    "label": "Machine1&2 Panmix Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "read_only": 1
   },
   {
    "fieldname": "m12ggbs",
    "fieldtype": "Link",
    "label": "Machine1&2 GGBS Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "read_only": 1
   },
   {
    "fieldname": "m12",
@@ -85,13 +90,15 @@
    "fieldname": "cw_wh",
    "fieldtype": "Link",
    "label": "Compound Wall Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "read_only": 1
   },
   {
    "fieldname": "m3wh",
    "fieldtype": "Link",
    "label": "Machine3 Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_12",
@@ -112,12 +119,22 @@
    "fieldtype": "Link",
    "label": "Warehouse for Colour Powder Items",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "raw_material_details",
+   "fieldtype": "Table",
+   "label": "Raw Material Details",
+   "options": "DSM Raw Material Details"
+  },
+  {
+   "fieldname": "section_break_3",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-01-07 10:44:23.010354",
+ "modified": "2023-02-16 11:03:55.810312",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "DSM Defaults",

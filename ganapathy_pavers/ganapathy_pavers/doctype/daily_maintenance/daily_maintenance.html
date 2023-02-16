@@ -20,7 +20,7 @@
             <tr>
                 <td class="silo-item" style="width: 20%">{{ data.item }}</td>
                 <td class="silo-item" style="width: 10%; text-align: left">{{ "%.2f"%data.qty }}</td>
-                <td class="silo-item" style="width: 20%; text-align: left">{{ data.days }}</td>
+                <td class="silo-item" style="width: 20%; text-align: left">{{ data.days or "" }}</td>
             </tr>
             {% endfor %}
         </table>
