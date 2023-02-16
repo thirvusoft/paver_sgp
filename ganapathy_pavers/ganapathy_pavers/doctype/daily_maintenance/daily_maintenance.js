@@ -28,9 +28,9 @@ frappe.ui.form.on('Daily Maintenance', {
 		frappe.call({
 			method: "ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.paver_item",
 			args: {
-				warehouse: cur_frm.doc.warehouse || cur_frm.scroll_to_field('warehouse') + frappe.throw({ message: "Please enter <b>Warehouse for Pavers and Compound Walls</b>", title: "Missing Fields", indicator: "red" }),
+				warehouse: cur_frm.doc.warehouse.length?cur_frm.doc.warehouse:cur_frm.scroll_to_field('warehouse') + frappe.throw({ message: "Please enter <b>Warehouse for Pavers and Compound Walls</b>", title: "Missing Fields", indicator: "red" }),
 				date: cur_frm.doc.date || cur_frm.scroll_to_field('date') + frappe.throw({ message: "Please enter <b>Date</b> to fetch production and vehicle details", title: "Missing Fields", indicator: "red" }),
-				warehouse_colour: cur_frm.doc.warehouse_colour || cur_frm.scroll_to_field('warehouse_colour') + frappe.throw({ message: "Please enter <b>Warehouse for Colour Powder Items</b>", title: "Missing Fields", indicator: "red" })
+				warehouse_colour: cur_frm.doc.warehouse_colour.length?cur_frm.doc.warehouse_colour:cur_frm.scroll_to_field('warehouse_colour') + frappe.throw({ message: "Please enter <b>Warehouse for Colour Powder Items</b>", title: "Missing Fields", indicator: "red" })
 			},
 			freeze: true,
 			freeze_message: loading_svg() || "Fetching data...",

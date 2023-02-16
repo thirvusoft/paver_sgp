@@ -87,7 +87,7 @@ def paver_item(warehouse, date, warehouse_colour):
 					select attribute_value from `tabItem Variant Attribute` where parent='{j.name}' and parenttype='Item' and attribute='Colour'
 				""")
 				if colour and colour[0]:
-					colour=colour[0][0].lower()
+					colour=frappe.scrub(colour[0][0]) ####
 				else:
 					continue
 					
@@ -116,7 +116,7 @@ def paver_item(warehouse, date, warehouse_colour):
 					select attribute_value from `tabItem Variant Attribute` where parent='{sb.name}' and parenttype='Item' and attribute='Colour' order by attribute_value 
 				""")
 				if colour_sb and colour_sb[0]:
-					colour_sb=colour_sb[0][0].lower()
+					colour_sb=frappe.scrub(colour_sb[0][0])####
 				else:
 					continue
 				if colour_sb not in template_1:
@@ -276,7 +276,7 @@ def paver_item(warehouse, date, warehouse_colour):
 				
 				for k in attribute.attributes:
 					if k.attribute=="Colour":
-						colour=k.attribute_value.lower()
+						colour=frappe.scrub(k.attribute_value)####
 				if not colour:
 					continue
 				if j.name not in colour_details:
@@ -288,10 +288,10 @@ def paver_item(warehouse, date, warehouse_colour):
 		colour_details[j.name]={'colour': j.name, 'stock':color_stock}
 	colour_details=list(colour_details.values())
 	for item in colour_details:
-		if 'pigment' in item['colour'].lower():
+		if 'pigment' in frappe.scrub(item['colour']):####
 			item['sqft']=round(item['stock']/3*100)
 			item['no_of_days']=round(item['stock']/3*100/3000)
-		elif 'dolamite' in item['colour'].lower():
+		elif 'dolamite' in frappe.scrub(item['colour']):####
 			item['sqft']=round(item['stock']*49/75*100)
 			item['no_of_days']=round(item['stock']*49/75*100/3000)
 	# slab type item
@@ -327,7 +327,11 @@ def paver_item(warehouse, date, warehouse_colour):
 	return items_stock, total_stock, items_stock_shot, total_stock_shot, list(sqf.values()), production,  sorted(list(post_item.values()), key=lambda x: x.get("post_length", "") or ""), colour_details, sorted(slab_details, key=lambda x: x.get("item", "") or ""), normal_total_stock, raw_material_stock
 
 def size_details(items, _type):
-	fields=['red', 'black', 'grey', 'brown', 'yellow']
+	fields=[]
+	attribute_doc=frappe.get_doc("Item Attribute","Colour")
+	for i in attribute_doc.item_attribute_values:
+		fields.append((frappe.scrub(i.attribute_value)))
+
 	total_size={}
 	for row in items:
 		if row['short_name'] and 'mm' not in row['short_name'].lower():

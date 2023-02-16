@@ -9,8 +9,7 @@ def colour_creation(self,event):
     final_color_details=[]
     final_color_table_sb=[]
     # item attribute table
-    attribute_doc=frappe.get_doc("Item Attribute","Colour")
-    for i in attribute_doc.item_attribute_values:
+    for i in self.item_attribute_values:
         attribute_table.append((i.attribute_value))
 
     # Colour Details Child Table
