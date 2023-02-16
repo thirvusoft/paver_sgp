@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
 
+import json
 from erpnext.stock.stock_ledger import get_previous_sle
 import frappe
 from frappe.model.document import Document
@@ -10,7 +11,7 @@ from ganapathy_pavers import uom_conversion
 def get_stock_qty(item_code, warehouse):
 	qty = get_previous_sle({
 		'item_code': item_code,
-		'warehouse': warehouse,
+		'warehouse_condition': f""" warehouse in {tuple(warehouse)}""" if len(warehouse)>1 else f""" warehouse = '{warehouse[0]}'""",
 		'posting_date': nowdate(),
 		'posting_time': nowtime()
 	}).get('qty_after_transaction') or 0
@@ -65,6 +66,8 @@ class DailyMaintenance(Document):
 	pass
 @frappe.whitelist()
 def paver_item(warehouse, date, warehouse_colour):
+	warehouse = [row.get('warehouse') for row in json.loads(warehouse) if row.get('warehouse')]
+	warehouse_colour=[row.get('warehouse') for row in json.loads(warehouse_colour) if row.get('warehouse')]
 	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name',order_by='name')
 	items_stock=[]
 	total_stock={}
@@ -347,17 +350,12 @@ def size_details(items, _type):
 
 def raw_material_stock_details():
 	dsm=frappe.get_single("DSM Defaults")
-	m12_warehouse_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.m12top, "Machine 1&2", "TOPLAYER"), (dsm.m12pan, "Machine 1&2", "PANMIX"), (dsm.m12ggbs, "Machine 1&2", "PAVER")]]
-	m3_warehouse_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.m3wh, "Machine 3", "PAVER")]]
-	cw_stock=[get_stock_details_from_warehosue(*item) for item in [(dsm.cw_wh, "Compound Wall", "C.WALL")]]
+	raw_material_stock = [get_stock_details_from_warehosue(item.warehouse, item.machine or "", item.type or "") for item in dsm.raw_material_details]
 	
 	total_stock=[]
-	for item in m12_warehouse_stock:
+	for item in raw_material_stock:
 		total_stock+=list(item)
-	for item in m3_warehouse_stock:
-		total_stock+=list(item)
-	for item in cw_stock:
-		total_stock+=list(item)
+	
 	total_stock.sort(key=lambda x: x.get("item", "") or "")
 	return total_stock
 	

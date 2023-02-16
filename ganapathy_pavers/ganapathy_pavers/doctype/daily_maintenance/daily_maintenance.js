@@ -4,10 +4,10 @@
 frappe.ui.form.on('Daily Maintenance', {
 	refresh: async function (frm) { 
 		if (frm.is_new()) {
-			let fi = await frappe.db.get_single_value("DSM Defaults", "warehouse_for_pavers_and_compound_walls"),
-				raw = await frappe.db.get_single_value("DSM Defaults", "warehouse_for_colour_powder_items")
-			frm.set_value("warehouse", fi);
-			frm.set_value("warehouse_colour", raw);
+			let fi = await frappe.db.get_doc("DSM Defaults"),
+				raw = await frappe.db.get_doc("DSM Defaults")
+			frm.set_value("warehouse", fi.warehouse_for_pavers_and_compound_walls);
+			frm.set_value("warehouse_colour", raw.warehouse_for_colour_powder_items);
 		}
 	},
 	get_attendance_details: function (frm) {
