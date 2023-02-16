@@ -28,6 +28,12 @@ frappe.query_reports["Running Order Report"] = {
             "options": "Customer",
         },
         {
+            "fieldname": "working_status",
+            "label": __("Working Status"),
+            "fieldtype": "Select",
+            "options": "\nNo Delivery\nDelivery Started & No Laying\nDelivery & Laying Started"
+        },
+        {
             "fieldname": "type",
             "label": __("Type"),
             "fieldtype": "Select",
