@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
 
+import json
 from erpnext.stock.stock_ledger import get_previous_sle
 import frappe
 from frappe.model.document import Document
@@ -10,7 +11,7 @@ from ganapathy_pavers import uom_conversion
 def get_stock_qty(item_code, warehouse):
 	qty = get_previous_sle({
 		'item_code': item_code,
-		'warehouse': warehouse,
+		'warehouse_condition': f""" warehouse in {tuple(warehouse)}""" if len(warehouse)>1 else f""" warehouse = '{warehouse[0]}'""",
 		'posting_date': nowdate(),
 		'posting_time': nowtime()
 	}).get('qty_after_transaction') or 0
@@ -65,6 +66,8 @@ class DailyMaintenance(Document):
 	pass
 @frappe.whitelist()
 def paver_item(warehouse, date, warehouse_colour):
+	warehouse = [row.get('warehouse') for row in json.loads(warehouse) if row.get('warehouse')]
+	warehouse_colour=[row.get('warehouse') for row in json.loads(warehouse_colour) if row.get('warehouse')]
 	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name',order_by='name')
 	items_stock=[]
 	total_stock={}
