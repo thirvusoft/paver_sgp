@@ -1,0 +1,57 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-02-15 17:45:22.718264",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "bin",
+  "item_code",
+  "average_qty",
+  "total_qty"
+ ],
+ "fields": [
+  {
+   "fieldname": "bin",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Bin",
+   "options": "\nBIN1 T\nBIN1 A\nBIN2 T\nBIN2 A\nBIN3 T\nBIN3 A\nBIN4 T\nBIN4 A\nCM2 T\nCM2 A\nGGBS2 T\nGGBS2 A",
+   "reqd": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "average_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Average Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total Qty",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-02-15 18:02:08.786124",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "MM Bin Select",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -9,7 +9,7 @@ frappe.ui.form.on("CW Manufacturing", {
     refresh: function (frm) {
         if (frm.is_new()) {
             default_value(frm, "labour_cost_per_hrs", "labour_salary_per_hrs");
-            default_value(frm, "strapping_cost_per_sqft", "strapping_cost_per_sqft_unmold");
+            default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
             default_value(frm, "labour_cost_per_sqft", "labour_cost_per_sqft_curing");
             default_value(frm, "chips_for_post", "post_chips");
             default_value(frm, "chips_for_slab", "slab_chips_item_name");
@@ -44,6 +44,9 @@ frappe.ui.form.on("CW Manufacturing", {
         set_css(frm);
     },
     onload: function (frm) {},
+    type: function(frm) {
+        default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
+    },
     ts_before_save: function (frm) {
         let post_chips = 0,
             slab_chips = 0,
@@ -569,6 +572,7 @@ async function total_qty(frm, table_name) {
         frm.set_value("total_no_of_batche", total_no_of_batche);
     }
 }
+
 function default_value(frm, usb_field, set_field) {
     frappe.db.get_single_value("CW Settings", usb_field).then((value) => {
         frm.set_value(set_field, value);
@@ -576,6 +580,18 @@ function default_value(frm, usb_field, set_field) {
     frm.refresh_field(set_field);
 }
 
+async function default_value_from_table(frm, usb_field, type, set_field, default_value_to_set = 0) {
+    let table = (await frappe.db.get_doc("CW Settings"))[usb_field]
+    frm.set_value(set_field, default_value_to_set);
+    if (table) {
+        (table || []).forEach(row => {
+            if (row.type == type) {
+                frm.set_value(set_field, row.cost)
+            }
+        });
+    }
+    frm.refresh_field(set_field);
+}
 function total_amount(frm, cdt, cdn) {
     var d = locals[cdt][cdn];
     frappe.model.set_value(cdt, cdn, "amount", d.qty * d.rate);
