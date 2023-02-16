@@ -63,6 +63,15 @@
   {
    "hidden": 0,
    "is_query_report": 1,
+   "label": "Job Worker Ledger",
+   "link_to": "Job Worker Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
    "label": "Stock Report",
    "link_to": "Stock Balance",
    "link_type": "Report",
@@ -106,6 +115,15 @@
   },
   {
    "hidden": 0,
+   "is_query_report": 1,
+   "label": "Running Order Report",
+   "link_to": "Running Order Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
    "is_query_report": 0,
    "label": "Reprots",
    "link_type": "DocType",
@@ -122,7 +140,7 @@
    "type": "Link"
   }
  ],
- "modified": "2022-12-20 17:54:33.225219",
+ "modified": "2023-02-16 18:48:53.413083",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Sales Cycle",
