@@ -48,7 +48,7 @@ frappe.ui.form.on("CW Manufacturing", {
     },
     get_bin_items: async function (frm) {
         frm.clear_table("bin_items");
-		frm.fields_dict.bin_items?.refresh()
+        frm.fields_dict.bin_items?.refresh()
         await frappe.db.get_doc("CW Settings").then(bin_items_map => {
             (bin_items_map.bin_items || []).forEach(bin => {
                 let row = frm.add_child("bin_items")
