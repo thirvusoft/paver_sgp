@@ -80,7 +80,8 @@ def add_total_amount(items):
 
 
 def autoname(self, event):
-    self.name= (self.project_name or "").title()
+    self.project_name = (self.project_name or "").title()
+    self.name= self.project_name
 
 
 def create_status():
