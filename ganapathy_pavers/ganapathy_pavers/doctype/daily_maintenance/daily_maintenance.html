@@ -107,22 +107,26 @@
             <th style="text-align: center; color: black">PAVER</th>
             <th style="text-align: center; color: black" colspan="5">STOCK</th>
         </tr>
-        <tr>
-            <th style="width: 70%; text-align: center; color: black">ITEM</th>
-            <th style="width: 5%; text-align: center; color: red">RED</th>
-            <th style="width: 5%; text-align: center; color: black">BLACK</th>
-            <th style="width: 5%; text-align: center; color: grey">GREY</th>
-            <th style="width: 5%; text-align: center; color: brown">BROWN</th>
-            <th style="width: 5%; text-align: center; color: yellow">YELLOW</th>
+        {% set b=color_table1() %}
+         
+        <tr> <th style="width: 70%; text-align: center; color: black">ITEM</th>
+             {% for i in b %}
+           
+            <th style="width: 70%; text-align: center; color: black">{{i}}</th>
+           {% endfor %}
         </tr>
+       
         {% for colour_details in doc.colour_details %}
         <tr>
             <td style="color: black; text-align: left">{{colour_details.short_name}}</td>
-            <td style="color: red">{{colour_details.red or 0}}</td>
-            <td style="color: black">{{colour_details.black or 0}}</td>
-            <td style="color: grey">{{colour_details.grey or 0}}</td>
-            <td style="color: brown">{{colour_details.brown or 0}}</td>
-            <td style="color: yellow">{{colour_details.yellow or 0}}</td>
+               {% set c=color_table1() %}
+                {% for i in c %}
+               
+            <td style="color: black">
+            {{colour_details[i.replace(' ', '_').replace('-', '_').lower()]}}
+             </td>
+      
+           {% endfor %}
         </tr>
         {% endfor %}
     </table>
@@ -174,20 +178,24 @@
             </tr>
             <tr>
                 <th style="width: 70% !important; text-align: center; color: black">ITEM</th>
-                <th style="text-align: center; color: red">RED</th>
-                <th style="text-align: center; color: black">BLACK</th>
-                <th style="text-align: center; color: grey">GREY</th>
-                <th style="text-align: center; color: brown">BROWN</th>
-                <th style="text-align: center; color: yellow">YELLOW</th>
+                {% set b=color_table2() %}
+                {% for i in b %}
+           
+            <th style="width: 70%; text-align: center; color: black">{{i}}</th>
+           {% endfor %}
             </tr>
             {% for colour_details_of_sb in doc.colour_details_of_sb %}
             <tr>
                 <td style="color: black; text-align: left">{{colour_details_of_sb.short_name}}</td>
-                <td style="color: red">{{colour_details_of_sb.get_formatted('red' )}}</td>
-                <td style="color: black">{{colour_details_of_sb.get_formatted('black' )}}</td>
-                <td style="color: grey">{{colour_details_of_sb.get_formatted('grey' )}}</td>
-                <td style="color: brown">{{colour_details_of_sb.get_formatted('brown' )}}</td>
-                <td style="color: yellow">{{colour_details_of_sb.get_formatted('yellow' )}}</td>
+                
+                 {% set c=color_table2() %}
+                {% for i in c %}
+               
+            <td style="color: black">
+            {{colour_details_of_sb[i.replace(' ', '_').replace('-', '_').lower()]}}
+             </td>
+      
+           {% endfor %}
             </tr>
             {% endfor %}
         </table>
