@@ -71,6 +71,7 @@ frappe.ui.form.on("CW Manufacturing", {
             if (check_duplicate.includes(row.item_code)) {
                 frappe.throw(`Bin <b>${row.bin}</b> is repeating more than once in <b>Bin Item Mapping</b>`)
             } else {
+                row.total_qty = 0
                 check_duplicate.push(row.item_code)
             }
         });
@@ -80,6 +81,7 @@ frappe.ui.form.on("CW Manufacturing", {
                 bin.total_qty += (row[frappe.model.scrub(bin.bin || "")] || 0)
             });
         });
+        frm.fields_dict.bin_items.refresh()
 
         item_details_total(frm);
         raw_material_cost(frm);
