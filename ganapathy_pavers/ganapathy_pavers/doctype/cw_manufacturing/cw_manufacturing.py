@@ -292,46 +292,25 @@ def get_valuation_rate(item_code):
 def std_item(doc):
     items = {}
     doc = json.loads(doc)
-    if doc.get('cement_item_name') and doc.get('cement_qty'):
-        row = {}
+
+    bin_items={}
+    for bin in doc.get("bin_items"):
+        if bin.get('item_code') not in bin_items:
+            bin_items[bin.get("item_code")]={
+                "total_qty": 0,
+                "item_code": bin.get("item_code"),
+            }
+        bin_items[bin.get("item_code")]["total_qty"]+=bin.get("total_qty", 0)
+
+    for bin in list(bin_items.values()):
+        row={}
         row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
-            "Item", doc['cement_item_name'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
-        row['qty'] = doc.get('cement_qty')
+            "Item", bin.get('item_code'), ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])        
+        row['qty']=bin.get('total_qty')
         row['validation_rate'] = get_valuation_rate(row['item_code'])
-        row['amount'] = doc.get('cement_qty') * (row['rate'] or row['validation_rate'])
+        row['amount'] = row['qty'] * (row['rate'] or row['validation_rate'])
         items[row['item_code']] = row
-    if doc.get('ggbs_item_name') and doc.get('cement_qty'):
-        row = {}
-        row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
-            "Item", doc['ggbs_item_name'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
-        row['qty'] = doc.get('ggbs_qty')
-        row['validation_rate'] = get_valuation_rate(row['item_code'])
-        row['amount'] = doc.get('ggbs_qty') * (row['rate'] or row['validation_rate'])
-        items[row['item_code']] = row
-    if doc.get('post_chips') and doc.get('post_chips_qty'):
-        row = {}
-        row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
-            "Item", doc['post_chips'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
-        row['qty'] = doc.get('post_chips_qty')
-        row['validation_rate'] = get_valuation_rate(row['item_code'])
-        row['amount'] = doc.get('post_chips_qty') * (row['rate'] or row['validation_rate'])
-        items[row['item_code']] = row
-    if doc.get('slab_chips_item_name') and doc.get('slab_chips_qty'):
-        row = {}
-        row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
-            "Item", doc['slab_chips_item_name'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
-        row['qty'] = doc.get('slab_chips_qty')
-        row['validation_rate'] = get_valuation_rate(row['item_code'])
-        row['amount'] = doc.get('slab_chips_qty') * (row['rate'] or row['validation_rate'])
-        items[row['item_code']] = row
-    if doc.get('m_sand_item_name') and doc.get('m_sand_qty'):
-        row = {}
-        row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
-            "Item", doc['m_sand_item_name'], ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])
-        row['qty'] = doc.get('m_sand_qty')
-        row['validation_rate'] = get_valuation_rate(row['item_code'])
-        row['amount'] = doc.get('m_sand_qty') * (row['rate'] or row['validation_rate'])
-        items[row['item_code']] = row
+
     bom_list = []
     for row in doc.get('item_details') or  []:
         if(row.get('bom') and row.get('bom') not in bom_list):

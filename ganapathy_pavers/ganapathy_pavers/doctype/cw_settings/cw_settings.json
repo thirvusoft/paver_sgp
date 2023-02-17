@@ -28,12 +28,7 @@
   "column_break_22",
   "default_unmolding_and_bundling_uom",
   "default_item_section",
-  "chips_for_post",
-  "chips_for_slab",
-  "m_sand",
-  "column_break_28",
-  "cement",
-  "ggbs",
+  "bin_items",
   "labour_costing_details_section",
   "labour_cost_per_sqft",
   "strapping_cost",
@@ -104,24 +99,6 @@
    "label": "Default Items"
   },
   {
-   "fieldname": "column_break_28",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "cement",
-   "fieldtype": "Link",
-   "label": "Cement",
-   "options": "Item",
-   "reqd": 1
-  },
-  {
-   "fieldname": "ggbs",
-   "fieldtype": "Link",
-   "label": "GGBS",
-   "options": "Item",
-   "reqd": 1
-  },
-  {
    "fieldname": "labour_costing_details_section",
    "fieldtype": "Section Break",
    "label": "Costing Details"
@@ -178,27 +155,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "m_sand",
-   "fieldtype": "Link",
-   "label": "M Sand",
-   "options": "Item",
-   "reqd": 1
-  },
-  {
-   "fieldname": "chips_for_post",
-   "fieldtype": "Link",
-   "label": "Chips for Post",
-   "options": "Item",
-   "reqd": 1
-  },
-  {
-   "fieldname": "chips_for_slab",
-   "fieldtype": "Link",
-   "label": "Chips for Slab",
-   "options": "Item",
-   "reqd": 1
-  },
-  {
    "fieldname": "column_break_22",
    "fieldtype": "Column Break"
   },
@@ -238,12 +194,18 @@
    "label": "Strapping Cost",
    "options": "CW Settings Cost",
    "reqd": 1
+  },
+  {
+   "fieldname": "bin_items",
+   "fieldtype": "Table",
+   "label": "Bin Items",
+   "options": "CW Bin Select"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-02-15 12:44:28.218700",
+ "modified": "2023-02-17 11:15:04.292839",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Settings",

@@ -6,16 +6,12 @@ function throw_error(doc, field) {
 }
 
 frappe.ui.form.on("CW Manufacturing", {
-    refresh: function (frm) {
+    refresh: async function (frm) {
         if (frm.is_new()) {
             default_value(frm, "labour_cost_per_hrs", "labour_salary_per_hrs");
             default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
             default_value(frm, "labour_cost_per_sqft", "labour_cost_per_sqft_curing");
-            default_value(frm, "chips_for_post", "post_chips");
-            default_value(frm, "chips_for_slab", "slab_chips_item_name");
-            default_value(frm, "m_sand", "m_sand_item_name");
-            default_value(frm, "cement", "cement_item_name");
-            default_value(frm, "ggbs", "ggbs_item_name");
+            frm.trigger("get_bin_items");
         }
 
         frm.set_query("item", "item_details", function () {
@@ -41,31 +37,50 @@ frappe.ui.form.on("CW Manufacturing", {
                 },
             };
         });
+        frm.set_query("item_code", "bin_items", function () {
+            return {
+                "filters": {
+                    item_group: "Raw Material"
+                }
+            }
+        })
         set_css(frm);
     },
-    onload: function (frm) {},
-    type: function(frm) {
+    get_bin_items: async function (frm) {
+        frm.clear_table("bin_items");
+		frm.fields_dict.bin_items?.refresh()
+        await frappe.db.get_doc("CW Settings").then(bin_items_map => {
+            (bin_items_map.bin_items || []).forEach(bin => {
+                let row = frm.add_child("bin_items")
+                row.item_code = bin.item_code
+                row.bin = bin.bin
+            });
+            frm.fields_dict.bin_items?.refresh()
+        })
+    },
+    onload: function (frm) { },
+    type: function (frm) {
         default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
     },
     ts_before_save: function (frm) {
-        let post_chips = 0,
-            slab_chips = 0,
-            cement = 0,
-            m_sand = 0,
-            ggbs = 0;
-        let rm_consmp = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption : [];
-        for (let i = 0; i < rm_consmp.length; i++) {
-            post_chips += rm_consmp[i].bin1 ? rm_consmp[i].bin1 : 0;
-            m_sand += rm_consmp[i].bin2 ? rm_consmp[i].bin2 : 0;
-            slab_chips += rm_consmp[i].bin3 ? rm_consmp[i].bin3 : 0;
-            cement += rm_consmp[i].cement ? rm_consmp[i].cement : 0;
-            ggbs += rm_consmp[i].ggbs ? rm_consmp[i].ggbs : 0;
-        }
-        frm.set_value("post_chips_qty", post_chips ? post_chips : 0);
-        frm.set_value("slab_chips_qty", slab_chips ? slab_chips : 0);
-        frm.set_value("cement_qty", cement ? cement : 0);
-        frm.set_value("m_sand_qty", m_sand ? m_sand : 0);
-        frm.set_value("ggbs_qty", ggbs ? ggbs : 0);
+        let rm_consmp = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption : [],
+            bin_items = frm.doc.bin_items ? frm.doc.bin_items : [],
+            check_duplicate = [];
+
+        bin_items.forEach(row => {
+            if (check_duplicate.includes(row.item_code)) {
+                frappe.throw(`Bin <b>${row.bin}</b> is repeating more than once in <b>Bin Item Mapping</b>`)
+            } else {
+                check_duplicate.push(row.item_code)
+            }
+        });
+
+        rm_consmp.forEach(row => {
+            bin_items.forEach(bin => {
+                bin.total_qty += (row[frappe.model.scrub(bin.bin || "")] || 0)
+            });
+        });
+
         item_details_total(frm);
         raw_material_cost(frm);
         total_expense_per_sqft(frm);
@@ -555,10 +570,10 @@ async function total_qty(frm, table_name) {
         total_produced_qty += table_name[i].produced_qty ? table_name[i].produced_qty : 0;
         table_name[i].item
             ? await frappe.db.get_value("Item", table_name[i].item, "compound_wall_type").then((value) => {
-                  if (value.message.compound_wall_type == "Post") {
-                      total_no_of_batche += table_name[i].no_of_batches ? table_name[i].no_of_batches : 0;
-                  }
-              })
+                if (value.message.compound_wall_type == "Post") {
+                    total_no_of_batche += table_name[i].no_of_batches ? table_name[i].no_of_batches : 0;
+                }
+            })
             : "";
         total_production_sqft += table_name[i].production_sqft ? table_name[i].production_sqft : 0;
         ts_production_sqft += table_name[i].ts_production_sqft ? table_name[i].ts_production_sqft : 0;

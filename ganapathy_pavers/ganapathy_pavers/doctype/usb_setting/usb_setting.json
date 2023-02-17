@@ -34,12 +34,8 @@
   "column_break_26",
   "default_shot_blast_workstation",
   "default_item_section",
-  "chips",
-  "dust",
   "setting_oil",
-  "column_break_28",
-  "cement",
-  "ggbs",
+  "item_bin_select",
   "labour_costing_details_section",
   "labour_cost_per_sqft",
   "strapping_cost_per_sqft",
@@ -173,18 +169,6 @@
    "label": "Default Item"
   },
   {
-   "fieldname": "cement",
-   "fieldtype": "Link",
-   "label": "Cement",
-   "options": "Item"
-  },
-  {
-   "fieldname": "ggbs",
-   "fieldtype": "Link",
-   "label": "GGBS",
-   "options": "Item"
-  },
-  {
    "fieldname": "scrap_warehouse",
    "fieldtype": "Link",
    "label": "Scrap Warehouse",
@@ -194,22 +178,6 @@
    "fieldname": "default_scrap_warehouse",
    "fieldtype": "Heading",
    "label": "Default Scrap Warehouse"
-  },
-  {
-   "fieldname": "chips",
-   "fieldtype": "Link",
-   "label": "Chips ",
-   "options": "Item"
-  },
-  {
-   "fieldname": "dust",
-   "fieldtype": "Link",
-   "label": "Dust",
-   "options": "Item"
-  },
-  {
-   "fieldname": "column_break_28",
-   "fieldtype": "Column Break"
   },
   {
    "description": "for shot blasting item",
@@ -253,12 +221,18 @@
    "fieldname": "shot_blast_per_sqft",
    "fieldtype": "Currency",
    "label": "Shot Blast Cost Per Sqft"
+  },
+  {
+   "fieldname": "item_bin_select",
+   "fieldtype": "Table",
+   "label": "Item Bin Select",
+   "options": "MM Bin Select"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-02-15 15:12:41.212178",
+ "modified": "2023-02-17 10:38:38.521298",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "USB Setting",

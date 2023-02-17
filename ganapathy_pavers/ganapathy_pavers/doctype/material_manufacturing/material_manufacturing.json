@@ -30,6 +30,7 @@
   "section_break_15",
   "raw_material_consumption",
   "bin_item_mapping_section",
+  "get_bin_items",
   "bin_items",
   "section_break_2",
   "total_no_of_raw_material",
@@ -931,12 +932,18 @@
    "fieldtype": "Table",
    "label": "Bin Items",
    "options": "MM Bin Select"
+  },
+  {
+   "description": "Get Bin Items from USB Setting",
+   "fieldname": "get_bin_items",
+   "fieldtype": "Button",
+   "label": "Get Bin Items"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-02-15 19:34:23.801256",
+ "modified": "2023-02-17 11:32:35.649794",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

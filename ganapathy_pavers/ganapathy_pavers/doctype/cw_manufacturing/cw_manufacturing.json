@@ -16,17 +16,8 @@
   "section_break_15",
   "raw_material_consumption",
   "raw_materials_section",
-  "post_chips",
-  "slab_chips_item_name",
-  "m_sand_item_name",
-  "cement_item_name",
-  "ggbs_item_name",
-  "column_break_20",
-  "post_chips_qty",
-  "slab_chips_qty",
-  "m_sand_qty",
-  "cement_qty",
-  "ggbs_qty",
+  "get_bin_items",
+  "bin_items",
   "manufacturing_items",
   "item_details",
   "section_break_21",
@@ -205,65 +196,6 @@
   {
    "fieldname": "section_break_21",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "cement_item_name",
-   "fieldtype": "Link",
-   "label": "Cement Item Name",
-   "options": "Item"
-  },
-  {
-   "fieldname": "m_sand_item_name",
-   "fieldtype": "Link",
-   "label": "M Sand Item Name",
-   "options": "Item"
-  },
-  {
-   "fieldname": "ggbs_item_name",
-   "fieldtype": "Link",
-   "label": "GGBS Item Name",
-   "options": "Item"
-  },
-  {
-   "fieldname": "column_break_20",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "cement_qty",
-   "fieldtype": "Float",
-   "label": "Cement Qty"
-  },
-  {
-   "fieldname": "m_sand_qty",
-   "fieldtype": "Float",
-   "label": "M Sand Qty"
-  },
-  {
-   "fieldname": "ggbs_qty",
-   "fieldtype": "Float",
-   "label": "GGBS Qty"
-  },
-  {
-   "fieldname": "post_chips",
-   "fieldtype": "Link",
-   "label": "Post Chips Item Name",
-   "options": "Item"
-  },
-  {
-   "fieldname": "slab_chips_item_name",
-   "fieldtype": "Link",
-   "label": "Slab Chips Item Name",
-   "options": "Item"
-  },
-  {
-   "fieldname": "slab_chips_qty",
-   "fieldtype": "Float",
-   "label": "Slab Chips Qty"
-  },
-  {
-   "fieldname": "post_chips_qty",
-   "fieldtype": "Float",
-   "label": "Post Chips Qty"
   },
   {
    "fieldname": "molding_date",
@@ -600,12 +532,24 @@
    "in_standard_filter": 1,
    "label": "Type",
    "options": "Post\nSlab\nFencing Post\nLego Block"
+  },
+  {
+   "fieldname": "bin_items",
+   "fieldtype": "Table",
+   "label": "Bin Items",
+   "options": "CW Bin Select"
+  },
+  {
+   "description": "Get Bin Items from CW Settings",
+   "fieldname": "get_bin_items",
+   "fieldtype": "Button",
+   "label": "Get Bin Items"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-17 10:19:31.455713",
+ "modified": "2023-02-17 11:34:54.593984",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",
