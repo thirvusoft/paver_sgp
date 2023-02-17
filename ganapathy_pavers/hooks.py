@@ -162,6 +162,9 @@ doc_events = {
 	"Driver":{
 		"validate":"ganapathy_pavers.custom.py.driver.validate_phone"
 	},
+	"Item Attribute":{
+		"validate":"ganapathy_pavers.custom.py.item_varient.colour_creation"
+	},
 
 	"Employee Advance":{
 		"on_submit":"ganapathy_pavers.utils.py.employee_advance.create_payment_entry",
