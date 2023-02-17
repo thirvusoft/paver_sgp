@@ -111,7 +111,7 @@
         <tr> 
             <th style="width: 70%; text-align: center; color: black">ITEM</th>
             {% for i in b %}
-                <th style="width: 70%; text-align: center; color: black">{{i}}</th>
+                <th style="width: 70%; text-align: center; color: {{i}}">{{i}}</th>
             {% endfor %}
         </tr>
        
@@ -119,7 +119,7 @@
             <tr>
                 <td style="color: black; text-align: left">{{colour_details.short_name}}</td>
                     {% for i in b %}
-                        <td style="color: black">
+                        <td style="color: {{i}}">
                             {{colour_details[i.replace(' ', '_').replace('-', '_').lower()]}}
                         </td>
                     {% endfor %}
@@ -156,14 +156,14 @@
             <tr>
                 <th style="width: 70% !important; text-align: center; color: black">ITEM</th>
                 {% for i in b %}
-                    <th style="width: 70%; text-align: center; color: black">{{i}}</th>
+                    <th style="width: 70%; text-align: center; color: {{i}}">{{i}}</th>
                 {% endfor %}
             </tr>
             {% for colour_details_of_sb in doc.colour_details_of_sb %}
                 <tr>
                     <td style="color: black; text-align: left">{{colour_details_of_sb.short_name}}</td>
                     {% for i in b %}
-                        <td style="color: black">
+                        <td style="color: {{i}}">
                             {{colour_details_of_sb[i.replace(' ', '_').replace('-', '_').lower()]}}
                         </td>
                     {% endfor %}
