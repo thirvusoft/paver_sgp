@@ -97,37 +97,33 @@
     </table>
     {% endif %}
 </div>
+{% set b=color_table1(doc.colour_details) %}
 {% if doc.colour_details %}
 <div class="main2">
     <table>
         <tr>
-            <th style="width: 100; text-align: center; color: #e45829" colspan="6">NORMAL PAVERS STOCK</th>
+            <th style="width: 100; text-align: center; color: #e45829" colspan="{{b|len + 1}}">NORMAL PAVERS STOCK</th>
         </tr>
         <tr>
             <th style="text-align: center; color: black">PAVER</th>
-            <th style="text-align: center; color: black" colspan="5">STOCK</th>
+            <th style="text-align: center; color: black" colspan="{{b|len}}">STOCK</th>
         </tr>
-        {% set b=color_table1() %}
-         
-        <tr> <th style="width: 70%; text-align: center; color: black">ITEM</th>
-             {% for i in b %}
-           
-            <th style="width: 70%; text-align: center; color: black">{{i}}</th>
-           {% endfor %}
+        <tr> 
+            <th style="width: 70%; text-align: center; color: black">ITEM</th>
+            {% for i in b %}
+                <th style="width: 70%; text-align: center; color: black">{{i}}</th>
+            {% endfor %}
         </tr>
        
         {% for colour_details in doc.colour_details %}
-        <tr>
-            <td style="color: black; text-align: left">{{colour_details.short_name}}</td>
-               {% set c=color_table1() %}
-                {% for i in c %}
-               
-            <td style="color: black">
-            {{colour_details[i.replace(' ', '_').replace('-', '_').lower()]}}
-             </td>
-      
-           {% endfor %}
-        </tr>
+            <tr>
+                <td style="color: black; text-align: left">{{colour_details.short_name}}</td>
+                    {% for i in b %}
+                        <td style="color: black">
+                            {{colour_details[i.replace(' ', '_').replace('-', '_').lower()]}}
+                        </td>
+                    {% endfor %}
+            </tr>
         {% endfor %}
     </table>
     {% endif %}
@@ -146,37 +142,32 @@
             {% endif %}
         {% endfor %}
     </table>
+    {% set b=color_table2(doc.colour_details_of_sb) %}
     {% if doc.colour_details_of_sb %}
     <div class="main3">
         <table>
             <tr>
-                <th style="text-align: center; color: #e45829" colspan="6">SHOT BLAST PAVERS STOCK</th>
+                <th style="text-align: center; color: #e45829" colspan="{{b|len + 1}}">SHOT BLAST PAVERS STOCK</th>
             </tr>
             <tr>
                 <th style="text-align: center; color: black">PAVER</th>
-                <th style="text-align: center; color: black" colspan="5">STOCK</th>
+                <th style="text-align: center; color: black" colspan="{{b|len}}">STOCK</th>
             </tr>
             <tr>
                 <th style="width: 70% !important; text-align: center; color: black">ITEM</th>
-                {% set b=color_table2() %}
                 {% for i in b %}
-           
-            <th style="width: 70%; text-align: center; color: black">{{i}}</th>
-           {% endfor %}
+                    <th style="width: 70%; text-align: center; color: black">{{i}}</th>
+                {% endfor %}
             </tr>
             {% for colour_details_of_sb in doc.colour_details_of_sb %}
-            <tr>
-                <td style="color: black; text-align: left">{{colour_details_of_sb.short_name}}</td>
-                
-                 {% set c=color_table2() %}
-                {% for i in c %}
-               
-            <td style="color: black">
-            {{colour_details_of_sb[i.replace(' ', '_').replace('-', '_').lower()]}}
-             </td>
-      
-           {% endfor %}
-            </tr>
+                <tr>
+                    <td style="color: black; text-align: left">{{colour_details_of_sb.short_name}}</td>
+                    {% for i in b %}
+                        <td style="color: black">
+                            {{colour_details_of_sb[i.replace(' ', '_').replace('-', '_').lower()]}}
+                        </td>
+                    {% endfor %}
+                </tr>
             {% endfor %}
         </table>
         {% endif %}
