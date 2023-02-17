@@ -104,7 +104,7 @@ def execute(filters=None):
                 total[2] = "Total"
                 total[3] = sum((data[i][3] or 0) for i in range(start,i+1))
                 total[4] = sum((data[i][4] or 0) for i in range(start,i+1))
-                total[5] = sum((data[i][5] or 0) for i in range(start,i+1))
+                total[5] = None#sum((data[i][5] or 0) for i in range(start,i+1))
                 total[6]=0
                 total[8] = sum((data[i][8] or 0) for i in range(start,i+1))
                 total[9] = sum((data[i][9] or 0) for i in range(start,i+1))
@@ -136,7 +136,7 @@ def execute(filters=None):
         total[2] = "Total"
         total[3] = sum((data[i][3] or 0) for i in range(start,len(data)))
         total[4] = sum((data[i][4] or 0) for i in range(start,len(data)))
-        total[5] = sum((data[i][5] or 0) for i in range(start,len(data)))
+        total[5] = None#sum((data[i][5] or 0) for i in range(start,len(data)))
         total[6]=0
         total[8] = sum((data[i][8] or 0) for i in range(start,len(data)))
         total[9] = sum((data[i][9] or 0) for i in range(start,len(data)))
@@ -185,7 +185,7 @@ def get_columns(other_work):
         {
             "fieldname": "bundle",
             "label": "Bundle",
-            "fieldtype": "Float",
+            "fieldtype": "Int",
             "ts_right_align": "text-right"
         },
 		{
@@ -285,7 +285,7 @@ def get_employee_salary_slip_amount(employee, from_date, to_date):
         WHERE ss.docstatus=1 AND ss.employee='{employee}' AND ss.start_date >= '{from_date}' AND ss.end_date <= '{to_date}'
     """
     res=frappe.db.sql(query)[0][0]
-    return round((res or 0), 2)
+    return round((res or 0), 2) or ""
 
 def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv):
     if frappe.db.get_all('Salary Slip', {'employee': employee, 'start_date': [">=", from_date], 'end_date': ["<=", to_date], "docstatus": 1}):
