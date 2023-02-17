@@ -95,8 +95,8 @@ def paver_item(warehouse, date, warehouse_colour):
 					template[colour]=0
 				template[colour]+=stock_qty
 				if colour not in total_stock:
-					total_stock[colour]=0
-				total_stock[colour]+=stock_qty
+					total_stock[colour]={"colour": colour, "stock": 0}
+				total_stock[colour]["stock"]+=stock_qty
 			items_stock.append(template)
 	#paver_item_shotblast
 	items_stock_shot=[]
@@ -123,8 +123,8 @@ def paver_item(warehouse, date, warehouse_colour):
 					template_1[colour_sb]=0
 				template_1[colour_sb]+=stock_qty_sb
 				if colour_sb not in total_stock_shot:
-					total_stock_shot[colour_sb]=0
-				total_stock_shot[colour_sb]+=stock_qty_sb
+					total_stock_shot[colour_sb]={"colour": colour_sb, "stock": 0}
+				total_stock_shot[colour_sb]["stock"]+=stock_qty_sb
 			items_stock_shot.append(template_1)
 	
  
@@ -324,6 +324,8 @@ def paver_item(warehouse, date, warehouse_colour):
 	normal_total_stock=size_details(items_stock, _type='Normal')
 	normal_total_stock+=size_details(items_stock_shot, _type='Shot Blast')
 	raw_material_stock=raw_material_stock_details()
+	total_stock_shot= sorted(list(total_stock_shot.values()), key=lambda x: x.get("colour", ""))
+	total_stock=sorted(list(total_stock.values()), key=lambda x: x.get("colour", ""))
 	return items_stock, total_stock, items_stock_shot, total_stock_shot, list(sqf.values()), production,  sorted(list(post_item.values()), key=lambda x: x.get("post_length", "") or ""), colour_details, sorted(slab_details, key=lambda x: x.get("item", "") or ""), normal_total_stock, raw_material_stock
 
 def size_details(items, _type):

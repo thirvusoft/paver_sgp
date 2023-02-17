@@ -42,7 +42,7 @@
             {% for strapping_role in doc.strapping_role %}
             <tr>
                 <td style="Width:25%; text-align:left; color:{{strapping_role.colour}}">{{strapping_role.colour}}</td>
-                <td style="Width:25%; text-align:left; color:{{strapping_role.colour}}">{{strapping_role.stock or 0}}</td>
+                <td style="Width:25%; text-align:left; color:{{strapping_role.colour}}">{{"%.2f"%(strapping_role.stock or 0)}}</td>
             </tr>
             {% endfor %}
         </table>
@@ -89,8 +89,8 @@
         {% for colour_powder in doc.colour_powder %}
         <tr>
             <td style="Width:25%; color:{{colour_powder.attribute_value}}">{{colour_powder.colour}}</td>
-            <td style="Width:25%; color:{{colour_powder.attribute_value}}">{{colour_powder.stock}}</td>
-            <td style="width: 25%; color: black">{{colour_powder.sqft or 0}}</td>
+            <td style="Width:25%; color:{{colour_powder.attribute_value}}">{{"%.2f"%(colour_powder.stock or 0)}}</td>
+            <td style="width: 25%; color: black">{{"%.2f"%(colour_powder.sqft or 0)}}</td>
             <td style="width: 25%; color: black">{{colour_powder.no_of_days or 0}}</td>
         </tr>
         {% endfor %}
@@ -133,34 +133,14 @@
         <tr>
             <th style="width: 100%; text-align: center; color: black" colspan="2">TOTAL</th>
         </tr>
-        <tr>
-            <td style="text-align: left; color: black">100MM PAVER</td>
-            <td style="color: black">6769</td>
-        </tr>
-        <tr>
-            <td style="text-align: left; color: black">120MM PAVER</td>
-            <td style="color: black">101</td>
-        </tr>
-        <tr>
-            <td style="text-align: left; color: black">60MM PAVER</td>
-            <td style="color: black">13212</td>
-        </tr>
-        <tr>
-            <td style="text-align: left; color: black">65MM PAVER</td>
-            <td style="color: black">1748</td>
-        </tr>
-        <tr>
-            <td style="text-align: left; color: black">70MM PAVER</td>
-            <td style="color: black">1487</td>
-        </tr>
-        <tr>
-            <td style="text-align: left; color: black">80MM PAVER</td>
-            <td style="color: black">22007</td>
-        </tr>
-        <tr>
-            <td style="text-align: left; color: black">KERB STONE</td>
-            <td style="color: black">2874</td>
-        </tr>
+        {% for row in doc.size_details %}
+            {% if row.type=="Normal" %}
+                <tr>
+                    <td style="text-align: left; color: black">{{ row.size }}</td>
+                    <td style="color: black">{{ "%.2f"%(row.total_stock or 0) }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
     </table>
     {% if doc.colour_details_of_sb %}
     <div class="main3">
@@ -198,30 +178,14 @@
             <tr>
                 <th style="color: black; text-align: center" colspan="2">TOTAL</th>
             </tr>
-            <tr>
-                <td style="text-align: left; color: black">60MM PAVER</td>
-                <td style="color: black">18334</td>
-            </tr>
-            <tr>
-                <td style="text-align: left; color: black">65MM PAVER</td>
-                <td style="color: black">18108</td>
-            </tr>
-            <tr>
-                <td style="text-align: left; color: black">70MM PAVER</td>
-                <td style="color: black">11822</td>
-            </tr>
-            <tr>
-                <td style="text-align: left; color: black">75MM PAVER</td>
-                <td style="color: black">206</td>
-            </tr>
-            <tr>
-                <td style="text-align: left; color: black">80MM PAVER</td>
-                <td style="color: black">3724</td>
-            </tr>
-            <tr>
-                <td style="text-align: center; color: black">Overall Total</td>
-                <td style="color: black">101401</td>
-            </tr>
+            {% for row in doc.size_details %}
+            {% if row.type=="Shot Blast" %}
+                <tr>
+                    <td style="text-align: left; color: black">{{ row.size }}</td>
+                    <td style="color: black">{{ row.total_stock }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
         </table>
     </div>
     <div class="cw">
@@ -239,13 +203,13 @@
             </tr>
 
             {% for compound_wall_stock in doc.compound_wall_stock %} {% if compound_wall_stock.type=='Normal' %}
-            <tr>
-                <td>{{compound_wall_stock.post_length}}</td>
-                <td style="color: green">{{compound_wall_stock.wo_bolt or 0}}</td>
-                <td style="color: #3729b1">{{compound_wall_stock.with_bolt or 0}}</td>
-                <td style="color: green">{{compound_wall_stock.pc_wo_bolt or 0}}</td>
-                <td style="color: #3729b1">{{compound_wall_stock.pc_with_bolt or 0}}</td>
-            </tr>
+                <tr>
+                    <td>{{compound_wall_stock.post_length}}</td>
+                    <td style="color: green">{{"%.2f"%(compound_wall_stock.wo_bolt or 0)}}</td>
+                    <td style="color: #3729b1">{{"%.2f"%(compound_wall_stock.with_bolt or 0)}}</td>
+                    <td style="color: green">{{"%.2f"%(compound_wall_stock.pc_wo_bolt or 0)}}</td>
+                    <td style="color: #3729b1">{{"%.2f"%(compound_wall_stock.pc_with_bolt or 0)}}</td>
+                </tr>
             {% endif %} {% endfor %}
         </table>
     </div>
@@ -256,7 +220,7 @@
             {% for compound_wall_item_stock in doc.compound_wall_item_stock %}
             <tr>
                 <th style="width: 50%; text-align: left; color: black">{{compound_wall_item_stock.item}}</th>
-                <th style="width: 50%; text-align: center; color: black">{{compound_wall_item_stock.stock}}</th>
+                <th style="width: 50%; text-align: center; color: black">{{"%.2f"%(compound_wall_item_stock.stock or 0)}}</th>
             </tr>
             {% endfor %}
         </table>

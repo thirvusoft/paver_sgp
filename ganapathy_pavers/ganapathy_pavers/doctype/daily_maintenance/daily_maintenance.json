@@ -24,27 +24,11 @@
   "load_item_details",
   "colour_details",
   "data_12",
-  "red_total_n",
-  "column_break_14",
-  "black_total_n",
-  "column_break_16",
-  "grey_total_n",
-  "column_break_18",
-  "brown_total_n",
-  "column_break_20",
-  "yellow_total_n",
+  "normal_colour_total",
   "colour_details_of_sb_section",
   "colour_details_of_sb",
   "shot_blast_section",
-  "red_total_s",
-  "column_break_24",
-  "black_total_s",
-  "column_break_26",
-  "grey_total_s",
-  "column_break_28",
-  "brown_total_s",
-  "column_break_30",
-  "yellow_total_s",
+  "shot_blast_colour_total",
   "size_details_section",
   "size_details",
   "data_26",
@@ -135,59 +119,9 @@
    "label": "Normal Total"
   },
   {
-   "fieldname": "red_total_n",
-   "fieldtype": "Float",
-   "label": "Red Total "
-  },
-  {
-   "fieldname": "black_total_n",
-   "fieldtype": "Float",
-   "label": "Black Total "
-  },
-  {
-   "fieldname": "grey_total_n",
-   "fieldtype": "Float",
-   "label": "Grey Total "
-  },
-  {
-   "fieldname": "brown_total_n",
-   "fieldtype": "Float",
-   "label": "Brown Total "
-  },
-  {
-   "fieldname": "yellow_total_n",
-   "fieldtype": "Float",
-   "label": "Yellow Total "
-  },
-  {
    "fieldname": "shot_blast_section",
    "fieldtype": "Section Break",
-   "label": "Shot Blast"
-  },
-  {
-   "fieldname": "red_total_s",
-   "fieldtype": "Float",
-   "label": "Red Total "
-  },
-  {
-   "fieldname": "black_total_s",
-   "fieldtype": "Float",
-   "label": "Black Total "
-  },
-  {
-   "fieldname": "grey_total_s",
-   "fieldtype": "Float",
-   "label": "Grey Total "
-  },
-  {
-   "fieldname": "brown_total_s",
-   "fieldtype": "Float",
-   "label": "Brown Total "
-  },
-  {
-   "fieldname": "yellow_total_s",
-   "fieldtype": "Float",
-   "label": "Yellow Total "
+   "label": "Shot Blast Total"
   },
   {
    "fieldname": "size_details",
@@ -283,38 +217,6 @@
    "options": "Vehicle Details"
   },
   {
-   "fieldname": "column_break_14",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_16",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_18",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_20",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_24",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_26",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_28",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_30",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "warehouse",
    "fieldtype": "Table",
    "label": "Warehouse for Pavers and Compound Walls",
@@ -349,12 +251,24 @@
    "fieldname": "get_attendance_details",
    "fieldtype": "Button",
    "label": "Get Attendance Details"
+  },
+  {
+   "fieldname": "normal_colour_total",
+   "fieldtype": "Table",
+   "label": "Normal Colour Total",
+   "options": "DSM Colour Total"
+  },
+  {
+   "fieldname": "shot_blast_colour_total",
+   "fieldtype": "Table",
+   "label": "Shot Blast Colour Total",
+   "options": "DSM Colour Total"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-02-16 11:49:51.629627",
+ "modified": "2023-02-17 12:36:43.369347",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Daily Maintenance",
