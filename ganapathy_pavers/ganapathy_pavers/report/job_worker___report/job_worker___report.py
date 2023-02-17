@@ -211,7 +211,8 @@ def get_columns(other_work):
             "fieldname": "other_work_description",
             "label": "Other Work Description",
             "fieldtype": "Data",
-            "hidden": not other_work
+            "hidden": not other_work,
+            "width": 150,
         },
         {
             "fieldname": "salary_balance",
@@ -242,7 +243,7 @@ def get_columns(other_work):
             "label": "Payment",
             "fieldtype": "Float",
             "default": None,
-            "width": 150,
+            "minWidth": 120,
             "ts_right_align": "text-right"
         }
 		]
