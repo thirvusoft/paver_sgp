@@ -93,7 +93,8 @@ def run(filters={}):
 				data[i][6] = "%.2f"%data[i][6]
 				final_data.append(data[i][:8]+[f"{currency} %.2f"%data[i][8]])
 				total = [" " for i in range(9)]
-				total[5] = "<b style=color:rgb(255 82 0);>""Total""</b>"
+				total[4] = "<b style=color:rgb(255 82 0);>Total</b>"
+				total[5] = frappe.bold("%.2f"%sum(float(data[i][5]) for i in range(start,i+1)))
 				total[6] = frappe.bold("%.2f"%sum(float(data[i][6]) for i in range(start,i+1)))
 				total[7] = ("")
 				total[8] = frappe.bold(f"{currency} %.2f"%sum(float(data[i][8]) for i in range(start,i+1)))
@@ -107,7 +108,8 @@ def run(filters={}):
 				
 		final_data.append(data[-1])
 		total = ["" for i in range(9)]
-		total[5] = "<b style=color:rgb(255 82 0);>""Total""</b>"
+		total[4] = "<b style=color:rgb(255 82 0);>""Total""</b>"
+		total[5] = frappe.bold("%.2f"%sum(float(data[i][5]) for i in range(start,len(data))))
 		total[6] = frappe.bold("%.2f"%sum(float(data[i][6]) for i in range(start,len(data))))
 		total[7] = ("")
 		total[8] = frappe.bold(f"{currency} %.2f"%sum(float(data[i][8]) for i in range(start,len(data))))
