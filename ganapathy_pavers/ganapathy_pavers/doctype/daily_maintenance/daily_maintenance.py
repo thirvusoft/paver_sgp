@@ -357,12 +357,11 @@ def size_details(items, _type):
 def raw_material_stock_details():
 	dsm=frappe.get_single("DSM Defaults")
 	raw_material_stock = [get_stock_details_from_warehosue(item.warehouse, item.machine or "", item.type or "") for item in dsm.raw_material_details]
-	
+
 	total_stock=[]
 	for item in raw_material_stock:
-		total_stock+=list(item)
+		total_stock+=sorted(list(item), key = lambda x: x.get("item", "") or "")
 	
-	total_stock.sort(key=lambda x: x.get("item", "") or "")
 	return total_stock
 	
 

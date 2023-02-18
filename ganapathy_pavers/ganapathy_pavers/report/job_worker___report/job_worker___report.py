@@ -20,7 +20,7 @@ def execute(filters=None):
             conditions += " and site.type='{0}'".format(site_type)
             conditions += " and emp.paver=1" if site_type=="Pavers" else " and emp.compound_wall=1"
         if from_date and to_date:
-            conditions += "  and jwd.end_date >= '{0}'".format(from_date, to_date)
+            conditions += "  and jwd.start_date >= '{0}' and jwd.end_date <= '{1}'".format(from_date, to_date)
             adv_conditions += " and empadv.posting_date between '{0}' and '{1}' ".format(from_date, to_date)
         if employee:
             conditions += " and jwd.name1 ='{0}' ".format(employee)
