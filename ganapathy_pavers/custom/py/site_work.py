@@ -228,6 +228,10 @@ def reduce_advance_amount(self, event=None):
         })
         doc.db_update()
 
+@frappe.whitelist()
+def update_completion_date(date, name):
+    frappe.db.set_value("Project", name, "completion_date", date)
+
 def update_status(doc, events):
     frappe.db.set_value("Project", doc.name, "previous_state", doc.status)
     doc.reload()

@@ -40,6 +40,35 @@ frappe.ui.form.on("Project",{
         setquery(frm,cdt,cdn)
     }, 
     refresh: async function(frm,cdt,cdn){
+		if (frm.doc.status == "Completed") {
+			frm.add_custom_button("Update Site Completion Date",  function() {
+				let d = new frappe.ui.Dialog({
+					title: "Update Site Completion Date",
+					fields: [
+						{
+							fieldname: "date",
+							label: "Site Completion Date",
+							fieldtype: "Date",
+							reqd: 1
+						}
+					],
+					primary_action: async function(data) {
+						await frappe.call({
+							method: "ganapathy_pavers.custom.py.site_work.update_completion_date",
+							args: {
+								date: data.date,
+								name: frm.doc.name
+							},
+							callback: function (r) {
+								frm.reload_doc()
+								d.hide()
+							},
+						})
+					}
+				});
+				d.show();
+			});
+		}
 		await frm.add_custom_button("Update Delivery Details", function() {
 			if (!frm.is_dirty()) {
 				frappe.call({
