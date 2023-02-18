@@ -56,7 +56,7 @@ def execute(filters=None):
 				FROM `{table_name}`
 				) as design,
 				(SELECT sum(ps.{field_name}) FROM `{table_name}` as ps WHERE ps.parent='{sw.name}') as po_qty,
-				(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as total_paver_delivery,
+				(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as total_delivery,
 				(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}) as total_laying,
 				(
 					(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}')
@@ -112,9 +112,9 @@ def get_columns():
 			"width": 110
 		},
 		{
-			"label": ("Total Paver Delivery"),
+			"label": ("Total Delivery"),
 			"fieldtype": "Float",
-			"fieldname": "total_paver_delivery",
+			"fieldname": "total_delivery",
 			"width": 150
 		},
 		{
