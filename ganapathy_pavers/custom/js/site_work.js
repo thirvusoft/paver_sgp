@@ -212,7 +212,7 @@ function percent_complete(frm,cdt,cdn){
 		}
 	
 	}
-	let percent=(completed_area/total_area)*100
+	let percent=total_area?(completed_area/total_area)*100:0;
 	frm.set_value('total_required_area',total_area)
 	frm.set_value('total_completed_area',completed_area)
 	frm.set_value('total_required_bundle',total_bundle)
