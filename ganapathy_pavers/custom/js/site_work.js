@@ -206,10 +206,13 @@ function percent_complete(frm,cdt,cdn){
 	let total_comp_bundle = 0;
 	let work= cur_frm.doc.job_worker?cur_frm.doc.job_worker:[]
 	for(let row=0;row<work.length;row++){
-		completed_area+= cur_frm.doc.job_worker[row].sqft_allocated?cur_frm.doc.job_worker[row].sqft_allocated:0
-		total_comp_bundle += cur_frm.doc.job_worker[row].completed_bundle?cur_frm.doc.job_worker[row].completed_bundle:0
+		if(!row.other_work){
+			completed_area+= cur_frm.doc.job_worker[row].sqft_allocated?cur_frm.doc.job_worker[row].sqft_allocated:0
+			total_comp_bundle += cur_frm.doc.job_worker[row].completed_bundle?cur_frm.doc.job_worker[row].completed_bundle:0
+		}
+	
 	}
-	let percent=(completed_area/total_area)*100
+	let percent=total_area?(completed_area/total_area)*100:0;
 	frm.set_value('total_required_area',total_area)
 	frm.set_value('total_completed_area',completed_area)
 	frm.set_value('total_required_bundle',total_bundle)

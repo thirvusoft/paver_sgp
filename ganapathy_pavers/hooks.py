@@ -181,6 +181,7 @@ doc_events = {
 			"ganapathy_pavers.custom.py.site_work.rework_count",
 			"ganapathy_pavers.custom.py.site_work.update_delivery_detail",
 			"ganapathy_pavers.custom.py.site_work.job_worker",
+			"ganapathy_pavers.custom.py.site_work.completed_and_required_area",
 			"ganapathy_pavers.custom.py.site_work.job_worker_laying_details",
 		],
 		"after_insert":"ganapathy_pavers.custom.py.site_work.validate",
