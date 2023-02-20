@@ -24,7 +24,9 @@
   "column_break_14",
   "warehouse_for_colour_powder_items",
   "section_break_15",
-  "items"
+  "items",
+  "alternative_colours_section",
+  "dsm_alternative_colours"
  ],
  "fields": [
   {
@@ -130,12 +132,23 @@
    "fieldname": "section_break_3",
    "fieldtype": "Section Break",
    "hidden": 1
+  },
+  {
+   "fieldname": "alternative_colours_section",
+   "fieldtype": "Section Break",
+   "label": "Alternative Colours"
+  },
+  {
+   "fieldname": "dsm_alternative_colours",
+   "fieldtype": "Table",
+   "label": "DSM Alternative Colours",
+   "options": "DSM Alternative Colours"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-02-17 16:47:02.562440",
+ "modified": "2023-02-20 18:21:14.759891",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "DSM Defaults",

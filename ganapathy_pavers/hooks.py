@@ -130,7 +130,8 @@ jenv = {
 		"bundle_sum:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.print_format",
 		"get_daily_maintenance_html:ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.daily_maintenance_print_format",
 		"get_raw_materials_for_print:ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.get_raw_materials_for_print",
-		"check_only_rm:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.check_only_rm"
+		"check_only_rm:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.check_only_rm",
+		"get_dsm_color:ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.get_dsm_color"
 	]
 }
 

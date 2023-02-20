@@ -1,0 +1,39 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-02-20 18:20:34.157706",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "actual_colour",
+  "replaced_colour"
+ ],
+ "fields": [
+  {
+   "fieldname": "actual_colour",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Actual Colour",
+   "reqd": 1
+  },
+  {
+   "fieldname": "replaced_colour",
+   "fieldtype": "Color",
+   "in_list_view": 1,
+   "label": "Replaced Colour",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-02-20 18:20:34.157706",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "DSM Alternative Colours",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

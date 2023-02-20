@@ -41,8 +41,8 @@
             </tr>
             {% for strapping_role in doc.strapping_role %}
             <tr>
-                <td style="Width:25%; text-align:left; color:{{strapping_role.colour}}">{{strapping_role.colour}}</td>
-                <td style="Width:25%; text-align:left; color:{{strapping_role.colour}}">{{"%.2f"%(strapping_role.stock or 0)}}</td>
+                <td style="Width:25%; text-align:left; color:{{get_dsm_color(strapping_role.colour)}}">{{strapping_role.colour}}</td>
+                <td style="Width:25%; text-align:left; color:{{get_dsm_color(strapping_role.colour)}}">{{"%.2f"%(strapping_role.stock or 0)}}</td>
             </tr>
             {% endfor %}
         </table>
@@ -88,8 +88,8 @@
         </tr>
         {% for colour_powder in doc.colour_powder %}
         <tr>
-            <td style="Width:25%; color:{{colour_powder.attribute_value}}">{{colour_powder.colour}}</td>
-            <td style="Width:25%; color:{{colour_powder.attribute_value}}">{{"%.2f"%(colour_powder.stock or 0)}}</td>
+            <td style="Width:25%; color:{{get_dsm_color(colour_powder.attribute_value)}}">{{colour_powder.colour}}</td>
+            <td style="Width:25%; color:{{get_dsm_color(colour_powder.attribute_value)}}">{{"%.2f"%(colour_powder.stock or 0)}}</td>
             <td style="width: 25%; color: black">{{"%.2f"%(colour_powder.sqft or 0)}}</td>
             <td style="width: 25%; color: black">{{colour_powder.no_of_days or 0}}</td>
         </tr>
@@ -111,7 +111,7 @@
         <tr> 
             <th style="width: 70%; text-align: center; color: black">ITEM</th>
             {% for i in b %}
-                <th style="width: 70%; text-align: center; color: {{i}}">{{i}}</th>
+                <th style="width: 70%; text-align: center; color: {{get_dsm_color(i)}}">{{i}}</th>
             {% endfor %}
         </tr>
        
@@ -119,7 +119,7 @@
             <tr>
                 <td style="color: black; text-align: left">{{colour_details.short_name}}</td>
                     {% for i in b %}
-                        <td style="color: {{i}}">
+                        <td style="color: {{get_dsm_color(i)}}">
                             {{colour_details[i.replace(' ', '_').replace('-', '_').lower()]}}
                         </td>
                     {% endfor %}
@@ -156,14 +156,14 @@
             <tr>
                 <th style="width: 70% !important; text-align: center; color: black">ITEM</th>
                 {% for i in b %}
-                    <th style="width: 70%; text-align: center; color: {{i}}">{{i}}</th>
+                    <th style="width: 70%; text-align: center; color: {{get_dsm_color(i)}}">{{i}}</th>
                 {% endfor %}
             </tr>
             {% for colour_details_of_sb in doc.colour_details_of_sb %}
                 <tr>
                     <td style="color: black; text-align: left">{{colour_details_of_sb.short_name}}</td>
                     {% for i in b %}
-                        <td style="color: {{i}}">
+                        <td style="color: {{get_dsm_color(i)}}">
                             {{colour_details_of_sb[i.replace(' ', '_').replace('-', '_').lower()]}}
                         </td>
                     {% endfor %}

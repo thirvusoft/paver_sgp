@@ -23,7 +23,16 @@ def dsm_uom_conversion(item, qty, uom=None):
 		return qty
 	return uom_conversion(item=item, from_uom=uom, from_qty=qty, to_uom=to_uom)
 
-
+def get_dsm_color(color):
+	_color=(color or "").lower()
+	alter_colors = frappe.db.sql(f"""
+		SELECT
+			replaced_colour
+		FROM `tabDSM Alternative Colours`
+		WHERE actual_colour='{_color}'
+	""")
+	res=(alter_colors[0][0] if alter_colors and alter_colors[0] and alter_colors[0][0] else color) or color
+	return res
 
 def daily_maintenance_print_format(doc):
 	html=frappe.render_template('ganapathy_pavers/ganapathy_pavers/doctype/daily_maintenance/daily_maintenance.html', {'doc':doc})
