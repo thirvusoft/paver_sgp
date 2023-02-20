@@ -520,11 +520,5 @@ def completed_and_required_area(self,event):
     self.total_completed_area=completed_area
     self.total_required_bundle=total_bundle
     self.total_completed_bundle=total_comp_bundle
-    self.completed=(completed_area/total_area)*100
+    self.completed=(completed_area/total_area)*100 if total_area else 0
  
-
-
-
-
-
-
