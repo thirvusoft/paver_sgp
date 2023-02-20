@@ -148,7 +148,8 @@ def employee_update(doc,action):
     if action=="on_submit":
         employee_doc.salary_balance=doc.total_unpaid_amount
     elif action=="on_cancel":
-        employee_doc.salary_balance=employee_doc.salary_balance-(doc.total_amount-doc.total_paid_amount)
+        ss_balance=frappe.get_all("Salary Slip", {"docstatus": 1, "employee": doc.employee}, pluck="total_unpaid_amount", order_by="end_date desc", limit=1)
+        employee_doc.salary_balance=ss_balance[0] if ss_balance else employee_doc.salary_balance-(doc.total_amount-doc.total_paid_amount)
     employee_doc.save()
 
 def validate_salaryslip(self, event=None):
