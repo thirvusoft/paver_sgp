@@ -382,7 +382,7 @@ def additional_salary_update(self, event=None):
                         if ss_row.salary_slip==self.name:
                             ss_row.amount-=row.amount
                             add_row=False
-                additional_salary.salary_slip_amount= additional_salary.amount - row.amount
+                additional_salary.salary_slip_amount = additional_salary.salary_slip_amount - row.amount
             additional_salary.save('Update')
 
 def remove_branch_read_only():
