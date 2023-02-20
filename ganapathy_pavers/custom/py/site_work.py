@@ -513,7 +513,7 @@ def completed_and_required_area(self,event):
     job_worker=self.job_worker
     if job_worker:
         for i in job_worker:
-            if(i.other_work !=0):
+            if(i.other_work ==0):
                 completed_area+=i.sqft_allocated or 0
                 total_comp_bundle +=i.completed_bundle or 0
     self.total_required_area=total_area
