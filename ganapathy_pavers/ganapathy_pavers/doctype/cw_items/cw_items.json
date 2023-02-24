@@ -75,7 +75,7 @@
   {
    "columns": 2,
    "fieldname": "no_of_batches",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "No. Of Batches",
    "mandatory_depends_on": "eval: parent.type==\"Post\"",
@@ -107,7 +107,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-02-14 19:07:09.580245",
+ "modified": "2023-02-24 14:18:48.319873",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Items",
