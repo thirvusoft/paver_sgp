@@ -15,7 +15,7 @@ def update_customer(self,event):
 
 def einvoice_validation(self,event):
     accounting=frappe.get_value("Branch",self.branch,"is_accounting")
-    if(accounting==1 and not self.get('service_bill')):
+    if(accounting==1 and not self.get('service_bill') and frappe.db.get_single_value("E Invoice Settings", "enable")):
         if(not self.transporter and not self.vehicle_no and not self.mode_of_transport):
             frappe.throw("Enter the Transport Details")
 
