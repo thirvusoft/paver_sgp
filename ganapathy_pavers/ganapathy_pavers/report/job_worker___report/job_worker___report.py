@@ -111,7 +111,8 @@ def execute(filters=None):
                 total[10] = adv
                 amount=sum((data[i][9] or 0) for i in range(start,i+1))
                 salary_bal=sum((data[i][8] or 0) for i in range(start,i+1))
-                total[11] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
+                total_amt=round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
+                total[11] = total_amt if(total_amt and total_amt>0) else 0.0
                 total[12]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
                 final_data[-1][8]=None
                 final_data.append(total)
@@ -143,7 +144,8 @@ def execute(filters=None):
         total[10] = adv
         amount=sum((data[i][9] or 0) for i in range(start,len(data)))
         salary_bal=sum((data[i][8] or 0) for i in range(start,len(data)))
-        total[11] = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
+        total_amt = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
+        total[11] = total_amt if (total_amt and total_amt > 0) else 0.0
         total[12]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
         final_data[-1][8]=None
         final_data.append(total)
