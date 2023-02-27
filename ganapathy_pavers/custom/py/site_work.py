@@ -260,9 +260,10 @@ def update_delivery_detail(self, event):
     item_details = self.item_details + self.item_details_compound_wall
     to_delivered_qty = {}
     for row in item_details:
-        if(row.item not in to_delivered_qty):
-            to_delivered_qty[row.item] = 0
-        to_delivered_qty[row.item] += row.stock_qty
+        if row.work!="Supply Only":
+            if(row.item not in to_delivered_qty):
+                to_delivered_qty[row.item] = 0
+            to_delivered_qty[row.item] += row.stock_qty
 
     for items in to_delivered_qty:
         catch = 0

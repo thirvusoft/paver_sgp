@@ -32,7 +32,7 @@ def create_site(doc):
         for row in (doc['items'] or []):
             if(row.get("work")!="Supply Only"):
                 create=True
-        if(doc.get('work')!="Supply Only" and create):
+        if(create):
             supervisor=doc.get('supervisor_name') if('supervisor_name' in doc) else ''
             pavers=[]
             compoun_walls=[]
@@ -72,7 +72,9 @@ def create_site(doc):
                     'amount':row['amount'],
                     'sales_order':doc['name'],
                     'stock_qty': row['stock_qty'],
-                    'stock_uom': row['stock_uom']
+                    'stock_uom': row['stock_uom'],
+                    'customer_scope': doc.get("customer_scope"),
+                    'rate_inclusive': doc.get("rate_inclusive") if not doc.get("customer_scope") else 0
                     } for row in doc['items'] if(row['item_group']=='Raw Material')]
             site_work=frappe.get_doc('Project',doc['site_work'])
             total_area=0
@@ -122,7 +124,7 @@ def update_site(doc, event):
         for row in (doc.items or []):
             if(row.get("work")!="Supply Only"):
                 create=True
-        if(doc.get('work')!="Supply Only" and create):
+        if(create):
             supervisor=doc.get('supervisor_name') or ''
             pavers=[]
             compoun_walls=[]
@@ -162,7 +164,9 @@ def update_site(doc, event):
                     'amount':row.amount,
                     'sales_order':doc.name,
                     'stock_qty': row.stock_qty,
-                    'stock_uom': row.stock_uom
+                    'stock_uom': row.stock_uom,
+                    'customer_scope': doc.get("customer_scope"),
+                    'rate_inclusive': doc.get("rate_inclusive") if not doc.get("customer_scope") else 0
                     } for row in doc.items if(row.item_group=='Raw Material')]
             site_work=frappe.get_doc('Project',doc.site_work)
             total_area=0
@@ -277,12 +281,23 @@ def remove_project_fields(self,event):
         new_paver=[]
         new_cw=[]
         new_rm=[]
+        delivery_detail=doc.delivery_detail
         for item in paver:
             if(item.sales_order!=self.name):
                 new_paver.append(item)
+            else:
+                for row in delivery_detail:
+                    if item.work!="Supply Only" and row.item == item.item:
+                        row.qty_to_deliver -= item.stock_qty
+                        row.pending_qty__to_deliver -= item.stock_qty
         for item in cw:
             if(item.sales_order!=self.name):
                 new_cw.append(item)
+            else:
+                for row in delivery_detail:
+                    if item.work!="Supply Only" and row.item == item.item:
+                        row.qty_to_deliver -= item.stock_qty
+                        row.pending_qty__to_deliver -= item.stock_qty
         for item in raw_material:
             if(item.sales_order!=self.name):
                 new_rm.append(item)
@@ -307,10 +322,10 @@ def remove_project_fields(self,event):
             'raw_material':new_rm,
             'total_required_area': total_area,
             'total_completed_area': completed_area,
-            'completed': percent
+            'completed': percent,
+            'delivery_detail': delivery_detail,
         })
         doc.save()
-        frappe.db.commit()
         
 
     

@@ -47,15 +47,16 @@ def execute(filters=None):
 				SELECT 
 					GROUP_CONCAT(
 					IF(
-						parent='{sw.name}'
-						, item
+						pav_cw.parent='{sw.name}'
+						, pav_cw.item
 						, NULL
 					) 
 					SEPARATOR ', '
 					) 
-				FROM `{table_name}`
+				FROM `{table_name}` pav_cw
+				WHERE pav_cw.work != "Supply Only"
 				) as design,
-				(SELECT sum(ps.{field_name}) FROM `{table_name}` as ps WHERE ps.parent='{sw.name}') as po_qty,
+				(SELECT sum(ps.{field_name}) FROM `{table_name}` as ps WHERE ps.parent='{sw.name}' AND ps.work != "Supply Only") as po_qty,
 				(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as total_delivery,
 				(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}) as total_laying,
 				(
@@ -66,7 +67,7 @@ def execute(filters=None):
 			WHERE sw.name='{sw.name}'
 			{working_status}
 		""", as_dict=1)
-		print(site_data)
+
 		raw_material=frappe.db.sql(f"""
 			SELECT 
 				rw.item as raw_material
@@ -74,6 +75,8 @@ def execute(filters=None):
 				, (rw.delivered_quantity + rw.returned_quantity) as raw_material_delivered 
 			FROM `tabRaw Materials` as rw 
 			WHERE rw.parent='{sw.name}'
+			AND rw.customer_scope = {filters.get("customer_scope", 0)} 
+			AND rw.rate_inclusive = {filters.get("rate_inclusive", 0)}
 		""", as_dict=1)
 
 		if raw_material and site_data:
