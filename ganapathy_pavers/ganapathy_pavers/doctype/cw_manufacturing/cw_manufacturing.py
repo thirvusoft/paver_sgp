@@ -30,11 +30,11 @@ class CWManufacturing(Document):
             elif(type1[0] == "Slab"):
                 doc.total_no_of_batche = len(doc.raw_material_consumption)
 
-            for row in doc.item_details:
-                if(row.get('item')):
-                    cw_type = frappe.get_value("Item", row.get('item'), 'compound_wall_type')
-                    if(cw_type and cw_type=="Post" and not row.get("no_of_batches")):
-                        frappe.throw(f"""Please enter <b>No of Batches</b> for an Item <b>{row.get('item')}</b>""")
+            # for row in doc.item_details:
+            #     if(row.get('item')):
+            #         cw_type = frappe.get_value("Item", row.get('item'), 'compound_wall_type')
+            #         if(cw_type and cw_type=="Post" and not row.get("no_of_batches")):
+            #             frappe.throw(f"""Please enter <b>No of Batches</b> for an Item <b>{row.get('item')}</b>""")
 
         doc.abstractcalc()
     
@@ -447,7 +447,7 @@ def add_item(doc, batches = 1):
         else:
             type1 = type1[0]
         for k in doc:
-            no_of_batches = (k.get('no_of_batches') or 0) if(type1 == 'Post') else float(batches)/item_table_len
+            no_of_batches = float(batches)/item_table_len
             if(k.get('bom')):
                 bom_doc = frappe.get_doc("BOM",k.get('bom'))
                 fields = ['item_code','qty', 'uom', 'stock_uom', 'rate', 'amount', 'source_warehouse']

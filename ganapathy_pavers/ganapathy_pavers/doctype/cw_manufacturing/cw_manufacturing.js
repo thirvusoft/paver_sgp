@@ -552,9 +552,9 @@ frappe.ui.form.on("CW Items", {
     produced_qty: function (frm, cdt, cdn) {
         total_qty(frm, frm.doc.item_details);
     },
-    no_of_batches: function (frm, cdt, cdn) {
-        total_qty(frm, frm.doc.item_details);
-    },
+    // no_of_batches: function (frm, cdt, cdn) {
+    //     total_qty(frm, frm.doc.item_details);
+    // },
     production_sqft: function (frm, cdt, cdn) {
         total_qty(frm, frm.doc.item_details);
     },
@@ -563,20 +563,20 @@ async function total_qty(frm, table_name) {
     var total_production_qty = 0;
     var total_dam_qty = 0;
     var total_produced_qty = 0;
-    var total_no_of_batche = 0;
+    // var total_no_of_batche = 0;
     var total_production_sqft = 0;
     var ts_production_sqft = 0;
     for (var i = 0; i < table_name.length; i++) {
         total_production_qty += table_name[i].production_qty ? table_name[i].production_qty : 0;
         total_dam_qty += table_name[i].damaged_qty ? table_name[i].damaged_qty : 0;
         total_produced_qty += table_name[i].produced_qty ? table_name[i].produced_qty : 0;
-        table_name[i].item
-            ? await frappe.db.get_value("Item", table_name[i].item, "compound_wall_type").then((value) => {
-                if (value.message.compound_wall_type == "Post") {
-                    total_no_of_batche += table_name[i].no_of_batches ? table_name[i].no_of_batches : 0;
-                }
-            })
-            : "";
+        // table_name[i].item
+        //     ? await frappe.db.get_value("Item", table_name[i].item, "compound_wall_type").then((value) => {
+        //         if (value.message.compound_wall_type == "Post") {
+        //             total_no_of_batche += table_name[i].no_of_batches ? table_name[i].no_of_batches : 0;
+        //         }
+        //     })
+        //     : "";
         total_production_sqft += table_name[i].production_sqft ? table_name[i].production_sqft : 0;
         ts_production_sqft += table_name[i].ts_production_sqft ? table_name[i].ts_production_sqft : 0;
     }
@@ -585,9 +585,9 @@ async function total_qty(frm, table_name) {
     frm.set_value("damaged_qty", total_dam_qty);
     frm.set_value("production_sqft", total_production_sqft);
     frm.set_value("ts_production_sqft", ts_production_sqft);
-    if (total_no_of_batche) {
-        frm.set_value("total_no_of_batche", total_no_of_batche);
-    }
+    // if (total_no_of_batche) {
+    //     frm.set_value("total_no_of_batche", total_no_of_batche);
+    // }
 }
 
 function default_value(frm, usb_field, set_field) {

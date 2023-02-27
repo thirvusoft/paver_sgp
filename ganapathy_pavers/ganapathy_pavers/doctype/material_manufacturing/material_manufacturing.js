@@ -467,7 +467,7 @@ function std_item(frm) {
 				}
 				for (const d of r.message['items']) {
 					for (const i of frm.doc.items ? frm.doc.items : []) {
-						if (i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type == i.layer_type && item1.includes('item_code:' + (d.item_code ? d.item_code : '') + 'layer_type:' + (d.layer_type ? d.layer_type : ''))) {
+						if (i.item_code == d.item_code && d.layer_type == i.layer_type && item1.includes('item_code:' + (d.item_code ? d.item_code : '') + 'layer_type:' + (d.layer_type ? d.layer_type : ''))) {
 							item1.splice(item1.indexOf('item_code:' + (d.item_code ? d.item_code : '') + 'layer_type:' + (d.layer_type ? d.layer_type : '')), 1)
 						}
 					}
@@ -516,7 +516,7 @@ function std_item(frm) {
 						}
 						for (const d of r.message) {
 							for (const i of frm.doc.items ? frm.doc.items : []) {
-								if (i.item_code == d.item_code && d.source_warehouse == i.source_warehouse && d.layer_type == i.layer_type && item1.includes('item_code:' + (d.item_code ? d.item_code : '') + 'layer_type:' + (d.layer_type ? d.layer_type : ''))) {
+								if (i.item_code == d.item_code && d.layer_type == i.layer_type && item1.includes('item_code:' + (d.item_code ? d.item_code : '') + 'layer_type:' + (d.layer_type ? d.layer_type : ''))) {
 									item1.splice(item1.indexOf('item_code:' + (d.item_code ? d.item_code : '') + 'layer_type:' + (d.layer_type ? d.layer_type : '')), 1)
 								}
 							}
