@@ -69,9 +69,20 @@ frappe.query_reports["Delivery Report"] = {
 		{
 			"fieldname":"sw_status",
 			"label": __("Site Work Status to don't fetch"),
-			"fieldtype": "Select",
-			"options": "\nOpen\nCompleted\nCancelled\nStock Pending at Site\nRework",
-			"default": "Completed"
+			"fieldtype": "MultiSelectList",
+			"options": "\nOpen\nCompleted\nTo Bill\nBilled\nCancelled\nStock Pending at Site\nRework",
+			"default": "Billed",
+			"get_data": function () {
+				return [
+					{value: "Open", description: ''},
+					{value: "Completed", description: ''},
+					{value: "To Bill", description: ''},
+					{value: "Billed", description: ''},
+					{value: "Cancelled", description: ''},
+					{value: "Stock Pending at Site", description: ''},
+					{value: "Rework", description: ''},
+				]
+			}
 		},
 		{
 			"fieldname":"type",

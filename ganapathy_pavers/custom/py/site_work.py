@@ -92,7 +92,7 @@ def create_status():
         "doc_type":"Project",
         "field_name":"status",
         "property":"options",
-        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site\nRework"
+        "value":"\nOpen\nCompleted\nTo Bill\nBilled\nCancelled\nStock Pending at Site\nRework"
     })
     doc.save()
     frappe.db.commit()
@@ -246,12 +246,12 @@ def update_status(doc, events):
     doc.reload()
 
 def validate_status(self,event):
-    if (self.previous_state == "Completed" and self.status != "Rework"):
-        frappe.throw("Completed Site Work cannot be updated.")
+    if (self.previous_state == "Billed" and self.status != "Rework"):
+        frappe.throw("Billed Site Work cannot be updated.")
 
 def rework_count(self,event):
     a = frappe.get_value("Project", self.name, 'status')
-    if (a =="Completed" and self.status =="Rework"):
+    if (a =="Billed" and self.status =="Rework"):
         self.total_rework = self.total_rework + 1
     else:
         pass

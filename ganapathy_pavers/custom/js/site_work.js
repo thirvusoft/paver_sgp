@@ -24,7 +24,7 @@ frappe.ui.form.on("Project",{
 		validate=true;
 	},
 	validate: function(frm){
-		if (validate && frm.doc.status=="Completed" && frm.doc.previous_state!="Completed")
+		if (validate && ["Billed", "Completed"].includes(frm.doc.status) && frm.doc.previous_state!="Billed")
 		{frappe.validated=false;
 		frappe.confirm('Are you sure you want to complete this site?',
     	function(){
@@ -40,7 +40,7 @@ frappe.ui.form.on("Project",{
         setquery(frm,cdt,cdn)
     }, 
     refresh: async function(frm,cdt,cdn){
-		if (frm.doc.status == "Completed") {
+		if (["Billed", "Completed"].includes(frm.doc.status)) {
 			frm.add_custom_button("Update Site Completion Date",  function() {
 				let d = new frappe.ui.Dialog({
 					title: "Update Site Completion Date",
