@@ -160,30 +160,31 @@ def validate(self,event):
         })
 
 def validate_jw_qty(self):
-    bundle_uom="Bdl"
-    sqf_uom="SQF"
-    delivered_item={}
-    for row in self.delivery_detail:
-        if(row.item not  in delivered_item):
-            delivered_item[row.item]=0
-        bundle_qty=uom_conversion(item=row.item, from_qty=row.delivered_stock_qty+row.returned_stock_qty, to_uom=bundle_uom)
-        delivered_item[row.item]+=round(bundle_qty)
-    jw_items={}
-    for row in self.job_worker:
-        if(row.item and not row.other_work):
-            if(row.item not  in jw_items):
-                jw_items[row.item]=0
-            
-            bundle_qty=uom_conversion(item=row.item, from_uom=sqf_uom, from_qty=row.sqft_allocated, to_uom=bundle_uom)
-            jw_items[row.item]+=round(bundle_qty)
-            
-    wrong_items=[]
-    for item in jw_items:
-        if((jw_items.get(item) or 0)>math.ceil(delivered_item.get(item) or 0)):
-            wrong_items.append({"item_code": item, "entered":jw_items.get(item), "delivered": math.ceil(delivered_item.get(item) or 0)})
-    if(wrong_items):
-        message="<ul>"+''.join([f"""<li><a href="/app/item/{item.get('item_code', '')}"><b>{item.get("item_code", "")}</b></a><div style="display: flex; width: 100%;"><div style="width: 50%;">Delivered Qty: {item.get("delivered", 0)}</div><div style="width: 50%;">Entered Qty: {item.get("entered", 0)}</div></div></li>""" for item in wrong_items])+"</ul>"
-        frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+ message)
+    if(self.type == "Pavers"):
+        bundle_uom="Bdl"
+        sqf_uom="SQF"
+        delivered_item={}
+        for row in self.delivery_detail:
+            if(row.item not  in delivered_item):
+                delivered_item[row.item]=0
+            bundle_qty=uom_conversion(item=row.item, from_qty=row.delivered_stock_qty+row.returned_stock_qty, to_uom=bundle_uom)
+            delivered_item[row.item]+=round(bundle_qty)
+        jw_items={}
+        for row in self.job_worker:
+            if(row.item and not row.other_work):
+                if(row.item not  in jw_items):
+                    jw_items[row.item]=0
+                
+                bundle_qty=uom_conversion(item=row.item, from_uom=sqf_uom, from_qty=row.sqft_allocated, to_uom=bundle_uom)
+                jw_items[row.item]+=round(bundle_qty)
+                
+        wrong_items=[]
+        for item in jw_items:
+            if((jw_items.get(item) or 0)>math.ceil(delivered_item.get(item) or 0)):
+                wrong_items.append({"item_code": item, "entered":jw_items.get(item), "delivered": math.ceil(delivered_item.get(item) or 0)})
+        if(wrong_items):
+            message="<ul>"+''.join([f"""<li><a href="/app/item/{item.get('item_code', '')}"><b>{item.get("item_code", "")}</b></a><div style="display: flex; width: 100%;"><div style="width: 50%;">Delivered Qty: {item.get("delivered", 0)}</div><div style="width: 50%;">Entered Qty: {item.get("entered", 0)}</div></div></li>""" for item in wrong_items])+"</ul>"
+            frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+ message)
 
     if(self.type == "Compound Wall"):
         delivered_qty = 0
@@ -196,8 +197,16 @@ def validate_jw_qty(self):
             if((not row.item) or row.item_group == "Compound Walls"):
                 completed_qty += float(row.sqft_allocated or 0)
 
-        if(completed_qty > math.ceil(delivered_qty)):
-            frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty.")
+        if(completed_qty > (math.ceil(delivered_qty) - (self.earth_foundation_sqft or 0))):
+            frappe.throw(f"""Job Worker completed qty cannot be greater than Delivered Qty.
+                <div>
+                    <ul>
+                        <li>Delivered Qty - <b>{math.ceil(delivered_qty)}</b></li>
+                        <li>Earth Foundation - <b>{(self.earth_foundation_sqft or 0)}</b></li>
+                        <li>Job Worker Qty - <b>{completed_qty}</b></li> 
+                    </ul>
+                </div>
+            """)
 
 def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, exchange_rate):
     doc=frappe.new_doc('Employee Advance')
