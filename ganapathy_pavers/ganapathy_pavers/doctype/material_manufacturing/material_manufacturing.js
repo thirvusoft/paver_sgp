@@ -162,19 +162,19 @@ frappe.ui.form.on('Material Manufacturing', {
 				cur_frm.set_value('total_rack_shift_expense', frm.doc.labour_cost_in_rack_shift + frm.doc.operators_cost_in_rack_shift);
 				cur_frm.set_value('rack_shifting_total_expense1', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost);
 			}
-			frappe.call({
-				method: "ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.find_batch",
-				args: {
-					name: frm.doc.name,
-				},
-				callback(r) {
-					if (r.message) {
-						cur_frm.set_value('batch_no_manufacture', r.message[0]);
-						cur_frm.set_value('batch_no_rack_shifting', r.message[1]);
-						cur_frm.set_value('batch_no_curing', r.message[2]);
-					}
-				}
-			})
+			// frappe.call({
+			// 	method: "ganapathy_pavers.ganapathy_pavers.doctype.material_manufacturing.material_manufacturing.find_batch",
+			// 	args: {
+			// 		name: frm.doc.name,
+			// 	},
+			// 	callback(r) {
+			// 		if (r.message) {
+			// 			cur_frm.set_value('batch_no_manufacture', r.message[0]);
+			// 			cur_frm.set_value('batch_no_rack_shifting', r.message[1]);
+			// 			cur_frm.set_value('batch_no_curing', r.message[2]);
+			// 		}
+			// 	}
+			// })
 
 		}
 	},
@@ -396,12 +396,9 @@ function make_stock_entry(frm, type1) {
 			doc: frm.doc,
 			type1: type1
 		},
-		callback: function (r) {
-			if (r.message) {
-				cur_frm.set_value("status1", r.message);
-			}
+		callback: async function (r) {
+			await cur_frm.reload_doc()
 			cur_frm.save()
-
 		}
 	})
 }

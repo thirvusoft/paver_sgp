@@ -7,6 +7,9 @@ import datetime
 from frappe.model.document import Document
 
 class CWManufacturing(Document):
+    def on_update(self):
+        find_batch(self)
+
     def before_submit(doc):
         manufacture = frappe.get_all("Stock Entry",filters={"cw_usb":doc.get("name"),"stock_entry_type":"Manufacture"},pluck="name")
         repack = frappe.get_all("Stock Entry",filters={"cw_usb":doc.get("name"),"stock_entry_type":"Repack"},pluck="name")
@@ -75,6 +78,10 @@ def throw_error(field, doctype = "Cw Settings"):
 @frappe.whitelist()
 def make_stock_entry_for_molding(doc):
     doc = json.loads(doc)
+    cw_doc = frappe.get_doc("CW Manufacturing", doc.get("name"))
+    find_batch(cw_doc)
+    cw_doc.reload()
+    doc=cw_doc
     if(not doc.get('molding_date')):
         frappe.throw("Please Enter Manufacturing Date")
     valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
@@ -122,9 +129,9 @@ def make_stock_entry_for_molding(doc):
         if (doc.get("items")):
             for i in doc.get("items"):
                 stock_entry.append('items', dict(
-                    s_warehouse=(i.get("source_warehouse") or source_warehouse), item_code=i["item_code"], qty=i["qty"]*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), uom=i["uom"],
-                    basic_rate=i['rate'],
-                        basic_rate_hidden=i['rate'],
+                    s_warehouse=(i.get("source_warehouse") or source_warehouse), item_code=i.get("item_code"), qty=i.get("qty")*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), uom=i.get("uom"),
+                    basic_rate=i.get('rate'),
+                        basic_rate_hidden=i.get('rate'),
                     
                 ))
         else:
@@ -150,12 +157,22 @@ def make_stock_entry_for_molding(doc):
         stock_entry.save()
         stock_entry.submit()
         stock_entries.append(stock_entry.name)
+    cw_doc = frappe.get_doc("CW Manufacturing", doc.get("name"))
+    find_batch(cw_doc)
+    cw_doc.reload()
+    cw_doc.status1 = "Unmolding"
+    cw_doc.total_production_sqft = cw_doc.production_sqft or 0
+    cw_doc.save()
     frappe.msgprint("New Stock Entry Created: <ul>" + frappe.bold(''.join(["<li>"+frappe.utils.csvutils.getlink('Stock Entry', i)+"</li>" for i in stock_entries]))+ "</ul>")
     return "Unmolding"
 
 @frappe.whitelist()
 def make_stock_entry_for_bundling(doc):
     doc = json.loads(doc)
+    cw_doc = frappe.get_doc("CW Manufacturing", doc.get("name"))
+    find_batch(cw_doc)
+    cw_doc.reload()
+    doc=cw_doc
     valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
             "name"), "stock_entry_type": "Manufacture", "docstatus": ["!=", 2]}, pluck="name")
         
@@ -218,6 +235,12 @@ def make_stock_entry_for_bundling(doc):
         stock_entry.save()
         stock_entry.submit()
         stock_entries.append(stock_entry.name)
+    cw_doc = frappe.get_doc("CW Manufacturing", doc.get("name"))
+    find_batch(cw_doc)
+    cw_doc.reload()
+    cw_doc.status1 = "Curing"
+    cw_doc.bundled_sqft_curing = cw_doc.total_production_sqft or 0
+    cw_doc.save()
     frappe.msgprint("New Stock Entry Created: <ul>" + frappe.bold(''.join(["<li>"+frappe.utils.csvutils.getlink('Stock Entry', i)+"</li>" for i in stock_entries]))+ "</ul>")
     return "Curing"
 
@@ -225,6 +248,10 @@ def make_stock_entry_for_bundling(doc):
 @frappe.whitelist()
 def make_stock_entry_for_curing(doc):
     doc = json.loads(doc)
+    cw_doc = frappe.get_doc("CW Manufacturing", doc.get("name"))
+    find_batch(cw_doc)
+    cw_doc.reload()
+    doc=cw_doc
     valid = frappe.get_all("Stock Entry", filters={"cw_usb": doc.get(
             "name"), "stock_entry_type": "Repack", "docstatus": ["!=", 2]}, pluck="name")
         
@@ -274,6 +301,11 @@ def make_stock_entry_for_curing(doc):
         stock_entry.save()
         stock_entry.submit()
         stock_entries.append(stock_entry.name)
+    cw_doc = frappe.get_doc("CW Manufacturing", doc.get("name"))
+    find_batch(cw_doc)
+    cw_doc.reload()
+    cw_doc.status1 = "Completed"
+    cw_doc.save()
     frappe.msgprint("New Stock Entry Created: <ul>" + frappe.bold(''.join(["<li>"+frappe.utils.csvutils.getlink('Stock Entry', i)+"</li>" for i in stock_entries]))+ "</ul>")
     return "Completed"
 
@@ -307,9 +339,9 @@ def std_item(doc):
         row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
             "Item", bin.get('item_code'), ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])        
         row['qty']=bin.get('total_qty')
-        row['validation_rate'] = get_valuation_rate(row['item_code'])
-        row['amount'] = row['qty'] * (row['rate'] or row['validation_rate'])
-        items[row['item_code']] = row
+        row['validation_rate'] = get_valuation_rate(row.get('item_code'))
+        row['amount'] = row.get('qty') * (row.get('rate') or row.get('validation_rate'))
+        items[row.get('item_code')] = row
 
     bom_list = []
     for row in doc.get('item_details') or  []:
@@ -338,12 +370,12 @@ def std_item(doc):
 
 
 @frappe.whitelist()
-def find_batch(name):
+def find_batch(self):
     manufacture_batch_list = []
     unmolding_batch_list = []
     curing_batch_list = []
-    if name:
-        stock = frappe.get_all("Stock Entry",filters={"cw_usb":name,"docstatus":1},fields=['name','stock_entry_type'])
+    if self.name:
+        stock = frappe.get_all("Stock Entry",filters={"cw_usb":self.name,"docstatus":1},fields=['name','stock_entry_type'])
         for i in stock:
             if i.stock_entry_type == "Manufacture":
                 batch = frappe.get_doc("Stock Entry",i.name)
@@ -361,7 +393,13 @@ def find_batch(name):
                 for j in batch.items:
                     if j.t_warehouse and j.s_warehouse:
                         curing_batch_list.append({'item_code': j.item_code, 'batch': j.batch_no, 'qty': j.qty, 'uom': j.uom})
-    return manufacture_batch_list, unmolding_batch_list, curing_batch_list
+    self.update({
+    "cw_manufacturing_batch_details": manufacture_batch_list,
+    "cw_unmolding_batch_details": unmolding_batch_list,
+    "cw_curing_batch_details": curing_batch_list,
+    })
+    self.run_method = lambda *args, **kwargs: 0
+    self.save()
 
 @frappe.whitelist()
 def uom_conversion(item, from_uom='', from_qty=0, to_uom=''):

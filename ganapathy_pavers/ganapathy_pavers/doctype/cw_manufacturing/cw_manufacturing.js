@@ -92,19 +92,19 @@ frappe.ui.form.on("CW Manufacturing", {
     before_save: async function (frm) {
         await frm.trigger("ts_before_save").then(async (ret) => {
             no_of_batches_count(frm);
-            if (!frm.is_new()) {
-                await frappe.call({
-                    method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.find_batch",
-                    args: {
-                        name: frm.doc.name,
-                    },
-                    callback: function (r) {
-                        frm.set_value("cw_manufacturing_batch_details", r.message[0]);
-                        frm.set_value("cw_unmolding_batch_details", r.message[1]);
-                        frm.set_value("cw_curing_batch_details", r.message[2]);
-                    },
-                });
-            }
+            // if (!frm.is_new()) {
+            //     await frappe.call({
+            //         method: "ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing.find_batch",
+            //         args: {
+            //             name: frm.doc.name,
+            //         },
+            //         callback: function (r) {
+            //             frm.set_value("cw_manufacturing_batch_details", r.message[0]);
+            //             frm.set_value("cw_unmolding_batch_details", r.message[1]);
+            //             frm.set_value("cw_curing_batch_details", r.message[2]);
+            //         },
+            //     });
+            // }
         });
     },
     labour_salary_per_hrs: function (frm) {
@@ -206,8 +206,7 @@ frappe.ui.form.on("CW Manufacturing", {
                 },
                 callback: async function (r) {
                     if (r.message) {
-                        frm.set_value("status1", r.message);
-                        frm.set_value("total_production_sqft", frm.doc.production_sqft ? frm.doc.production_sqft : 0);
+                        await frm.reload_doc()
                         frm.save();
                     }
                 },
@@ -228,8 +227,7 @@ frappe.ui.form.on("CW Manufacturing", {
                 },
                 callback: async function (r) {
                     if (r.message) {
-                        frm.set_value("status1", r.message);
-                        frm.set_value("bundled_sqft_curing", frm.doc.total_production_sqft ? frm.doc.total_production_sqft : 0);
+                        await frm.reload_doc()
                         frm.save();
                     }
                 },
@@ -250,7 +248,7 @@ frappe.ui.form.on("CW Manufacturing", {
                 },
                 callback: async function (r) {
                     if (r.message) {
-                        frm.set_value("status1", r.message);
+                        await frm.reload_doc()
                         frm.save();
                     }
                 },

@@ -11,6 +11,9 @@ from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing
 from frappe.utils.data import time_diff_in_hours
 
 class MaterialManufacturing(Document):
+    def on_update(self):
+        find_batch(self)
+      
     def validate(doc):
         doc.get_bin_items()
         for row in doc.items:
@@ -156,6 +159,10 @@ def item_data(item_code):
 @frappe.whitelist()
 def make_stock_entry(doc,type1):
    doc=json.loads(doc)
+   pm_doc = frappe.get_doc("Material Manufacturing", doc.get("name"))
+   find_batch(pm_doc)
+   pm_doc.reload()
+   doc = pm_doc
    if(doc.get("item_to_manufacture")):
        if(not frappe.get_value('Item', doc.get("item_to_manufacture"), 'has_batch_no')):
            frappe.throw(f'Please choose {frappe.bold("Has Batch No")} for an item {doc.get("item_to_manufacture")}')
@@ -182,9 +189,9 @@ def make_stock_entry(doc,type1):
        if(doc.get("items")):
            for i in doc.get("items"):
                stock_entry.append('items', dict(
-               s_warehouse = i.get("source_warehouse") or doc.get("source_warehouse"), item_code = i["item_code"],qty = i["qty"], uom = i["uom"],
-               basic_rate_hidden = i["rate"],
-               basic_rate = i["rate"]
+               s_warehouse = i.get("source_warehouse") or doc.get("source_warehouse"), item_code = i.get("item_code"),qty = i.get("qty"), uom = i.get("uom"),
+               basic_rate_hidden = i.get("rate"),
+               basic_rate = i.get("rate")
                ))
        else:
            frappe.throw("Kindly Save this Form")
@@ -285,17 +292,26 @@ def make_stock_entry(doc,type1):
        stock_entry.save()
        stock_entry.submit()
        frappe.msgprint("New Stock Entry Created "+stock_entry.name)
+      
+   pm_doc = frappe.get_doc("Material Manufacturing", doc.get("name"))
+   find_batch(pm_doc)
+   pm_doc.reload()
+   status = pm_doc.status1
+   
    if doc.get("status1") == "Manufacture":
-       return "Rack Shifting"
+       status = "Rack Shifting"
    elif doc.get("status1") == "Rack Shifting":
-       return "Curing"
+       status = "Curing"
    elif doc.get("status1") == "Curing":
        if doc.get("is_shot_blasting") ==1:
-           return "Shot Blast"
+           status = "Shot Blast"
        else:
-           return "Completed"
+           status = "Completed"
    elif doc.get("status1") == "Shot Blast":
-       return "Completed"
+       status = "Completed"
+   pm_doc.status1 = status
+   pm_doc.save()
+   return status
 
 def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
    emp_batch=[]
@@ -330,12 +346,12 @@ def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
    return 0,[],0
 
 @frappe.whitelist()
-def find_batch(name):
+def find_batch(self):
    manufacture=""
    repack=""
    transfer=""
-   if name:
-       stock = frappe.get_all("Stock Entry",filters={"usb":name,"docstatus":1},fields=['name','stock_entry_type'])
+   if self.name:
+       stock = frappe.get_all("Stock Entry",filters={"usb":self.name,"docstatus":1},fields=['name','stock_entry_type'])
        for i in stock:
            if i.stock_entry_type == "Manufacture":
                batch = frappe.get_doc("Stock Entry",i.name)
@@ -352,5 +368,12 @@ def find_batch(name):
                for j in batch.items:
                    if j.t_warehouse and j.s_warehouse:
                        transfer=j.batch_no
+   self.update({
+      'batch_no_manufacture': manufacture,
+      'batch_no_rack_shifting': repack,
+      'batch_no_curing': transfer,
+   })
+   self.run_method = lambda *args, **kwargs: 0
+   self.save()
    return manufacture,repack,transfer
 
