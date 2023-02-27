@@ -92,7 +92,7 @@ def create_status():
         "doc_type":"Project",
         "field_name":"status",
         "property":"options",
-        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site\nRework"
+        "value":"\nOpen\nCompleted\nTo Bill\nBilled\nCancelled\nStock Pending at Site\nRework"
     })
     doc.save()
     frappe.db.commit()
@@ -160,30 +160,60 @@ def validate(self,event):
         })
 
 def validate_jw_qty(self):
-    bundle_uom="Bdl"
-    sqf_uom="SQF"
-    delivered_item={}
-    for row in self.delivery_detail:
-        if(row.item not  in delivered_item):
-            delivered_item[row.item]=0
-        bundle_qty=uom_conversion(item=row.item, from_qty=row.delivered_stock_qty+row.returned_stock_qty, to_uom=bundle_uom)
-        delivered_item[row.item]+=round(bundle_qty)
-    jw_items={}
-    for row in self.job_worker:
-        if(row.item and not row.other_work):
-            if(row.item not  in jw_items):
-                jw_items[row.item]=0
-            
-            bundle_qty=uom_conversion(item=row.item, from_uom=sqf_uom, from_qty=row.sqft_allocated, to_uom=bundle_uom)
-            jw_items[row.item]+=round(bundle_qty)
-            
-    wrong_items=[]
-    for item in jw_items:
-        if((jw_items.get(item) or 0)>math.ceil(delivered_item.get(item) or 0)):
-            wrong_items.append({"item_code": item, "entered":jw_items.get(item), "delivered": math.ceil(delivered_item.get(item) or 0)})
-    if(wrong_items):
-        message="<ul>"+''.join([f"""<li><a href="/app/item/{item.get('item_code', '')}"><b>{item.get("item_code", "")}</b></a><div style="display: flex; width: 100%;"><div style="width: 50%;">Delivered Qty: {item.get("delivered", 0)}</div><div style="width: 50%;">Entered Qty: {item.get("entered", 0)}</div></div></li>""" for item in wrong_items])+"</ul>"
-        frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+ message)
+    if(self.type == "Pavers"):
+        bundle_uom="Bdl"
+        sqf_uom="SQF"
+        delivered_item={}
+        warning_delivered_item={}
+        for row in self.delivery_detail:
+            if(row.item not  in delivered_item):
+                delivered_item[row.item]=0
+                warning_delivered_item[row.item]=0
+            bundle_qty=uom_conversion(item=row.item, from_qty=row.delivered_stock_qty+row.returned_stock_qty, to_uom=bundle_uom)
+            delivered_item[row.item]+=round(bundle_qty)
+            warning_delivered_item[row.item]+=round(row.delivered_stock_qty+row.returned_stock_qty)
+        jw_items={}
+        warning_jw_items={}
+        for row in self.job_worker:
+            if(row.item and not row.other_work):
+                if(row.item not  in jw_items):
+                    jw_items[row.item]=0
+                    warning_jw_items[row.item]=0
+                
+                bundle_qty=uom_conversion(item=row.item, from_uom=sqf_uom, from_qty=row.sqft_allocated, to_uom=bundle_uom)
+                jw_items[row.item]+=round(bundle_qty)
+                warning_jw_items[row.item]+=round(row.sqft_allocated)
+                
+        wrong_items=[]
+        warning_items=[]
+        jw_qty = 0
+        del_qty = 0
+        for item in jw_items:
+            jw_qty += (jw_items.get(item) or 0)
+            del_qty += delivered_item.get(item) or 0
+            if((jw_items.get(item) or 0)>math.ceil(delivered_item.get(item) or 0)):
+                wrong_items.append({"item_code": item, "entered":jw_items.get(item), "delivered": (delivered_item.get(item) or 0)})
+            elif((warning_jw_items.get(item) or 0)>(warning_delivered_item.get(item) or 0)):
+                warning_items.append({"item_code": item, "entered":warning_jw_items.get(item), "delivered": (warning_delivered_item.get(item) or 0)})
+
+        if(wrong_items):
+            message="<ul>"+''.join([f"""<li><a href="/app/item/{item.get('item_code', '')}"><b>{item.get("item_code", "")}</b></a><div style="display: flex; width: 100%;"><div style="width: 50%;">Delivered Qty: {item.get("delivered", 0)}</div><div style="width: 50%;">Entered Qty: {item.get("entered", 0)}</div></div></li>""" for item in wrong_items])+"</ul>"
+            frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty for the following items "+ message)
+        
+        if(warning_items):
+            message="<ul>"+''.join([f"""<li><a href="/app/item/{item.get('item_code', '')}"><b>{item.get("item_code", "")}</b></a><div style="display: flex; width: 100%;"><div style="width: 50%;">Delivered Qty: {item.get("delivered", 0)}</div><div style="width: 50%;">Entered Qty: {item.get("entered", 0)}</div></div></li>""" for item in warning_items])+"</ul>"
+            frappe.msgprint(title="Warning", msg="Job Worker completed qty is greater than Delivered Qty for the following items "+ message)
+
+        if jw_qty > (del_qty - (self.returned_scrap_qty or 0)):
+            frappe.throw(f"""Job Worker completed qty cannot be greater than Delivered Qty.
+                <div>
+                    <ul>
+                        <li>Delivered Qty - <b>{del_qty}</b></li>
+                        <li>Returned Scrap Qty - <b>{(self.returned_scrap_qty or 0)}</b></li>
+                        <li>Job Worker Qty - <b>{jw_qty}</b></li> 
+                    </ul>
+                </div>
+            """)
 
     if(self.type == "Compound Wall"):
         delivered_qty = 0
@@ -196,8 +226,17 @@ def validate_jw_qty(self):
             if((not row.item) or row.item_group == "Compound Walls"):
                 completed_qty += float(row.sqft_allocated or 0)
 
-        if(completed_qty > math.ceil(delivered_qty)):
-            frappe.throw("Job Worker completed qty cannot be greater than Delivered Qty.")
+        if(completed_qty > (math.ceil(delivered_qty) - (self.earth_foundation_sqft or 0) - (self.returned_scrap_qty or 0))):
+            frappe.throw(f"""Job Worker completed qty cannot be greater than Delivered Qty.
+                <div>
+                    <ul>
+                        <li>Delivered Qty - <b>{math.ceil(delivered_qty)}</b></li>
+                        <li>Earth Foundation - <b>{(self.earth_foundation_sqft or 0)}</b></li>
+                        <li>Returned Scrap Qty - <b>{(self.returned_scrap_qty or 0)}</b></li>
+                        <li>Job Worker Qty - <b>{completed_qty}</b></li> 
+                    </ul>
+                </div>
+            """)
 
 def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, exchange_rate):
     doc=frappe.new_doc('Employee Advance')
@@ -237,12 +276,12 @@ def update_status(doc, events):
     doc.reload()
 
 def validate_status(self,event):
-    if (self.previous_state == "Completed" and self.status != "Rework"):
-        frappe.throw("Completed Site Work cannot be updated.")
+    if (self.previous_state == "Billed" and self.status != "Rework"):
+        frappe.throw("Billed Site Work cannot be updated.")
 
 def rework_count(self,event):
     a = frappe.get_value("Project", self.name, 'status')
-    if (a =="Completed" and self.status =="Rework"):
+    if (a =="Billed" and self.status =="Rework"):
         self.total_rework = self.total_rework + 1
     else:
         pass
@@ -251,9 +290,10 @@ def update_delivery_detail(self, event):
     item_details = self.item_details + self.item_details_compound_wall
     to_delivered_qty = {}
     for row in item_details:
-        if(row.item not in to_delivered_qty):
-            to_delivered_qty[row.item] = 0
-        to_delivered_qty[row.item] += row.stock_qty
+        if row.work!="Supply Only":
+            if(row.item not in to_delivered_qty):
+                to_delivered_qty[row.item] = 0
+            to_delivered_qty[row.item] += row.stock_qty
 
     for items in to_delivered_qty:
         catch = 0

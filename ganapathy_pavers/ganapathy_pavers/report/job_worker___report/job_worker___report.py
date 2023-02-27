@@ -112,7 +112,7 @@ def execute(filters=None):
                 amount=sum((data[i][9] or 0) for i in range(start,i+1))
                 salary_bal=sum((data[i][8] or 0) for i in range(start,i+1))
                 total_amt=round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
-                total[11] = total_amt if(total_amt and total_amt>0) else 0.0
+                total[11] = total_amt
                 total[12]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
                 final_data[-1][8]=None
                 final_data.append(total)
@@ -145,7 +145,7 @@ def execute(filters=None):
         amount=sum((data[i][9] or 0) for i in range(start,len(data)))
         salary_bal=sum((data[i][8] or 0) for i in range(start,len(data)))
         total_amt = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
-        total[11] = total_amt if (total_amt and total_amt > 0) else 0.0
+        total[11] = total_amt
         total[12]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
         final_data[-1][8]=None
         final_data.append(total)
@@ -158,22 +158,25 @@ def execute(filters=None):
             row[6]=""
             row[7]=""
     columns = get_columns(other_work)
-    return columns, add_total_row(final_data)
+    return columns, add_total_row(final_data, index = 11)
 
-def add_total_row(data):
+def add_total_row(data, index=None):
     res=[]
     if data and data[0]:
         res=[0 for i in range(len(data[0]))]
         for row in data:
             if res and row[2]=="Total":
-                res=add_list(row, res)
+                res=add_list(row, res, index)
         res[0]="Total"
     return data+[res] if res else data
 
-def add_list(a, b):
+def add_list(a, b, index=None):
     ret_list1 = []
     for i in range(len(a)):
         if((isinstance(a[i], int) or isinstance(a[i], float)) and (isinstance(b[i], int) or isinstance(b[i], float))):
+            if (i==index and a[i]<0):
+                ret_list1.append(b[i])
+                continue
             ret_list1.append(a[i] + b[i])
         else:
             ret_list1.append(None)

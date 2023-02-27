@@ -20,7 +20,7 @@ def employee_finder(advance1="", location=""):
 	return employee_names
 
 @frappe.whitelist()
-def create_employee_advance(name,amount,date,payment_type,mode_of_payment,branch, salary_slip=""):
+def create_employee_advance(name,amount,date,payment_type,mode_of_payment,branch, salary_slip="", commit = True):
 		advance_doc=frappe.new_doc('Employee Advance')
 		advance_doc.employee = name
 		advance_doc.advance_amount = amount
@@ -34,7 +34,8 @@ def create_employee_advance(name,amount,date,payment_type,mode_of_payment,branch
 		advance_doc.insert()
 		advance_doc.save()
 		advance_doc.submit()
-		frappe.db.commit()
+		if commit:
+			frappe.db.commit()
 		return advance_doc
 
 @frappe.whitelist()

@@ -265,9 +265,9 @@ frappe.ui.form.on('Sales Order', {
         cur_frm.set_value('total_slab', Math.ceil(cur_frm.doc.post * (cur_frm.doc.height - 2)))
     },
     work: function (frm) {
-        if (frm.doc.work == "Supply Only") {
-            frm.set_value('site_work', '')
-        }
+        // if (frm.doc.work == "Supply Only") {
+        //     frm.set_value('site_work', '')
+        // }
         for (let row = 0; row < (frm.doc.items ? frm.doc.items.length : 0); row++) {
             frappe.model.set_value(frm.doc.items[row].doctype, frm.doc.items[row].name, 'work', frm.doc.work)
         }

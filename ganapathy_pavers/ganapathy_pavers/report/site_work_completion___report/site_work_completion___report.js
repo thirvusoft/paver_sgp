@@ -39,5 +39,11 @@ frappe.query_reports["Site Work Completion - Report"] = {
 			"options": "Job Worker\nSite Name",
 			"default": "Job Worker"
 		},
+		{
+			"fieldname": "show_other_work",
+			"label": __("Show Other Work"),
+			"fieldtype": "Check",
+			"default": 1,
+		},
 	]
 };

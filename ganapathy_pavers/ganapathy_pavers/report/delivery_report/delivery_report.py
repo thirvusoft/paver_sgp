@@ -37,7 +37,7 @@ class PartyLedgerSummaryReport(object):
 		for row in data:
 			if self.filters.get("sw_status") and row.get("project"):
 				try:
-					if (frappe.get_value("Project", row.get("project"), "status") != self.filters.get("sw_status")):
+					if (frappe.get_value("Project", row.get("project"), "status") not in self.filters.get("sw_status")):
 						final_data.append(row)
 				except:
 					pass

@@ -35,7 +35,7 @@ def create_designation():
         "doc_type":"Project",
         "field_name":"status",
         "property":"options",
-        "value":"\nOpen\nCompleted\nCancelled\nStock Pending at Site\nRework"
+        "value":"\nOpen\nCompleted\nTo Bill\nBilled\nCancelled\nStock Pending at Site\nRework"
     })
     doc.save()
     frappe.db.commit()

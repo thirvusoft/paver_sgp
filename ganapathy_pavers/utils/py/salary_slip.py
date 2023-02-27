@@ -157,7 +157,7 @@ def validate_salaryslip(self, event=None):
     validate_salary_slip(self, event)
     validate_contrator_welfare(self, event)
 
-def employee_advance(self, event):
+def employee_advance(self, event=None):
     if self.excess_amount_to_create_advance:
         if not self.branch:
             frappe.throw(f"""Field <b>Branch</b> is required for creating <b>Employee Advance</b> in <a href="/app/salary-slip/{self.name}"><b>{self.name}</b></a>""")
@@ -171,7 +171,20 @@ def employee_advance(self, event):
             , self.advance_payment_mode
             , self.branch
             , salary_slip = self.name
+            , commit = False
             )
+        if self.deduct_advance:
+            adv.reload()
+            adv.update({
+                "deduction_planning": [
+                    {
+                        "date": frappe.utils.add_to_date(self.end_date, days=7),
+                        "amount": self.excess_amount_to_create_advance
+                    }
+                ]
+            })
+            adv.total_planned_deductions = self.excess_amount_to_create_advance
+            adv.save('Update')
 
 
 def set_net_pay(self,event):
