@@ -169,7 +169,7 @@ def validate_jw_qty(self):
             if(row.item not  in delivered_item):
                 delivered_item[row.item]=0
                 warning_delivered_item[row.item]=0
-            bundle_qty=uom_conversion(item=row.item, from_qty=row.delivered_stock_qty+row.returned_stock_qty, to_uom=bundle_uom)
+            bundle_qty=uom_conversion(item=row.item, from_qty=((row.delivered_stock_qty or 0)+(row.returned_stock_qty or 0)), to_uom=bundle_uom)
             delivered_item[row.item]+=round(bundle_qty)
             warning_delivered_item[row.item]+=round(row.delivered_stock_qty+row.returned_stock_qty)
         jw_items={}
