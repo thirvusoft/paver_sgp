@@ -86,6 +86,8 @@ def execute(filters=None):
 			AND rw.customer_scope = {filters.get("customer_scope", 0)} 
 			AND rw.rate_inclusive = {filters.get("rate_inclusive", 0)}
 		""", as_dict=1)
+		if not raw_material and (filters.get("customer_scope", 0) or filters.get("rate_inclusive", 0)):
+			continue
 
 		if raw_material and site_data:
 			for rm_idx in range(0, len(raw_material), 1):

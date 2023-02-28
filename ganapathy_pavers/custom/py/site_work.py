@@ -171,7 +171,7 @@ def validate_jw_qty(self):
                 warning_delivered_item[row.item]=0
             bundle_qty=uom_conversion(item=row.item, from_qty=((row.delivered_stock_qty or 0)+(row.returned_stock_qty or 0)), to_uom=bundle_uom)
             delivered_item[row.item]+=round(bundle_qty)
-            warning_delivered_item[row.item]+=round(row.delivered_stock_qty+row.returned_stock_qty)
+            warning_delivered_item[row.item]+=round((row.delivered_stock_qty or 0)+(row.returned_stock_qty or 0))
         jw_items={}
         warning_jw_items={}
         for row in self.job_worker:
