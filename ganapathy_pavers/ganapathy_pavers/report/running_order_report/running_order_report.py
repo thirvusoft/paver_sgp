@@ -60,10 +60,17 @@ def execute(filters=None):
 				(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as total_delivery,
 				(SELECT sum(ds.delivered_bundle + ds.returned_bundle) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as bundle_delivery,
 				(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}) as total_laying,
+				(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}) as bundle_laying,
 				(
 					(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}')
 					- (SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter})
-				) as paver_stock_site 
+				) as site_stock,
+				(
+					(SELECT sum(ds.delivered_bundle + ds.returned_bundle) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}')
+					- (SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter})
+				) as bundle_site_stock,
+				null as raw_material_fixed,
+				null as raw_material_delivered
 			FROM `tabProject` as sw
 			WHERE sw.name='{sw.name}'
 			{working_status}
@@ -119,13 +126,13 @@ def get_columns():
 			"label": ("Total Delivery"),
 			"fieldtype": "Float",
 			"fieldname": "total_delivery",
-			"width": 150
+			"width": 100
 		},
 		{
-			"label": ("Bundle Delivered"),
+			"label": ("Bndl Del"),
 			"fieldtype": "Float",
 			"fieldname": "bundle_delivery",
-			"width": 150
+			"width": 100
 		},
 		{
 			"label": ("Raw Material"),
@@ -135,26 +142,38 @@ def get_columns():
 		},
 		{
 			"label": ("Fixed Raw Material"),
-			"fieldtype": "Data",
+			"fieldtype": "Float",
 			"fieldname": "raw_material_fixed",
-			"width": 150
+			"width": 100
 		},
 		{
 			"label": ("Delivered Raw Material"),
-			"fieldtype": "Data",
+			"fieldtype": "Float",
 			"fieldname": "raw_material_delivered",
-			"width": 170
+			"width": 100
 		},
 		{
 			"label": ("Total Laying"),
-			"fieldtype": "Data",
+			"fieldtype": "Float",
 			"fieldname": "total_laying",
 			"width": 100
 		},
 		{
-		    "label": ("Paver Stock @Site"),
-		    "fieldtype": "Data",
-		    "fieldname": "paver_stock_site",
+			"label": ("Bndl Laying"),
+			"fieldtype": "Float",
+			"fieldname": "bundle_laying",
+			"width": 100
+		},
+		{
+		    "label": ("Stock @Site"),
+		    "fieldtype": "Float",
+		    "fieldname": "site_stock",
+		    "width": 100
+		},
+		{
+		    "label": ("Bndl Stock @Site"),
+		    "fieldtype": "Float",
+		    "fieldname": "bundle_site_stock",
 		    "width": 100
 		},
 	]
