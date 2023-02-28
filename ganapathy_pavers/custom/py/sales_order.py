@@ -124,10 +124,11 @@ def update_site(doc, event):
         for row in (doc.items or []):
             if(row.get("work")!="Supply Only"):
                 create=True
+        supervisor=doc.get('supervisor_name') or ''
+        pavers=[]
+        compoun_walls=[]
+        raw_material=[]
         if(create):
-            supervisor=doc.get('supervisor_name') or ''
-            pavers=[]
-            compoun_walls=[]
             pavers=[{
                     'item':row.item_code,
                     'required_area':row.qty,
@@ -168,66 +169,66 @@ def update_site(doc, event):
                     'customer_scope': doc.get("customer_scope"),
                     'rate_inclusive': doc.get("rate_inclusive") if not doc.get("customer_scope") else 0
                     } for row in doc.items if(row.item_group=='Raw Material')]
-            site_work=frappe.get_doc('Project',doc.site_work)
-            total_area=0
-            completed_area=0
-            
-            sw_pavers=[]
-            sw_cw=[]
-            sw_rm=[]
-            
-            for item in (site_work.get('item_details') or []):
-                if(item.get('sales_order') != doc.name):
-                    sw_pavers.append(item)
-            for item in (site_work.get('item_details_compound_wall') or []):
-                if(item.get('sales_order') != doc.name):
-                    sw_cw.append(item)
-            for item in (site_work.get('raw_material') or []):
-                if(item.get('sales_order') != doc.name):
-                    sw_rm.append(item)
-            
-            site_work.update({
-                'item_details': sw_pavers,
-                'item_details_compound_wall': sw_cw,
-                'raw_material': sw_rm
-            })
+        site_work=frappe.get_doc('Project',doc.site_work)
+        total_area=0
+        completed_area=0
+        
+        sw_pavers=[]
+        sw_cw=[]
+        sw_rm=[]
+        
+        for item in (site_work.get('item_details') or []):
+            if(item.get('sales_order') != doc.name):
+                sw_pavers.append(item)
+        for item in (site_work.get('item_details_compound_wall') or []):
+            if(item.get('sales_order') != doc.name):
+                sw_cw.append(item)
+        for item in (site_work.get('raw_material') or []):
+            if(item.get('sales_order') != doc.name):
+                sw_rm.append(item)
+        
+        site_work.update({
+            'item_details': sw_pavers,
+            'item_details_compound_wall': sw_cw,
+            'raw_material': sw_rm
+        })
 
-            for item in (site_work.get('item_details') or []):
-                total_area+=item.required_area
-            for item in pavers:
-                total_area+=item['required_area']
-            for item in (site_work.get('item_details_compound_wall') or []):
-                total_area+=item.allocated_ft
-            for item in compoun_walls:
-                total_area+=item['allocated_ft']
-            for item in (site_work.get('job_worker') or []):
-                completed_area+=item.sqft_allocated
-            
+        for item in (site_work.get('item_details') or []):
+            total_area+=item.required_area
+        for item in pavers:
+            total_area+=item['required_area']
+        for item in (site_work.get('item_details_compound_wall') or []):
+            total_area+=item.allocated_ft
+        for item in compoun_walls:
+            total_area+=item['allocated_ft']
+        for item in (site_work.get('job_worker') or []):
+            completed_area+=item.sqft_allocated
+        
+        site_work.update({
+            'is_multi_customer': doc.get('is_multi_customer') or 0,
+            'customer': (doc.customer or '') if(not doc.get('is_multi_customer')) else '',
+            'supervisor': doc.get('supervisor') or '',
+            'supervisor_name': supervisor,
+            'item_details': (site_work.get('item_details') or []) +pavers,
+            'item_details_compound_wall': (site_work.get('item_details_compound_wall') or []) +compoun_walls,
+            'raw_material': (site_work.get('raw_material') or []) + raw_material,
+            'total_required_area': total_area,
+            'total_completed_area': completed_area,
+            'completed': ((completed_area/total_area)*100) if(total_area) else 0,
+            'distance':(site_work.get('distance') or 0)+(doc.get('distance') or 0)
+        })
+        if(doc.is_multi_customer):
+            sw_cust=[cus.customer for cus in (site_work.get('customer_name') or [] )]
+            customer=[]
+            for cust in doc.customers_name:
+                if(cust.customer not in sw_cust):
+                    customer.append({'customer':cust.customer})
             site_work.update({
-				'is_multi_customer': doc.get('is_multi_customer') or 0,
-                'customer': (doc.customer or '') if(not doc.get('is_multi_customer')) else '',
-                'supervisor': doc.get('supervisor') or '',
-                'supervisor_name': supervisor,
-                'item_details': (site_work.get('item_details') or []) +pavers,
-                'item_details_compound_wall': (site_work.get('item_details_compound_wall') or []) +compoun_walls,
-                'raw_material': (site_work.get('raw_material') or []) + raw_material,
-                'total_required_area': total_area,
-                'total_completed_area': completed_area,
-                'completed': ((completed_area/total_area)*100) if(total_area) else 0,
-                'distance':(site_work.get('distance') or 0)+(doc.get('distance') or 0)
+                'customer_name': (site_work.get('customer_name') or [] ) + customer
             })
-            if(doc.is_multi_customer):
-                sw_cust=[cus.customer for cus in (site_work.get('customer_name') or [] )]
-                customer=[]
-                for cust in doc.customers_name:
-                    if(cust.customer not in sw_cust):
-                        customer.append({'customer':cust.customer})
-                site_work.update({
-                    'customer_name': (site_work.get('customer_name') or [] ) + customer
-                })
-            site_work.save()
-            frappe.db.commit()
-            return 1
+        site_work.save()
+        frappe.db.commit()
+        return 1
 
 
 @frappe.whitelist()

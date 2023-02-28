@@ -101,6 +101,7 @@
    "description": "in stock uom",
    "fieldname": "qty_to_deliver",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Qty to Deliver",
    "read_only": 1
   },
@@ -112,6 +113,7 @@
    "description": "in stock uom",
    "fieldname": "pending_qty__to_deliver",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Pending Qty to Deliver",
    "read_only": 1
   },
@@ -135,7 +137,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-02-17 13:15:58.277128",
+ "modified": "2023-02-28 17:35:27.167757",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Delivery Status",
