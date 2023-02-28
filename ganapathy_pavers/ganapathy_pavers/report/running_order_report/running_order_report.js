@@ -62,5 +62,25 @@ frappe.query_reports["Running Order Report"] = {
             "label": __("Include Other Works"),
             "fieldtype": "Check",
         },
+        {
+            "fieldname": "hide_supply_only",
+            "label": __("Don't Show Supply Only"),
+            "fieldtype": "Check",
+            "on_change": function() {
+                if (frappe.query_report.get_filter('hide_supply_only').get_value())
+                frappe.query_report.get_filter('show_only_supply_only').set_value(!frappe.query_report.get_filter('hide_supply_only').get_value())
+                frappe.query_report.refresh()
+            }
+        },
+        {
+            "fieldname": "show_only_supply_only",
+            "label": __("Show Only Supply Only"),
+            "fieldtype": "Check",
+            "on_change": function() {
+                if (frappe.query_report.get_filter('show_only_supply_only').get_value())
+                frappe.query_report.get_filter('hide_supply_only').set_value(!frappe.query_report.get_filter('show_only_supply_only').get_value())
+                frappe.query_report.refresh()
+            }
+        },
     ]
 };

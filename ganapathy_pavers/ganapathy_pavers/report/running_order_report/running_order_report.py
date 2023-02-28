@@ -31,6 +31,20 @@ def execute(filters=None):
 	if not filters.get("include_other_works"):
 		jw_filter=""" AND jw.other_work=0"""
 
+	supply_only_filter = ""
+
+	if filters.get("hide_supply_only"):
+		supply_only_filter = f"""
+		AND (SELECT COUNT(wc.name) FROM `{table_name}` wc WHERE wc.parent=sw.name AND wc.work != "Supply Only") > 0
+		AND (SELECT COUNT(so.name) FROM `tabSales Order` so WHERE so.docstatus = 1 AND so.site_work=sw.name) > 0
+		"""
+	
+	if filters.get("show_only_supply_only"):
+		supply_only_filter = f"""
+		AND (SELECT COUNT(wc.name) FROM `{table_name}` wc WHERE wc.parent=sw.name AND wc.work != "Supply Only") = 0
+		AND (SELECT COUNT(so.name) FROM `tabSales Order` so WHERE so.docstatus = 1 AND so.site_work=sw.name) > 0
+		"""
+
 	working_status=""
 	if filters.get("working_status") == "No Delivery":
 		working_status += f"""  and (SELECT sum(ds1.delivered_stock_qty + ds1.returned_stock_qty)  FROM `tabDelivery Status` as ds1 WHERE ds1.parent=sw.name)=0"""
@@ -73,7 +87,7 @@ def execute(filters=None):
 				null as raw_material_delivered
 			FROM `tabProject` as sw
 			WHERE sw.name='{sw.name}'
-			AND (SELECT COUNT(wc.name) FROM `{table_name}` wc WHERE wc.parent='{sw.name}' AND wc.work != "Supply Only") > 0
+			{supply_only_filter}
 			{working_status}
 		""", as_dict=1)
 
