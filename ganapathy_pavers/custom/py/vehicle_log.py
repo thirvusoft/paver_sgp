@@ -1,3 +1,4 @@
+from ganapathy_pavers.custom.py.journal_entry_override import get_workstations
 import frappe
 import erpnext
 from frappe.utils import date_diff
@@ -217,14 +218,14 @@ def supplier_journal_entry(self, event=None):
         frappe.throw("Please enter <b>Default Expense Account for Fuel Entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
     branch=frappe.db.get_single_value("Vehicle Settings", "default_branch")
     if not branch:
-        frappe.throw("Please enter <b>Default Branch for Fuel Expense entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+        frappe.throw("Please enter <b>Default Branch for Vehicle Expense entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
     company=erpnext.get_default_company()
     doc=frappe.new_doc("Journal Entry")
     doc.update({
         "company": company,
         "posting_date": self.date,
         "branch": branch,
-        "accounts": [
+        "accounts": update_vehicle_jea_exp(self, [
             {
                 "account": get_supplier_credit_acc(self.supplier or frappe.throw(f"Supplier is Mandatory for Fuel Entry in <a href='/app/vehicle-log/{self.name}'>{self.name}</a>"), company),
                 "party_type": "Supplier",
@@ -237,7 +238,7 @@ def supplier_journal_entry(self, event=None):
                 "debit_in_account_currency": self.total_fuel,
                 "branch": branch
             }
-        ],
+        ]),
         "vehicle_log": self.name
     })
     doc.insert()
@@ -273,3 +274,60 @@ def supplier_fuel_entry_patch():
         self=frappe.get_doc("Vehicle Log", log)
         supplier_journal_entry(self)
     frappe.msgprint(f"""Journal Entry created successfully""")
+
+def update_vehicle_jea_exp(self, exp):
+    for row in exp:
+        row.update({
+            "expense_type": self.expense_type,
+            "paver": self.paver,
+            "compound_wall": self.compound_wall,
+            "lego_block": self.lego_block,
+            "fencing_post": self.fencing_post,
+        })
+        if self.get("license_plate"):
+            row.update({
+                "license_plate": self.get("license_plate")
+            })
+        row.update({wrk: wrk in [frappe.scrub(row.workstation or "") for row in (self.get("workstations", []) or [])] for wrk in get_workstations()})
+    return exp
+
+def service_expenses(self, event=None):
+    exp = []
+    total_exp=0
+    company=erpnext.get_default_company()
+    branch=frappe.db.get_single_value("Vehicle Settings", "default_branch")
+    if not branch:
+        frappe.throw("Please enter <b>Default Branch for Vehicle Expense entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+    
+    for row in self.service_item_table:
+        if row.service_item and row.expense_amount:
+            total_exp+=(row.expense_amount or 0)
+            exp.append({
+                "account": frappe.db.get_value("Service Item", row.service_item, "expense_account") 
+                or frappe.throw(f"""Please Enter <b>Expense Account</b> for <a href="/app/service-item/{row.service_item}">{row.service_item}</a>"""),
+                "vehicle": self.license_plate,
+                "debit_in_account_currency": row.expense_amount,
+                "branch": branch
+            })
+    
+    if not exp:
+        return
+    
+    exp = [{
+        "account": get_supplier_credit_acc(self.supplier1 or frappe.throw(f"Supplier is Mandatory for Fuel Entry in <a href='/app/vehicle-log/{self.name}'><b>{self.name}</b></a>"), company),
+        "party_type": "Supplier",
+        "party": self.supplier1 or frappe.throw(f"<b>Supplier</b> is Mandatory for Vehicle Service Expense Entry in <a href='/app/vehicle-log/{self.name}'><b>{self.name}</b></a>"),
+        "credit_in_account_currency": total_exp,
+        "branch": branch
+    }] + exp
+    
+    doc=frappe.new_doc("Journal Entry")
+    doc.update({
+        "company": company,
+        "posting_date": self.date,
+        "branch": branch,
+        "accounts": update_vehicle_jea_exp(self, exp),
+        "vehicle_log": self.name
+    })
+    doc.insert()
+    doc.submit()
