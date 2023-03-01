@@ -28,10 +28,17 @@ frappe.ui.form.on("Vehicle Log", {
     last_odometer: function (frm) {
         distance(frm)
     },
-    select_purpose: function (frm) {
+    select_purpose: async function (frm) {
         distance(frm)
         if (frm.doc.select_purpose == "Service") {
             frm.set_value("odometer", frm.doc.last_odometer)
+        }
+        if (frm.doc.select_purpose == "Fuel") {
+            await frappe.db.get_single_value("Vehicle Settings", "default_fuel_warehouse").then(res => {
+                frm.set_value("fuel_warehouse", res || "");
+            })
+        } else {
+            frm.set_value("fuel_warehouse", "");
         }
     },
     fuel_odometer_value: function (frm) {

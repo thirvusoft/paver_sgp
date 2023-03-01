@@ -232,6 +232,7 @@ doc_events = {
 						"ganapathy_pavers.custom.py.vehicle_log.supplier_journal_entry",
 						"ganapathy_pavers.custom.py.vehicle_log.vehicle_log_mileage",
 						"ganapathy_pavers.custom.py.vehicle_log.service_expenses",
+						"ganapathy_pavers.custom.py.vehicle_log.fuel_stock_entry",
 					  ],
 		"on_cancel":["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 					 "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],

@@ -211,7 +211,7 @@ def update_delivery_note(self, event=None):
             dn.save("Update")
 
 def supplier_journal_entry(self, event=None):
-    if self.select_purpose!="Fuel":
+    if not self.select_purpose == "Fuel" or (self.select_purpose == "Fuel" and self.from_barrel):
         return
     debit_acc=frappe.db.get_single_value("Vehicle Settings", "fuel_expense")
     if not debit_acc:
@@ -286,7 +286,7 @@ def update_vehicle_jea_exp(self, exp):
         })
         if self.get("license_plate"):
             row.update({
-                "license_plate": self.get("license_plate")
+                "vehicle": self.get("license_plate")
             })
         row.update({wrk: wrk in [frappe.scrub(row.workstation or "") for row in (self.get("workstations", []) or [])] for wrk in get_workstations()})
     return exp
@@ -305,7 +305,6 @@ def service_expenses(self, event=None):
             exp.append({
                 "account": frappe.db.get_value("Service Item", row.service_item, "expense_account") 
                 or frappe.throw(f"""Please Enter <b>Expense Account</b> for <a href="/app/service-item/{row.service_item}">{row.service_item}</a>"""),
-                "vehicle": self.license_plate,
                 "debit_in_account_currency": row.expense_amount,
                 "branch": branch
             })
@@ -331,3 +330,53 @@ def service_expenses(self, event=None):
     })
     doc.insert()
     doc.submit()
+
+
+def fuel_stock_entry(self, event=None):
+    if not self.select_purpose == "Fuel" or (self.select_purpose == "Fuel" and not self.from_barrel):
+        return
+    
+    vehicle_settings=frappe.get_single("Vehicle Settings")
+    from_warehouse = self.fuel_warehouse
+    if not from_warehouse:
+        from_warehouse=frappe.db.get_single_value("Vehicle Settings", "default_fuel_warehouse")
+    if not from_warehouse:
+        frappe.throw(f"""<b>Fuel Warehouse</b> is required to create <b>Fuel Stock Entry</b> in <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>""")
+
+    vehicle_fuel_type=frappe.db.get_value("Vehicle", self.license_plate, "fuel_type")
+    if not vehicle_fuel_type:
+        frappe.throw(f"""Please Enter <b>Fuel Type</b> in <b>Vehicle <a href="/app/vehicle/{self.license_plate}">{self.license_plate}</a><b>""")
+    
+    fuel_item=""
+    for row in vehicle_settings.fuel_item_map:
+        if row.fuel_type == vehicle_fuel_type:
+            fuel_item=row.item_code
+            break
+
+    if not fuel_item:
+        frappe.throw(f"""<b>Fuel Item</b> is required to create <b>Fuel Stock Entry</b> in <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>. Please Enter the <b>Default Item</b> for Fuel in <a href="/app/vehicle-settings"><b>Vehicle Settings</b></a>""")
+
+    company=erpnext.get_default_company()
+    branch=frappe.db.get_single_value("Vehicle Settings", "default_branch")
+    if not branch:
+        frappe.throw("Please enter <b>Default Branch for Fuel Stock entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+    
+    doc=frappe.new_doc("Stock Entry")
+    doc.update({
+        "company": company,
+        "branch": branch,
+        "stock_entry_type": "Material Issue",
+        "posting_date": self.date,
+        "from_warehouse": from_warehouse,
+        "items": [{
+            "item_code": fuel_item,
+            "s_warehouse": from_warehouse,
+            "qty": self.fuel_qty,
+            "valuation_rate": self.price,
+            "basic_rate": self.price,
+            "branch": branch,
+        }]
+    })
+    doc.save()
+    doc.submit()
+    frappe.msgprint(f"""Fuel <b>Stock Entry <a href="/app/stock-entry/{doc.name}">{doc.name}</a></b> Created for <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>""")

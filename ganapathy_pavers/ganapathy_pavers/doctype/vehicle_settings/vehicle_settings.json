@@ -10,9 +10,13 @@
   "diesel_per_liter",
   "vehicle_update",
   "default_fuel_supplier",
+  "adblue_warehouse",
+  "adblue_item_code",
   "column_break_5",
   "fuel_expense",
   "default_branch",
+  "default_fuel_warehouse",
+  "fuel_item_map",
   "section_break_7",
   "email_id_for_notification"
  ],
@@ -62,14 +66,38 @@
   {
    "fieldname": "default_branch",
    "fieldtype": "Link",
-   "label": "Default Branch for Fuel Expense entry",
+   "label": "Default Branch for Vehicle Expense entry and Fuel Stock Entry",
    "options": "Branch"
+  },
+  {
+   "fieldname": "fuel_item_map",
+   "fieldtype": "Table",
+   "label": "Fuel Item Map",
+   "options": "Fuel Item Map"
+  },
+  {
+   "fieldname": "default_fuel_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Fuel Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "adblue_warehouse",
+   "fieldtype": "Link",
+   "label": "Adblue Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "adblue_item_code",
+   "fieldtype": "Link",
+   "label": "Adblue Item Code",
+   "options": "Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-22 13:35:43.237960",
+ "modified": "2023-03-01 20:26:42.192136",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Settings",
