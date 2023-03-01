@@ -202,7 +202,7 @@ def validate_jw_qty(self):
         
         if(warning_items):
             message="<ul>"+''.join([f"""<li><a href="/app/item/{item.get('item_code', '')}"><b>{item.get("item_code", "")}</b></a><div style="display: flex; width: 100%;"><div style="width: 50%;">Delivered Qty: {item.get("delivered", 0)}</div><div style="width: 50%;">Entered Qty: {item.get("entered", 0)}</div></div></li>""" for item in warning_items])+"</ul>"
-            frappe.msgprint(title="Warning", msg="Job Worker completed qty is greater than Delivered Qty for the following items "+ message)
+            # frappe.msgprint(title="Warning", msg="Job Worker completed qty is greater than Delivered Qty for the following items "+ message)
 
         if jw_qty > (del_qty - (self.returned_scrap_qty or 0)):
             frappe.throw(f"""Job Worker completed qty cannot be greater than Delivered Qty.

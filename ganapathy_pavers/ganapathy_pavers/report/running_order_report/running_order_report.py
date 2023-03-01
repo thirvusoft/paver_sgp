@@ -76,12 +76,12 @@ def execute(filters=None):
 				(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}) as total_laying,
 				(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}) as bundle_laying,
 				(
-					(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}')
-					- (SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter})
+					IFNULL((SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}'), 0)
+					- IFNULL((SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}), 0)
 				) as site_stock,
 				(
-					(SELECT sum(ds.delivered_bundle + ds.returned_bundle) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}')
-					- (SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter})
+					IFNULL((SELECT sum(ds.delivered_bundle + ds.returned_bundle) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}'), 0)
+					- IFNULL((SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}), 0)
 				) as bundle_site_stock,
 				null as raw_material_fixed,
 				null as raw_material_delivered
