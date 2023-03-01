@@ -1,7 +1,8 @@
 var month, paver, cw, lego, fp;
 
 frappe.ui.form.on("Journal Entry", {
-    refresh: function (frm) {
+    refresh: async function (frm) {
+        await frappe.model.with_doctype("TS Workstation")
         if (!frm.doc.docstatus) {
             frm.add_custom_button('Get Monthly Costing', async function () {
                 if (frm.doc.machine_3 || frm.doc.machine_12) {

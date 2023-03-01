@@ -2,6 +2,13 @@ var from_lp = 0;
 
 frappe.ui.form.on("Vehicle Log", {
     onload: function (frm) {
+        frm.set_query("workstations", function () {
+            return {
+                filters: {
+                    used_in_expense_splitup: 1
+                }
+            }
+        });
         if (cur_frm.is_new()) {
             frappe.call({
                 method: "ganapathy_pavers.custom.py.vehicle_log.fuel_supplier",
@@ -33,6 +40,7 @@ frappe.ui.form.on("Vehicle Log", {
     license_plate: function (frm) {
         distance(frm)
         total_cost(frm)
+        fetch_expense_details(frm)
     },
     driver_cost: function (frm) {
         if (from_lp) {
@@ -60,6 +68,23 @@ frappe.ui.form.on("Vehicle Log", {
     }
 });
 
+async function fetch_expense_details(frm) {
+    if (frm.doc.license_plate) {
+        await frappe.model.with_doc("Vehicle", frm.doc.license_plate).then(async vehicle => {
+            frm.set_value("expense_type", vehicle.expense_type)
+            await frm.set_value("workstations", [])
+            vehicle.workstations.forEach(async row => {
+                let d = frm.add_child("workstations")
+                d.workstation = row.workstation || ""
+            })
+            refresh_field("workstations")
+            frm.set_value("paver", vehicle.paver)
+            frm.set_value("compound_wall", vehicle.compound_wall)
+            frm.set_value("fencing_post", vehicle.fencing_post)
+            frm.set_value("lego_block", vehicle.lego_block)
+        });
+    }
+}
 
 function distance(frm) {
     frm.set_value('today_odometer_value', (frm.doc.odometer ? frm.doc.odometer : 0) - (["Fuel"].includes(frm.doc.select_purpose) ? (frm.doc.fuel_odometer_value || 0) : (frm.doc.last_odometer || 0)))

@@ -1,4 +1,5 @@
 import frappe
+from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
          
 def total_no_salary(doc,action):
@@ -17,4 +18,43 @@ def operator_salary(operator):
     salary = sum(frappe.get_all("Salary Structure Assignment", filters={'employee':operator, 'docstatus': 1}, pluck='base')) / 26
     return salary
 
+def make_custom_field(self, event=None):
+    if self.used_in_expense_splitup:
+        for doctype in ["Journal Entry Account", "GL Entry"]:
+            custom_fields={
+                doctype: [
+                        dict(
+                            fieldname=frappe.scrub(self.name),
+                            label=f"{self.name}",
+                            fieldtype="Check",
+                            insert_after="workstation",
+                            depends_on="""eval:doc.expense_type=="Manufacturing" """,
+                        ),]
+                }
+            create_custom_fields(custom_fields)
+    else:
+        remove_custom_field(self)
+
+def remove_custom_field(self, event=None):
+    #check field exists
+    if not [row for row in frappe.get_meta("GL Entry").fields if row.fieldname==frappe.scrub(self.name)]:
+        for i in frappe.get_all("Custom Field", {"dt": ["in", ["Journal Entry Account", "GL Entry"]],"fieldname": frappe.scrub(self.name)}, pluck = "name"):
+            frappe.delete_doc("Custom Field", i)
+        return 
+    
+    #if field exists
+    gl_links = frappe.get_all("GL Entry", filters = {frappe.scrub(self.name): 1}, fields = ["voucher_type", "voucher_no"], group_by="voucher_no, voucher_type")
+
+    if gl_links:
+        messgae = "This document is used in Expense entries <ul>"
+        for i in gl_links:
+            messgae += f"<li><a href='/app/{i.voucher_type}/{i.voucher_no}'>{i.voucher_no}</a></li>"
+        
+        messgae += "</ul>"
+
+        frappe.throw(messgae)
+    
+    for i in frappe.get_all("Custom Field", {"dt": ["in", ["Journal Entry Account", "GL Entry"]],"fieldname": frappe.scrub(self.name)}, pluck = "name"):
+        frappe.delete_doc("Custom Field", i)
+    
 

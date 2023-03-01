@@ -268,7 +268,9 @@ doc_events = {
         "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
 	},
 	"Workstation":{
-		"validate": "ganapathy_pavers.custom.py.workstation.total_no_salary"
+		"validate": "ganapathy_pavers.custom.py.workstation.total_no_salary",
+		"on_update": "ganapathy_pavers.custom.py.workstation.make_custom_field",
+		"on_trash": "ganapathy_pavers.custom.py.workstation.remove_custom_field",
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"

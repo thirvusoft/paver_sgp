@@ -1,5 +1,12 @@
 frappe.ui.form.on("Vehicle", {
     onload: function (frm) {
+        frm.set_query("workstations", function () {
+            return {
+                filters: {
+                    used_in_expense_splitup: 1
+                }
+            }
+        });
         frm.set_query('operator', function (frm) {
             return {
                 filters: {
