@@ -33,6 +33,16 @@ frappe.ui.form.on('Expense Accounts', {
 				}
 			}
 		});
+		frm.set_query("vehicle_service_expense_group", function () {
+			return {
+				filters: {
+					company: frm.doc.company,
+					is_group: 1,
+					root_type: "Expense",
+					name: ["not in", vehicle_expense_filters]
+				}
+			}
+		});
 		frm.set_query("paver_account", "expense_account_common_groups", function () {
 			return {
 				filters: {
