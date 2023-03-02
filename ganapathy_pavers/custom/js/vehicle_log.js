@@ -38,6 +38,32 @@ frappe.ui.form.on("Vehicle Log", {
             });
         }
     },
+    site_work: async function (frm) {
+        if (frm.doc.site_work) {
+            await frappe.db.get_doc("Project", frm.doc.site_work).then(site_work => {
+                if (site_work.fastag_applicable) {
+                    frm.set_value("fastag_charge", site_work.fastag_charge)
+                } else {
+                    frm.set_value("fastag_charge", 0)
+                }
+            })
+        }
+    },
+    get_fastag_details: async function (frm) {
+        if (frm.doc.select_purpose == "Goods Supply") { 
+            await frappe.db.get_doc("Vehicle Settings").then(vs => {
+                frm.set_value("payment_to_supplier", vs.payment_to_supplier);
+                frm.set_value("fastag_supplier", vs.fastag_supplier);
+                frm.set_value("credit_account", vs.credit_account);
+                frm.set_value("fastag_exp_account", vs.fastag_exp_account);
+            });
+        } else {
+            frm.set_value("payment_to_supplier", "");
+            frm.set_value("fastag_supplier", "");
+            frm.set_value("credit_account", "");
+            frm.set_value("fastag_exp_account", "");
+        }
+    },
     odometer: function (frm) {
         distance(frm)
         total_cost(frm)
@@ -46,6 +72,7 @@ frappe.ui.form.on("Vehicle Log", {
         distance(frm)
     },
     select_purpose: async function (frm) {
+        frm.trigger("get_fastag_details");
         distance(frm)
         if (frm.doc.select_purpose == "Service") {
             frm.set_value("odometer", frm.doc.last_odometer)

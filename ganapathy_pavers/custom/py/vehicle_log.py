@@ -100,6 +100,19 @@ def validate(self, event):
         self.adblue_warehouse=""
         self.adblue_qty=0
 
+    if(self.select_purpose!='Goods Supply'):
+        self.delivery_note=""
+        self.site_work=""
+        self.fastag_charge = 0
+        self.payment_to_supplier = 0
+        self.fastag_supplier = ""
+        self.credit_account = ""
+        self.fastag_exp_account = ""
+    
+    if self.delivery_note:
+        self.site_work=frappe.db.get_value("Delivery Note", self.delivery_note, "site_work")
+    else:
+        self.site_work=""
 
 def update_transport_cost(self, event):
     sw=''
@@ -352,6 +365,76 @@ def service_expenses(self, event=None):
     doc.insert()
     doc.submit()
     frappe.msgprint(f"""<b>Journal Entry <a href="/app/journal-entry/{doc.name}">{doc.name}</a></b> for <b>Service Expense</b> is created for <b>Vehicle Log <a href="/app/vehicle-log/{self.name}">{self.name}</a></b>""")
+
+def fastag_expense(self, event=None):
+    if self.select_purpose != "Goods Supply" or self.fastag_charge <= 0:
+        return
+    
+    branch=frappe.db.get_single_value("Vehicle Settings", "default_branch")
+    if not branch:
+        frappe.throw("Please enter <b>Default Branch for Vehicle Expense entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+    company=erpnext.get_default_company()
+
+    debit_acc=self.fastag_exp_account
+    if not debit_acc:
+        debit_acc=frappe.db.get_single_value("Vehicle Settings", "fastag_exp_account")
+    if not debit_acc:
+        frappe.throw("Please enter <b>Fastag Expense Account</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+    
+    supplier=""
+    credit_acc=""
+    if self.payment_to_supplier:
+        supplier=self.fastag_supplier
+        if not supplier:
+            supplier=frappe.db.get_single_value("Vehicle Settings", "fastag_supplier")
+        if not supplier:
+            frappe.throw(f"""Please enter <b>FASTag Supplier</b>""")
+
+        credit_acc=get_supplier_credit_acc(supplier, company)
+    else:
+        credit_acc = self.credit_account
+        if not credit_acc:
+            credit_acc=frappe.db.get_single_value("Vehicle Settings", "credit_account")
+        if not credit_acc:
+            frappe.throw(f"""Please enter <b>Credit Account</b>""")        
+    
+    doc=frappe.new_doc("Journal Entry")
+    doc.update({
+        "company": company,
+        "posting_date": self.date,
+        "branch": branch,
+        "accounts": update_vehicle_jea_exp(self, [
+            {
+                "account": credit_acc,
+                "party_type": "Supplier" if self.payment_to_supplier else "",
+                "party": supplier if self.payment_to_supplier else "",
+                "credit_in_account_currency": self.fastag_charge,
+                "branch": branch
+            },
+            {
+                "account": debit_acc,
+                "debit_in_account_currency": self.fastag_charge,
+                "branch": branch
+            }
+        ]),
+        "vehicle_log": self.name
+    })
+    doc.insert()
+    doc.submit()
+    frappe.msgprint(f"""<b>Journal Entry <a href="/app/journal-entry/{doc.name}">{doc.name}</a></b> for <b>FASTag</b> is created for <b>Vehicle Log <a href="/app/vehicle-log/{self.name}">{self.name}</a></b>""")
+
+def update_fasttag_exp_to_sw(self, event=None):
+    if self.select_purpose != "Goods Supply" or self.fastag_charge <= 0:
+        return
+    
+    if self.site_work:
+        fastag_exp=frappe.db.get_value("Project", self.site_work, "total_fastag_charges")
+        if event == "on_submit":
+            current_exp=(fastag_exp or 0) + (self.fastag_charge or 0)
+            frappe.db.set_value("Project", self.site_work, "total_fastag_charges", current_exp)
+        if event == "on_cancel":
+            current_exp=(fastag_exp or 0) - (self.fastag_charge or 0)
+            frappe.db.set_value("Project", self.site_work, "total_fastag_charges", current_exp)
 
 
 def fuel_stock_entry(self, event=None):
