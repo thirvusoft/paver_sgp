@@ -81,3 +81,19 @@ def get_production_rate(item_code, warehouse, creation):
         else:
             production_rate=cw_m[0]["total_cost_per_sqft"]
     return production_rate
+
+def site_completion_delivery_uom(site_work, item):
+    query=f"""
+        SELECT 
+            SUM(dni.qty) as qty,
+            dni.uom
+        FROM `tabDelivery Note Item` dni
+        LEFT OUTER JOIN `tabDelivery Note` dn
+        ON dn.name=dni.parent AND dni.parenttype="Delivery Note"
+        WHERE
+            dni.item_code = '{item}'
+            AND dn.site_work='{site_work}'
+            AND dn.docstatus=1
+        GROUP BY dni.uom
+    """
+    return frappe.db.sql(query, as_dict=True)

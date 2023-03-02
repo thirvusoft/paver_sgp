@@ -140,7 +140,7 @@ def get_production_cost(filters, item):
                 SELECT AVG((lomm.operators_cost_in_manufacture+lomm.operators_cost_in_rack_shift))/AVG(lomm.production_sqft) + 
                 AVG((lomm.labour_cost_manufacture+lomm.labour_cost_in_rack_shift+lomm.labour_expense))/AVG(lomm.production_sqft)
                 FROM `tabMaterial Manufacturing` as lomm
-                {conditions.replace("mm", "lomm").replace(F"AND lomm.item_to_manufacture='{item}'", " ")}
+                {conditions.replace("mm.", "lomm.").replace(F"AND lomm.item_to_manufacture='{item}'", " ")}
             ) as labour_operator_cost,
             ( 
                 (
@@ -148,7 +148,7 @@ def get_production_cost(filters, item):
                     WHERE bi.parent in (
                         SELECT mmm.name
                         from `tabMaterial Manufacturing` mmm
-                        {conditions.replace("mm", "mmm") + " AND mmm.item_to_manufacture=mm.item_to_manufacture"}
+                        {conditions.replace("mm.", "mmm.") + " AND mmm.item_to_manufacture=mm.item_to_manufacture"}
                     )
                 )/SUM(mm.production_sqft)
             ) as prod_cost,
