@@ -8,7 +8,7 @@ def get_data(data=None):
 		'transactions': [
 			{
 				'label': _('Transactions'),
-				'items': ['Journal Entry']
+				'items': ['Journal Entry', "Stock Entry"]
 			}
 		],
 		'disable_create_buttons': ["Journal Entry"]

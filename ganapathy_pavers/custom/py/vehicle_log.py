@@ -81,6 +81,23 @@ def validate(self, event):
     if(self.select_purpose=='Raw Material' and self.purchase_invoice and self.purchase_receipt):
         frappe.throw(f"Please don't choose both {frappe.bold('Purchase Receipt')} and {frappe.bold('Purchase Invoice')} under {frappe.bold('Purpose')}")
 
+    if self.select_purpose!="Service":
+        self.service_item_table=[]
+        self.total_expence=0
+
+    if self.select_purpose!="Fuel":
+        self.from_barrel=0
+        self.fuel_warehouse=''
+        self.fuel_qty=0
+        self.price=0
+        self.total_fuel=0
+
+    if self.select_purpose!="Adblue":
+        self.adblue_item=""
+        self.adblue_warehouse=""
+        self.adblue_qty=0
+
+
 def update_transport_cost(self, event):
     sw=''
     if(self.select_purpose=='Goods Supply' and self.delivery_note):
@@ -243,6 +260,7 @@ def supplier_journal_entry(self, event=None):
     })
     doc.insert()
     doc.submit()
+    frappe.msgprint(f"""<b>Journal Entry <a href="/app/journal-entry/{doc.name}">{doc.name}</a></b> for <b>Fuel Expense</b> is created for <b>Vehicle Log <a href="/app/vehicle-log/{self.name}">{self.name}</a></b>""")
 
 def get_supplier_credit_acc(supplier, company):
 	acc=""
@@ -292,6 +310,8 @@ def update_vehicle_jea_exp(self, exp):
     return exp
 
 def service_expenses(self, event=None):
+    if self.select_purpose!="Service":
+        return
     exp = []
     total_exp=0
     company=erpnext.get_default_company()
@@ -330,6 +350,7 @@ def service_expenses(self, event=None):
     })
     doc.insert()
     doc.submit()
+    frappe.msgprint(f"""<b>Journal Entry <a href="/app/journal-entry/{doc.name}">{doc.name}</a></b> for <b>Service Expense</b> is created for <b>Vehicle Log <a href="/app/vehicle-log/{self.name}">{self.name}</a></b>""")
 
 
 def fuel_stock_entry(self, event=None):
@@ -366,7 +387,10 @@ def fuel_stock_entry(self, event=None):
         "company": company,
         "branch": branch,
         "stock_entry_type": "Material Issue",
+        "vehicle_log": self.name,
         "posting_date": self.date,
+        "posting_time": self.time,
+        "set_posting_time": bool(self.time),
         "from_warehouse": from_warehouse,
         "items": [{
             "item_code": fuel_item,
@@ -380,3 +404,48 @@ def fuel_stock_entry(self, event=None):
     doc.save()
     doc.submit()
     frappe.msgprint(f"""Fuel <b>Stock Entry <a href="/app/stock-entry/{doc.name}">{doc.name}</a></b> Created for <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>""")
+
+def adblue_stock_entry(self, event=None):
+    if not self.select_purpose == "Adblue":
+        return
+    
+    vehicle_settings=frappe.get_single("Vehicle Settings")
+    from_warehouse = self.adblue_warehouse
+    if not from_warehouse:
+        from_warehouse=frappe.db.get_single_value("Vehicle Settings", "adblue_warehouse")
+    if not from_warehouse:
+        frappe.throw(f"""<b>Adblue Warehouse</b> is required to create <b>Adblue Stock Entry</b> in <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>""")
+
+    adblue_item = self.adblue_item
+
+    if not adblue_item:
+        adblue_item=vehicle_settings.adblue_item_code
+
+    if not adblue_item:
+        frappe.throw(f"""<b>Adblue Item</b> is required to create <b>Adblue Stock Entry</b> in <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>. Please Enter the <b>Default Item</b> for Adblue in <a href="/app/vehicle-settings"><b>Vehicle Settings</b></a>""")
+
+    company=erpnext.get_default_company()
+    branch=frappe.db.get_single_value("Vehicle Settings", "default_branch")
+    if not branch:
+        frappe.throw("Please enter <b>Default Branch for Stock entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+    
+    doc=frappe.new_doc("Stock Entry")
+    doc.update({
+        "company": company,
+        "branch": branch,
+        "stock_entry_type": "Material Issue",
+        "vehicle_log": self.name,
+        "posting_date": self.date,
+        "posting_time": self.time,
+        "set_posting_time": bool(self.time),
+        "from_warehouse": from_warehouse,
+        "items": [{
+            "item_code": adblue_item,
+            "s_warehouse": from_warehouse,
+            "qty": self.adblue_qty,
+            "branch": branch,
+        }]
+    })
+    doc.save()
+    doc.submit()
+    frappe.msgprint(f"""Adblue <b>Stock Entry <a href="/app/stock-entry/{doc.name}">{doc.name}</a></b> Created for <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>""")

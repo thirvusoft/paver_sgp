@@ -66,7 +66,7 @@
   {
    "fieldname": "default_branch",
    "fieldtype": "Link",
-   "label": "Default Branch for Vehicle Expense entry and Fuel Stock Entry",
+   "label": "Default Branch for Journal entry and Stock Entry",
    "options": "Branch"
   },
   {
@@ -97,7 +97,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-03-01 20:26:42.192136",
+ "modified": "2023-03-02 10:57:00.500095",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Settings",

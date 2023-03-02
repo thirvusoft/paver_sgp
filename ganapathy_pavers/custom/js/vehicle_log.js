@@ -10,6 +10,7 @@ frappe.ui.form.on("Vehicle Log", {
             }
         });
         if (cur_frm.is_new()) {
+            frm.set_value("time", frappe.datetime.now_time())
             frappe.call({
                 method: "ganapathy_pavers.custom.py.vehicle_log.fuel_supplier",
                 args: { name: frm.doc.name },
@@ -37,6 +38,17 @@ frappe.ui.form.on("Vehicle Log", {
             await frappe.db.get_single_value("Vehicle Settings", "default_fuel_warehouse").then(res => {
                 frm.set_value("fuel_warehouse", res || "");
             })
+        } else {
+            frm.set_value("fuel_warehouse", "");
+        }
+
+        if (frm.doc.select_purpose == "Adblue") {
+            await frappe.db.get_single_value("Vehicle Settings", "adblue_item_code").then(res => {
+                frm.set_value("adblue_item", res || "");
+            });
+            await frappe.db.get_single_value("Vehicle Settings", "adblue_warehouse").then(res => {
+                frm.set_value("adblue_warehouse", res || "");
+            });
         } else {
             frm.set_value("fuel_warehouse", "");
         }
