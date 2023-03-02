@@ -76,6 +76,9 @@ def days():
             
 
 def validate(self, event):
+    if  frappe.db.get_value("Vehicle", self.license_plate, "odometer_depends_on"):
+        self.total_hours_travelled = self.today_odometer_value
+
     if(self.select_purpose=='Goods Supply' and self.delivery_note and self.sales_invoice):
         frappe.throw(f"Please don't choose both {frappe.bold('Delivery Note')} and {frappe.bold('Sales Invoice')} under {frappe.bold('Purpose')}")
     if(self.select_purpose=='Raw Material' and self.purchase_invoice and self.purchase_receipt):
@@ -147,8 +150,6 @@ def vehicle_log_mileage(self, event):
                 frappe.db.set(self, 'mileage', mileage)
 
 def validate_distance(self, event):
-    if self.select_purpose=="Service":
-        self.odometer=self.last_odometer
     self.today_odometer_value=(self.odometer or 0)-((self.fuel_odometer_value or 0) if self.select_purpose in ["Fuel", "Service"] else (self.last_odometer or 0))
 
 def total_cost(self, event):

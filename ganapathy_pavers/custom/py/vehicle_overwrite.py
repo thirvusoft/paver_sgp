@@ -8,7 +8,11 @@ class odometer(VehicleLog):
     def validate(self):
         if (self.select_purpose =="Fuel" or self.select_purpose =="Service"):
             if flt(self.odometer) < flt(self.fuel_odometer_value):
-                frappe.throw(_("Current Odometer Value should be greater than Last Fuel Odometer Value {0}").format(self.last_odometer))
+                frappe.throw(_("Current Odometer Value should be greater than Last Fuel Odometer Value {0}").format(self.fuel_odometer_value))
+        else:
+            if flt(self.odometer) < flt(self.last_odometer):
+                frappe.throw(_("Current Odometer Value should be greater than Last Odometer Value {0}").format(self.last_odometer))
+                        
     def on_submit(self):
 		
         if (self.select_purpose =="Fuel" or self.select_purpose =="Service"):
