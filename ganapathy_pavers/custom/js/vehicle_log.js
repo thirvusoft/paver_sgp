@@ -2,6 +2,7 @@ var from_lp = 0;
 
 frappe.ui.form.on("Vehicle Log", {
     onload: function (frm) {
+        frm.trigger("set_odometer_field_labels");
         frm.set_query("workstations", function () {
             return {
                 filters: {
@@ -20,8 +21,23 @@ frappe.ui.form.on("Vehicle Log", {
             })
         }
     },
-
-
+    set_odometer_field_labels: async function (frm) {
+        if (frm.doc.license_plate) {
+            await frappe.db.get_value("Vehicle", frm.doc.license_plate, "odometer_depends_on").then(res => {
+                if (res?.message?.odometer_depends_on == "Hours") {
+                    frm.fields_dict.today_odometer_value.set_label("Hours Travelled");
+                    frm.fields_dict.odometer.set_label("Current Hour");
+                    frm.fields_dict.last_odometer.set_label("Last Hours");
+                    frm.fields_dict.fuel_odometer_value.set_label("Last Hours (Fuel or Service)");
+                } else {
+                    frm.fields_dict.today_odometer_value.set_label("Distance Travelled");
+                    frm.fields_dict.odometer.set_label("Current Odometer value");
+                    frm.fields_dict.last_odometer.set_label("Last Odometer Value");
+                    frm.fields_dict.fuel_odometer_value.set_label("Last Odometer Value(Fuel or Service)");
+                }
+            });
+        }
+    },
     odometer: function (frm) {
         distance(frm)
         total_cost(frm)
@@ -57,6 +73,7 @@ frappe.ui.form.on("Vehicle Log", {
         distance(frm)
     },
     license_plate: function (frm) {
+        frm.trigger("set_odometer_field_labels");
         distance(frm)
         total_cost(frm)
         fetch_expense_details(frm)
