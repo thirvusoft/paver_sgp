@@ -2441,7 +2441,7 @@
    "name": "Vehicle Log-select_purpose",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "\nFuel\nRaw Material\nService\nGoods Supply\nMaterial Shifting",
+   "options": "\nAdblue\nFuel\nRaw Material\nService\nGoods Supply\nMaterial Shifting",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,

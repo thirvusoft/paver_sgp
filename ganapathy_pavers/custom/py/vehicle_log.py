@@ -153,7 +153,7 @@ def vehicle_log_creation(self, event):
 def vehicle_log_draft(self, event):
     vehicle_draft=frappe.get_all("Vehicle Log",filters={"docstatus":0,"license_plate":self.license_plate, "select_purpose": ["not in", ["Fuel", "Service"]]})
     for i in vehicle_draft:
-        frappe.db.set_value("Vehicle Log",i.name,"last_odometer",self.odometer)
+        frappe.db.set_value("Vehicle Log",i.name,"last_odometer",self.odometer,  update_modified=False)
 
 def vehicle_log_mileage(self, event):
     if((frappe.db.get_single_value('Vehicle Settings', 'vehicle_update'))==1):
