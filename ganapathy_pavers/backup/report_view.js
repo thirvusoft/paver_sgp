@@ -153,7 +153,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 			fields: this.report_doc.json.fields,
 			order_by: this.report_doc.json.order_by,
 			add_totals_row: this.report_doc.json.add_totals_row,
-			average_columns: this.average_columns, // Customization
+			average_columns: this.report_doc.json.average_columns, // Customization
 			page_length: this.report_doc.json.page_length,
 			column_widths: this.report_doc.json.column_widths,
 			group_by: this.report_doc.json.group_by,
@@ -379,7 +379,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 				}
 			},
 			{    // Customization Start
-				label: __('Show Average Total'),
+				label: __('Show Average/Total'),
 				action: (datatabe_col) => {
 					if (!this.average_columns) {
 						this.average_columns = []
