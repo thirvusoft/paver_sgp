@@ -153,11 +153,13 @@
    "default": "0",
    "fieldname": "payment_to_supplier",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Payment to Supplier (Default for Vehicle Log)"
   },
   {
    "fieldname": "fastag_supplier",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "FASTag Supplier (If Payment to Supplier)",
    "options": "Supplier"
   }
@@ -165,7 +167,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-03-02 18:09:57.245062",
+ "modified": "2023-03-03 18:08:16.541021",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Settings",
