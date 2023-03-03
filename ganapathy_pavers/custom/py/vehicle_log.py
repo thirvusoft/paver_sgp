@@ -53,9 +53,9 @@ def notification(owner, license_plate, service_item, kilometers_after_last_servi
     doc.save()
 
 def days():
+    emailid = frappe.get_single("Vehicle Settings").email_id_for_notification
     for vehiclename in frappe.get_all('Vehicle', pluck='name'):
         vehicle = frappe.get_doc('Vehicle' , vehiclename)
-        emailid = frappe.get_single("Vehicle Settings").email_id_for_notification
         for doc in vehicle.service_details_table:
             if doc.frequency == 'Monthly':
                 if date_diff(frappe.utils.nowdate(), doc.last_service_date) == 365//12:
