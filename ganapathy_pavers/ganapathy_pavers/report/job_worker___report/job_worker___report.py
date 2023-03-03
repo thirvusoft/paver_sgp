@@ -106,11 +106,13 @@ def execute(filters=None):
                 total[4] = sum((data[i][4] or 0) for i in range(start,i+1))
                 total[5] = None#sum((data[i][5] or 0) for i in range(start,i+1))
                 total[6]=0
-                total[8] = sum((data[i][8] or 0) for i in range(start,i+1))
+                salary_bal=sum((data[i][8] or 0) for i in range(start,i+1))
+                if salary_bal < 0:
+                    salary_bal = 0
+                total[8] = salary_bal
                 total[9] = sum((data[i][9] or 0) for i in range(start,i+1))
                 total[10] = adv
                 amount=sum((data[i][9] or 0) for i in range(start,i+1))
-                salary_bal=sum((data[i][8] or 0) for i in range(start,i+1))
                 total_amt=round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
                 total[11] = total_amt
                 total[12]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
@@ -139,11 +141,14 @@ def execute(filters=None):
         total[4] = sum((data[i][4] or 0) for i in range(start,len(data)))
         total[5] = None#sum((data[i][5] or 0) for i in range(start,len(data)))
         total[6]=0
-        total[8] = sum((data[i][8] or 0) for i in range(start,len(data)))
+        salary_bal=sum((data[i][8] or 0) for i in range(start,len(data)))
+        if salary_bal<0:
+            salary_bal=0
+        total[8] = salary_bal
         total[9] = sum((data[i][9] or 0) for i in range(start,len(data)))
         total[10] = adv
         amount=sum((data[i][9] or 0) for i in range(start,len(data)))
-        salary_bal=sum((data[i][8] or 0) for i in range(start,len(data)))
+        
         total_amt = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
         total[11] = total_amt
         total[12]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
@@ -315,7 +320,7 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
             AND dp.date between '{from_date}' and '{to_date}'
             AND ea.repay_unclaimed_amount_from_salary=1
     """)[0][0]
-    return round((planned_deduction or 0), 2) or get_undeducted_advances(employee, from_date, to_date)
+    return round((planned_deduction or 0), 2) or 0#get_undeducted_advances(employee, from_date, to_date)
 
 def get_undeducted_advances(employee, from_date, to_date):
     res= frappe.db.sql(f"""

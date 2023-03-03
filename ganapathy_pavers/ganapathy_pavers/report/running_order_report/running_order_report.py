@@ -9,6 +9,8 @@ def execute(filters=None):
 	_type=filters.get("type")
 	status=filters.get("status")
 	
+	date = filters.get("date")
+
 	data=[]
 	sw_filters={}
 
@@ -53,6 +55,19 @@ def execute(filters=None):
 	elif filters.get("working_status") == "Delivery & Laying Started":
 		working_status += f"""  and (SELECT sum(ds1.delivered_stock_qty + ds1.returned_stock_qty)  FROM `tabDelivery Status` as ds1 WHERE ds1.parent=sw.name)>0 AND sw.total_layed_sqft>0"""
 
+	laying_query = f"""
+		(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter}) as total_laying,
+		(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter}) as bundle_laying,
+	"""
+
+	if date:
+		laying_query = f"""
+			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date < '{date}') as total_laying,
+			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date < '{date}') as bundle_laying,
+			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date = '{date}') as total_laying_date,
+			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date = '{date}') as bundle_laying_date,
+		"""
+
 	for sw in sw_list:		
 		site_data=frappe.db.sql(f"""
 			SELECT 
@@ -73,8 +88,7 @@ def execute(filters=None):
 				(SELECT sum(ps.{field_name}) FROM `{table_name}` as ps WHERE ps.parent='{sw.name}' AND ps.work != "Supply Only") as po_qty,
 				(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as total_delivery,
 				(SELECT sum(ds.delivered_bundle + ds.returned_bundle) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as bundle_delivery,
-				(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}) as total_laying,
-				(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}) as bundle_laying,
+				{laying_query}
 				(
 					IFNULL((SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}'), 0)
 					- IFNULL((SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}), 0)
@@ -113,11 +127,11 @@ def execute(filters=None):
 		if site_data:
 			data += site_data or []
 
-	columns=get_columns()
+	columns=get_columns(filters)
 	return columns,data
 	
 
-def get_columns():
+def get_columns(filters):
 
 	columns = [
 		{
@@ -179,6 +193,20 @@ def get_columns():
 			"label": ("Bndl Laying"),
 			"fieldtype": "Float",
 			"fieldname": "bundle_laying",
+			"width": 100
+		},
+		{
+			"label": f"""Total Laying @ {frappe.utils.formatdate(filters.get("date", ""))}""",
+			"fieldtype": "Float",
+			"fieldname": "total_laying_date",
+			"hidden": not filters.get("date"),
+			"width": 100
+		},
+		{
+			"label": f"""Bndl Laying @ {frappe.utils.formatdate(filters.get("date", ""))}""",
+			"fieldtype": "Float",
+			"fieldname": "bundle_laying_date",
+			"hidden": not filters.get("date"),
 			"width": 100
 		},
 		{

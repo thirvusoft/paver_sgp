@@ -48,6 +48,11 @@ frappe.query_reports["Running Order Report"] = {
             'default': frappe.get_meta('Project').fields.filter(df => df.fieldname === 'status')[0].options.includes('Open')?"Open":""
         },
         {
+            "fieldname": "date",
+            "label": __("Date"),
+            "fieldtype": "Date",
+        },
+        {
             "fieldname": "customer_scope",
             "label": __("Raw Material Customer Scope"),
             "fieldtype": "Check",

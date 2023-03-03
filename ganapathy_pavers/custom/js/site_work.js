@@ -293,8 +293,8 @@ frappe.ui.form.on('TS Job Worker Details',{
 			}
 		}
 		frappe.model.set_value(cdt,cdn,"name1",name)
-		frappe.model.set_value(cdt,cdn,"start_date",date)
-		frappe.model.set_value(cdt,cdn,"end_date",date)
+		// frappe.model.set_value(cdt,cdn,"start_date",date)
+		// frappe.model.set_value(cdt,cdn,"end_date",date)
 	},
 	no_of_person: function(frm, cdt, cdn) {
 		let data=locals[cdt][cdn]

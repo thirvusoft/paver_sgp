@@ -223,7 +223,7 @@ def validate_jw_qty(self):
 
         completed_qty = 0
         for row in self.job_worker:
-            if((not row.item) or row.item_group == "Compound Walls"):
+            if((not row.item) or row.item_group == "Compound Walls") and not row.other_work:
                 completed_qty += float(row.sqft_allocated or 0)
 
         if(completed_qty > (math.ceil(delivered_qty) - (self.earth_foundation_sqft or 0) - (self.returned_scrap_qty or 0))):
