@@ -20,6 +20,8 @@
   "fp_group",
   "vehicle_expense_account_groups_section",
   "vehicle_expense",
+  "column_break_343",
+  "vehicle_service_expense_group",
   "column_break_15",
   "default_fuel_account",
   "section_break_10",
@@ -167,12 +169,22 @@
   {
    "fieldname": "column_break_15",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_343",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vehicle_service_expense_group",
+   "fieldtype": "Link",
+   "label": "Vehicle Service Expense Group",
+   "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-02-04 11:56:24.721924",
+ "modified": "2023-03-01 19:09:02.704031",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Expense Accounts",

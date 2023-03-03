@@ -83,6 +83,17 @@ def get_child_under_vehicle_expense():
 	return ret_acc_list
 
 @frappe.whitelist()
+def get_child_under_vehicle_expense_service():
+	exp=frappe.get_single("Expense Accounts")
+	if not exp.vehicle_expense:
+		return []
+	vehicle_expense=tree_node(parent=exp.vehicle_service_expense_group)
+	acc_list=[]
+	acc_groups=[]
+	ret_acc_list, acc_groups=get_filter_list(vehicle_expense, acc_list, acc_groups)
+	return ret_acc_list
+
+@frappe.whitelist()
 def get_common_account(account):
 	exp=frappe.get_single("Expense Accounts")
 	return exp.get_common_account(account)

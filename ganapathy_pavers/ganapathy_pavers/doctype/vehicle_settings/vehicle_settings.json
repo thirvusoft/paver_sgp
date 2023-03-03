@@ -6,15 +6,30 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "section_break_7",
+  "email_id_for_notification",
+  "section_break_3",
+  "vehicle_update",
   "petrol_per_liter",
   "diesel_per_liter",
-  "vehicle_update",
-  "default_fuel_supplier",
-  "column_break_5",
+  "column_break_7",
   "fuel_expense",
   "default_branch",
-  "section_break_7",
-  "email_id_for_notification"
+  "fuel_details_section",
+  "default_fuel_supplier",
+  "default_fuel_warehouse",
+  "column_break_12",
+  "fuel_item_map",
+  "adblue_details_section",
+  "adblue_item_code",
+  "column_break_5",
+  "adblue_warehouse",
+  "fastag_details_section",
+  "payment_to_supplier",
+  "fastag_supplier",
+  "credit_account",
+  "column_break_22",
+  "fastag_exp_account"
  ],
  "fields": [
   {
@@ -36,7 +51,6 @@
   {
    "fieldname": "email_id_for_notification",
    "fieldtype": "Table",
-   "label": "Email Id for Notification",
    "options": "TS Email id"
   },
   {
@@ -50,8 +64,10 @@
    "fieldtype": "Column Break"
   },
   {
+   "collapsible": 1,
    "fieldname": "section_break_7",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Email Id for Notification"
   },
   {
    "fieldname": "fuel_expense",
@@ -62,14 +78,94 @@
   {
    "fieldname": "default_branch",
    "fieldtype": "Link",
-   "label": "Default Branch for Fuel Expense entry",
+   "label": "Default Branch for Journal entry and Stock Entry",
    "options": "Branch"
+  },
+  {
+   "fieldname": "fuel_item_map",
+   "fieldtype": "Table",
+   "label": "Fuel Item Map",
+   "options": "Fuel Item Map"
+  },
+  {
+   "fieldname": "default_fuel_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Fuel Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "adblue_warehouse",
+   "fieldtype": "Link",
+   "label": "Adblue Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "adblue_item_code",
+   "fieldtype": "Link",
+   "label": "Adblue Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "section_break_3",
+   "fieldtype": "Section Break",
+   "label": "Defaults"
+  },
+  {
+   "fieldname": "fuel_details_section",
+   "fieldtype": "Section Break",
+   "label": "Fuel Details"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "adblue_details_section",
+   "fieldtype": "Section Break",
+   "label": "Adblue Details"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fastag_details_section",
+   "fieldtype": "Section Break",
+   "label": "FASTag Details"
+  },
+  {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fastag_exp_account",
+   "fieldtype": "Link",
+   "label": "FASTag Exp Account (Debit)",
+   "options": "Account"
+  },
+  {
+   "fieldname": "credit_account",
+   "fieldtype": "Link",
+   "label": "Credit Account",
+   "options": "Account"
+  },
+  {
+   "default": "0",
+   "fieldname": "payment_to_supplier",
+   "fieldtype": "Check",
+   "label": "Payment to Supplier (Default for Vehicle Log)"
+  },
+  {
+   "fieldname": "fastag_supplier",
+   "fieldtype": "Link",
+   "label": "FASTag Supplier (If Payment to Supplier)",
+   "options": "Supplier"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-22 13:35:43.237960",
+ "modified": "2023-03-02 18:09:57.245062",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Settings",

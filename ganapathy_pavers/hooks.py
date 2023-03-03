@@ -225,13 +225,21 @@ doc_events = {
 	},
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
-		"on_submit": ["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
-					  "ganapathy_pavers.custom.py.vehicle_log.onsubmit_hours",
-					  "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
-					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_draft",
-					  "ganapathy_pavers.custom.py.vehicle_log.supplier_journal_entry",
-					  "ganapathy_pavers.custom.py.vehicle_log.vehicle_log_mileage"],
+		"on_submit": [
+						"ganapathy_pavers.custom.py.vehicle_log.onsubmit",
+						"ganapathy_pavers.custom.py.vehicle_log.onsubmit_hours",
+						"ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
+						"ganapathy_pavers.custom.py.vehicle_log.vehicle_log_draft",
+						"ganapathy_pavers.custom.py.vehicle_log.supplier_journal_entry",
+						"ganapathy_pavers.custom.py.vehicle_log.vehicle_log_mileage",
+						"ganapathy_pavers.custom.py.vehicle_log.service_expenses",
+						"ganapathy_pavers.custom.py.vehicle_log.fuel_stock_entry",
+						"ganapathy_pavers.custom.py.vehicle_log.adblue_stock_entry",
+						"ganapathy_pavers.custom.py.vehicle_log.fastag_expense",
+						"ganapathy_pavers.custom.py.vehicle_log.update_fasttag_exp_to_sw",
+					  ],
 		"on_cancel":["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
+					 "ganapathy_pavers.custom.py.vehicle_log.update_fasttag_exp_to_sw",
 					 "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
 		"validate": ["ganapathy_pavers.custom.py.vehicle_log.validate",
 					"ganapathy_pavers.custom.py.vehicle_log.validate_distance",
@@ -259,7 +267,6 @@ doc_events = {
   	},
 	"Vehicle":{
         "validate":[
-					"ganapathy_pavers.custom.py.vehicle.reference_date",
 					],
 		"on_update": [
 					"ganapathy_pavers.ganapathy_pavers.doctype.maintenance_type.maintenance_type.update_select_purpose",
@@ -269,7 +276,9 @@ doc_events = {
         "on_trash":"ganapathy_pavers.custom.py.employee_atten_tool.fill_emp_cancel_detail",
 	},
 	"Workstation":{
-		"validate": "ganapathy_pavers.custom.py.workstation.total_no_salary"
+		"validate": "ganapathy_pavers.custom.py.workstation.total_no_salary",
+		"on_update": "ganapathy_pavers.custom.py.workstation.make_custom_field",
+		"on_trash": "ganapathy_pavers.custom.py.workstation.remove_custom_field",
 	},
 	"Purchase Receipt":{
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"

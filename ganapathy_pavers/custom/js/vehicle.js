@@ -1,5 +1,13 @@
 frappe.ui.form.on("Vehicle", {
     onload: function (frm) {
+        frm.trigger("odometer_depends_on")
+        frm.set_query("workstations", function () {
+            return {
+                filters: {
+                    used_in_expense_splitup: 1
+                }
+            }
+        });
         frm.set_query('operator', function (frm) {
             return {
                 filters: {
@@ -21,7 +29,16 @@ frappe.ui.form.on("Vehicle", {
                 }
             };
         });
-    }
+    },
+    odometer_depends_on: function (frm) { 
+        if (frm.doc.odometer_depends_on == "Hours") {
+            frm.fields_dict.last_odometer.set_label("Last Hours");
+            frm.fields_dict.fuel_odometer.set_label("Last Hours  (Fuel or Service)");
+        } else {
+            frm.fields_dict.last_odometer.set_label("Odometer Value (Last)");
+            frm.fields_dict.fuel_odometer.set_label("Odometer (Fuel or Service)");
+        }
+    },
 });
 
 frappe.ui.form.on('Vehicle', {
