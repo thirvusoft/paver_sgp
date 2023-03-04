@@ -1,10 +1,17 @@
 var salary_balance,standard_hrs=0;
 frappe.ui.form.on('Salary Slip',{
+    refresh: function(frm, cdt, cdn) {
+        if (frm.is_new() && frm.doc.employee) {
+        frappe.db.get_doc('Employee', frm.doc.employee).then((doc) => {
+            frm.set_value("billed_salary_balance", doc.salary_balance)
+        });
+    }
+    },
     employee:function(frm,cdt,cdn){
         frm.trigger("get_mess_amount");
         if(frm.doc.designation=='Job Worker' && frm.doc.start_date && frm.doc.end_date){
             frappe.db.get_doc('Employee', frm.doc.employee).then((doc) => {
-                salary_balance=doc.billed_salary_balance
+                salary_balance=doc.salary_balance
             });
             frappe.call({
                 method:"ganapathy_pavers.utils.py.salary_slip.site_work_details",
