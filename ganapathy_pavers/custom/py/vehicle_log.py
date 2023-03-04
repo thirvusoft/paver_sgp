@@ -5,7 +5,7 @@ from frappe.utils import date_diff
 
 def onsubmit(doc, event):
     updateservice(doc)
-    if doc.today_odometer_value:
+    if doc.today_odometer_value and doc.select_purpose not in ["Fuel", "Service"]:
         km = doc.today_odometer_value
         vehicle = frappe.get_doc('Vehicle' , doc.license_plate)
         service = []
