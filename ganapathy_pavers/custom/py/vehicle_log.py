@@ -28,7 +28,7 @@ def updateservice(doc):
     for j in doc.service_item_table:
         service=[]
         for k in vehicle.service_details_table:
-            if j.service_item == k.service_item and j.type == 'Service':
+            if j.service_item == k.service_item:
                 k.kilometers_after_last_service = 0
                 if k.frequency!='Mileage' and k.frequency!='':
                     k.last_service_date = doc.date
@@ -208,7 +208,7 @@ def updateservice_hours(doc):
     for j in doc.service_item_table:
         service=[]
         for k in vehicle.service_details_table:
-            if j.service_item == k.service_item and j.type == 'Service':
+            if j.service_item == k.service_item:
                 k.hours_after_last_service = 0
                 if k.frequency!='Hourly' and k.frequency!='':
                     k.last_service_date = doc.date
