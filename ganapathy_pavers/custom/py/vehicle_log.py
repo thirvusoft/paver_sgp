@@ -76,7 +76,7 @@ def days():
             
 
 def validate(self, event):
-    if  frappe.db.get_value("Vehicle", self.license_plate, "odometer_depends_on"):
+    if  frappe.db.get_value("Vehicle", self.license_plate, "odometer_depends_on")=="Hours":
         self.total_hours_travelled = self.today_odometer_value
 
     if(self.select_purpose=='Goods Supply' and self.delivery_note and self.sales_invoice):
