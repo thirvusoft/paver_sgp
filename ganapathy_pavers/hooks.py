@@ -287,7 +287,13 @@ doc_events = {
 		"on_submit":"ganapathy_pavers.custom.py.purchase_invoice_dashboard.tags_msg"
 	},
 	"Journal Entry": {
-		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry"
+		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry",
+		"on_submit": [
+			"ganapathy_pavers.custom.py.journal_entry.site_work_additional_cost"
+		],
+		"on_cancel": [
+			"ganapathy_pavers.custom.py.journal_entry.site_work_additional_cost"
+		],
 	},
 	"Attendance": {
 		"on_submit": ["ganapathy_pavers.custom.py.employee_checkin.check_in_out",
