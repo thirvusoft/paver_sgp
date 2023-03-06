@@ -1,11 +1,16 @@
+from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_cw_production_report.itemwise_monthly_cw_production_report import get_cw_cost
+from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost
 import frappe
+from frappe.utils import nowdate, get_first_day, get_last_day
 from ganapathy_pavers import get_valuation_rate, uom_conversion
+
+DATE_FORMAT = "%Y-%m-%d"
 
 def site_work(doc):
     doc=frappe.get_doc("Project",doc)
     items={}
     exp={}
-    production_rate=[]
+    production_rate={}
     nos=0
     supply_sqf=0
     sqf=doc.measurement_sqft or 0
@@ -41,11 +46,53 @@ def site_work(doc):
             exp[row.description.lower().strip()]["amount"]+=row.amount
             exp[row.description.lower().strip()]["sqft_amount"]+=(row.amount or 0)/sqf if sqf else 0
             exp[row.description.lower().strip()]["supply_sqft_amount"]+=(row.amount or 0)/supply_sqf if supply_sqf else 0
+    
     delivered_items=(items.keys())
     dn_items=frappe.get_all("Delivery Note Item", {"parenttype": "Delivery Note", "parent": ["in", dn], "item_code": ["in", delivered_items]}, ["creation", "item_code", "warehouse"])
     dn_items+=frappe.get_all("Sales Invoice Item", {"parenttype": "Sales Invoice", "parent": ["in", si], "item_code": ["in", delivered_items]}, ["creation", "item_code", "warehouse"])
+    
+    paver_prod_details = []
+    cw_types={}
     for item in dn_items:
-        production_rate.append(get_production_rate(item["item_code"], item["warehouse"], item["creation"]))
+        if frappe.db.get_value("Item", item['item_code'], "item_group") == "Pavers":
+            if item['item_code'] not in production_rate:
+                production_rate[item['item_code']] = []
+            
+            if [item["item_code"], get_first_day(item["creation"])] not in paver_prod_details:
+                prod_cost=get_paver_production_rate(item["item_code"], item["creation"])
+                paver_prod_details.append([item["item_code"], get_first_day(item["creation"])])
+                if prod_cost:
+                    production_rate[item['item_code']].append(prod_cost)
+        
+        if frappe.db.get_value("Item", item['item_code'], "item_group") == "Compound Walls":
+            _type = frappe.db.get_value("Item", item['item_code'], "compound_wall_type")
+            if item['item_code'] not in production_rate:
+                production_rate[item['item_code']] = 0
+            
+            month = get_first_day(item["creation"])
+
+            if month not in cw_types:
+                cw_types[month]=[]
+
+            if _type not in cw_types[month]:
+                cw_types[month].append(_type)
+    
+    prod_cost = []
+    for i in cw_types:
+        cost = get_cw_production_rate(_type=cw_types[i], date = i)
+        if cost:
+            prod_cost.append(cost)
+    
+    prod_cost = (sum(prod_cost) / len(prod_cost)) if prod_cost else 0
+    
+    for item in dn_items:
+        if frappe.db.get_value("Item", item['item_code'], "item_group") == "Compound Walls":
+            production_rate[item['item_code']] = prod_cost
+
+    for item in production_rate:
+        if isinstance(production_rate[item], list):
+            if len(list(set(production_rate[item]))):
+                production_rate[item]= sum(list(set(production_rate[item])))/len(list(set(production_rate[item])))
     return {
             'items':items,
             'nos':round(nos,2),
@@ -56,31 +103,9 @@ def site_work(doc):
             'total': doc.total / sqf if sqf else 0, 
             'supply_total': doc.total / supply_sqf if supply_sqf else 0,
             'supply_sqf': supply_sqf, 
-            'production_rate': sum(production_rate)/len(production_rate) if len(production_rate) else 0
+            'production_rate': production_rate
         }
     
-def get_production_rate(item_code, warehouse, creation):
-    production_rate=0
-    item_doc=frappe.get_doc("Item", item_code)
-    date=creation.date()
-    if item_doc.item_group=="Pavers":
-        paver_m=frappe.get_all("Material Manufacturing", filters={"docstatus": ["!=", 2], "from_time": ["<=", creation], "item_to_manufacture": item_code}, fields=["item_price", "name"], limit=1, order_by="from_time desc")
-        if (paver_m and not paver_m[0]["item_price"]) or not paver_m:
-            production_rate=get_valuation_rate(item_code, warehouse, creation)
-        else:
-            production_rate=paver_m[0]["item_price"]
-    elif item_doc.item_group=="Compound Walls":
-        filters=[
-            ["CW Items", "item", "=", item_code],
-            ["docstatus", "!=", 2],
-            ["molding_date", "<=", date]
-        ]
-        cw_m=frappe.get_all("CW Manufacturing", filters=filters, fields=["total_cost_per_sqft", "name", "molding_date"], limit=1,  order_by="molding_date desc")
-        if (cw_m and not cw_m[0]["total_cost_per_sqft"]) or not cw_m:
-            production_rate=get_valuation_rate(item_code, warehouse, creation)
-        else:
-            production_rate=cw_m[0]["total_cost_per_sqft"]
-    return production_rate
 
 def site_completion_delivery_uom(site_work, item):
     query=f"""
@@ -97,3 +122,97 @@ def site_completion_delivery_uom(site_work, item):
         GROUP BY dni.uom
     """
     return frappe.db.sql(query, as_dict=True)
+
+def get_paver_production_rate(item, date=None):
+    def get_paver_production_date(filters, item):
+        if frappe.get_all("Material Manufacturing", {
+            "item_to_manufacture": item,
+            "docstatus": ["!=", 2],
+            "from_time": ["between", [filters.get('from_date'), filters.get('to_date')]]
+            }):
+            return filters
+        
+        date = frappe.get_all("Material Manufacturing",{
+            "item_to_manufacture": item,
+            "docstatus": ["!=", 2],
+            "from_time": ["<=", filters.get('to_date'),]
+            }, order_by="from_time desc", pluck="from_time", limit=1)
+
+        if not date:
+            date = frappe.get_all("Material Manufacturing",{
+            "item_to_manufacture": item,
+            "docstatus": ["!=", 2],
+            }, order_by="from_time desc", pluck="from_time", limit=1)
+        
+        if not date:
+            return filters
+    
+        filters["from_date"] = get_first_day(date[0]).strftime(DATE_FORMAT)
+        filters["last_date"] = get_last_day(date[0]).strftime(DATE_FORMAT)
+        return filters
+    
+
+    if not date:
+        date=nowdate()
+    
+    filters = {
+        "from_date": get_first_day(date).strftime(DATE_FORMAT),
+        "to_date": get_last_day(date).strftime(DATE_FORMAT),
+        "machine": []
+    }
+    filters = get_paver_production_date(filters, item)
+
+    return sum(get_production_cost(filters, item))
+
+def get_cw_production_rate(_type=[], date=None):
+    def get_cw_production_date(_type, filters):
+        if frappe.get_all("CW Manufacturing", {
+            "docstatus": ["!=", 2],
+            "type": ["in", _type], 
+            "molding_date": ["between", [filters.get('from_date'), filters.get('to_date')]]
+            }):
+            return filters
+        
+        date = frappe.get_all("Material Manufacturing",{
+            "docstatus": ["!=", 2],
+            "type": ["in", _type], 
+            "molding_date": ["<=", filters.get('to_date'),]
+            }, order_by="molding_date desc", pluck="molding_date", limit=1)
+
+        if not date:
+            date = frappe.get_all("Material Manufacturing",{
+            "docstatus": ["!=", 2],
+            "type": ["in", _type], 
+            }, order_by="molding_date desc", pluck="molding_date", limit=1)
+        
+        if not date:
+            return filters
+    
+        filters["from_date"] = get_first_day(date[0]).strftime(DATE_FORMAT)
+        filters["last_date"] = get_last_day(date[0]).strftime(DATE_FORMAT)
+        return filters
+    
+
+    if not date:
+        date=nowdate()
+    
+    filters = {
+        "from_date": get_first_day(date).strftime(DATE_FORMAT),
+        "to_date": get_last_day(date).strftime(DATE_FORMAT),
+    }
+    filters = get_cw_production_date(_type, filters)
+
+    cw_docs = frappe.get_all("CW Manufacturing", {
+        "molding_date":["between", (filters.get("from_date"), filters.get("to_date"))],
+        "type":["in",_type],
+        "production_sqft":["!=",0],
+        "docstatus":["!=",2]
+        }, order_by = 'molding_date')
+    
+    cw_cost = get_cw_cost(doc_list=cw_docs)
+    prod_cost = []
+    for row in cw_cost:
+        cost=(row.get("prod_cost", 0) or 0)+(row.get("labour_operator_cost", 0) or 0)+(row.get("strapping_cost", 0) or 0)+(row.get("additional_cost", 0) or 0)
+        prod_cost.append(cost)
+
+    return sum(prod_cost)/len(prod_cost) if prod_cost and len(prod_cost)>0 else 0
