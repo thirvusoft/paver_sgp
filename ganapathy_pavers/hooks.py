@@ -284,7 +284,16 @@ doc_events = {
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
 	},
 	"Purchase Invoice":{
-		"on_submit":"ganapathy_pavers.custom.py.purchase_invoice_dashboard.tags_msg"
+		"validate": [
+			"ganapathy_pavers.custom.py.purchase_invoice.update_pi_items",
+		],
+		"on_submit":[
+    		"ganapathy_pavers.custom.py.purchase_invoice_dashboard.tags_msg",
+		    "ganapathy_pavers.custom.py.purchase_invoice.site_work_details_from_pi",
+		],
+		"on_cancel": [
+			"ganapathy_pavers.custom.py.purchase_invoice.site_work_details_from_pi",
+		]
 	},
 	"Journal Entry": {
 		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry",
