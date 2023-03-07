@@ -158,7 +158,7 @@ def validate_salaryslip(self, event=None):
     validate_contrator_welfare(self, event)
 
 def employee_advance(self, event=None):
-    if self.excess_amount_to_create_advance:
+    if self.excess_amount_to_create_advance and self.designation=='Job Worker':
         if not self.branch:
             frappe.throw(f"""Field <b>Branch</b> is required for creating <b>Employee Advance</b> in <a href="/app/salary-slip/{self.name}"><b>{self.name}</b></a>""")
         if not self.advance_payment_mode:
@@ -328,35 +328,47 @@ def get_additional_salaries(employee, start_date, end_date, component_type):
     #     ((additional_sal.payroll_date <= end_date))
     # ).run(as_dict=True)
 
-
-    additional_salary_list=frappe.db.sql(f"""
+    if frappe.db.get_value("Employee", employee, "designation")=="Job Worker":
+        additional_salary_list=frappe.db.sql(f"""
+            select 
+                additional_sal.name
+                , additional_sal.salary_component as component
+                , additional_sal.type
+                , CASE
+                    WHEN additional_sal.ref_doctype = "Employee Advance"  AND IFNULL(additional_sal.ref_docname, "") != ""
+                        THEN (
+                            SELECT 
+                                SUM(dp.amount)
+                            FROM `tabDeduction Planning` dp
+                            WHERE dp.date <= '{end_date}'
+                            AND dp.date >= '{start_date}'
+                            AND dp.parenttype='Employee Advance'
+                            AND dp.parent=additional_sal.ref_docname
+                        )
+                END as amount
+                , additional_sal.is_recurring
+                , additional_sal.overwrite_salary_structure_amount as overwrite
+                , additional_sal.deduct_full_tax_on_selected_payroll_date
+            from `tabAdditional Salary` additional_sal
+            where 
+                additional_sal.employee='{employee}' and additional_sal.docstatus = 1 and 
+                additional_sal.type = "{comp_type}" and additional_sal.salary_slip_amount < additional_sal.amount and
+                additional_sal.payroll_date <= "{end_date}"
+        """, as_dict=True)
+    else:
+        additional_salary_list=frappe.db.sql(f"""
         select 
-            additional_sal.name
-            , additional_sal.salary_component as component
-            , additional_sal.type
-            , CASE
-                WHEN additional_sal.ref_doctype = "Employee Advance"  AND IFNULL(additional_sal.ref_docname, "") != ""
-                    THEN (
-                        SELECT 
-                            SUM(dp.amount)
-                        FROM `tabDeduction Planning` dp
-                        WHERE dp.date <= '{end_date}'
-                        AND dp.date >= '{start_date}'
-                        AND dp.parenttype='Employee Advance'
-                        AND dp.parent=additional_sal.ref_docname
-                    )
-            END as amount
-            , additional_sal.is_recurring
-            , additional_sal.overwrite_salary_structure_amount as overwrite
-            , additional_sal.deduct_full_tax_on_selected_payroll_date
+            additional_sal.name, additional_sal.salary_component as component, additional_sal.type,
+            (additional_sal.amount - additional_sal.salary_slip_amount) as amount, additional_sal.is_recurring, additional_sal.overwrite_salary_structure_amount as overwrite,
+            additional_sal.deduct_full_tax_on_selected_payroll_date
         from `tabAdditional Salary` additional_sal
         where 
             additional_sal.employee='{employee}' and additional_sal.docstatus = 1 and 
             additional_sal.type = "{comp_type}" and additional_sal.salary_slip_amount < additional_sal.amount and
             additional_sal.payroll_date <= "{end_date}"
     """, as_dict=True)
-    
-    
+
+
     additional_salaries = []
     components_to_overwrite = []
 
