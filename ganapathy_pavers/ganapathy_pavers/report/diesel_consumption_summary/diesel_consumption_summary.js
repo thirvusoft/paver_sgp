@@ -26,7 +26,11 @@ frappe.query_reports["Diesel Consumption Summary"] = {
 			"fieldtype": "Select",
 			"options":"\nPetrol\nDiesel\nNatural Gas\nElectric",
 			"width":"100"
+		},
+		{
+			"fieldname":"from_barrel",
+			"label": __("From Barrel"),
+			"fieldtype": "Check",
 		}
-
 	]
 };

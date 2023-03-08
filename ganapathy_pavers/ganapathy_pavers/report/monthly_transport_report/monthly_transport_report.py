@@ -103,7 +103,8 @@ def execute(filters=None):
 			"1":f"<b>{pavers_total}</b>"
 		})
 		
-	data.append({})
+	if  transport_based_on == "Report":
+		data.append({})
 	
 
 				
@@ -206,20 +207,32 @@ def execute(filters=None):
 				"3":round((cw_total / total_sqft)*j['expense'],2)
 			})
 
-	expense_details = get_expense_data((pavers_total+cw_total) or 1, filters, pavers_total, cw_total)
-	if transport_based_on=="Report":
-		data+=(expense_details)
-	paver_total_amount=round(sum([i["2"] or 0 for i in expense_details]), 2)
-	cw_total_amount=round(sum([i["3"] or 0 for i in expense_details]), 2)
+	expense_details = get_expense_data((pavers_total+cw_total) or 1, filters, pavers_total, cw_total, ((pavers_km or 0) + (cw_km or 0)), pavers_km, cw_km)
+	# if transport_based_on=="Report":
+	data+=(expense_details)
+	paver_total_amount=round(sum([i["2"] or 0 for i in expense_details if not i.get("is_km_exp")]), 2)
+	cw_total_amount=round(sum([i["3"] or 0 for i in expense_details if not i.get("is_km_exp")]), 2)
+
+	paver_total_amount_km=round(sum([i["2"] or 0 for i in expense_details if i.get("is_km_exp")]), 2)
+	cw_total_amount_km=round(sum([i["3"] or 0 for i in expense_details if i.get("is_km_exp")]), 2)
 
 	data.append({})
 
 	data.append({
-		"item":"<b>Total Amount</b>",
-		"qty":f'<b>{round(sum([i["qty"] or 0 for i in expense_details]), 2)}</b>',
-		"1":f'<b>{round(sum([i["1"] or 0 for i in expense_details]), 2)}</b>',
+		"item":"<b>Total Amount for SQFT</b>",
+		"qty":f'<b>{round(sum([i["qty"] or 0 for i in expense_details if not i.get("is_km_exp")]), 2)}</b>',
+		"1":f'<b>{round(sum([i["1"] or 0 for i in expense_details if not i.get("is_km_exp")]), 2)}</b>',
 		"2":f'<b>{paver_total_amount}</b>',
 		"3":f'<b>{cw_total_amount}</b>'
+	})
+
+	if paver_total_amount_km or cw_total_amount_km:
+		data.append({
+		"item":"<b>Total Amount for KM</b>",
+		"qty":f'<b>{round(sum([i["qty"] or 0 for i in expense_details if i.get("is_km_exp")]), 2)}</b>',
+		"1":f'<b>{round(sum([i["1"] or 0 for i in expense_details if i.get("is_km_exp")]), 2)}</b>',
+		"2":f'<b>{paver_total_amount_km}</b>',
+		"3":f'<b>{cw_total_amount_km}</b>'
 	})
 
 	data.append({
@@ -229,9 +242,15 @@ def execute(filters=None):
 	})
 
 	data.append({
+		"item":"<b>Total KM</b>",
+		"2":f'<b>{pavers_km}</b>',
+		"3":f'<b>{cw_km}</b>'
+	})
+
+	data.append({
 		"item":"<b>Total Cost</b>",
-		"2":f'<b>{round(paver_total_amount/pavers_total,2) if pavers_total else "0.0"}</b>',
-		"3":f'<b>{round(cw_total_amount/cw_total,2) if cw_total else "0.0"}</b>'
+		"2":f'<b>{round(((paver_total_amount/pavers_total) if pavers_total else 0)+((paver_total_amount_km/pavers_km) if pavers_km else 0), 2)}</b>',
+		"3":f'<b>{round(((cw_total_amount/cw_total) if cw_total else 0)+((cw_total_amount_km/cw_km) if cw_km else 0), 2)}</b>'
 	})
 
 	return columns, data
@@ -273,40 +292,77 @@ def get_columns():
 	]
 	return columns
 
-def get_expense_data(total_delivery_sqft, filters, paver_sqft, cw_sqft):
+def get_expense_data(total_delivery_sqft, filters, paver_sqft, cw_sqft, total_km, paver_km, cw_km):
 	exp=frappe.get_single("Expense Accounts")
 	if not exp.vehicle_expense:
 		return []
 	exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.vehicle_expense, vehicle=filters.get("vehicle_no"))
 	res=[]
+	vehicle=None
+	if filters.get("vehicle_no"):
+		vehicle=frappe.get_doc("Vehicle", filters.get("vehicle_no"))
+	
 	for i in exp_tree:
+		is_km_exp=0
+		paver=paver_sqft
+		cw=cw_sqft
+		total=total_delivery_sqft
+
 		if i.get("expandable"):
-			child=get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft)
+			child=get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft, total_km, paver_km, cw_km, filters)
 			if child:
 				res+=child
 		else:
+			for md in vehicle.maintanence_details_:
+				if md.default_expense_account == i['value'] and md.expense_calculation_per_km:
+					total=(total_km)
+					paver=paver_km
+					cw=cw_km
+					is_km_exp=1
+
 			if i["balance"]:
 				res.append({
 					"item": i['value'],
 					"qty": i["balance"],
-					"1": (i["balance"]/total_delivery_sqft) or 0,
-					"2": (i["balance"])*(paver_sqft/total_delivery_sqft) or 0,
-					"3": (i["balance"])*(cw_sqft/total_delivery_sqft) or 0,
+					"1": (i["balance"]/total) or 0,
+					"2": (i["balance"])*(paver/total) or 0,
+					"3": (i["balance"])*(cw/total) or 0,
+					"is_km_exp": is_km_exp,
 				})	
 	return res
 
-def get_expense_from_child(total_delivery_sqft, account, paver_sqft, cw_sqft):
+def get_expense_from_child(total_delivery_sqft, account, paver_sqft, cw_sqft, total_km, paver_km, cw_km, filters):
+	vehicle=None
+	if filters.get("vehicle_no"):
+		vehicle=frappe.get_doc("Vehicle", filters.get("vehicle_no"))
+
 	res=[]
+	total=total_delivery_sqft
+	paver=paver_sqft
+	cw=cw_sqft
 	for i in account:
+		paver=paver_sqft
+		cw=cw_sqft
+		total=total_delivery_sqft
+		is_km_exp=0
 		if i["balance"]:
+			if vehicle:
+				for md in vehicle.maintanence_details_:
+					if md.default_expense_account == i['value'] and md.expense_calculation_per_km:
+						total=(total_km)
+						paver=paver_km
+						cw=cw_km
+						is_km_exp=1
+
 			res.append({
 				"item": i['value'],
 				"qty": i["balance"],
-				"1": (i["balance"]/total_delivery_sqft) or 0,
-				"2": (i["balance"])*(paver_sqft/total_delivery_sqft) or 0,
-				"3": (i["balance"])*(cw_sqft/total_delivery_sqft) or 0,
+				"1": (i["balance"]/total) or 0,
+				"2": (i["balance"])*(paver/total) or 0,
+				"3": (i["balance"])*(cw/total) or 0,
+				"is_km_exp": is_km_exp,
 			})
 		if i['child_nodes']:
-			res1=(get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft))
+			res1=(get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft, total_km, paver_km, cw_km, filters))
 			res+=res1
 	return res

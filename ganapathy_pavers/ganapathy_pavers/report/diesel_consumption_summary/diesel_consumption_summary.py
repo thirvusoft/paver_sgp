@@ -36,7 +36,13 @@ def get_columns(filters):
 
 def get_data(filters):
     fuel=filters.get('fuel_type')
-    filters_1={'date':['between',[filters.get('from_date'),filters.get('to_date')]], 'docstatus':1, 'fuel_qty':['>',0]}
+    filters_1={
+        'select_purpose': 'Fuel',
+        'date':['between',[filters.get('from_date'),filters.get('to_date')]],
+        'docstatus':1, 
+        'fuel_qty':['>',0],
+        'from_barrel': filters.get("from_barrel", 0) or 0
+        }
     if fuel:
         vehicle=frappe.get_all("Vehicle", filters={'fuel_type':fuel}, pluck='name')
         filters_1['license_plate']= ['in', vehicle]
