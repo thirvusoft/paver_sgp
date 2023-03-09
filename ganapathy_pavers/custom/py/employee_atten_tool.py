@@ -212,7 +212,7 @@ def fill_attn_cancel_detail(self, event):
 
 
 @frappe.whitelist()
-def help_session(emp, emp_tabl):
+def help_section(emp, emp_tabl):
 	emp_tabl=json.loads(emp_tabl)
 	res={}
 	for i in emp_tabl:

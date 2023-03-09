@@ -115,7 +115,7 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
     update:function(frm,cdt,cdn){
         if (cur_frm.doc.employee && cur_frm.doc.updated_checkout){
                 frappe.call({
-                    method:"ganapathy_pavers.custom.py.employee_atten_tool.help_session",
+                    method:"ganapathy_pavers.custom.py.employee_atten_tool.help_section",
                     args:{
                         emp: cur_frm.doc.employee,
                         emp_tabl : cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:[]
