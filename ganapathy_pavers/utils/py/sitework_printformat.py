@@ -180,14 +180,14 @@ def get_cw_production_rate(_type=[], date=None):
             }):
             return filters
         
-        date = frappe.get_all("Material Manufacturing",{
+        date = frappe.get_all("CW Manufacturing",{
             "docstatus": ["!=", 2],
             "type": ["in", _type], 
             "molding_date": ["<=", filters.get('to_date'),]
             }, order_by="molding_date desc", pluck="molding_date", limit=1)
 
         if not date:
-            date = frappe.get_all("Material Manufacturing",{
+            date = frappe.get_all("CW Manufacturing",{
             "docstatus": ["!=", 2],
             "type": ["in", _type], 
             }, order_by="molding_date desc", pluck="molding_date", limit=1)
@@ -196,7 +196,7 @@ def get_cw_production_rate(_type=[], date=None):
             return filters
     
         filters["from_date"] = get_first_day(date[0]).strftime(DATE_FORMAT)
-        filters["last_date"] = get_last_day(date[0]).strftime(DATE_FORMAT)
+        filters["to_date"] = get_last_day(date[0]).strftime(DATE_FORMAT)
         return filters
     
 
