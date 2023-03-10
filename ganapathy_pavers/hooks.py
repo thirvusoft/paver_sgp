@@ -221,7 +221,8 @@ doc_events = {
 		# ]
 	},
 	"Purchase Order":{
-		"before_submit":"ganapathy_pavers.custom.py.purchase_order.getdate"
+		"before_submit":"ganapathy_pavers.custom.py.purchase_order.getdate",
+		"before_cancel": "ganapathy_pavers.custom.py.purchase_order.update_drop_ship_items_in_sw",
 	},
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
@@ -425,7 +426,8 @@ except:pass
 # ------------------------------
 #
 override_whitelisted_methods = {
-	"erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry": "ganapathy_pavers.custom.py.payment_entry.get_payment_entry"
+	"erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry": "ganapathy_pavers.custom.py.payment_entry.get_payment_entry",
+	"erpnext.buying.doctype.purchase_order.purchase_order.update_status": "ganapathy_pavers.custom.py.purchase_order.update_status",
 }
 #
 # each overriding function accepts a `data` argument;

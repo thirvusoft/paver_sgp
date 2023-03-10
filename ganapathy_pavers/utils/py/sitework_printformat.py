@@ -100,13 +100,16 @@ def site_work(doc):
             if len(list(set(production_rate[item]))):
                 production_rate[item]= sum(list(set(production_rate[item])))/len(list(set(production_rate[item])))
 
+    total_job_worker_cost = sum([(i.amount or 0) for i in doc.job_worker if not i.other_work])
+    total_other_worker_cost = sum([(i.amount or 0) for i in doc.job_worker if i.other_work])
     return {
             'items':items,
             'nos':round(nos,2),
             'sqf':round(sqf,2), 
             'expense': list(exp.values()), 
             'transporting_cost': doc.transporting_cost / sqf if sqf else 0,
-            'total_job_worker_cost': doc.total_job_worker_cost / sqf if sqf else 0, 
+            'total_job_worker_cost': total_job_worker_cost / sqf if sqf else 0,
+            'total_other_worker_cost': total_other_worker_cost / sqf if sqf else 0,
             'total': doc.total / sqf if sqf else 0, 
             'supply_total': doc.total / supply_sqf if supply_sqf else 0,
             'supply_sqf': supply_sqf, 
@@ -114,21 +117,30 @@ def site_work(doc):
         }
     
 
-def site_completion_delivery_uom(site_work, item):
+def site_completion_delivery_uom(site_work, item_group='Raw Material'):
     query=f"""
         SELECT 
+            dni.item_code,
             SUM(dni.qty) as qty,
             dni.uom
         FROM `tabDelivery Note Item` dni
         LEFT OUTER JOIN `tabDelivery Note` dn
         ON dn.name=dni.parent AND dni.parenttype="Delivery Note"
         WHERE
-            dni.item_code = '{item}'
+            dni.item_group='{item_group}'
             AND dn.site_work='{site_work}'
             AND dn.docstatus=1
-        GROUP BY dni.uom
+        GROUP BY dni.item_code, dni.uom
     """
-    return frappe.db.sql(query, as_dict=True)
+    res = frappe.db.sql(query, as_dict=True)
+    f_res = {}
+
+    for row in res:
+        if row.item_code not in f_res:
+            f_res[row.item_code] = []
+        f_res[row.item_code].append(row)
+
+    return f_res
 
 def get_paver_production_rate(item, date=None):
     def get_paver_production_date(filters, item):
