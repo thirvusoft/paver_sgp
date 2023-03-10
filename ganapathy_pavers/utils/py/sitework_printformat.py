@@ -1,4 +1,4 @@
-from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_cw_production_report.itemwise_monthly_cw_production_report import get_cw_cost
+import copy
 from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost
 import frappe
 from frappe.utils import nowdate, get_first_day, get_last_day
@@ -38,6 +38,12 @@ def site_work(doc):
         nos+=uom_conversion(i.item,i.stock_uom,i.delivered_stock_qty,"Nos")
         items[i.item]["sqf"]+=round(uom_conversion(i.item,i.stock_uom,i.delivered_stock_qty,"SQF"),2)
         supply_sqf+=uom_conversion(i.item,i.stock_uom,i.delivered_stock_qty,"SQF")
+    
+    _items = copy.deepcopy(items)
+    for row in _items:
+        if not _items[row].get('nos') and not _items[row].get('sqf'):
+            del items[row]
+
     for row in doc.additional_cost:
         if row.description.lower().strip() not in exp:
             exp[row.description.lower().strip()]={"description": row.description, "nos": row.nos, "amount": row.amount, "sqft_amount": (row.amount or 0)/sqf if sqf else 0, "supply_sqft_amount": (row.amount or 0)/supply_sqf if supply_sqf else 0}
@@ -93,6 +99,7 @@ def site_work(doc):
         if isinstance(production_rate[item], list):
             if len(list(set(production_rate[item]))):
                 production_rate[item]= sum(list(set(production_rate[item])))/len(list(set(production_rate[item])))
+
     return {
             'items':items,
             'nos':round(nos,2),
@@ -200,19 +207,55 @@ def get_cw_production_rate(_type=[], date=None):
         "from_date": get_first_day(date).strftime(DATE_FORMAT),
         "to_date": get_last_day(date).strftime(DATE_FORMAT),
     }
+
     filters = get_cw_production_date(_type, filters)
+    exp_group="cw_group"
+    prod="cw"
 
-    cw_docs = frappe.get_all("CW Manufacturing", {
-        "molding_date":["between", (filters.get("from_date"), filters.get("to_date"))],
-        "type":["in",_type],
-        "production_sqft":["!=",0],
-        "docstatus":["!=",2]
-        }, order_by = 'molding_date')
+    if _type == ["Lego Block"]:
+        exp_group="lg_group"
+        prod="lego"
+
+    elif _type == ['Fencing Post']:
+        exp_group="fp_group" 
+        prod="fp"
     
-    cw_cost = get_cw_cost(doc_list=cw_docs)
-    prod_cost = []
-    for row in cw_cost:
-        cost=(row.get("prod_cost", 0) or 0)+(row.get("labour_operator_cost", 0) or 0)+(row.get("strapping_cost", 0) or 0)+(row.get("additional_cost", 0) or 0)
-        prod_cost.append(cost)
+    cw_cost = get_cw_monthly_cost(filters=filters,
+                                  _type=_type,
+                                  exp_group=exp_group,
+                                  prod=prod)
 
-    return sum(prod_cost)/len(prod_cost) if prod_cost and len(prod_cost)>0 else 0
+    return cw_cost
+
+def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw"):
+    from_date = filters.get("from_date")
+    to_date = filters.get("to_date")
+
+    cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]],'type':["in",_type]},pluck="name")
+    total_cost_per_sqft = 0
+
+    if cw_list:
+        bom_item = frappe.db.sql(""" 
+                                select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent {0} group by item_code """.format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_list=1)
+        production_qty = frappe.db.sql(""" 
+                                select sum(ts_production_sqft) as production_sqft,
+                                avg(total_cost_per_sqft) as total_cost_per_sqft,
+                                sum(total_expence) as total_expence,
+                                sum(raw_material_cost) as raw_material_cost,
+                                sum(total_expense_for_unmolding) as total_expense_for_unmolding,
+                                sum(labour_expense_for_curing) as total_expense_for_curing,
+                                AVG(total_labour_wages + labour_expense_for_curing)/AVG(ts_production_sqft) as labour_cost_per_sqft,
+                                AVG(total_operator_wages)/AVG(ts_production_sqft) as operator_cost_per_sqft,
+                                avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
+                                avg(additional_cost_per_sqft) as additional_cost_per_sqft,
+                                avg(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name {0}""".format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_dict=1)
+        
+        for item in bom_item:
+            total_cost_per_sqft += item[4] / (production_qty[0]['production_sqft'] or 1)
+
+        total_cost_per_sqft +=  ((production_qty[0]['strapping_cost_per_sqft'] or 0)
+                                + (production_qty[0]['additional_cost_per_sqft']  or 0)
+                                + (production_qty[0]["labour_cost_per_sqft"] or 0) 
+                                + (production_qty[0]['operator_cost_per_sqft'] or 0))
+
+    return total_cost_per_sqft

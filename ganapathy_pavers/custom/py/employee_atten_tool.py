@@ -147,9 +147,30 @@ def attendance(table_list, company, ts_name):
 
 	
 def update_attendance_to_checkin(self, event):
-	emp_checkin_name=frappe.get_all('Employee Checkin', {'employee': self.employee, 'time': ['between', [self.attendance_date, self.attendance_date]]}, pluck='name')
-	for doc in emp_checkin_name:
-		frappe.db.set_value('Employee Checkin', doc, 'attendance', self.name, update_modified=False)
+	emp_checkin_name=frappe.db.sql(f"""
+		SELECT name
+		FROM `tabEmployee Checkin`
+		WHERE employee='{self.employee}' 
+		AND DATE(time) BETWEEN '{self.attendance_date}' AND '{self.attendance_date}'
+	""", as_list=True)
+
+	emp_checkin_name = [i[0] if isinstance(i, list) else i for i in emp_checkin_name if i]
+
+	for checkin in frappe.get_all('Employee Checkin', {'attendance': self.name, "name": ["not in", emp_checkin_name]}, pluck='name'):
+		doc=frappe.get_doc("Employee Checkin", checkin)
+		doc.add_comment(text=f"""
+		{frappe.utils.now()} - Reference: {self.name}<br>
+		Removed Attendance name: {self.name}  - {self.time}
+		""")
+		frappe.db.set_value('Employee Checkin', checkin, 'attendance', "")
+
+	for _doc in emp_checkin_name:
+		doc=frappe.get_doc("Employee Checkin", _doc)
+		doc.add_comment(text=f"""
+		{frappe.utils.now()} - Reference: {self.name}<br>
+		Linking Attendance name: {self.name}  - {self.time}
+		""")
+		frappe.db.set_value('Employee Checkin', _doc, 'attendance', self.name)
 
 
 def fill_emp_cancel_detail(self, event):
