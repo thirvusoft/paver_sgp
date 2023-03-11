@@ -362,7 +362,7 @@ def update_delivered_qty(site_work=[]):
                                         group by child.item_code, CASE WHEN child.item_group = "Raw Material" THEN doc.name
                                                       ELSE 1 END
                                         """, as_dict=True)
-            [frappe.errprint(i) for i in total_delivered_qty]
+
             for data in total_delivered_qty:
                 if frappe.get_value("Item", data.get('item_code'), "item_group") not in ["Raw Material"]:
                     old_value=frappe.db.sql(f"""
