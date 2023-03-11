@@ -11,7 +11,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 	data = []
 
 	cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]],'type':["in",_type]},pluck="name")
-	test_data = []
+	cw_data = []
 
 	if cw_list:
 		bom_item = frappe.db.sql(""" 
@@ -32,10 +32,10 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 		
 		total_cost_per_sqft = 0
 		for item in bom_item:
-			total_cost_per_sqft += item[4] / production_qty[0]['production_sqft']
+			total_cost_per_sqft += item[4] / (production_qty[0]['production_sqft'] or 1)
 
 
-		test_data.append({
+		cw_data.append({
 			"material":"-",
 			"qty":"-",
 			"consumption":f"<b>SQFT :</b> {production_qty[0]['production_sqft']:,.3f}",
@@ -44,7 +44,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 			"amount":None,
 			"cost_per_sqft":None
 		})
-		test_data.append({
+		cw_data.append({
 			"material":None,
 			"qty":None,
 			"consumption":None,
@@ -55,18 +55,18 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 		})
 		total_cost_per_sqft = 0
 		for item in bom_item:
-			test_data.append({
+			cw_data.append({
 				"material":item[0],
 				"qty":float(item[1]),
-				"consumption":f"{item[1] / production_qty[0]['production_sqft']:,.3f}",
+				"consumption":f"{item[1] / (production_qty[0]['production_sqft'] or 1):,.3f}",
 				"uom":item[2],
 				"rate":f'₹{item[3]:,.2f}',
 				"amount":f'₹{item[4]:,.2f}',
-				"cost_per_sqft":f"₹{item[4] / production_qty[0]['production_sqft']:,.3f}",
+				"cost_per_sqft":f"₹{item[4] / (production_qty[0]['production_sqft'] or 1):,.3f}",
 			})
-			total_cost_per_sqft += item[4] / production_qty[0]['production_sqft']
+			total_cost_per_sqft += item[4] / (production_qty[0]['production_sqft'] or 1)
 		
-		test_data.append({
+		cw_data.append({
 			"material":None,
 			"qty":None,
 			"consumption":None,
@@ -85,7 +85,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 				"Total Additional Cost":production_qty[0]['additional_cost_per_sqft']}
 
 		for cost in abstract_cost:
-			test_data.append({
+			cw_data.append({
 				"material":None,
 				"qty":None,
 				"consumption":None,
@@ -95,8 +95,8 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 				"cost_per_sqft":f"<b>₹{abstract_cost[cost]:,.2f}</b>" if isinstance(abstract_cost[cost], int) or isinstance(abstract_cost[cost], float) else abstract_cost[cost]
 			})
 
-		if len(test_data) > 2:
-			data += test_data
+		if len(cw_data) > 2:
+			data += cw_data
 		total_sqf=0
 		total_amt=0
 		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'))

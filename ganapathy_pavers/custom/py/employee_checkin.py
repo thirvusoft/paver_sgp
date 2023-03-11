@@ -28,10 +28,17 @@ def check_in_out(self, event):
             if current_log=="IN":
                 current_log="OUT"
     hours=0
+    hours_to_reduce=0
+    if self.ts_employee_attendance_tool:
+        ts_emp=frappe.get_doc("TS Employee Attendance Tool", self.ts_employee_attendance_tool)
+        for row in ts_emp.employee_detail:
+            if row.employee == self.employee:
+                hours_to_reduce = row.hours_to_reduce
+
     for j in total_hours:
        hours+=(time_diff_in_hours(j[1],j[0]))
-    if self.ts_employee_attendance_tool and frappe.db.get_value("TS Employee Attendance Tool", self.ts_employee_attendance_tool, "hours_to_reduce"):
-        hours-=frappe.db.get_value("TS Employee Attendance Tool", self.ts_employee_attendance_tool, "hours_to_reduce")
+    if self.ts_employee_attendance_tool and hours_to_reduce:
+        hours-=hours_to_reduce
     frappe.db.set_value(self.doctype, self.name, 'working_hours',hours)
     return ot_hours_cal(self, float(hours))
 

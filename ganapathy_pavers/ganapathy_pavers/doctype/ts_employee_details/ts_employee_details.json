@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "employee",
+  "hours_to_reduce",
   "employee_name",
   "location",
   "machine",
@@ -46,7 +47,7 @@
    "label": "Check Out"
   },
   {
-   "columns": 2,
+   "columns": 1,
    "fieldname": "location",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -60,12 +61,19 @@
    "in_list_view": 1,
    "label": "Working Area",
    "options": "Working Area"
+  },
+  {
+   "columns": 1,
+   "fieldname": "hours_to_reduce",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Hours to Reduce"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-08-10 12:52:56.019318",
+ "modified": "2023-03-07 16:12:27.124119",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "TS Employee Details",

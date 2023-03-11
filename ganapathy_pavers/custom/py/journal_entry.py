@@ -142,3 +142,38 @@ def split_expenses(common_exp):
                 "vehicle": row.get("vehicle", ""),
             })
     return com_acc
+
+def site_work_additional_cost(self, event = None):
+    if not self.is_site_expense:
+        return
+    if event=="on_cancel":
+        sites = frappe.get_all("Project", filters = [
+            ["Additional Costs", "journal_entry", "=", self.name]
+            ], pluck="name")
+        if sites:
+            for site in sites:
+                sw_doc=frappe.get_doc("Project", site)
+                add_costs=[]
+                for row in sw_doc.additional_cost:
+                    if row.journal_entry != self.name:
+                        add_costs.append(row)
+                sw_doc.update({
+                    "additional_cost": add_costs 
+                })
+                sw_doc.save()
+        
+        return
+    
+    if not self.site_work:
+        return
+    
+    sw_doc = frappe.get_doc("Project", self.site_work)
+
+    for row in self.accounts:
+        if row.debit:
+            sw_doc.append("additional_cost", {
+                "description": frappe.get_value("Account", row.account, "account_name"),
+                "amount": row.debit,
+                "journal_entry": self.name,
+            })
+    sw_doc.save()    

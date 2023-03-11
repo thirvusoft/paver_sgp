@@ -17,7 +17,12 @@
   "stock_qty",
   "stock_uom",
   "customer_scope",
-  "rate_inclusive"
+  "rate_inclusive",
+  "section_break_13",
+  "purchase_invoice",
+  "item_tax_template",
+  "tax_rate",
+  "tax_amount"
  ],
  "fields": [
   {
@@ -111,12 +116,42 @@
    "fieldname": "rate_inclusive",
    "fieldtype": "Check",
    "label": "Rate Inclusive"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break",
+   "label": "Purchase Invoice Details"
+  },
+  {
+   "fieldname": "purchase_invoice",
+   "fieldtype": "Data",
+   "label": "Purchase Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item_tax_template",
+   "fieldtype": "Link",
+   "label": "Item Tax Template",
+   "options": "Item Tax Template",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tax_rate",
+   "fieldtype": "Currency",
+   "label": "Tax Rate",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tax_amount",
+   "fieldtype": "Currency",
+   "label": "Tax Amount",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-02-27 17:09:12.442275",
+ "modified": "2023-03-06 19:05:07.696712",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Raw Materials",

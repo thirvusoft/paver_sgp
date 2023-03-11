@@ -107,10 +107,15 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
     after_save: async function(){
         cur_frm.reload_doc()
     },
+    hours_to_reduce: function(frm) {
+        (frm.doc.employee_detail || []).forEach(row => {
+            frappe.model.set_value(row.doctype, row.name, "hours_to_reduce", frm.doc.hours_to_reduce);
+        })
+    },
     update:function(frm,cdt,cdn){
         if (cur_frm.doc.employee && cur_frm.doc.updated_checkout){
                 frappe.call({
-                    method:"ganapathy_pavers.custom.py.employee_atten_tool.help_session",
+                    method:"ganapathy_pavers.custom.py.employee_atten_tool.help_section",
                     args:{
                         emp: cur_frm.doc.employee,
                         emp_tabl : cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:[]

@@ -221,7 +221,8 @@ doc_events = {
 		# ]
 	},
 	"Purchase Order":{
-		"before_submit":"ganapathy_pavers.custom.py.purchase_order.getdate"
+		"before_submit":"ganapathy_pavers.custom.py.purchase_order.getdate",
+		"before_cancel": "ganapathy_pavers.custom.py.purchase_order.update_drop_ship_items_in_sw",
 	},
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
@@ -284,10 +285,25 @@ doc_events = {
 		"validate":"ganapathy_pavers.custom.py.purchase_receipt.purchase_receipt_rawmaterial"
 	},
 	"Purchase Invoice":{
-		"on_submit":"ganapathy_pavers.custom.py.purchase_invoice_dashboard.tags_msg"
+		"validate": [
+			"ganapathy_pavers.custom.py.purchase_invoice.update_pi_items",
+		],
+		"on_submit":[
+    		"ganapathy_pavers.custom.py.purchase_invoice_dashboard.tags_msg",
+		    "ganapathy_pavers.custom.py.purchase_invoice.site_work_details_from_pi",
+		],
+		"on_cancel": [
+			"ganapathy_pavers.custom.py.purchase_invoice.site_work_details_from_pi",
+		]
 	},
 	"Journal Entry": {
-		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry"
+		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry",
+		"on_submit": [
+			"ganapathy_pavers.custom.py.journal_entry.site_work_additional_cost"
+		],
+		"on_cancel": [
+			"ganapathy_pavers.custom.py.journal_entry.site_work_additional_cost"
+		],
 	},
 	"Attendance": {
 		"on_submit": ["ganapathy_pavers.custom.py.employee_checkin.check_in_out",
@@ -410,7 +426,8 @@ except:pass
 # ------------------------------
 #
 override_whitelisted_methods = {
-	"erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry": "ganapathy_pavers.custom.py.payment_entry.get_payment_entry"
+	"erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry": "ganapathy_pavers.custom.py.payment_entry.get_payment_entry",
+	"erpnext.buying.doctype.purchase_order.purchase_order.update_status": "ganapathy_pavers.custom.py.purchase_order.update_status",
 }
 #
 # each overriding function accepts a `data` argument;
