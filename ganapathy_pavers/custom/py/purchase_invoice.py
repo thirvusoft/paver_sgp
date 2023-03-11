@@ -57,7 +57,7 @@ def site_work_details_from_pi(self, event=None):
                         "qty": field_data["qty"],
                         "uom": field_data["uom"],
                         "rate": field_data["rate"],
-                        "amount": field_data["amount"],
+                        "amount": field_data["amount"] + field_data["tax_amount"],
                         "item_tax_template": field_data["item_tax_template"],
                         "tax_rate": field_data["tax_rate"],
                         "tax_amount": field_data["tax_amount"],
