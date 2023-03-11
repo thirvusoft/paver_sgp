@@ -13,10 +13,10 @@ def execute(filters=None):
 	vehicle_no = filters.get("vehicle_no")
 	transport_based_on = filters.get("transport_based_on")
 
-	doc = frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no}, [
+	doc = frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no, "docstatus": 1, "select_purpose": ["not in", ["Fuel", "Service"]]}, [
 							'last_odometer', 'odometer', 'delivery_note', 'sales_invoice', 'today_odometer_value'], order_by="date",)
-	dn_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'delivery_note':['is','set']}, pluck='delivery_note')
-	si_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'sales_invoice':['is','set']}, pluck='sales_invoice')
+	dn_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'delivery_note':['is','set'], "docstatus": 1, "select_purpose": ["not in", ["Fuel", "Service"]]}, pluck='delivery_note')
+	si_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'sales_invoice':['is','set'], "docstatus": 1, "select_purpose": ["not in", ["Fuel", "Service"]]}, pluck='sales_invoice')
 	start_km = 0
 	end_km = 0
 	pavers_km = 0
@@ -72,8 +72,8 @@ def execute(filters=None):
 		})
 
 
-	dn_item=frappe.get_all("Delivery Note Item",{"parent":['in',dn_doc]},['item_code','item_group','sum(stock_qty) as stock_qty', 'stock_uom'],group_by='item_code')
-	si_item=frappe.get_all("Sales Invoice Item",{"parent":['in',si_doc]},['item_code','item_group','sum(stock_qty) as stock_qty', 'stock_uom'],group_by='item_code')
+	dn_item=frappe.get_all("Delivery Note Item",{"parent":['in',dn_doc], "docstatus": 1},['item_code','item_group','sum(stock_qty) as stock_qty', 'stock_uom'],group_by='item_code')
+	si_item=frappe.get_all("Sales Invoice Item",{"parent":['in',si_doc], "docstatus": 1},['item_code','item_group','sum(stock_qty) as stock_qty', 'stock_uom'],group_by='item_code')
 
 	si_qty = lambda item_code: sum([i['stock_qty'] for i in si_item if(i['item_code']==item_code)])
 
@@ -210,29 +210,17 @@ def execute(filters=None):
 	expense_details = get_expense_data((pavers_total+cw_total) or 1, filters, pavers_total, cw_total, ((pavers_km or 0) + (cw_km or 0)), pavers_km, cw_km)
 	# if transport_based_on=="Report":
 	data+=(expense_details)
-	paver_total_amount=round(sum([i["2"] or 0 for i in expense_details if not i.get("is_km_exp")]), 2)
-	cw_total_amount=round(sum([i["3"] or 0 for i in expense_details if not i.get("is_km_exp")]), 2)
-
-	paver_total_amount_km=round(sum([i["2"] or 0 for i in expense_details if i.get("is_km_exp")]), 2)
-	cw_total_amount_km=round(sum([i["3"] or 0 for i in expense_details if i.get("is_km_exp")]), 2)
+	paver_total_amount=round(sum([i["2"] or 0 for i in expense_details]), 2)
+	cw_total_amount=round(sum([i["3"] or 0 for i in expense_details]), 2)
 
 	data.append({})
 
 	data.append({
-		"item":"<b>Total Amount for SQFT</b>",
-		"qty":f'<b>{round(sum([i["qty"] or 0 for i in expense_details if not i.get("is_km_exp")]), 2)}</b>',
-		"1":f'<b>{round(sum([i["1"] or 0 for i in expense_details if not i.get("is_km_exp")]), 2)}</b>',
+		"item":"<b>Total Amount</b>",
+		"qty":f'<b>{round(sum([i["qty"] or 0 for i in expense_details]), 2)}</b>',
+		"1":f'<b>{round(sum([i["1"] or 0 for i in expense_details]), 2)}</b>',
 		"2":f'<b>{paver_total_amount}</b>',
 		"3":f'<b>{cw_total_amount}</b>'
-	})
-
-	if paver_total_amount_km or cw_total_amount_km:
-		data.append({
-		"item":"<b>Total Amount for KM</b>",
-		"qty":f'<b>{round(sum([i["qty"] or 0 for i in expense_details if i.get("is_km_exp")]), 2)}</b>',
-		"1":f'<b>{round(sum([i["1"] or 0 for i in expense_details if i.get("is_km_exp")]), 2)}</b>',
-		"2":f'<b>{paver_total_amount_km}</b>',
-		"3":f'<b>{cw_total_amount_km}</b>'
 	})
 
 	data.append({
@@ -242,15 +230,9 @@ def execute(filters=None):
 	})
 
 	data.append({
-		"item":"<b>Total KM</b>",
-		"2":f'<b>{pavers_km}</b>',
-		"3":f'<b>{cw_km}</b>'
-	})
-
-	data.append({
 		"item":"<b>Total Cost</b>",
-		"2":f'<b>{round(((paver_total_amount/pavers_total) if pavers_total else 0)+((paver_total_amount_km/pavers_km) if pavers_km else 0), 2)}</b>',
-		"3":f'<b>{round(((cw_total_amount/cw_total) if cw_total else 0)+((cw_total_amount_km/cw_km) if cw_km else 0), 2)}</b>'
+		"2":f'<b>{round(((paver_total_amount/pavers_total) if pavers_total else 0), 2)}</b>',
+		"3":f'<b>{round(((cw_total_amount/cw_total) if cw_total else 0), 2)}</b>'
 	})
 
 	return columns, data
@@ -263,13 +245,13 @@ def get_columns():
             "fieldtype": "Link",
             "fieldname": "item",
             "options":"Item",
-            "width": 150
+            "width": 250
         },
         {
             "label": _("<b>Qty</b>"),
             "fieldtype": "Data",
             "fieldname": "qty",
-            "width": 150
+            "width": 250
         },
 		 {
             "label": _("<b>1</b>"),

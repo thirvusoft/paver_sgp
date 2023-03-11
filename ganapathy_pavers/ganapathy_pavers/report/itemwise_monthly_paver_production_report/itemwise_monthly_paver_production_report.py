@@ -113,12 +113,14 @@ def get_data(filters):
     prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
     expense_cost=get_sqft_expense(filters)
     for row in data:
+        row["prod_cost"] = (row.get("prod_cost", 0) or 0) + (row.get("strapping", 0) or 0) + (row.get("shot_blasting", 0) or 0)
         row["strapping_cost"]=(row["strapping"] or 0)
         row["shot_blasting_cost"]=(row["shot_blasting"] or 0)
         row['pieces']=uom_conversion(item=row['item'], from_uom="SQF", from_qty=row['sqft'], to_uom="Nos")
         row["expense_cost"]=(expense_cost or 0) if not expense_cost else (expense_cost*(row['sqft'] or 0))/(prod_details.get("paver") or 1)/(prod_details.get("paver") or 1)
         row["expense_cost"]=(expense_cost or 0) if not expense_cost else (expense_cost)/(prod_details.get("paver") or 1)
-        row["total_cost"]=(row["prod_cost"] or 0) + (row["strapping"] or 0) + (row["expense_cost"] or 0) + (row["shot_blasting"] or 0) + (row["labour_operator_cost"] or 0)
+        row["expense_cost"] = (row.get("expense_cost", 0) or 0) + (row.get("labour_operator_cost", 0) or 0)
+        row["total_cost"]=(row["prod_cost"] or 0) + (row["expense_cost"] or 0)
    
     return data
 	
