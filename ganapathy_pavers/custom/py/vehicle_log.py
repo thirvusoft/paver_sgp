@@ -324,6 +324,7 @@ def update_vehicle_jea_exp(self, exp):
     return exp
 
 def service_expenses(self, event=None):
+    return
     if self.select_purpose!="Service":
         return
     exp = []
