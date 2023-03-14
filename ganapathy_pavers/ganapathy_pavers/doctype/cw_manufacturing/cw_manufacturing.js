@@ -79,6 +79,7 @@ frappe.ui.form.on("CW Manufacturing", {
         rm_consmp.forEach(row => {
             bin_items.forEach(bin => {
                 bin.total_qty += (row[frappe.model.scrub(bin.bin || "")] || 0)
+                bin.average_qty += (((row[frappe.model.scrub(bin.bin || "")] || 0)/rm_consmp.length) || 0)
             });
         });
         frm.fields_dict.bin_items.refresh()
@@ -426,6 +427,7 @@ async function std_item(frm) {
                             row.no_of_batches = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption.length : 0;
                             row.qty = d.qty;
                             row.bom_qty = d.ts_qty;
+                            row.average_consumption = d.average_consumption;
                             row.is_usb_item = 1;
                             row.from_usb = 1;
                             row.stock_uom = d.stock_uom;
@@ -474,6 +476,7 @@ async function item_adding(frm) {
                             row.item_code = d.item_code;
                             row.qty = d.qty;
                             row.bom_qty = d.ts_qty;
+                            row.average_consumption = d.ts_qty;
                             row.stock_uom = d.stock_uom;
                             row.source_warehouse = d.source_warehouse
                             row.from_bom = 1;

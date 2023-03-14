@@ -87,5 +87,26 @@ frappe.query_reports["Running Order Report"] = {
                 frappe.query_report.refresh()
             }
         },
-    ]
+    ],
+	formatter: function (value, row, column, data, default_formatter) {
+		value = __(default_formatter(value, row, column, data));
+        if (["po_qty", "total_delivery", "total_laying", "total_laying_date", "site_stock"].includes(column.fieldname)){
+            value = $(`<span>${value}</span>`);
+			var $value = $(value).css("color", "red");
+			value = $value.wrap("<p></p>").parent().html();
+        } 
+        else if (["bundle_delivery", "bundle_laying", "bundle_laying_date", "bundle_site_stock"].includes(column.fieldname)){
+            value = $(`<span>${value}</span>`);
+			var $value = $(value).css("color", "blue");
+			value = $value.wrap("<p></p>").parent().html();
+        }
+        else if (["raw_material", "raw_material_fixed", "raw_material_delivered"].includes(column.fieldname)){
+            value = $(`<span>${value}</span>`);
+			var $value = $(value).css("color", "deeppink");
+			value = $value.wrap("<p></p>").parent().html();
+        }
+        
+
+		return value;
+	},
 };

@@ -330,15 +330,18 @@ def std_item(doc):
         if bin.get('item_code') not in bin_items:
             bin_items[bin.get("item_code")]={
                 "total_qty": 0,
+                "average_qty": 0,
                 "item_code": bin.get("item_code"),
             }
         bin_items[bin.get("item_code")]["total_qty"]+=bin.get("total_qty", 0)
+        bin_items[bin.get("item_code")]["average_qty"]+=bin.get("average_qty", 0)
 
     for bin in list(bin_items.values()):
         row={}
         row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
             "Item", bin.get('item_code'), ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])        
         row['qty']=bin.get('total_qty')
+        row['average_consumption'] = bin.get('average_qty', 0)
         row['validation_rate'] = get_valuation_rate(row.get('item_code'))
         row['amount'] = row.get('qty') * (row.get('rate') or row.get('validation_rate'))
         items[row.get('item_code')] = row

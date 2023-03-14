@@ -160,10 +160,48 @@ def get_columns(filters):
 			"width": 100
 		},
 		{
+			"label": ("Total Laying"),
+			"fieldtype": "Float",
+			"fieldname": "total_laying",
+			"width": 100
+		},
+		{
+			"label": f"""Total Laying @ {frappe.utils.formatdate(filters.get("date", ""))}""",
+			"fieldtype": "Float",
+			"fieldname": "total_laying_date",
+			"hidden": not filters.get("date"),
+			"width": 100
+		},
+		{
+		    "label": ("Stock @Site"),
+		    "fieldtype": "Float",
+		    "fieldname": "site_stock",
+		    "width": 100
+		},
+		{
 			"label": ("Bndl Del"),
 			"fieldtype": "Float",
 			"fieldname": "bundle_delivery",
 			"width": 100
+		},
+		{
+			"label": ("Bndl Laying"),
+			"fieldtype": "Float",
+			"fieldname": "bundle_laying",
+			"width": 100
+		},
+		{
+			"label": f"""Bndl Laying @ {frappe.utils.formatdate(filters.get("date", ""))}""",
+			"fieldtype": "Float",
+			"fieldname": "bundle_laying_date",
+			"hidden": not filters.get("date"),
+			"width": 100
+		},
+		{
+		    "label": ("Bndl Stock @Site"),
+		    "fieldtype": "Float",
+		    "fieldname": "bundle_site_stock",
+		    "width": 100
 		},
 		{
 			"label": ("Raw Material"),
@@ -182,44 +220,6 @@ def get_columns(filters):
 			"fieldtype": "Float",
 			"fieldname": "raw_material_delivered",
 			"width": 100
-		},
-		{
-			"label": ("Total Laying"),
-			"fieldtype": "Float",
-			"fieldname": "total_laying",
-			"width": 100
-		},
-		{
-			"label": ("Bndl Laying"),
-			"fieldtype": "Float",
-			"fieldname": "bundle_laying",
-			"width": 100
-		},
-		{
-			"label": f"""Total Laying @ {frappe.utils.formatdate(filters.get("date", ""))}""",
-			"fieldtype": "Float",
-			"fieldname": "total_laying_date",
-			"hidden": not filters.get("date"),
-			"width": 100
-		},
-		{
-			"label": f"""Bndl Laying @ {frappe.utils.formatdate(filters.get("date", ""))}""",
-			"fieldtype": "Float",
-			"fieldname": "bundle_laying_date",
-			"hidden": not filters.get("date"),
-			"width": 100
-		},
-		{
-		    "label": ("Stock @Site"),
-		    "fieldtype": "Float",
-		    "fieldname": "site_stock",
-		    "width": 100
-		},
-		{
-		    "label": ("Bndl Stock @Site"),
-		    "fieldtype": "Float",
-		    "fieldname": "bundle_site_stock",
-		    "width": 100
 		},
 	]
 	return columns

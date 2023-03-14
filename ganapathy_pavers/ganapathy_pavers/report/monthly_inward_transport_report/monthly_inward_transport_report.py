@@ -14,7 +14,6 @@ def execute(filters=None):
 
 	doc = frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no}, ['name',
 							'last_odometer', 'odometer', 'purchase_invoice', 'purchase_receipt', 'today_odometer_value'], order_by="date",)
-	pr_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'purchase_receipt':['is',"set"]}, pluck='purchase_receipt')
 	pi_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'purchase_invoice':['is',"set"]}, pluck='purchase_invoice')
 	start_km = 0
 	end_km = 0
@@ -29,12 +28,9 @@ def execute(filters=None):
 		except:
 			pass
 
-	receipt_grand_total = frappe.get_list("Purchase Receipt",{"name":["in",pr_doc]},['sum(grand_total) as grand_total'],pluck="grand_total")
-	invoice_grand_total = frappe.get_list("Purchase Invoice",{"name":["in",pi_doc]},['sum(grand_total) as grand_total'],pluck="grand_total")
+	invoice_grand_total = frappe.get_list("Purchase Invoice",{"name":["in",pi_doc], 'purpose': ["!=", "Service"]},['sum(ts_total_amount) as grand_total'],pluck="grand_total")
 
-	if not receipt_grand_total[0]:
-		receipt_grand_total=[0]
-	if not invoice_grand_total[0]:
+	if not invoice_grand_total:
 		invoice_grand_total = [0]
 	
 	if not doc:
@@ -60,18 +56,12 @@ def execute(filters=None):
 		"1": "<b>Total Unit</b>",
 	})
 
-	pr_item=frappe.get_all("Purchase Receipt Item",{"parent":['in',pr_doc],"uom":"Unit"},['item_code','count(item_code) as count','sum(stock_qty) as stock_qty','stock_uom'],group_by='item_code')
 	pi_item=frappe.get_all("Purchase Invoice Item",{"parent":['in',pi_doc],"uom":"Unit"},['item_code','count(item_code) as count','sum(stock_qty) as stock_qty','stock_uom'],group_by='item_code')
 	
-
 	from collections import Counter
 	purchase_uom = Counter()
 	purchase_count = Counter()
 	purchase_qty = Counter()
-	for d in pr_item:
-		purchase_count[d['item_code']] += d['count']
-		purchase_uom[d['item_code']] = d['stock_uom']
-		purchase_qty[d['item_code']] += d['stock_qty']
 
 	for d in pi_item:
 		purchase_count[d['item_code']] += d['count']
@@ -99,7 +89,7 @@ def execute(filters=None):
 
 	data.append({
 		"item": "<b>Total Amount</b>",
-		"1": f"<b>{receipt_grand_total[0]+invoice_grand_total[0] }</b>",
+		"1": f"<b>{invoice_grand_total[0] }</b>",
 	})
 
 	data.append({})
@@ -141,8 +131,8 @@ def execute(filters=None):
 	})
 
 	data.append({
-		"item": "<b>Profit</b>",
-		"qty": f"<b>{(receipt_grand_total[0]+invoice_grand_total[0])-total_amount}</b>",
+		"item": "<b>Total Expense</b>",
+		"qty": f"<b>{(invoice_grand_total[0])+total_amount}</b>",
 	})
 
 	return columns, data

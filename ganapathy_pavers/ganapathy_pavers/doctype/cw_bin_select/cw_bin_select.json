@@ -8,7 +8,8 @@
  "field_order": [
   "bin",
   "item_code",
-  "total_qty"
+  "total_qty",
+  "average_qty"
  ],
  "fields": [
   {
@@ -33,12 +34,19 @@
    "in_list_view": 1,
    "label": "Total Qty",
    "read_only": 1
+  },
+  {
+   "fieldname": "average_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Average Qty",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-02-17 11:02:02.456168",
+ "modified": "2023-03-14 17:07:58.286667",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Bin Select",
