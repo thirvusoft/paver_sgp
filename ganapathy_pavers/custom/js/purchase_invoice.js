@@ -54,7 +54,7 @@ async function create_vehicle_log(frm) {
         await frappe.run_serially([
             async () => {
                 await frappe.new_doc("Vehicle Log", {
-                    select_purpose: "Raw Material",
+                    select_purpose: frm.doc.purpose,
                     date: date,
                     purchase_invoice: frm.doc.name,
                     license_plate: frm.doc.vehicle
@@ -74,15 +74,23 @@ async function create_vehicle_log(frm) {
                     options: "Vehicle",
                     label: "Vehicle",
                     reqd: 1,
+                },
+                {
+                    fieldname: "purpose",
+                    fieldtype: "Select",
+                    options:"\nRaw Material\nService",
+                    label: "Purpose",
+                    reqd: 1,
                 }
             ],
             primary_action: async function (data) {
                 await frappe.db.set_value(frm.doc.doctype, frm.doc.name, "vehicle", data.vehicle);
+                await frappe.db.set_value(frm.doc.doctype, frm.doc.name, "purpose", data.purpose);
                 await frm.reload_doc();
                 await frappe.run_serially([
                     async () => {
                         await frappe.new_doc("Vehicle Log", {
-                            select_purpose: "Raw Material",
+                            select_purpose: data.purpose,
                             date: date,
                             purchase_invoice: frm.doc.name,
                             license_plate: data.vehicle

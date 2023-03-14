@@ -1,3 +1,4 @@
+import json
 import frappe
 
 def update_pi_items(self, event=None):
@@ -66,3 +67,58 @@ def site_work_details_from_pi(self, event=None):
                 elif field == "Raw Material":
                     sw_doc.append(frappe.scrub(field), field_data)
         sw_doc.save()
+
+
+def create_service_vehicle_log(self, event=None):
+    if not (self.vehicle and self.purpose=="Service"):
+        return
+
+    services = []
+    for row in self.items:
+        service = frappe.db.get_value("Service Item", {'item_code': row.item_code}, "name")
+        if not service:
+            frappe.throw(f"""Please link this item <b>{row.item_code}</b> to a <a href="/app/service-item"><b>Service</b></a>""")
+        
+        services.append({
+            "service_item": service,
+            "type": row.service_type,
+            "expense_amount": row.amount,
+            "description": row.description,
+        })
+
+    service_doc = frappe.new_doc("Vehicle Log")
+
+    service_doc.update({
+        "license_plate": self.vehicle,
+        "date": self.posting_date,
+        "odometer": frappe.db.get_value("Vehicle", self.vehicle, "fuel_odometer"),
+        "select_purpose": self.purpose,
+        "supplier1": self.supplier,
+        "service_item_table": services,
+    })
+
+    service_doc.save()
+    service_doc.submit()
+
+@frappe.whitelist()
+def create_service_logs(docnames=[]):
+    if isinstance(docnames, str):
+        try:
+            docnames = json.loads(docnames)
+        except:
+            return 0
+    
+    pi=[]
+    filters={"docstatus": 1, "vehicle": ["is", "set"], "purpose": "Service"}
+    if docnames:
+        filters["name"] = ["in", docnames]
+
+    success = 0
+    pi=frappe.get_all("Purchase Invoice", filters, ["name", "vehicle", "purpose"])
+    for pi_doc in pi:
+        if not frappe.get_all("Vehicle Log", {"docstatus": 1, "license_plate": pi_doc['vehicle'], "select_purpose": pi_doc["purpose"]}):
+            create_service_vehicle_log(frappe.get_doc("Purchase Invoice", pi_doc["name"]))
+            success+=1
+    
+    print(success)
+    return success

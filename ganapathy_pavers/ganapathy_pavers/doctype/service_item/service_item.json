@@ -8,7 +8,9 @@
  "engine": "InnoDB",
  "field_order": [
   "service_item",
-  "expense_account"
+  "expense_account",
+  "column_break_3",
+  "item_code"
  ],
  "fields": [
   {
@@ -26,11 +28,23 @@
    "in_list_view": 1,
    "label": "Expense Account",
    "options": "Account"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-01 16:04:57.247292",
+ "modified": "2023-03-13 12:21:16.901022",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Service Item",
