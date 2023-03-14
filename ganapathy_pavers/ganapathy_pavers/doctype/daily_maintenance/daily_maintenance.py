@@ -361,7 +361,7 @@ def size_details(items, _type):
 			total_size[size]={'type': _type, 'size': size, "num_size": num_size, 'total_stock': 0}
 		for field in fields:
 			total_size[size]['total_stock']+=row.get(field, 0)
-	return sorted(list(total_size.values()), key=lambda x: x.get("num_size", "") or "")
+	return sorted(list(total_size.values()), key=lambda x: x.get("num_size", 0) or 0)
 
 def raw_material_stock_details():
 	dsm=frappe.get_single("DSM Defaults")

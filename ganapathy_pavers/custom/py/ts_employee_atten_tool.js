@@ -239,6 +239,7 @@ function get_data(frm, cdt, cdn){
             for(var i=0;i<r.message.length;i++){
                 var child = cur_frm.add_child("employee_detail");
                 frappe.model.set_value(child.doctype, child.name, "employee", r.message[i]["name"])
+                frappe.model.set_value(child.doctype, child.name, "hours_to_reduce", frm.doc.hours_to_reduce)
                 frappe.model.set_value(child.doctype, child.name, "check_in", cur_frm.doc.date)
                 frappe.model.set_value(child.doctype, child.name, "check_out", cur_frm.doc.checkout_time)
                 frappe.model.set_value(child.doctype, child.name, "employee_name", r.message[i]["employee_name"])
@@ -358,6 +359,7 @@ frappe.ui.form.on('TS Employee Details', {
         not_permitted(frm, cdt, cdn);
     },
     employee_detail_add: async function(frm, cdt, cdn){
+        frappe.model.set_value(cdt, cdn, frm.doc.hours_to_reduce)
         duplicate_entry(frm, cdt, cdn)
         cur_frm.trigger('onload_post_render')
     }
