@@ -3,11 +3,14 @@
 
 frappe.ui.form.on('Shot Blast Costing', {
 	onload: async function (frm) {
-		frm.set_query("material_manufacturing", "items", function () {
+		frm.set_query("material_manufacturing", "items", function (f, cdt, cdn) {
+			let data = locals[cdt][cdn]
 			return {
-				"filters": {
+				filters: {
+					item_to_manufacture: data.item_name,
 					is_shot_blasting: 1,
-					docstatus: 0
+					docstatus: ["!=", 2],
+					shot_blasted_bundle: [">", 0]
 				}
 			}
 		})

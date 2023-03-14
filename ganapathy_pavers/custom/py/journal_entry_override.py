@@ -21,6 +21,7 @@ class _JournalEntry(JournalEntry):
                         "vehicle": d.vehicle, # Customization
                         "expense_type": d.expense_type, # Customization
                         "paver": d.paver, # Customization
+                        "is_shot_blast": d.is_shot_blast, # Customization
                         "compound_wall": d.compound_wall, # Customization
                         "fencing_post": d.fencing_post, # Customization
                         "lego_block": d.lego_block, # Customization
@@ -111,7 +112,7 @@ def merge_similar_entries(gl_map, precision=None):
     for entry in gl_map:
         # if there is already an entry in this account then just add it
         # to that entry
-        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "compound_wall", "fencing_post", "lego_block",] + get_workstations()) # Customization
+        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block",] + get_workstations()) # Customization
         if same_head:
             same_head.debit	= flt(same_head.debit) + flt(entry.debit)
             same_head.debit_in_account_currency	= \

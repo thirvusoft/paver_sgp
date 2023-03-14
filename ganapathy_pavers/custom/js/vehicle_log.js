@@ -127,6 +127,7 @@ async function fetch_expense_details(frm) {
             })
             refresh_field("workstations")
             frm.set_value("paver", vehicle.paver)
+            frm.set_value("is_shot_blast", vehicle.is_shot_blast)
             frm.set_value("compound_wall", vehicle.compound_wall)
             frm.set_value("fencing_post", vehicle.fencing_post)
             frm.set_value("lego_block", vehicle.lego_block)
