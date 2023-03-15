@@ -3,6 +3,7 @@ import json
 from frappe.utils.csvutils import getlink
 from datetime import datetime
 from frappe.utils import date_diff
+DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 @frappe.whitelist()
@@ -136,7 +137,7 @@ def attendance(table_list, company, ts_name):
 			doc.update({
 				'employee':i.get("employee"),
 				'status':"Present",
-				'attendance_date': i.get('check_in'),
+				'attendance_date':  datetime.strptime(i.get('check_in'), DATE_TIME_FORMAT).date(),
 				'location': i.get('location'),
 				'machine': i.get('machine'),
 				'company': company if(company) else doc1.default_company,
@@ -160,7 +161,7 @@ def update_attendance_to_checkin(self, event):
 		doc=frappe.get_doc("Employee Checkin", checkin)
 		doc.add_comment(text=f"""
 		{frappe.utils.now()} - Reference: {self.name}<br>
-		Removed Attendance name: {self.name}  - {self.time}
+		Removed Attendance name: {doc.attendance}  - {self.attendance_date}
 		""")
 		frappe.db.set_value('Employee Checkin', checkin, 'attendance', "")
 
@@ -168,7 +169,7 @@ def update_attendance_to_checkin(self, event):
 		doc=frappe.get_doc("Employee Checkin", _doc)
 		doc.add_comment(text=f"""
 		{frappe.utils.now()} - Reference: {self.name}<br>
-		Linking Attendance name: {self.name}  - {self.time}
+		Linking Attendance name: {self.name}  - {self.attendance_date}
 		""")
 		frappe.db.set_value('Employee Checkin', _doc, 'attendance', self.name)
 
@@ -287,7 +288,7 @@ def validate_empty_field(employee_detail):
 
 def day_wise_department(self, event):
 	if(self.date):
-		date=datetime.strptime(str(self.date), "%Y-%m-%d %H:%M:%S").date()
+		date=datetime.strptime(str(self.date), DATE_TIME_FORMAT).date()
 		filters={'date': ['between', [date, date]], 'docstatus':['!=', 2]}
 		if(self.name in frappe.get_all(self.doctype, pluck = 'name')):
 			filters['name'] = ['!=', self.name]

@@ -12,7 +12,7 @@ def mark_attendance():
     
 def check_in_out(self, event):
     emp_checkin_hours=frappe.get_all('Employee Checkin', 
-    {'employee': self.employee, 'time': ['between',[self.attendance_date,self.attendance_date]]},
+    {'attendance': self.name},
     ["log_type","time"])
     current_log="IN"
     total_hours=[]

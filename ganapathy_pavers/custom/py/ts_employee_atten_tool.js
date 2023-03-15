@@ -60,6 +60,9 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
         })
     },
     onload_post_render: async function(frm){
+        if (cur_frm.is_new()) {
+            return
+        } 
         let table = (cur_frm.doc.employee_detail?cur_frm.doc.employee_detail:[])
         for(let row=0; row<table.length; row++){
             if(table[row].employee){
@@ -337,9 +340,15 @@ async function not_permitted(frm, cdt, cdn){
 
 frappe.ui.form.on('TS Employee Details', {
     check_in:function(frm,cdt,cdn){
+        if (cur_frm.is_new()) {
+            return
+        } 
         change_checkin(frm,cdt,cdn, 'IN');
     },
     check_out:function(frm,cdt,cdn){
+        if (cur_frm.is_new()) {
+            return
+        } 
         change_checkin(frm,cdt,cdn, 'OUT');
     },
     employee:function(frm,cdt,cdn){
@@ -356,6 +365,9 @@ frappe.ui.form.on('TS Employee Details', {
         }
     },
     before_employee_detail_remove: async function(frm, cdt, cdn) {
+        if (cur_frm.is_new()) {
+            return
+        } 
         not_permitted(frm, cdt, cdn);
     },
     employee_detail_add: async function(frm, cdt, cdn){
