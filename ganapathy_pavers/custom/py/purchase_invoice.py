@@ -95,6 +95,8 @@ def create_service_vehicle_log(self, event=None):
         "select_purpose": self.purpose,
         "supplier1": self.supplier,
         "service_item_table": services,
+        "reference_doctype": self.doctype,
+        "reference_document": self.name,
     })
 
     service_doc.save()
