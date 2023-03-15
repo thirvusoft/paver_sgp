@@ -14,20 +14,37 @@ function get_filters() {
 			fieldtype: "Link",
 			get_query: () => {
 				return {
-					filters: { "has_variants": 1 }
+					// filters: { "has_variants": 1 }
 				}
 			},
 			on_change: async () => {
 				await hideAndUnhideFilters(frappe.query_report.get_filter_value("item"), attributes)
 				frappe.query_report.refresh()
 			}
-		}
+		},
+		{
+			fieldname:"from_date",
+			label: __("From Date"),
+			fieldtype: "Date",
+			default: frappe.datetime.month_start(),
+			width: "80",
+			reqd:1
+		},
+		{
+			fieldname:"to_date",
+			label: __("To Date"),
+			fieldtype: "Date",
+			default: frappe.datetime.month_end(),
+			width: "80",
+			reqd:1
+		},
 	]
 	frappe.db.get_list("Item Attribute").then(res => {
 		res.forEach(attr => {
-			attributes.push(frappe.model.scrub(attr.name))
+			let fieldname = frappe.model.scrub(attr.name)
+			attributes.push(fieldname)
 			report_filters.push({
-				fieldname: frappe.model.scrub(attr.name),
+				fieldname: fieldname,
 				label: __(attr.name),
 				fieldtype: "MultiSelectList",
 				hidden: 1,

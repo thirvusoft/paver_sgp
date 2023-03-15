@@ -2,28 +2,27 @@
 # For license information, please see license.txt
 
 
+import json
+from ganapathy_pavers.utils.py.sitework_printformat import get_cw_monthly_cost
+from ganapathy_pavers.custom.py.journal_entry import get_production_details
+from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost, get_sqft_expense
 import frappe
 from frappe import _
 
 
 def execute(filters=None):
 	columns = get_columns(filters.item)
-	data = get_data(filters.item)
+	data = get_data(filters)
 	return columns, data
 
-def get_data(item):
+def get_data(filters):
+	item = filters.item
 	if not item:
 		return []
+
 	item_dicts = []
 
-	variant_results = frappe.db.get_all(
-		"Item",
-		fields=["name"],
-		filters={
-			"variant_of": ["=", item],
-			"disabled": 0
-		}
-	)
+	variant_results = get_item_data(filters) 
 
 	if not variant_results:
 		frappe.msgprint(_("There aren't any item variants for the selected item"))
@@ -31,9 +30,6 @@ def get_data(item):
 	else:
 		variant_list = [variant['name'] for variant in variant_results]
 
-	order_count_map = get_open_sales_orders_count(variant_list)
-	stock_details_map = get_stock_details_map(variant_list)
-	buying_price_map = get_buying_price_map(variant_list)
 	selling_price_map = get_selling_price_map(variant_list)
 	attr_val_map = get_attribute_values_map(variant_list)
 
@@ -48,6 +44,9 @@ def get_data(item):
 	attribute_list = [row.get("attribute") for row in attributes]
 
 	# Prepare dicts
+	expense_cost=get_sqft_expense(filters)
+	prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
+
 	variant_dicts = [{"variant_name": d['name']} for d in variant_results]
 	for item_dict in variant_dicts:
 		name = item_dict.get("variant_name")
@@ -57,16 +56,32 @@ def get_data(item):
 			if attr_dict and attr_dict.get(attribute):
 				item_dict[frappe.scrub(attribute)] = attr_val_map.get(name).get(attribute)
 
-		item_dict["open_orders"] = order_count_map.get(name) or 0
+		if frappe.db.get_value("Item", item_dict.get("variant_name"), "item_group") == "Pavers":
+			item_dict["production_rate"] = sum(get_production_cost(filters, item_dict.get("variant_name"))) 
+			if item_dict["production_rate"]:
+				item_dict["production_rate"] += (expense_cost /(prod_details.get("paver", 1) or 1)) 
+		
+		if frappe.db.get_value("Item", item_dict.get("variant_name"), "item_group") == "Compound Walls":
+			
+			_type = [frappe.db.get_value("Item", item_dict.get("variant_name"), "compound_wall_type")]
+			if "Post" in _type or "Slab" in _type:
+				_type = ["Post", "Slab"]
+			exp_group="cw_group"
+			prod="cw"
 
-		if stock_details_map.get(name):
-			item_dict["current_stock"] = stock_details_map.get(name)["Inventory"] or 0
-			item_dict["in_production"] = stock_details_map.get(name)["In Production"] or 0
-		else:
-			item_dict["current_stock"] = item_dict["in_production"] = 0
+			if _type == ["Lego Block"]:
+				exp_group="lg_group"
+				prod="lego"
 
-		item_dict["avg_buying_price_list_rate"] = buying_price_map.get(name) or 0
-		item_dict["avg_selling_price_list_rate"] = selling_price_map.get(name) or 0
+			elif _type == ['Fencing Post']:
+				exp_group="fp_group" 
+				prod="fp"
+			item_dict["production_rate"] = get_cw_monthly_cost(filters=filters,
+                                  _type=_type,
+                                  exp_group=exp_group,
+                                  prod=prod)
+
+		item_dict["selling_price_list_rate"] = selling_price_map.get(name) or 0
 
 		item_dicts.append(item_dict)
 
@@ -93,33 +108,15 @@ def get_columns(item):
 
 	additional_columns = [
 		{
-			"fieldname": "avg_buying_price_list_rate",
-			"label": _("Avg. Buying Price List Rate"),
+			"fieldname": "production_rate",
+			"label": _("Production Rate"),
 			"fieldtype": "Currency",
 			"width": 150
 		},
 		{
 			"fieldname": "avg_selling_price_list_rate",
-			"label": _("Avg. Selling Price List Rate"),
+			"label": _("Selling Price List Rate"),
 			"fieldtype": "Currency",
-			"width": 150
-		},
-		{
-			"fieldname": "current_stock",
-			"label": _("Current Stock"),
-			"fieldtype": "Float",
-			"width": 120
-		},
-		{
-			"fieldname": "in_production",
-			"label": _("In Production"),
-			"fieldtype": "Float",
-			"width": 150
-		},
-		{
-			"fieldname": "open_orders",
-			"label": _("Open Sales Orders"),
-			"fieldtype": "Float",
 			"width": 150
 		}
 	]
@@ -127,74 +124,41 @@ def get_columns(item):
 
 	return columns
 
-def get_open_sales_orders_count(variants_list):
-	open_sales_orders = frappe.db.get_list(
-		"Sales Order",
-		fields=[
-			"name",
-			"`tabSales Order Item`.item_code"
-		],
-		filters=[
-			["Sales Order", "docstatus", "=", 1],
-			["Sales Order Item", "item_code", "in", variants_list]
-		],
-		distinct=1
-	)
 
-	order_count_map = {}
-	for row in open_sales_orders:
-		item_code = row.get("item_code")
-		if order_count_map.get(item_code) is None:
-			order_count_map[item_code] = 1
-		else:
-			order_count_map[item_code] += 1
+def get_item_data(filters):
+	item_doc = frappe.get_doc("Item", filters.item)
 
-	return order_count_map
+	attributes = {}
 
-def get_stock_details_map(variant_list):
-	stock_details = frappe.db.get_all(
-		"Bin",
-		fields=[
-			"sum(planned_qty) as planned_qty",
-			"sum(actual_qty) as actual_qty",
-			"sum(projected_qty) as projected_qty",
-			"item_code",
-		],
+	for row in item_doc.attributes:
+		attr = frappe.scrub(row.attribute)
+		if attr in filters and filters.get(attr):
+			attributes[attr] = filters.get(attr)
+
+	result = []
+	variants = frappe.db.get_all(
+		"Item",
+		fields=["name"],
 		filters={
-			"item_code": ["in", variant_list]
+			"variant_of": ["=", filters.item],
+			"disabled": 0
 		},
-		group_by="item_code"
 	)
 
-	stock_details_map = {}
-	for row in stock_details:
-		name = row.get("item_code")
-		stock_details_map[name] = {
-			"Inventory": row.get("actual_qty"),
-			"In Production": row.get("planned_qty")
-		}
+	for item in variants:
+		item_doc = frappe.get_doc("Item", item.name)
+		matches = []
+		for attr in attributes:
+			for row in item_doc.attributes:
+				if (frappe.scrub(row.attribute) == attr and row.attribute_value in filters.get(attr)):
+					matches.append(1)
+					continue
+		
+		if len(matches) == len(attributes):
+			result.append(item)
 
-	return stock_details_map
+	return result
 
-def get_buying_price_map(variant_list):
-	buying = frappe.db.get_all(
-		"Item Price",
-		fields=[
-			"avg(price_list_rate) as avg_rate",
-			"item_code",
-		],
-		filters={
-			"item_code": ["in", variant_list],
-			"buying": 1
-		},
-		group_by="item_code"
-	)
-
-	buying_price_map = {}
-	for row in buying:
-		buying_price_map[row.get("item_code")] = row.get("avg_rate")
-
-	return buying_price_map
 
 def get_selling_price_map(variant_list):
 	selling = frappe.db.get_all(
