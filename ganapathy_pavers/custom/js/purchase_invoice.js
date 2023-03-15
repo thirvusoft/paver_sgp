@@ -35,7 +35,7 @@ frappe.ui.form.on("Purchase Invoice", {
         frm.trigger("taxes_and_charges");
     },
     refresh: function (frm) {
-        if (frm.doc.docstatus != 2) {
+        if (frm.doc.docstatus != 2 && frm.doc.purpose != "Service" && frm.doc.vehicle) {
             frm.add_custom_button("Vehicle Log", function () {
                 create_vehicle_log(frm)
             }, "Create");
