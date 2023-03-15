@@ -125,7 +125,9 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
         SELECT 
             dni.item_code,
             SUM(dni.qty) as qty,
-            dni.uom
+            dni.uom,
+            AVG(rate) as rate,
+            SUM(dni.amount) as amount
         FROM `tabDelivery Note Item` dni
         LEFT OUTER JOIN `tabDelivery Note` dn
         ON dn.name=dni.parent AND dni.parenttype="Delivery Note"
