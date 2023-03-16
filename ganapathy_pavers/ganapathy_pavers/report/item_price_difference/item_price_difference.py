@@ -3,6 +3,7 @@
 
 
 import json
+from erpnext.stock.get_item_details import get_item_price
 from frappe.desk.reportview import get_filters_cond, get_match_cond
 from frappe.utils.data import nowdate
 from ganapathy_pavers.utils.py.sitework_printformat import get_cw_monthly_cost
@@ -14,11 +15,12 @@ from frappe import _, scrub
 
 
 def execute(filters=None):
-	columns = get_columns(filters.item)
-	data = get_data(filters)
+	selling_price_lists = frappe.get_all("Price List", {"enabled": 1, "item_price_difference": 1}, pluck="name")
+	columns = get_columns(filters.item, selling_price_lists)
+	data = get_data(filters, selling_price_lists)
 	return columns, data
 
-def get_data(filters):
+def get_data(filters, selling_price_lists):
 	item = filters.item
 	if not item:
 		return []
@@ -35,7 +37,6 @@ def get_data(filters):
 	
 	variant_list = [variant['name'] for variant in variant_results]
 
-	selling_price_map = get_selling_price_map(variant_list)
 	attr_val_map = get_attribute_values_map(variant_list)
 
 	attributes = frappe.db.get_all(
@@ -93,13 +94,15 @@ def get_data(filters):
 			if item_dict["production_rate"]:
 				item_dict["production_rate"] += ((cw_expense_cost.get(exp_group, 0) or 0) /(prod_details.get(prod, 1) or 1))
 
-		item_dict["selling_price_list_rate"] = selling_price_map.get(name) or 0
+		for price_list in selling_price_lists:
+			selling_price_map = get_selling_price_map(filters, item_dict.get("variant_name"), price_list)
+			item_dict[scrub(price_list)] = selling_price_map.get(name) or 0
 
 		item_dicts.append(item_dict)
 
 	return item_dicts
 
-def get_columns(item):
+def get_columns(item, selling_price_lists):
 	columns = [{
 		"fieldname": "variant_name",
 		"label": "Variant",
@@ -124,14 +127,18 @@ def get_columns(item):
 			"label": _("Production Rate"),
 			"fieldtype": "Currency",
 			"width": 150
-		},
+		}
+	]
+	for price_list in selling_price_lists:
+		additional_columns += [
 		{
-			"fieldname": "avg_selling_price_list_rate",
-			"label": _("Selling Price List Rate"),
+			"fieldname": scrub(price_list),
+			"label": _(price_list),
 			"fieldtype": "Currency",
 			"width": 150
 		}
 	]
+
 	columns.extend(additional_columns)
 
 	return columns
@@ -172,23 +179,18 @@ def get_item_data(filters):
 	return result
 
 
-def get_selling_price_map(variant_list):
-	selling = frappe.db.get_all(
-		"Item Price",
-		fields=[
-			"avg(price_list_rate) as avg_rate",
-			"item_code",
-		],
-		filters={
-			"item_code": ["in", variant_list],
-			"selling": 1
-		},
-		group_by="item_code"
-	)
-
+def get_selling_price_map(filters, item, price_list):
 	selling_price_map = {}
-	for row in selling:
-		selling_price_map[row.get("item_code")] = row.get("avg_rate")
+	args = {
+	'item_code': item, 
+		'price_list': price_list, 
+		'uom': frappe.db.get_value("Item", item, "stock_uom"), 
+		'transaction_date': filters.get("to_date") or nowdate(), 
+		'posting_date': filters.get("to_date") or nowdate(), 
+		'batch_no': None,
+	}
+	item_price=get_item_price(args=args, item_code=item)
+	selling_price_map[item] = item_price[0][1] if len(item_price) and len(item_price[0])>1 else 0
 
 	return selling_price_map
 
