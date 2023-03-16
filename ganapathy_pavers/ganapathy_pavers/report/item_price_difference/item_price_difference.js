@@ -14,7 +14,7 @@ function get_filters() {
 			fieldtype: "Link",
 			get_query: () => {
 				return {
-					// filters: { "has_variants": 1 }
+					query: "ganapathy_pavers.ganapathy_pavers.report.item_price_difference.item_price_difference.item_query",
 				}
 			},
 			on_change: async () => {
