@@ -22,9 +22,18 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Item Price Difference",
+   "link_to": "Item Price Difference",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2023-02-10 11:53:32.256501",
+ "modified": "2023-03-16 12:33:41.163819",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "STOCK MANAGER",
