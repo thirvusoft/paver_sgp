@@ -116,5 +116,27 @@ async function hideAndUnhideFilters(item_code, attributes) {
 }
 
 frappe.query_reports["Item Price Difference"] = {
-	filters: get_filters()
+	filters: get_filters(),
+	formatter: function(value, row, column, data, default_formatter) {
+        if (column.is_price_list_rate) {
+			if (value > data.production_rate) {
+				value = __(default_formatter(value, row, column, data));
+
+				value = $(`<span>${value}</span>`);
+				var $value = $(value).css("color", "green");
+				value = $value.wrap("<p></p>").parent().html();
+			} else if(value <= data.production_rate) {
+				value = __(default_formatter(value, row, column, data));
+
+				value = $(`<span>${value}</span>`);
+				var $value = $(value).css("color", "red");
+				value = $value.wrap("<p></p>").parent().html();
+			} else {
+				value = __(default_formatter(value, row, column, data));
+			}
+		} else {
+			value = __(default_formatter(value, row, column, data));
+		}
+		return value
+	}
 };

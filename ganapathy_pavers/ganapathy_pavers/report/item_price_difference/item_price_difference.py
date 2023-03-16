@@ -15,6 +15,8 @@ from frappe import _, scrub
 
 
 def execute(filters=None):
+	if not filters.get("machine"):
+		filters["machine"] = []
 	selling_price_lists = frappe.get_all("Price List", {"enabled": 1, "item_price_difference": 1}, pluck="name")
 	columns = get_columns(filters.item, selling_price_lists)
 	data = get_data(filters, selling_price_lists)
@@ -135,7 +137,8 @@ def get_columns(item, selling_price_lists):
 			"fieldname": scrub(price_list),
 			"label": _(price_list),
 			"fieldtype": "Currency",
-			"width": 150
+			"width": 150,
+			"is_price_list_rate": 1
 		}
 	]
 
