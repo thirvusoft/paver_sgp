@@ -113,6 +113,9 @@ def execute(filters=None):
 			"cost_per_sqft":f"""<b style='color:rgb(255 82 0);'>₹{(production_cost_per_sqft):,.3f}</b>"""
 		})
 
+		if test_data and len(test_data)>0:
+				test_data[0]["uom"] = f"<b>Production Cost per SQFT :</b> ₹{(production_cost_per_sqft or 0):,.3f}"
+		
 		if len(test_data) > 2:
 			data += test_data
 		total_sqf=0

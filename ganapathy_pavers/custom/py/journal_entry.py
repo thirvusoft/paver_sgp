@@ -17,10 +17,15 @@ def journal_entry(self, event):
 
 @frappe.whitelist()
 def get_production_details(date=None, from_date=None, to_date=None, machines=[]):
+    if not machines:
+        machines = []
     res={'month': '', 'paver': 0, 'cw': 0, 'lego': 0, 'fp': 0}
     try:
         if (isinstance(machines, str)):
-            machines=json.loads(machines)
+            try:
+                machines=json.loads(machines)
+            except:
+                machines=[]
         if date and not from_date and not to_date:
             date=datetime.strptime(date, "%Y-%m-%d")
             to_date=date+relativedelta(day=1, months=+1, days=-1)

@@ -36,6 +36,7 @@ frappe.query_reports["Daily Paver Production Register"] = {
 			"fieldtype": "MultiSelectList",
 			"options":"Workstation",
 			"width": "80",
+			default: [],
 			on_change: on_change,
 			get_data: function(txt) {
 				return frappe.db.get_link_options('Workstation', txt);

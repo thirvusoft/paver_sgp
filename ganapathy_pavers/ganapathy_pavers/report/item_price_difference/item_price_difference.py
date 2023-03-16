@@ -7,7 +7,8 @@ from frappe.desk.reportview import get_filters_cond, get_match_cond
 from frappe.utils.data import nowdate
 from ganapathy_pavers.utils.py.sitework_printformat import get_cw_monthly_cost
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
-from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost, get_sqft_expense
+from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost, get_sqft_expense as paver_get_sqft_expense
+from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_cw_production_report.itemwise_monthly_cw_production_report import get_sqft_expense as cw_sqft_expense
 import frappe
 from frappe import _, scrub
 
@@ -23,14 +24,16 @@ def get_data(filters):
 		return []
 
 	item_dicts = []
-
-	variant_results = get_item_data(filters) 
-
-	if not variant_results:
-		frappe.msgprint(_("There aren't any item variants for the selected item"))
-		return []
+	if frappe.db.get_value("Item", item, "has_variants"):
+		variant_results = get_item_data(filters)
+		if not variant_results:
+			frappe.msgprint(_("There aren't any item variants for the selected item"))
+			return []
 	else:
-		variant_list = [variant['name'] for variant in variant_results]
+		variant_results = frappe.get_all("Item", {"name": item})
+
+	
+	variant_list = [variant['name'] for variant in variant_results]
 
 	selling_price_map = get_selling_price_map(variant_list)
 	attr_val_map = get_attribute_values_map(variant_list)
@@ -46,8 +49,9 @@ def get_data(filters):
 	attribute_list = [row.get("attribute") for row in attributes]
 
 	# Prepare dicts
-	expense_cost=get_sqft_expense(filters)
-	prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
+	paver_expense_cost=paver_get_sqft_expense(filters)
+	cw_expense_cost={}
+	prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=(filters.get("machine", []) or []))
 
 	variant_dicts = [{"variant_name": d['name']} for d in variant_results]
 	for item_dict in variant_dicts:
@@ -61,7 +65,7 @@ def get_data(filters):
 		if frappe.db.get_value("Item", item_dict.get("variant_name"), "item_group") == "Pavers":
 			item_dict["production_rate"] = sum(get_production_cost(filters, item_dict.get("variant_name"))) 
 			if item_dict["production_rate"]:
-				item_dict["production_rate"] += (expense_cost /(prod_details.get("paver", 1) or 1)) 
+				item_dict["production_rate"] += (paver_expense_cost /(prod_details.get("paver", 1) or 1)) 
 		
 		if frappe.db.get_value("Item", item_dict.get("variant_name"), "item_group") == "Compound Walls":
 			
@@ -78,10 +82,16 @@ def get_data(filters):
 			elif _type == ['Fencing Post']:
 				exp_group="fp_group" 
 				prod="fp"
+			
+			if exp_group not in cw_expense_cost:
+				cw_expense_cost[exp_group] = cw_sqft_expense(filters, exp_group)
+
 			item_dict["production_rate"] = get_cw_monthly_cost(filters=filters,
                                   _type=_type,
                                   exp_group=exp_group,
                                   prod=prod)
+			if item_dict["production_rate"]:
+				item_dict["production_rate"] += ((cw_expense_cost.get(exp_group, 0) or 0) /(prod_details.get(prod, 1) or 1))
 
 		item_dict["selling_price_list_rate"] = selling_price_map.get(name) or 0
 

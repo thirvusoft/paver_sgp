@@ -34,6 +34,7 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"label": __("Machine"),
 			"fieldtype": "MultiSelectList",
 			"options": "Workstation",
+			default: [],
 			on_change: on_change,
 			get_data: async function (txt) {
 				let ws = (await frappe.db.get_list("Material Manufacturing", { fields: ["work_station"], limit: 0}))
