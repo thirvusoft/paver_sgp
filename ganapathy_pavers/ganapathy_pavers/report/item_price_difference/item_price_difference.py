@@ -185,7 +185,7 @@ def get_selling_price_map(filters, item, price_list):
 	'item_code': item, 
 		'price_list': price_list, 
 		'uom': frappe.db.get_value("Item", item, "stock_uom"), 
-		'transaction_date': filters.get("to_date") or nowdate(), 
+		'transaction_date': None, 
 		'posting_date': filters.get("to_date") or nowdate(), 
 		'batch_no': None,
 	}
