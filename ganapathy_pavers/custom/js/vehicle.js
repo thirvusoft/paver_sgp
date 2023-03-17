@@ -15,13 +15,13 @@ frappe.ui.form.on("Vehicle", {
                 }
             }
         });
-        frm.set_query('employee', function (frm) {
-            return {
-                filters: {
-                    'employee_categories': 'Driver'
-                }
-            }
-        });
+        // frm.set_query('employee', function (frm) {
+        //     return {
+        //         filters: {
+        //             'employee_categories': 'Driver'
+        //         }
+        //     }
+        // });
         frm.set_query("add_on", function (frm) {
             return {
                 filters: {
