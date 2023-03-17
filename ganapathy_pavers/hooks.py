@@ -327,6 +327,9 @@ doc_events = {
 	"Batch": {
 		"autoname": "ganapathy_pavers.custom.py.batch.autoname",
 		"on_trash": "ganapathy_pavers.custom.py.batch.update_series"
+	},
+	"Quotation": {
+		"on_update": "ganapathy_pavers.custom.py.quotation.update_lead_on_save"
 	}
 }
 after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
