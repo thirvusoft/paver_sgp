@@ -32,7 +32,7 @@ function calculate_deduction_planning(frm, cdt, cdn) {
     (frm.doc.deduction_planning || []).forEach(row => {
         total_amount += (row.amount || 0)
     });
-    if (total_amount > frm.doc.advance_amount) {
+    if (roundNumber(total_amount) > roundNumber(frm.doc.advance_amount)) {
         frappe.throw({ message: "<b>Total Planned Deduction amount</b> can't be greater than <b>Advance Amount</b>", indicator: "red" });
         return;
     }
