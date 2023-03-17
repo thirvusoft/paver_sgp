@@ -385,12 +385,12 @@
   },
   {
    "fieldname": "total_no_of_produced_qty",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Total No of Produced Qty"
   },
   {
    "fieldname": "total_no_of_bundle",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Total No. of Bundle",
    "read_only": 1
   },
@@ -507,7 +507,7 @@
   },
   {
    "fieldname": "no_of_bundle",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "No. of Bundle"
   },
   {
@@ -657,7 +657,7 @@
    "default": "0",
    "depends_on": "eval:doc.is_shot_blasting==1",
    "fieldname": "shot_blasted_bundle",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Remaining Shot Blast Bundle",
    "read_only": 1
   },
@@ -944,7 +944,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-14 15:30:44.048867",
+ "modified": "2023-03-17 11:31:02.629738",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

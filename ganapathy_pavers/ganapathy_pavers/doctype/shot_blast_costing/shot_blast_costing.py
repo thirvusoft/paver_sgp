@@ -17,7 +17,12 @@ class ShotBlastCosting(Document):
             sbc=frappe.db.sql("""
                 select material_manufacturing, sum(bundle_taken) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2) group by material_manufacturing;
             """, as_dict=True)
-            for i in sbc:
+            mm = [i['material_manufacturing'] for i in sbc]
+            other_mms = frappe.get_all("Material Manufacturing", filters = {"is_shot_blasting": 1, "name": ["not in", mm]}, fields = ["name as material_manufacturing"])
+            for mm in other_mms:
+                mm["bundle_taken"] = 0
+
+            for i in sbc + other_mms:
                 Bdl=(frappe.db.get_value("Material Manufacturing", i['material_manufacturing'], 'no_of_bundle') or 0)
                 frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'shot_blasted_bundle', Bdl-(i['bundle_taken'] or 0))
                 if Bdl-(i['bundle_taken'] or 0) <= 0:
@@ -40,7 +45,12 @@ class ShotBlastCosting(Document):
             """)
             if not mm1:
                 sbc+=({'material_manufacturing': mm_doc[0], "bundle_taken": 0},)
-        for i in sbc:
+        mm = [i['material_manufacturing'] for i in sbc]
+        other_mms = frappe.get_all("Material Manufacturing", filters = {"is_shot_blasting": 1, "name": ["not in", mm]}, fields = ["name as material_manufacturing"])
+        for mm in other_mms:
+            mm["bundle_taken"] = 0
+
+        for i in sbc + other_mms:
             Bdl=(frappe.db.get_value("Material Manufacturing", i['material_manufacturing'], 'no_of_bundle') or 0)
             frappe.db.set_value("Material Manufacturing",i['material_manufacturing'],'shot_blasted_bundle', Bdl-(i['bundle_taken'] or 0))
             if Bdl-(i['bundle_taken'] or 0) <= 0:

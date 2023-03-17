@@ -185,6 +185,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_completed_qty);
 	},
 	total_no_of_produced_qty: function (frm) {
+		frm.set_value("remaining_qty", 0)
 		var bundle_cf = 0
 		var nos_cf = 0
 		var default_cf = 0
@@ -208,9 +209,8 @@ frappe.ui.form.on('Material Manufacturing', {
 				}
 			}
 			var total_amount = (frm.doc.total_no_of_produced_qty * nos_cf) / bundle_cf
-			cur_frm.set_value('remaining_qty', ((frm.doc.total_no_of_produced_qty * nos_cf) % bundle_cf) / nos_cf);
 			if (total_amount >= 1) {
-				cur_frm.set_value('total_no_of_bundle', Math.floor(total_amount));
+				cur_frm.set_value('total_no_of_bundle', total_amount);
 			}
 			else {
 				cur_frm.set_value('total_no_of_bundle', 0);

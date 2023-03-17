@@ -231,15 +231,10 @@ def make_stock_entry(doc,type1):
        stock_entry.stock_entry_type = doc.get("stock_entry_rack_shift")
        if doc.get("total_no_of_produced_qty") == 0:
            frappe.throw("Please Enter the Total No of Bundle")
-       r_qty,emp_bundle,r_total_qty = remaining_qty(doc.get("item_to_manufacture"),default_bundle,default_nos,doc.get("name"))
-       for i in emp_bundle:
-           if frappe.get_value("Batch",i,"batch_qty")>0:
-                stock_entry.append('items', dict(
-                    s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = frappe.get_value("Batch",i,"batch_qty"),uom = frappe.get_value("Batch",i,"stock_uom") ,batch_no = i
-                ))
-       qty = doc.get("total_no_of_bundle") + r_qty
+
+       qty = doc.get("total_no_of_bundle") 
        stock_entry.append('items', dict(
-       s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), "Nos", (doc.get("total_no_of_produced_qty")+doc.get("rack_shift_damage_qty"))-(int(r_total_qty) or doc.get("remaining_qty")), default_nos),uom = default_nos ,batch_no = doc.get("batch_no_manufacture"),
+       s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), "Nos", (doc.get("total_no_of_produced_qty")+doc.get("rack_shift_damage_qty")), default_nos),uom = default_nos ,batch_no = doc.get("batch_no_manufacture"),
        basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos),
         basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos)
        ))
@@ -313,37 +308,6 @@ def make_stock_entry(doc,type1):
    pm_doc.save()
    return status
 
-def remaining_qty(item_code,default_bundle,default_nos,cur_doc):
-   emp_batch=[]
-   uom =frappe.get_doc("Item",item_code)
-   uom_qty = 0
-   uom_nos = 0
-   for i in uom.uoms:
-       if(default_bundle == i.uom):
-           uom_qty=i.conversion_factor
-       if(default_nos == i.uom):
-           uom_nos=i.conversion_factor
-   total_qty=0
-   remaining_qty = frappe.get_all("Material Manufacturing",fields=['name','remaining_qty',"batch_no_manufacture"],filters={"item_to_manufacture" : item_code})
-   for j in remaining_qty:
-       total_qty = total_qty+(j.remaining_qty*uom_nos)
-   set_qty = 0
-   while(int(total_qty) > int(uom_qty)):
-       total_qty = total_qty - uom_qty
-       set_qty = set_qty+1
-   total_qty=(total_qty/uom_nos if uom_nos else 0)
-   if set_qty:
-       for j in range (len(remaining_qty)):
-           if remaining_qty[j].name == cur_doc:
-               frappe.db.set_value("Material Manufacturing",remaining_qty[j].name,'remaining_qty', total_qty)
-           else:
-               frappe.db.set_value("Material Manufacturing",remaining_qty[j].name,'remaining_qty', 0)
-               # frappe.db.set_value("Batch",remaining_qty[j].batch_no_manufacture,'batch_qty', 0)
-               if remaining_qty[j].remaining_qty:
-                  emp_batch.append(remaining_qty[j].batch_no_manufacture)
-    #    frappe.db.commit()
-       return set_qty,emp_batch,total_qty
-   return 0,[],0
 
 @frappe.whitelist()
 def find_batch(self):
