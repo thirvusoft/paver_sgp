@@ -21,6 +21,7 @@ def execute(filters={}):
 		if not filters.get("show_other_work"):
 			ts_filters['other_work'] = 0
 		jw=list(set(frappe.get_all("TS Job Worker Details", filters=ts_filters, pluck="name1")))
+		jw = [i or "" for i in jw]
 		jw.sort()
 		currency = frappe.db.get_value("Currency", frappe.db.get_default("currency"), "symbol") or ''
 		filters['ts_group_by'] = 'Job Worker'
