@@ -7,7 +7,7 @@
  "docstatus": 0,
  "doctype": "Workspace",
  "extends_another_page": 0,
- "hide_custom": 0,
+ "hide_custom": 1,
  "icon": "users",
  "idx": 0,
  "is_default": 0,
@@ -16,12 +16,37 @@
  "links": [
   {
    "hidden": 0,
-   "is_query_report": 1,
-   "label": "Batch-Wise Balance History",
-   "link_to": "Batch-Wise Balance History",
-   "link_type": "Report",
+   "is_query_report": 0,
+   "label": "Item Price",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Price List",
+   "link_to": "Price List",
+   "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Item Price",
+   "link_to": "Item Price",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reports",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
   },
   {
    "hidden": 0,
@@ -31,9 +56,18 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Batch-Wise Balance History",
+   "link_to": "Batch-Wise Balance History",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2023-03-16 12:33:41.163819",
+ "modified": "2023-03-17 10:10:29.904249",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "STOCK MANAGER",

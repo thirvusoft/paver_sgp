@@ -137,7 +137,7 @@ def get_columns(item, selling_price_lists):
 			"fieldname": scrub(price_list),
 			"label": _(price_list),
 			"fieldtype": "Currency",
-			"width": 150,
+			"width": 190,
 			"is_price_list_rate": 1
 		}
 	]
