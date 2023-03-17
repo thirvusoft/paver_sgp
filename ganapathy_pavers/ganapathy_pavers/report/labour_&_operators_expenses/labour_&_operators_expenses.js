@@ -25,6 +25,7 @@ frappe.query_reports["Labour & Operators Expenses"] = {
 			"label": __("Machine"),
 			"fieldtype": "MultiSelectList",
 			"options": "Workstation",
+			default: [],
 			get_data: async function (txt) {
 				let ws = (await frappe.db.get_list("Material Manufacturing", { fields: ["work_station"], limit: 0 }))
 				let machines = []

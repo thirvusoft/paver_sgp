@@ -110,7 +110,7 @@ def get_data(filters):
             data[f"{i.item_to_manufacture} {i.month}"]['no_of_days']+=1
         # data['pieces']=0
     data=list(data.values())
-    prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
+    prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=(filters.get("machine", []) or []))
     expense_cost=get_sqft_expense(filters)
     for row in data:
         row["prod_cost"] = (row.get("prod_cost", 0) or 0) + (row.get("strapping", 0) or 0) + (row.get("shot_blasting", 0) or 0)
@@ -132,9 +132,9 @@ def get_production_cost(filters, item):
         AND '{frappe.utils.data.add_to_date(filters.get('to_date'), days=1)}'
         AND mm.item_to_manufacture='{item}'
     """
-    if len(filters.get("machine", []))>1:
+    if len((filters.get("machine", []) or []))>1:
         conditions+=f""" AND mm.work_station in {tuple(filters.get("machine"))}"""
-    elif len(filters.get("machine", []))==1:
+    elif len((filters.get("machine", []) or []))==1:
         conditions+=f""" AND mm.work_station = '{filters.get("machine")[0]}'"""
     query=f"""
         SELECT 
@@ -171,11 +171,11 @@ def get_production_cost(filters, item):
 def get_sqft_expense(filters):
     exp=frappe.get_single("Expense Accounts")
     machine=None
-    if ("Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", [])) and "Machine3" in filters.get("machine", []):
+    if ("Machine1" in (filters.get("machine", []) or []) or "Machine2" in (filters.get("machine", []) or [])) and "Machine3" in (filters.get("machine", []) or []):
         pass
-    elif "Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", []):
+    elif "Machine1" in (filters.get("machine", []) or []) or "Machine2" in (filters.get("machine", []) or []):
         machine="machine_12"
-    elif filters.get("machine", []):
+    elif (filters.get("machine", []) or []):
         machine="machine_3"
     paver_exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine)
     total_sqf=0
