@@ -152,7 +152,7 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	before_save: function (frm) {
 
-		std_item(frm)
+	
 		if (frm.doc.docstatus == 0) {
 			if (frm.doc.ts_total_hours > 0 && frm.doc.docstatus == 0) {
 				cur_frm.set_value('total_manufacturing_expense', frm.doc.labour_cost_manufacture + frm.doc.operators_cost_in_manufacture);
@@ -317,6 +317,9 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	curing_stock_entry: function (frm) {
 		make_stock_entry(frm, "curing_stock_entry")
+	},
+	total_cost:function(frm){
+		std_item(frm)
 	},
 	total_no_of_batches: function (frm) {
 		for (let row = 0; row < (frm.doc.items ? frm.doc.items.length : 0); row++) {
