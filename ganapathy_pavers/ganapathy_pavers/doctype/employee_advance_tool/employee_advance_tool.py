@@ -7,7 +7,7 @@ class EmployeeAdvanceTool(Document):
 		table = self.employee_advance_details
 		total = 0
 		for  i in table:
-			total = total + i.get("current_advance")
+			total = total + (i.get("current_advance") or 0)
 
 		self.total_advance_amount=total
 	

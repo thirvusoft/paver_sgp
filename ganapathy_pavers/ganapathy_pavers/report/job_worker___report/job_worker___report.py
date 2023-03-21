@@ -86,7 +86,7 @@ def execute(filters=None):
         if row[0] and frappe.db.exists("Employee", row[0]):
             row[8]=get_employee_salary_balance(employee=row[0], from_date=from_date, to_date=to_date)
 
-    data.sort(key = lambda x:x[0])
+    data.sort(key = lambda x:(x[0] or ""))
     
     
     if(len(data)):
