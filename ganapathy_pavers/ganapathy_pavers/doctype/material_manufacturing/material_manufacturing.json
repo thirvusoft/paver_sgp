@@ -11,6 +11,7 @@
   "per_rack",
   "per_plate",
   "is_shot_blasting",
+  "is_sample",
   "machine_operator",
   "machine_operator_name",
   "column_break_2",
@@ -939,12 +940,18 @@
    "fieldname": "get_bin_items",
    "fieldtype": "Button",
    "label": "Get Bin Items"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_sample",
+   "fieldtype": "Check",
+   "label": "Is Sample"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-17 11:31:02.629738",
+ "modified": "2023-03-21 11:35:25.437287",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
