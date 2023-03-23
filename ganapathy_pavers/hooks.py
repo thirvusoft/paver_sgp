@@ -283,6 +283,7 @@ doc_events = {
 	"Workstation":{
 		"validate": "ganapathy_pavers.custom.py.workstation.total_no_salary",
 		"on_update": "ganapathy_pavers.custom.py.workstation.make_custom_field",
+		"after_rename": "ganapathy_pavers.custom.py.workstation.rename_custom_field",
 		"on_trash": "ganapathy_pavers.custom.py.workstation.remove_custom_field",
 	},
 	"Purchase Receipt":{

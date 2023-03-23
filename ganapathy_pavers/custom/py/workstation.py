@@ -1,6 +1,7 @@
+import copy
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
-
+from frappe.model.utils.rename_field import rename_field
          
 def total_no_salary(doc,action):
     if doc.ts_operators_table:
@@ -35,6 +36,17 @@ def make_custom_field(self, event=None):
     else:
         remove_custom_field(self)
 
+def rename_custom_field(self, event, oldname, newname, merge):
+    if oldname == newname:
+        return
+    make_custom_field(self)
+    for doctype in ["Journal Entry Account", "GL Entry"]:
+        rename_field(doctype, frappe.scrub(oldname), frappe.scrub(newname))
+    
+    _self = copy.deepcopy(self)
+    _self.name = oldname
+    remove_custom_field(_self, event)
+
 def remove_custom_field(self, event=None):
     #check field exists
     if not [row for row in frappe.get_meta("GL Entry").fields if row.fieldname==frappe.scrub(self.name)]:
@@ -45,7 +57,7 @@ def remove_custom_field(self, event=None):
     #if field exists
     gl_links = frappe.get_all("GL Entry", filters = {frappe.scrub(self.name): 1}, fields = ["voucher_type", "voucher_no"], group_by="voucher_no, voucher_type")
 
-    if gl_links:
+    if gl_links and not event == "after_rename":
         messgae = "This document is used in Expense entries <ul>"
         for i in gl_links:
             messgae += f"<li><a href='/app/{i.voucher_type}/{i.voucher_no}'>{i.voucher_no}</a></li>"
