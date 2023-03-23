@@ -63,6 +63,7 @@
   "operator_cost_workstation",
   "labour_cost_in_manufacture",
   "labour_cost_manufacture",
+  "total_cost",
   "column_break_26",
   "total_manufacturing_expense",
   "additional_cost",
@@ -946,12 +947,17 @@
    "fieldname": "is_sample",
    "fieldtype": "Check",
    "label": "Is Sample"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Button",
+   "label": "Total Cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-21 11:35:25.437287",
+ "modified": "2023-03-21 14:45:45.181138",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
