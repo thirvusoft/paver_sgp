@@ -237,10 +237,10 @@ def get_cw_production_rate(_type=[], date=None):
         exp_group="fp_group" 
         prod="fp"
     
-    cw_cost = get_cw_monthly_cost(filters=filters,
+    cw_cost = sum(get_cw_monthly_cost(filters=filters,
                                   _type=_type,
                                   exp_group=exp_group,
-                                  prod=prod)
+                                  prod=prod))
 
     return cw_cost
 
@@ -250,6 +250,7 @@ def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"], exp_group="cw_grou
 
     cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]],'type':["in",_type]},pluck="name")
     total_cost_per_sqft = 0
+    rm_cost = 0
 
     if cw_list:
         bom_item = frappe.db.sql(""" 
@@ -268,11 +269,11 @@ def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"], exp_group="cw_grou
                                 avg(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name {0}""".format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_dict=1)
         
         for item in bom_item:
-            total_cost_per_sqft += item[4] / (production_qty[0]['production_sqft'] or 1)
+            rm_cost += item[4] / (production_qty[0]['production_sqft'] or 1)
 
         total_cost_per_sqft +=  ((production_qty[0]['strapping_cost_per_sqft'] or 0)
                                 + (production_qty[0]['additional_cost_per_sqft']  or 0)
                                 + (production_qty[0]["labour_cost_per_sqft"] or 0) 
                                 + (production_qty[0]['operator_cost_per_sqft'] or 0))
 
-    return total_cost_per_sqft
+    return rm_cost, total_cost_per_sqft

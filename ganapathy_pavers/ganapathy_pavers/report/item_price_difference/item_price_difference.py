@@ -66,9 +66,12 @@ def get_data(filters, selling_price_lists):
 				item_dict[frappe.scrub(attribute)] = attr_val_map.get(name).get(attribute)
 
 		if frappe.db.get_value("Item", item_dict.get("variant_name"), "item_group") == "Pavers":
-			item_dict["production_rate"] = sum(get_production_cost(filters, item_dict.get("variant_name"))) 
-			if item_dict["production_rate"]:
-				item_dict["production_rate"] += (paver_expense_cost /(prod_details.get("paver", 1) or 1)) 
+			prod_cost, labour_operator_cost, strapping, shot_blasting = get_production_cost(filters, item_dict.get("variant_name"))
+			item_dict["prod_rate"] = prod_cost
+			item_dict["expense_cost"] = ((paver_expense_cost /(prod_details.get("paver", 1) or 1)) ) + sum([labour_operator_cost, strapping, shot_blasting])
+			item_dict["total_production_rate"] = sum([prod_cost, labour_operator_cost, strapping, shot_blasting]) 
+			if item_dict["total_production_rate"]:
+				item_dict["total_production_rate"] += (paver_expense_cost /(prod_details.get("paver", 1) or 1)) 
 		
 		if frappe.db.get_value("Item", item_dict.get("variant_name"), "item_group") == "Compound Walls":
 			
@@ -89,12 +92,15 @@ def get_data(filters, selling_price_lists):
 			if exp_group not in cw_expense_cost:
 				cw_expense_cost[exp_group] = cw_sqft_expense(filters, exp_group)
 
-			item_dict["production_rate"] = get_cw_monthly_cost(filters=filters,
+			item_dict["prod_rate"], item_dict["expense_cost"] = get_cw_monthly_cost(filters=filters,
                                   _type=_type,
                                   exp_group=exp_group,
                                   prod=prod)
-			if item_dict["production_rate"]:
-				item_dict["production_rate"] += ((cw_expense_cost.get(exp_group, 0) or 0) /(prod_details.get(prod, 1) or 1))
+			item_dict["total_production_rate"] = item_dict["prod_rate"] + item_dict["expense_cost"]
+			item_dict["expense_cost"] += ((cw_expense_cost.get(exp_group, 0) or 0) /(prod_details.get(prod, 1) or 1))
+
+			if item_dict["total_production_rate"]:
+				item_dict["total_production_rate"] += ((cw_expense_cost.get(exp_group, 0) or 0) /(prod_details.get(prod, 1) or 1))
 
 		for price_list in selling_price_lists:
 			selling_price_map = get_selling_price_map(filters, item_dict.get("variant_name"), price_list)
@@ -125,8 +131,20 @@ def get_columns(item, selling_price_lists):
 
 	additional_columns = [
 		{
-			"fieldname": "production_rate",
+			"fieldname": "prod_rate",
 			"label": _("Production Rate"),
+			"fieldtype": "Currency",
+			"width": 100
+		},
+		{
+			"fieldname": "expense_cost",
+			"label": _("Expense Cost"),
+			"fieldtype": "Currency",
+			"width": 100
+		},
+		{
+			"fieldname": "total_production_rate",
+			"label": _("Total Production Rate"),
 			"fieldtype": "Currency",
 			"width": 150
 		}
