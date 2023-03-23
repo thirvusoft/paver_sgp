@@ -679,6 +679,7 @@
    "label": "Total Expense per Sqft"
   },
   {
+   "fetch_from": "work_station.curing_labour_cost_per_sqft",
    "fieldname": "labour_cost_per_sqft",
    "fieldtype": "Currency",
    "label": "Labour Cost per Sqft"
@@ -951,13 +952,13 @@
   {
    "fieldname": "total_cost",
    "fieldtype": "Button",
-   "label": "Total Cost"
+   "label": "Get Labour and Operator Cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-21 14:45:45.181138",
+ "modified": "2023-03-23 10:49:04.421442",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

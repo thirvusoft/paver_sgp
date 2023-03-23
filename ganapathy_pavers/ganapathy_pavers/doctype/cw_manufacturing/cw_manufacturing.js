@@ -56,13 +56,10 @@ frappe.ui.form.on("CW Manufacturing", {
                 row.bin = bin.bin
             });
             frm.fields_dict.bin_items?.refresh()
-        })
+        });
+        frm.trigger("calculate_bin_qty")
     },
-    onload: function (frm) { },
-    type: function (frm) {
-        default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
-    },
-    ts_before_save: function (frm) {
+    calculate_bin_qty: function (frm) {
         let rm_consmp = frm.doc.raw_material_consumption ? frm.doc.raw_material_consumption : [],
             bin_items = frm.doc.bin_items ? frm.doc.bin_items : [],
             check_duplicate = [];
@@ -72,6 +69,7 @@ frappe.ui.form.on("CW Manufacturing", {
                 frappe.throw(`Bin <b>${row.bin}</b> is repeating more than once in <b>Bin Item Mapping</b>`)
             } else {
                 row.total_qty = 0
+                row.average_qty = 0
                 check_duplicate.push(row.item_code)
             }
         });
@@ -79,10 +77,17 @@ frappe.ui.form.on("CW Manufacturing", {
         rm_consmp.forEach(row => {
             bin_items.forEach(bin => {
                 bin.total_qty += (row[frappe.model.scrub(bin.bin || "")] || 0)
-                bin.average_qty += (((row[frappe.model.scrub(bin.bin || "")] || 0)/rm_consmp.length) || 0)
+                bin.average_qty += (((row[frappe.model.scrub(bin.bin || "")] || 0)/(rm_consmp.length)) || 0)
             });
         });
         frm.fields_dict.bin_items.refresh()
+    },
+    onload: function (frm) { },
+    type: function (frm) {
+        default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
+    },
+    ts_before_save: function (frm) {
+        frm.trigger("calculate_bin_qty")
 
         item_details_total(frm);
         raw_material_cost(frm);

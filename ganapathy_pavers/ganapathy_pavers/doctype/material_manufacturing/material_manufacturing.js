@@ -8,7 +8,7 @@ frappe.ui.form.on('Material Manufacturing', {
 			if (frm.doc.is_shot_blasting) {
 				default_value("shot_blast_per_sqft", "shot_blast_per_sqft")
 			}
-			default_value("labour_cost_per_sqft", "labour_cost_per_sqft")
+			// default_value("labour_cost_per_sqft", "labour_cost_per_sqft")
 			default_value("strapping_cost_per_sqft", "strapping_cost_per_sqft")
 			default_value("default_manufacture_operation", "operation")
 			default_value("default_rack_shift_workstation", "workstation")

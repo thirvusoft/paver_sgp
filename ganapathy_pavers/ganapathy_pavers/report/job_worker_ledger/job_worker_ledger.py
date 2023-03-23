@@ -153,7 +153,7 @@ def get_salary_slip_data(filters=None):
 				FROM `tabEmployee` emp
 				WHERE emp.name=ss.employee
 			) as employee,
-			ss.paid_amount as debit,
+			(ss.paid_amount - ss.excess_amount_to_create_advance) as debit,
 			0 as credit
 		FROM `tabSalary Slip` as ss
 		{ss_conditions}
