@@ -35,7 +35,8 @@ app_include_js = "/assets/js/ganapathy_pavers.min.js"
 
 doctype_list_js = {
 	"Project" : "/custom/js/sw_quick_entry.js",
-	"Vehicle Log": "/custom/js/vehicle_log_list.js"
+	"Vehicle Log": "/custom/js/vehicle_log_list.js",
+	"Item Price": "/custom/js/item_price_list.js",
 	}
 
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -73,7 +74,7 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 				 "ganapathy_pavers.utils.py.gl_entry.gl_entry_customization",
 				 "ganapathy_pavers.utils.py.workstation.workstation_item_customization",
 				 "ganapathy_pavers.utils.py.purchase_order.batch_customization",
-				 "ganapathy_pavers.utils.py.customer.create_multi_customer",
+				#  "ganapathy_pavers.utils.py.customer.create_multi_customer",
 				 "ganapathy_pavers.utils.py.item.batch_customization",
 				 "ganapathy_pavers.patches.location.execute",
 				 "ganapathy_pavers.utils.py.quotation.batch_property_setter",
@@ -210,10 +211,10 @@ doc_events = {
 					"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.update_return_qty_sitework",
 					],
-		"on_cancel":[
-					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
-					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
-					 ],
+		# "on_cancel":[
+		# 			"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
+		# 			"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
+		# 			 ],
 		"validate":[
 			"ganapathy_pavers.custom.py.delivery_note.validate",
 			"ganapathy_pavers.custom.py.tax_validation.dn_tax_validation"

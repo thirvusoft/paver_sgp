@@ -6,8 +6,16 @@ frappe.ui.form.on('Daily Maintenance', {
 		if (frm.is_new()) {
 			let fi = await frappe.db.get_doc("DSM Defaults"),
 				raw = await frappe.db.get_doc("DSM Defaults")
-			frm.set_value("warehouse", fi.warehouse_for_pavers_and_compound_walls);
-			frm.set_value("warehouse_colour", raw.warehouse_for_colour_powder_items);
+			fi.warehouse_for_pavers_and_compound_walls.forEach(row => {
+				let newrow = frm.add_child("warehouse")
+				newrow.warehouse = row.warehouse
+			})
+			refresh_field('warehouse')
+			raw.warehouse_for_colour_powder_items.forEach(row => {
+				let newrow = frm.add_child("warehouse_colour")
+				newrow.warehouse = row.warehouse
+			})
+			refresh_field('warehouse_colour')
 		}
 	},
 	get_attendance_details: function (frm) {

@@ -9,12 +9,14 @@ from frappe.utils.data import nowdate, nowtime
 from ganapathy_pavers import uom_conversion
 
 def get_stock_qty(item_code, warehouse):
-	qty = get_previous_sle({
-		'item_code': item_code,
-		'warehouse_condition': f""" warehouse in {tuple(warehouse)}""" if len(warehouse)>1 else f""" warehouse = '{warehouse[0]}'""",
-		'posting_date': nowdate(),
-		'posting_time': nowtime()
-	}).get('qty_after_transaction') or 0
+	qty = 0
+	for i in warehouse:
+		qty += get_previous_sle({
+			'item_code': item_code,
+			'warehouse': i,#f""" warehouse in {tuple(warehouse)}""" if len(warehouse)>1 else f""" warehouse = '{warehouse[0]}'""",
+			'posting_date': nowdate(),
+			'posting_time': nowtime()
+		}).get('qty_after_transaction', 0) or 0
 	return dsm_uom_conversion(item_code, qty)
 
 def dsm_uom_conversion(item, qty, uom=None):
@@ -76,6 +78,7 @@ class DailyMaintenance(Document):
 @frappe.whitelist()
 def paver_item(warehouse, date, warehouse_colour):
 	warehouse = [row.get('warehouse') for row in json.loads(warehouse) if row.get('warehouse')]
+	frappe.errprint(warehouse)
 	warehouse_colour=[row.get('warehouse') for row in json.loads(warehouse_colour) if row.get('warehouse')]
 	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name',order_by='name')
 	items_stock=[]
