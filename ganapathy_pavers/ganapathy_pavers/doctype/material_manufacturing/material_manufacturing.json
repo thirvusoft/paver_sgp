@@ -11,6 +11,7 @@
   "per_rack",
   "per_plate",
   "is_shot_blasting",
+  "is_sample",
   "machine_operator",
   "machine_operator_name",
   "column_break_2",
@@ -62,6 +63,7 @@
   "operator_cost_workstation",
   "labour_cost_in_manufacture",
   "labour_cost_manufacture",
+  "total_cost",
   "column_break_26",
   "total_manufacturing_expense",
   "additional_cost",
@@ -939,12 +941,23 @@
    "fieldname": "get_bin_items",
    "fieldtype": "Button",
    "label": "Get Bin Items"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_sample",
+   "fieldtype": "Check",
+   "label": "Is Sample"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Button",
+   "label": "Total Cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-17 11:31:02.629738",
+ "modified": "2023-03-21 14:45:45.181138",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

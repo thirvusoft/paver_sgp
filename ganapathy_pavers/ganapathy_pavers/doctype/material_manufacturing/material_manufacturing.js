@@ -151,6 +151,14 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value('labour_cost', (frm.doc.rate_per_hrs * frm.doc.total_hrs) / frm.doc.no_of_division)
 	},
 	before_save: function (frm) {
+		if (frm.is_new()) {
+			frm.trigger("total_cost");
+		} else if (!frm.doc.labour_cost_manufacture || !frm.doc.operators_cost_in_manufacture) {
+			frm.scroll_to_field("total_cost");
+			frm.scroll_to_field("labour_cost_manufacture");
+			frm.scroll_to_field("operators_cost_in_manufacture");
+			frappe.show_alert({ message: "Please fill Labour and Operator Cost", indicator: "red" });
+		}
 
 		std_item(frm)
 		if (frm.doc.docstatus == 0) {
@@ -318,6 +326,10 @@ frappe.ui.form.on('Material Manufacturing', {
 	curing_stock_entry: function (frm) {
 		make_stock_entry(frm, "curing_stock_entry")
 	},
+	total_cost: function (frm) {
+		cur_frm.set_value('operators_cost_in_manufacture', (frm.doc.operator_cost_workstation / ((frm.doc.no_of_item_in_process > 1) ? (frm.doc.total_working_hrs ? frm.doc.total_working_hrs : 1) : frm.doc.ts_total_hours) * frm.doc.ts_total_hours))
+		cur_frm.set_value('labour_cost_manufacture', frm.doc.labour_cost_in_manufacture * frm.doc.ts_total_hours * frm.doc.no_of_labours)
+	},
 	total_no_of_batches: function (frm) {
 		for (let row = 0; row < (frm.doc.items ? frm.doc.items.length : 0); row++) {
 			let cdt = frm.doc.items[row].doctype, cdn = frm.doc.items[row].name;
@@ -440,8 +452,7 @@ function add_total_raw_material(frm) {
 		cur_frm.set_value('total_manufacturing_expense', frm.doc.labour_cost_manufacture + frm.doc.operators_cost_in_manufacture);
 		cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense + frm.doc.total_raw_material);
 	}
-	cur_frm.set_value('labour_cost_manufacture', frm.doc.labour_cost_in_manufacture * frm.doc.ts_total_hours * frm.doc.no_of_labours)
-	cur_frm.set_value('operators_cost_in_manufacture', (frm.doc.operator_cost_workstation / ((frm.doc.no_of_item_in_process > 1) ? (frm.doc.total_working_hrs ? frm.doc.total_working_hrs : 1) : frm.doc.ts_total_hours) * frm.doc.ts_total_hours))
+	
 	cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft * frm.doc.production_sqft);
 	cur_frm.set_value('total_expense_per_sqft', (frm.doc.total_expense) / frm.doc.production_sqft);
 	cur_frm.set_value('rack_shifting_total_expense1_per_sqft', (frm.doc.rack_shifting_total_expense1) / frm.doc.production_sqft);
