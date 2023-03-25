@@ -231,6 +231,7 @@ doc_events = {
 	"Vehicle Log":{
 		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 		"on_submit": [
+						"ganapathy_pavers.custom.py.site_transport_cost.update_transport_cost_of_all_sites",
 						"ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 						"ganapathy_pavers.custom.py.vehicle_log.onsubmit_hours",
 						"ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
@@ -243,9 +244,11 @@ doc_events = {
 						"ganapathy_pavers.custom.py.vehicle_log.fastag_expense",
 						"ganapathy_pavers.custom.py.vehicle_log.update_fasttag_exp_to_sw",
 					  ],
-		"on_cancel":["ganapathy_pavers.custom.py.vehicle_log.onsubmit",
-					 "ganapathy_pavers.custom.py.vehicle_log.update_fasttag_exp_to_sw",
-					 "ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
+		"on_cancel":[
+						"ganapathy_pavers.custom.py.site_transport_cost.update_transport_cost_of_all_sites",
+						"ganapathy_pavers.custom.py.vehicle_log.onsubmit",
+						"ganapathy_pavers.custom.py.vehicle_log.update_fasttag_exp_to_sw",
+						"ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
 		"validate": ["ganapathy_pavers.custom.py.vehicle_log.validate",
 					"ganapathy_pavers.custom.py.vehicle_log.validate_distance",
 					"ganapathy_pavers.custom.py.vehicle_log.total_cost"
