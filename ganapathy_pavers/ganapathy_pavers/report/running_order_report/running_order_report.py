@@ -9,7 +9,11 @@ def execute(filters=None):
 	_type=filters.get("type")
 	status=filters.get("status")
 	
+	from_date = filters.get("from_date")
+	to_date = filters.get("to_date")
 	date = filters.get("date")
+	from_date = filters.get("from_date")
+	to_date = filters.get("to_date")
 
 	data=[]
 	sw_filters={}
@@ -60,12 +64,36 @@ def execute(filters=None):
 		(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter}) as bundle_laying,
 	"""
 
+	date=from_date
+
+	if to_date and not from_date:
+		date = to_date
+
+	date_filter=f"""jw.start_date = '{date}'"""
+
+	if from_date and to_date:
+		date_filter = f"""jw.start_date between '{from_date}' and '{to_date}' """
+	
+	date=from_date
+
+	if to_date and not from_date:
+		date = to_date
+
+	date_filter=f"""jw.start_date = '{date}'"""
+
+	if from_date and to_date:
+		date_filter = f"""jw.start_date between '{from_date}' and '{to_date}' """
+	
 	if date:
 		laying_query = f"""
 			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date < '{date}') as total_laying,
 			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date < '{date}') as bundle_laying,
+			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND {date_filter}) as total_laying_date,
+			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND {date_filter}) as bundle_laying_date,
 			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date = '{date}') as total_laying_date,
 			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date = '{date}') as bundle_laying_date,
+			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND {date_filter}) as total_laying_date,
+			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND {date_filter}) as bundle_laying_date,
 		"""
 
 	for sw in sw_list:		
@@ -166,10 +194,10 @@ def get_columns(filters):
 			"width": 100
 		},
 		{
-			"label": f"""Total Laying @ {frappe.utils.formatdate(filters.get("date", ""))}""",
+			"label": f"""Total Laying @ {frappe.utils.formatdate(filters.get("from_date", ""))} { f''' to {frappe.utils.formatdate(filters.get("to_date", ""))}''' if filters.get("to_date") else ""}""",
 			"fieldtype": "Float",
 			"fieldname": "total_laying_date",
-			"hidden": not filters.get("date"),
+			"hidden": not (filters.get("from_date") or filters.get("to_date")),
 			"width": 100
 		},
 		{
@@ -191,10 +219,12 @@ def get_columns(filters):
 			"width": 100
 		},
 		{
-			"label": f"""Bndl Laying @ {frappe.utils.formatdate(filters.get("date", ""))}""",
+			"label": f"""Bndl Laying @ {frappe.utils.formatdate(filters.get("from_date", ""))} { f''' to {frappe.utils.formatdate(filters.get("to_date", ""))}''' if filters.get("to_date") else ""}""",
 			"fieldtype": "Float",
 			"fieldname": "bundle_laying_date",
+			"hidden": not (filters.get("from_date") or filters.get("to_date")),
 			"hidden": not filters.get("date"),
+			"hidden": not (filters.get("from_date") or filters.get("to_date")),
 			"width": 100
 		},
 		{
