@@ -41,7 +41,7 @@ frappe.ui.form.on("Project",{
     }, 
     refresh: async function(frm,cdt,cdn){
 		if (["Billed", "Completed"].includes(frm.doc.status)) {
-			frm.add_custom_button("Update Site Completion Date",  function() {
+			frm.add_custom_button("Site Completion Date",  function() {
 				let d = new frappe.ui.Dialog({
 					title: "Update Site Completion Date",
 					fields: [
@@ -67,9 +67,9 @@ frappe.ui.form.on("Project",{
 					}
 				});
 				d.show();
-			});
+			}, "Update");
 		}
-		await frm.add_custom_button("Update Delivery Details", function() {
+		await frm.add_custom_button("Delivery Details", function() {
 			if (!frm.is_dirty()) {
 				frappe.call({
 					method: "ganapathy_pavers.custom.py.site_work.update_delivered_qty",
@@ -85,7 +85,20 @@ frappe.ui.form.on("Project",{
 			} else {
 				frappe.show_alert({message: "Please Save this Form", indicator: "red"})
 			}
-		})
+		}, "Update")
+		await frm.add_custom_button("Transport Cost", function() {
+			frappe.call({
+				method: "ganapathy_pavers.custom.py.site_transport_cost.update_transport_cost",
+				args: {
+					sitename: frm.doc.name
+				},
+				freeze: true,
+				freeze_message: "Updating",
+				callback(r) {
+					frm.reload_doc()
+				}
+			})
+		}, "Update")
         if(!cur_frm.is_new()){
             cur_frm.set_df_property('is_multi_customer', 'read_only', 1)
             cur_frm.set_df_property('customer_name', 'read_only', 1)
