@@ -93,6 +93,9 @@ frappe.ui.form.on('Shot Blast Costing', {
 	additional_cost: function (frm) {
 		cur_frm.set_value('total_cost', frm.doc.additional_cost + frm.doc.labour_cost)
 	},
+	labour_cost: function (frm) {
+		cur_frm.set_value('total_cost', frm.doc.additional_cost + frm.doc.labour_cost)
+	},
 });
 frappe.ui.form.on('Shot Blast Items', {
 	material_manufacturing: function (frm, cdt, cdn) {

@@ -27,7 +27,7 @@ def execute(filters=None):
 	if sitework:
 		sw_filters["name"] = sitework
 	
-	sw_list=frappe.get_all("Project", filters=sw_filters)
+	sw_list=frappe.get_all("Project", filters=sw_filters, order_by="name")
 	
 	table_name='tabPavers' if _type=="Pavers" else 'tabCompound Wall'
 	field_name='required_area' if _type=="Pavers" else 'allocated_ft'

@@ -64,8 +64,10 @@ class ShotBlastCosting(Document):
 @frappe.whitelist()
 def make_stock_entry(doc):
     doc=json.loads(doc)
-    if doc.get("total_cost") == 0 or doc.get("total_bundle") == 0 :
-            frappe.throw("Please Enter All Fields")
+    if doc.get("total_cost") == 0:
+        frappe.throw("Please Enter Total Expense Cost")
+    if doc.get("total_bundle") == 0 :
+        frappe.throw("Please Enter Total Bundle")
     valid = frappe.get_all("Stock Entry",filters={"shot_blast":doc.get("name"),"stock_entry_type":"Material Transfer","docstatus":["!=",2]},pluck="name")
     if len(valid) >= 1:
         frappe.throw("Already Stock Entry("+valid[0]+") Created")
@@ -85,7 +87,7 @@ def make_stock_entry(doc):
         ))
         if i["damages_in_nos"] > 0:
             stock_entry.append('items', dict(
-                s_warehouse = doc.get("source_warehouse"),t_warehouse = default_scrap_warehouse, item_code = i["item_name"]	,qty = i["damages_in_nos"], uom = default_nos, is_process_loss = 1
+                s_warehouse = doc.get("source_warehouse"),t_warehouse = default_scrap_warehouse, item_code = i["item_name"]	,qty = i["damages_in_nos"], uom = default_nos, is_process_loss = 1,batch_no = i["batch"]
                 ))
     stock_entry.append('additional_costs', dict(
             expense_account	 = expenses_included_in_valuation, amount = doc.get("total_cost"),description = "In Shot Blast, Cost of Labour and Additional"
