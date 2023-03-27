@@ -6,3 +6,4 @@ def attendance_submit(self, event = None):
     update_attendance_to_checkin(self, event)
     self.reload()
     check_in_out(self, event)
+    
