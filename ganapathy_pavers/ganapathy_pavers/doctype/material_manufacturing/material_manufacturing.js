@@ -36,7 +36,8 @@ frappe.ui.form.on('Material Manufacturing', {
 			frm.fields_dict.bin_items?.refresh()
 		})
 	},
-	validate: function (frm) {
+	validate: async function (frm) {
+		await frm.trigger("is_shot_blasting")
 		if (frm.doc.is_shot_blasting && !frm.doc.shot_blast_per_sqft) {
 			frappe.throw({ title: "Mandatory Fields", message: "Please enter value for <b>Shot Blast per Sqft</b>" })
 		}
