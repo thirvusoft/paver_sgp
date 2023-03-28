@@ -81,6 +81,28 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 			"width": "100"
 		},
 		{
+			"fieldname": "vehicle_no",
+			"label": __("Vehicle"),
+			"fieldtype": "MultiSelectList",
+			get_data: async function (txt) {
+				let r = [];
+				let customer = frappe.query_report.get_filter_value("customer")
+				let site = frappe.query_report.get_filter_value("site_name")
+				let filters = {"docstatus": 1}
+				if (customer) {
+					filters["customer"] = customer
+				}
+				if (site) {
+					filters["site_work"] = site
+				}
+				let vehicles = (await frappe.db.get_list("Delivery Note", { filters: filters, fields: ['own_vehicle_no'], limit: 0 }))
+				vehicles.forEach(t => {
+					if (!r.includes(t.own_vehicle_no)) { r.push(t.own_vehicle_no) }
+				})
+				return frappe.db.get_link_options("Vehicle", txt, {name: ["in", r]})
+			},
+		},
+		{
 			"fieldname": "group_total",
 			"label": __("Group Total"),
 			"fieldtype": "Check",

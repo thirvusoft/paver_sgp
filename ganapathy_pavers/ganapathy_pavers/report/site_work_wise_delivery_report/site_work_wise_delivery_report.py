@@ -13,6 +13,7 @@ def execute(filters=None):
     group_by = filters.get("group_by")
     item_code = filters.get("item_code")
     item_group = filters.get("item_group")
+    vehicle = filters.get("vehicle_no")
     conditions = " where doc.docstatus = 1"
     if from_date or to_date or customer or site_name or sales_type or group_by or item_code:
         if from_date and to_date:
@@ -27,6 +28,8 @@ def execute(filters=None):
             conditions += " and child.item_code ='{0}' ".format(item_code)
         if item_group:
             conditions += f" and child.item_group in {tuple(item_group)}" if len(item_group)>1 else f" and child.item_group = '{item_group[0]}'"
+        if vehicle:
+            conditions += f""" and doc.own_vehicle_no {f"= '{vehicle[0]}'" if len(vehicle)==1 else f"in {tuple(vehicle)}"} """
         
     report_data = frappe.db.sql(""" select
                                 doc.posting_date,
