@@ -39,6 +39,7 @@ def execute(filters=None):
                                 doc.site_work,
                                 child.item_code,
                                 child.warehouse,
+                                doc.own_vehicle_no,
                                 child.ts_qty,
                                 child.qty,
                                 child.uom,
@@ -58,9 +59,9 @@ def execute(filters=None):
     for i in range (0,len(data)-1,1):
         if data[i][1] == data[i+1][1]:
             matched_item = data[i][1]
-            data[i+1][13]=None
+            data[i+1][-1]=None
         elif matched_item == data[i+1][1]:
-            data[i+1][13]=None
+            data[i+1][-1]=None
         else:
             matched_item=""
 
@@ -99,6 +100,7 @@ def get_columns():
         _("Site Name") + ":Link/Project:150",
         _("Item Name") + ":Link/Item:350",
         _("Warehouse") + ":Link/Warehouse:150",
+        _("Vehicle") + ":Link/Vehicle:150",
         _("Bundle") + ":Data:80",
         _("Qty") + ":Data:80",
         _("UOM") + ":Link/UOM:100",
@@ -118,15 +120,15 @@ def group_total(filters = {}, data = []):
     else:
         if(filters.get("group_by") == "Date"):
             ret_list = []
-            total = [0] * 14
-            data.append([None]*14)
+            total = [0] * 15
+            data.append([None]*15)
             for row in range(len(data)):
                 if(data[row][0] and row!=0 or row == len(data)-1):
                     total[3] = "Group Total"
-                    ret_list.append([frappe.bold(str(i)) if(i!=None) else '' for i in total])
-                    ret_list.append([None] * 14)
+                    ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else '' for i in total])
+                    ret_list.append([None] * 15)
                     ret_list.append(data[row])
-                    total = [0] * 14
+                    total = [0] * 15
                     total = add_list(total, data[row])
                 else:
                     ret_list.append(data[row])
@@ -135,15 +137,15 @@ def group_total(filters = {}, data = []):
 
         elif(filters.get("group_by") == "Customer Wise"):
             ret_list = []
-            total = [0] * 14
-            data.append([None]*14)
+            total = [0] * 15
+            data.append([None]*15)
             for row in range(len(data)):
                 if(row!=0  and data[row][2]!=data[row-1][2]):
                     total[3] = "Group Total"
-                    ret_list.append([frappe.bold(str(i)) if(i!=None) else '' for i in total])
-                    ret_list.append([None] * 14)
+                    ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else '' for i in total])
+                    ret_list.append([None] * 15)
                     ret_list.append(data[row])
-                    total = [0] * 14
+                    total = [0] * 15
                     total = add_list(total, data[row])
                 else:
                     ret_list.append(data[row])
@@ -152,15 +154,15 @@ def group_total(filters = {}, data = []):
 
         else:
             ret_list = []
-            total = [0] * 14
-            data.append([None]*14)
+            total = [0] * 15
+            data.append([None]*15)
             for row in range(len(data)):
                 if( row!=0 and data[row][5]!=data[row-1][5]):
                     total[3] = "Group Total"
-                    ret_list.append([frappe.bold(str(i)) if(i!=None) else '' for i in total])
-                    ret_list.append([None] * 14)
+                    ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else '' for i in total])
+                    ret_list.append([None] * 15)
                     ret_list.append(data[row])
-                    total = [0] * 14
+                    total = [0] * 15
                     total = add_list(total, data[row])
                 else:
                     ret_list.append(data[row])
