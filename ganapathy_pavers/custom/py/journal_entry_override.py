@@ -6,8 +6,6 @@ from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import g
 from erpnext.accounts.doctype.journal_entry.journal_entry import JournalEntry
 from erpnext.accounts.general_ledger import check_if_in_list, make_reverse_gl_entries, save_entries, update_net_values, validate_accounting_period
 
-
-
 class _JournalEntry(JournalEntry):
     def make_gl_entries(self, cancel=0, adv_adj=0):
         gl_map = []
@@ -25,6 +23,8 @@ class _JournalEntry(JournalEntry):
                         "compound_wall": d.compound_wall, # Customization
                         "fencing_post": d.fencing_post, # Customization
                         "lego_block": d.lego_block, # Customization
+                        "from_date": d.from_date, # Customization
+                        "to_date": d.to_date, # Customization
                         "party_type": d.party_type,
                         "due_date": self.due_date,
                         "party": d.party,
@@ -112,7 +112,7 @@ def merge_similar_entries(gl_map, precision=None):
     for entry in gl_map:
         # if there is already an entry in this account then just add it
         # to that entry
-        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block",] + get_workstations()) # Customization
+        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block", "from_date", "to_date"] + get_workstations()) # Customization
         if same_head:
             same_head.debit	= flt(same_head.debit) + flt(entry.debit)
             same_head.debit_in_account_currency	= \
