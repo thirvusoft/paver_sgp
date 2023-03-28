@@ -2,8 +2,9 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Daily Maintenance', {
-	refresh: async function (frm) { 
+	refresh: async function (frm) {
 		if (frm.is_new()) {
+			frm.set_value("time", frappe.datetime.now_time())
 			let fi = await frappe.db.get_doc("DSM Defaults"),
 				raw = await frappe.db.get_doc("DSM Defaults")
 			fi.warehouse_for_pavers_and_compound_walls.forEach(row => {
@@ -36,9 +37,10 @@ frappe.ui.form.on('Daily Maintenance', {
 		frappe.call({
 			method: "ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.paver_item",
 			args: {
-				warehouse: cur_frm.doc.warehouse.length?cur_frm.doc.warehouse:cur_frm.scroll_to_field('warehouse') + frappe.throw({ message: "Please enter <b>Warehouse for Pavers and Compound Walls</b>", title: "Missing Fields", indicator: "red" }),
+				warehouse: cur_frm.doc.warehouse.length ? cur_frm.doc.warehouse : cur_frm.scroll_to_field('warehouse') + frappe.throw({ message: "Please enter <b>Warehouse for Pavers and Compound Walls</b>", title: "Missing Fields", indicator: "red" }),
 				date: cur_frm.doc.date || cur_frm.scroll_to_field('date') + frappe.throw({ message: "Please enter <b>Date</b> to fetch production and vehicle details", title: "Missing Fields", indicator: "red" }),
-				warehouse_colour: cur_frm.doc.warehouse_colour.length?cur_frm.doc.warehouse_colour:cur_frm.scroll_to_field('warehouse_colour') + frappe.throw({ message: "Please enter <b>Warehouse for Colour Powder Items</b>", title: "Missing Fields", indicator: "red" })
+				time: cur_frm.doc.time || cur_frm.scroll_to_field('time') + frappe.throw({ message: "Please enter <b>Time</b> to fetch production and vehicle details", title: "Missing Fields", indicator: "red" }),
+				warehouse_colour: cur_frm.doc.warehouse_colour.length ? cur_frm.doc.warehouse_colour : cur_frm.scroll_to_field('warehouse_colour') + frappe.throw({ message: "Please enter <b>Warehouse for Colour Powder Items</b>", title: "Missing Fields", indicator: "red" })
 			},
 			freeze: true,
 			freeze_message: loading_svg() || "Fetching data...",

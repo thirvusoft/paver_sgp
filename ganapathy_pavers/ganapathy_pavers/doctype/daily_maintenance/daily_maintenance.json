@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "date",
+  "time",
   "petrol_rate",
   "diesel_rate",
   "get_attendance_details",
@@ -263,12 +264,17 @@
    "fieldtype": "Table",
    "label": "Shot Blast Colour Total",
    "options": "DSM Colour Total"
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Time",
+   "label": "Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-02-17 12:36:43.369347",
+ "modified": "2023-03-28 11:05:20.156883",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Daily Maintenance",
