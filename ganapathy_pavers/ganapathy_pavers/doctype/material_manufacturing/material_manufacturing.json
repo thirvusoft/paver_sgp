@@ -143,6 +143,14 @@
   "shot_blast_per_sqft",
   "section_break_98",
   "item_price",
+  "section_break_137",
+  "total_production_qty",
+  "column_break_139",
+  "total_damaged_qty",
+  "column_break_141",
+  "total_produced_qty",
+  "column_break_143",
+  "total_production_sqft",
   "section_break_105",
   "batch_no_manufacture",
   "batch_no_rack_shifting",
@@ -953,12 +961,52 @@
    "fieldname": "total_cost",
    "fieldtype": "Button",
    "label": "Get Labour and Operator Cost"
+  },
+  {
+   "fieldname": "section_break_137",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_production_qty",
+   "fieldtype": "Float",
+   "label": "Total Production Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_139",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_damaged_qty",
+   "fieldtype": "Float",
+   "label": "Total Damaged Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_141",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_produced_qty",
+   "fieldtype": "Float",
+   "label": "Total Produced Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_143",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_production_sqft",
+   "fieldtype": "Float",
+   "label": "Total Production Sqft",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-23 10:49:04.421442",
+ "modified": "2023-03-29 11:06:57.019062",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",
