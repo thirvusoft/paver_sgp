@@ -96,7 +96,7 @@ def get_data(filters):
     }
     if filters.get("machine"):
         paver_filters["work_station"]=["in", filters.get("machine")]
-    paver=frappe.db.get_all("Material Manufacturing",  filters=paver_filters, fields=['item_to_manufacture','production_sqft','item_price','total_raw_material','from_time', 'strapping_cost_per_sqft', 'labour_cost_per_sqft'], order_by='from_time')
+    paver=frappe.db.get_all("Material Manufacturing",  filters=paver_filters, fields=['item_to_manufacture','total_production_sqft as production_sqft','item_price','total_raw_material','from_time', 'strapping_cost_per_sqft', 'labour_cost_per_sqft'], order_by='from_time')
     for i in paver:
         if not i.production_sqft:
             continue
@@ -139,8 +139,8 @@ def get_production_cost(filters, item):
     query=f"""
         SELECT 
             (
-                SELECT AVG((lomm.operators_cost_in_manufacture+lomm.operators_cost_in_rack_shift))/AVG(lomm.production_sqft) + 
-                AVG((lomm.labour_cost_manufacture+lomm.labour_cost_in_rack_shift+lomm.labour_expense))/AVG(lomm.production_sqft)
+                SELECT AVG((lomm.operators_cost_in_manufacture+lomm.operators_cost_in_rack_shift))/AVG(lomm.total_production_sqft) + 
+                AVG((lomm.labour_cost_manufacture+lomm.labour_cost_in_rack_shift+lomm.labour_expense))/AVG(lomm.total_production_sqft)
                 FROM `tabMaterial Manufacturing` as lomm
                 {conditions.replace("mm.", "lomm.").replace(F"AND lomm.item_to_manufacture='{item}'", " ")}
             ) as labour_operator_cost,
@@ -152,7 +152,7 @@ def get_production_cost(filters, item):
                         from `tabMaterial Manufacturing` mmm
                         {conditions.replace("mm.", "mmm.") + " AND mmm.item_to_manufacture=mm.item_to_manufacture"}
                     )
-                )/SUM(mm.production_sqft)
+                )/SUM(mm.total_production_sqft)
             ) as prod_cost,
         AVG(mm.strapping_cost_per_sqft) as strapping,
         AVG(mm.shot_blast_per_sqft) as shot_blasting

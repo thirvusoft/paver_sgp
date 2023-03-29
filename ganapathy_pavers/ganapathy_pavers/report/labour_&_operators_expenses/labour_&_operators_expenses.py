@@ -28,9 +28,9 @@ def execute(filters=None):
 		"Paver" as type,
 		SUM(labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense) as total_labour_cost,
 		SUM(operators_cost_in_manufacture+operators_cost_in_rack_shift) as total_operator_cost,
-		AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense))/AVG(production_sqft) as labour_cost,
-		AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(production_sqft) as operator_cost,
-		SUM(production_sqft) as production_sqft
+		AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense))/AVG(total_production_sqft) as labour_cost,
+		AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(total_production_sqft) as operator_cost,
+		SUM(total_production_sqft) as production_sqft
 		from `tabMaterial Manufacturing` {0}""".format(pm_filt), as_dict=1)
 	
 	cw_manufacturing=frappe.db.sql("""

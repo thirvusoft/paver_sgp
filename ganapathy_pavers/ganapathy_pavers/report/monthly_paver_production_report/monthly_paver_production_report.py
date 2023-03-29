@@ -30,7 +30,7 @@ def execute(filters=None):
 		bom_item = frappe.db.sql(""" 
 								select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent {0} group by item_code """.format(condition),as_list=1)
 		production_qty = frappe.db.sql(""" 
-								select sum(production_sqft) as production_sqft,
+								select sum(total_production_sqft) as production_sqft,
 								item_to_manufacture as item_to_manufacture,
 								avg(item_price) as item_price,
 								sum(rack_shifting_total_expense1) as rack_shifting_total_expense1,
@@ -40,12 +40,12 @@ def execute(filters=None):
 								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
 								avg(shot_blast_per_sqft) as shot_blast_per_sqft,
 								(
-									SELECT AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense))/AVG(production_sqft)
+									SELECT AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense))/AVG(total_production_sqft)
 									from `tabMaterial Manufacturing`
 									WHERE name {1}
 								) as labour_cost,
 								(
-									SELECT AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(production_sqft)
+									SELECT AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(total_production_sqft)
 									from `tabMaterial Manufacturing`
 									WHERE name {1}
 								) as operator_cost

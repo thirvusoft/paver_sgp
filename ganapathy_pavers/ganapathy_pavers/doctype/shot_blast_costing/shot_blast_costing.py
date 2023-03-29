@@ -2,12 +2,32 @@
 # For license information, please see license.txt
 
 # import frappe
+import datetime
 import json
+from erpnext.stock.doctype.batch.batch import get_batch_qty
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from erpnext.controllers.queries import get_fields
 
 class ShotBlastCosting(Document):
+    def validate(self):
+        self.total_cost = (self.additional_cost or 0) + (self.labour_cost or 0)
+        self.fetch_warehouses()
+    
+    def fetch_warehouses(self):
+        if not self.warehouse:
+            curing_t = frappe.db.get_single_value("USB Setting", "default_curing_target_warehouse")
+            self.warehouse = curing_t
+
+        if not self.source_warehouse:
+            curing_s = frappe.db.get_single_value("USB Setting", "default_curing_target_warehouse_for_setting")
+            self.source_warehouse = curing_s
+
+        if not self.workstation:
+            wrk = frappe.db.get_single_value("USB Setting", "default_shot_blast_workstation")
+            self.workstation = wrk
+
     def before_submit(doc):
         material = frappe.get_all("Stock Entry",filters={"shot_blast":doc.get("name"),"stock_entry_type":"Material Transfer"},pluck="name")
         if len(material) == 0:
@@ -71,13 +91,18 @@ def make_stock_entry(doc):
     valid = frappe.get_all("Stock Entry",filters={"shot_blast":doc.get("name"),"stock_entry_type":"Material Transfer","docstatus":["!=",2]},pluck="name")
     if len(valid) >= 1:
         frappe.throw("Already Stock Entry("+valid[0]+") Created")
+
+    _datetime = datetime.datetime.strptime(doc.get("to_time"), '%Y-%m-%d %H:%M:%S')
+
     default_scrap_warehouse = frappe.db.get_singles_value("USB Setting", "scrap_warehouse")
     expenses_included_in_valuation = frappe.get_cached_value("Company", doc.get("company"), "expenses_included_in_valuation")
+    
     stock_entry = frappe.new_doc("Stock Entry")
     stock_entry.company = doc.get("company")
     stock_entry.shot_blast = doc.get("name")
     stock_entry.set_posting_time = 1
-    stock_entry.posting_date = frappe.utils.formatdate(doc.get("to_time"), "yyyy-MM-dd")
+    stock_entry.posting_date = _datetime.date()
+    stock_entry.posting_time = _datetime.time()
     default_nos = frappe.db.get_singles_value("USB Setting", "default_manufacture_uom")
     default_bundle = frappe.db.get_singles_value("USB Setting", "default_rack_shift_uom")
     stock_entry.stock_entry_type = "Material Transfer"
@@ -85,6 +110,16 @@ def make_stock_entry(doc):
         stock_entry.append('items', dict(
         s_warehouse = doc.get("source_warehouse"),t_warehouse = doc.get("warehouse"), item_code = i["item_name"],qty = i["sqft"]-i["damages_in_sqft"], uom = frappe.db.get_value("Item", i["item_name"], "stock_uom"),batch_no = i["batch"]
         ))
+
+        check_batch_stock_avalability(
+            i["batch"], 
+            doc.get("source_warehouse"), 
+            doc.get("warehouse"),
+            _datetime.date(),
+            _datetime.time(),
+            i["sqft"]
+        )
+        
         if i["damages_in_nos"] > 0:
             stock_entry.append('items', dict(
                 s_warehouse = doc.get("source_warehouse"),t_warehouse = default_scrap_warehouse, item_code = i["item_name"]	,qty = i["damages_in_nos"], uom = default_nos, is_process_loss = 1,batch_no = i["batch"]
@@ -129,3 +164,53 @@ def batch_query(doctype, txt, searchfield, start, page_len, filters, as_dict=Fal
         {"txt": "%%%s%%" % txt, "_txt": txt.replace("%", ""), "start": start, "page_len": page_len},
     )
     return res
+
+def check_batch_stock_avalability(batch_no, warehouse, f_warehouse, date, time, needed_stock):
+    qty = get_batch_qty(batch_no, warehouse, posting_date=date, posting_time=time) or 0
+    if qty != 0:
+        return
+    
+    current_qty = get_batch_qty(batch_no, f_warehouse, posting_date=frappe.utils.nowdate(), posting_time=frappe.utils.nowtime()) or 0
+    if current_qty < needed_stock:
+        return
+
+    move_stock({
+                "date": str(date),
+                "time": str(time),
+                "batch_no": batch_no,
+                "from_warehouse": f_warehouse,
+                "to_warehouse": warehouse,
+            })
+
+
+def move_stock(args):
+    if not args:
+        return
+
+    date = args.get("date")  
+    time = args.get("time")  
+    batch_no = args.get("batch_no")  
+    f_warehouse = args.get("from_warehouse")  
+    warehouse = args.get("to_warehouse")  
+
+    current_qty = get_batch_qty(batch_no, f_warehouse, posting_date=frappe.utils.nowdate(), posting_time=frappe.utils.nowtime()) or 0
+    
+    if current_qty<=0:
+        return
+    
+    doc = frappe.new_doc("Stock Entry")
+    doc.update({
+        "stock_entry_type": "Material Transfer",
+        "posting_date": date,
+        "posting_time": time,
+        "set_posting_time": 1,
+        "items": [{
+            "s_warehouse": f_warehouse,
+            "t_warehouse": warehouse,
+            "item_code": frappe.db.get_value("Batch", batch_no, "item"),
+            "qty": current_qty,
+            "batch_no": batch_no
+        }]
+    })
+    doc.save()
+    doc.submit()

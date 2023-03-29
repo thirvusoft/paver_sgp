@@ -67,7 +67,7 @@ def get_data(filters):
         _filters["item_to_manufacture"]=filters.get('item')
     if filters.get('machine'):
         _filters["work_station"]=["in", filters.get('machine')]
-    daily_paver=frappe.db.get_all("Material Manufacturing", filters=_filters,fields=["name","item_to_manufacture","work_station","from_time","production_sqft","no_of_racks"], order_by="item_to_manufacture")
+    daily_paver=frappe.db.get_all("Material Manufacturing", filters=_filters,fields=["name","item_to_manufacture","work_station","from_time","total_production_sqft as production_sqft","no_of_racks"], order_by="item_to_manufacture")
 
     
     grand_total=0

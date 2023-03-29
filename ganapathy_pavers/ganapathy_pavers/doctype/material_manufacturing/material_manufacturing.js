@@ -140,7 +140,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value('no_of_bundle', frm.doc.no_of_bundle - frm.doc.curing_damaged_qty)
 	},
 	rack_shift_damage_qty: function (frm) {
-		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty)
+		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_completed_qty - frm.doc.rack_shift_damage_qty)
 	},
 	rate_per_hrs: function (frm) {
 		cur_frm.set_value('labour_cost', (frm.doc.rate_per_hrs * frm.doc.total_hrs) / frm.doc.no_of_division)

@@ -15,10 +15,25 @@ class MaterialManufacturing(Document):
         find_batch(self)
       
     def validate(doc):
+        doc.calculate_production_details()
         doc.get_bin_items()
         for row in doc.items:
             row.amount = (row.rate or 0) * (row.qty or 0)
             
+    def calculate_production_details(doc):
+        doc.total_production_qty = (doc.production_qty or 0)
+        doc.total_damaged_qty = (doc.damage_qty or 0) + (doc.rack_shift_damage_qty)
+        doc.total_produced_qty = doc.total_production_qty - doc.total_damaged_qty
+        doc.total_production_sqft = uom_conversion(doc.item_to_manufacture, "Nos", doc.total_produced_qty, "SQF")
+    
+    def db_set_total_production_sqft(d):
+        d.calculate_production_details()
+        frappe.db.set_value("Material Manufacturing", d.name, "total_production_qty", d.total_production_qty, update_modified=False)
+        frappe.db.set_value("Material Manufacturing", d.name, "total_damaged_qty", d.total_damaged_qty, update_modified=False)
+        frappe.db.set_value("Material Manufacturing", d.name, "total_produced_qty", d.total_produced_qty, update_modified=False)
+        frappe.db.set_value("Material Manufacturing", d.name, "total_production_sqft", d.total_production_sqft, update_modified=False)
+
+
     def get_bin_items(doc):
         bin_items = []
         total_raw_material=[]
