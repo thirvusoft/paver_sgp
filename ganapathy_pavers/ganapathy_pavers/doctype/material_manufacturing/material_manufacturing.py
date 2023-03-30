@@ -22,7 +22,7 @@ class MaterialManufacturing(Document):
             
     def calculate_production_details(doc):
         doc.total_production_qty = (doc.production_qty or 0)
-        doc.total_damaged_qty = (doc.damage_qty or 0) + (doc.rack_shift_damage_qty)
+        doc.total_damaged_qty = (doc.damage_qty or 0) + (doc.rack_shift_damage_qty or 0)
         doc.total_produced_qty = doc.total_production_qty - doc.total_damaged_qty
         doc.total_production_sqft = uom_conversion(doc.item_to_manufacture, "Nos", doc.total_produced_qty, "SQF")
     

@@ -34,10 +34,10 @@ def site_work(doc):
             items[i.item]={
                 "nos":0,"sqf":0,"rate": rate,
             }
-        items[i.item]["nos"]+=round(uom_conversion(i.item,i.stock_uom,i.delivered_stock_qty,'Nos'),2)
-        nos+=uom_conversion(i.item,i.stock_uom,i.delivered_stock_qty,"Nos")
-        items[i.item]["sqf"]+=round(uom_conversion(i.item,i.stock_uom,i.delivered_stock_qty,"SQF"),2)
-        supply_sqf+=uom_conversion(i.item,i.stock_uom,i.delivered_stock_qty,"SQF")
+        items[i.item]["nos"]+=round(uom_conversion(i.item,i.stock_uom,((i.delivered_stock_qty or 0) + (i.returned_stock_qty or 0)),'Nos'),2)
+        nos+=uom_conversion(i.item,i.stock_uom,((i.delivered_stock_qty or 0) + (i.returned_stock_qty or 0)),"Nos")
+        items[i.item]["sqf"]+=round(uom_conversion(i.item,i.stock_uom,((i.delivered_stock_qty or 0) + (i.returned_stock_qty or 0)),"SQF"),2)
+        supply_sqf+=uom_conversion(i.item,i.stock_uom,((i.delivered_stock_qty or 0) + (i.returned_stock_qty or 0)),"SQF")
     
     _items = copy.deepcopy(items)
     for row in _items:

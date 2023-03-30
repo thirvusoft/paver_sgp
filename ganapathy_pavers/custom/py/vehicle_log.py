@@ -440,7 +440,6 @@ def update_fasttag_exp_to_sw(self, event=None):
 
 
 def fuel_stock_entry(self, event=None):
-    return
     if not self.select_purpose == "Fuel" or (self.select_purpose == "Fuel" and not self.from_barrel):
         return
     
