@@ -9,7 +9,7 @@ def total_no_salary(doc,action):
     if doc.ts_operators_table:
         total =0
         for i in doc.ts_operators_table:
-            total+=i.ts_operator_wages
+            total+=(i.ts_operator_wages or 0)
         doc.ts_sum_of_operator_wages = total
         doc.ts_no_of_operator =  len(doc.ts_operators_table)
         
