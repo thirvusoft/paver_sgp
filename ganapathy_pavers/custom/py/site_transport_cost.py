@@ -10,8 +10,9 @@ class SiteTransportCost:
         self.vehicle_logs = self.get_vehicle_logs()
         self.driver_salary = self.get_vehicle_log_driver_cost()
         self.get_fuel_maintenance_cost()
+        self.vehicle_daily_cost = self.get_yearly_maintenance_cost()
 
-        return (sum(self.driver_salary.values()) or 0) + (self.maintenance_cost or 0) + (self.fuel_cost or 0)
+        return (sum(self.driver_salary.values()) or 0) + (self.maintenance_cost or 0) + (self.fuel_cost or 0) + (sum(self.vehicle_daily_cost.values()) or 0)
 
 
     def get_vehicle_logs(self):
@@ -20,7 +21,15 @@ class SiteTransportCost:
             "docstatus": 1,
             "delivery_note": ["in", delivery_notes],
             "select_purpose": "Goods Supply",
-        }, fields=["name", "license_plate", "date", "employee", "odometer", "last_odometer", "mileage", "delivery_note"])
+        }, fields=[
+            "name", 
+            "license_plate", 
+            "date", 
+            "employee", 
+            "odometer", 
+            "last_odometer", 
+            "delivery_note", 
+        ])
         return vehicle_logs
 
     def get_vehicle_log_driver_cost(self):
@@ -37,6 +46,7 @@ class SiteTransportCost:
 
         driver_salary = {}
         for employee in driver_trips_on_date:
+            per_day_salary = frappe.db.get_value("Driver", {"employee": employee}, "salary_per_day") or 0
             for date in driver_trips_on_date.get(employee, {}) or {}:
                 count = len(frappe.get_all("Vehicle Log", {
                     "docstatus": 1,
@@ -46,7 +56,6 @@ class SiteTransportCost:
                 if employee not in driver_salary:
                     driver_salary[employee] = 0
 
-                per_day_salary = frappe.db.get_value("Driver", {"employee": employee}, "salary_per_day") or 0
                                
                 salary = (per_day_salary or 0) * len((driver_trips_on_date.get(employee, {}) or {}).get(date, {}) or {}) / count
                 driver_salary[employee] += (salary or 0)
@@ -68,6 +77,34 @@ class SiteTransportCost:
 
         self.maintenance_cost = maintenance_cost
         self.fuel_cost = fuel_cost
+
+    def get_yearly_maintenance_cost(self):
+        yearl_maintenance = {}
+        date_vehicle_wise_logs = {}
+
+        for vl in self.vehicle_logs:
+            if vl.get("date") not in date_vehicle_wise_logs:
+                date_vehicle_wise_logs[vl.get("date")] = {}
+
+            if vl.get("license_plate") not in date_vehicle_wise_logs[vl.get("date")]:
+                date_vehicle_wise_logs[vl.get("date")][vl.get("license_plate")] = []
+
+            date_vehicle_wise_logs[vl.get("date")][vl.get("license_plate")].append(vl)
+
+        for date in date_vehicle_wise_logs:
+            for vehicle in date_vehicle_wise_logs.get(date, {}) or {}:
+                count = len(frappe.get_all("Vehicle Log", {
+                    "docstatus": 1,
+                    "date": date,
+                    "license_plate": vehicle,
+                }))
+                if date not in yearl_maintenance:
+                    yearl_maintenance[date] = 0
+                main_cost = frappe.db.get_value("Vehicle", vehicle, "yearly_maintenance_cost")            
+                cost = ((main_cost or 0)/365) * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) / count
+                yearl_maintenance[date] += (cost or 0)
+
+        return yearl_maintenance
 
     
     def get_last_fuel_rate(self, date, vehicle):
@@ -97,6 +134,19 @@ def update_transport_cost(sitename):
 
 def update_transport_cost_of_all_sites(self, event = None):
     if self.delivery_note:
-        site = frappe.get_value("Delivery Note", self.delivery_note, "site_work")
-        if site:
-            update_transport_cost(site)
+        sites = [frappe.get_value("Delivery Note", self.delivery_note, "site_work")]
+        vls = frappe.get_all("Vehicle Log", filters={
+                    "docstatus": 1,
+                    "select_purpose": "Goods Supply",
+                    "date": self.date,
+                }, fields=["site_work", "delivery_note"])
+        for vl in vls:
+            if not vl.site_work and vl.delivery_note:
+                vl.site_work = frappe.db.get_value("Delivery Note", vl.delivery_note, "site_work")
+            
+            if vl.site_work and vl.site_work not in sites:
+                sites.append(vl.site_work)
+
+        for site in sites:
+            if site:
+                update_transport_cost(site)
