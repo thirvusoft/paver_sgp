@@ -17,11 +17,11 @@ class SiteTransportCost:
         return {
             "value": (sum(self.operator_salary.values()) or 0) + (sum(self.driver_salary.values()) or 0) + (self.maintenance_cost or 0) + (self.fuel_cost or 0) + (sum(self.vehicle_daily_cost.values()) or 0),
             "description": f"""<div>
-                        Driver Salary: {self.driver_salary} <br>
-                        Operator Salary: {self.operator_salary} <br>
-                        Maintenance Cost: {self.maintenance_cost} <br>
-                        Fuel: {self.fuel_cost} <br>
-                        Vehicle Yearly: {self.vehicle_daily_cost}
+                        <b>Driver Salary:</b> {", ".join([f"<b>{emp}</b>: {self.driver_salary.get(emp)}" for emp in self.driver_salary])} <br>
+                        <b>Operator Salary:</b> {", ".join([f"<b>{opr}</b>: {self.operator_salary.get(opr)}" for opr in self.operator_salary])} <br>
+                        <b>Maintenance Cost:</b> {self.maintenance_cost} <br>
+                        <b>Fuel:</b> {self.fuel_cost} <br>
+                        <b>Vehicle Yearly:</b> {", ".join([f"<b>{str(date)}</b>: {self.vehicle_daily_cost.get(date)}" for date in self.vehicle_daily_cost])}
                     </div>"""
         }
 
