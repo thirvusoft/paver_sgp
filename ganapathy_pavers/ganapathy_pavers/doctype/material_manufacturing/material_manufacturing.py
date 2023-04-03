@@ -183,7 +183,7 @@ def make_stock_entry(doc,type1):
            frappe.throw(f'Please choose {frappe.bold("Has Batch No")} for an item {doc.get("item_to_manufacture")}')
 
    if doc.get("production_qty") == 0 or doc.get("cement_item") == '' or doc.get("ggbs_item") == '' or doc.get("total_expense") == 0:
-           frappe.throw("Please Enter the Produced Qty and From Time - To Time in Manufacture Section and Save This Form")
+           frappe.throw("Please Enter the Production Qty and From Time - To Time in Manufacture Section and Save This Form")
    default_scrap_warehouse = frappe.db.get_singles_value("USB Setting", "scrap_warehouse")
    expenses_included_in_valuation = frappe.get_cached_value("Company", doc.get("company"), "expenses_included_in_valuation")
    stock_entry = frappe.new_doc("Stock Entry")
