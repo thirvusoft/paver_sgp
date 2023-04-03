@@ -9,10 +9,21 @@ class SiteTransportCost:
     def get_transport_cost(self):
         self.vehicle_logs = self.get_vehicle_logs()
         self.driver_salary = self.get_vehicle_log_driver_cost()
+        self.operator_salary = self.get_vehicle_log_operator_cost()
         self.get_fuel_maintenance_cost()
         self.vehicle_daily_cost = self.get_yearly_maintenance_cost()
 
-        return (sum(self.driver_salary.values()) or 0) + (self.maintenance_cost or 0) + (self.fuel_cost or 0) + (sum(self.vehicle_daily_cost.values()) or 0)
+
+        return {
+            "value": (sum(self.operator_salary.values()) or 0) + (sum(self.driver_salary.values()) or 0) + (self.maintenance_cost or 0) + (self.fuel_cost or 0) + (sum(self.vehicle_daily_cost.values()) or 0),
+            "description": f"""<div>
+                        Driver Salary: {self.driver_salary} <br>
+                        Operator Salary: {self.operator_salary} <br>
+                        Maintenance Cost: {self.maintenance_cost} <br>
+                        Fuel: {self.fuel_cost} <br>
+                        Vehicle Yearly: {self.vehicle_daily_cost}
+                    </div>"""
+        }
 
 
     def get_vehicle_logs(self):
@@ -27,6 +38,7 @@ class SiteTransportCost:
             "date", 
             "employee", 
             "odometer", 
+            "mileage",
             "last_odometer", 
             "delivery_note", 
         ])
@@ -48,19 +60,62 @@ class SiteTransportCost:
         for employee in driver_trips_on_date:
             per_day_salary = frappe.db.get_value("Driver", {"employee": employee}, "salary_per_day") or 0
             for date in driver_trips_on_date.get(employee, {}) or {}:
-                count = len(frappe.get_all("Vehicle Log", {
+                vls = (driver_trips_on_date.get(employee, {}) or {}).get(date, []) or []
+                odometer = sum([(i.get("odometer") or 0) - (i.get("last_odometer") or 0) for i in vls])
+
+                total_odometer = sum(frappe.get_all("Vehicle Log", {
                     "docstatus": 1,
                     "employee": employee,
                     "date": date,
-                }))
+                    "select_purpose": "Goods Supply",
+                }, pluck="today_odometer_value")) or 1
+
                 if employee not in driver_salary:
                     driver_salary[employee] = 0
 
                                
-                salary = (per_day_salary or 0) * len((driver_trips_on_date.get(employee, {}) or {}).get(date, {}) or {}) / count
+                salary = (per_day_salary or 0) * len((driver_trips_on_date.get(employee, {}) or {}).get(date, []) or []) * odometer / total_odometer
                 driver_salary[employee] += (salary or 0)
 
         return driver_salary
+
+    def get_vehicle_log_operator_cost(self):
+        operator_trips_on_date={}
+
+        for vl in self.vehicle_logs:
+            operator = frappe.db.get_value("Vehicle", vl.get("license_plate"), "operator")
+            if operator not in operator_trips_on_date:
+                operator_trips_on_date[operator] = {}
+
+            if vl.get("date") not in operator_trips_on_date[operator]:
+                operator_trips_on_date[operator][vl.get("date")] = []
+
+            operator_trips_on_date[operator][vl.get("date")].append(vl)
+
+        operator_salary = {}
+
+        for operator in operator_trips_on_date:
+            per_day_salary = frappe.db.get_value("Driver", operator, "salary_per_day") or 0
+            for date in operator_trips_on_date.get(operator, {}) or {}:
+                vls = (operator_trips_on_date.get(operator, {}) or {}).get(date, []) or []
+                odometer = sum([(i.get("odometer") or 0) - (i.get("last_odometer") or 0) for i in vls])
+
+                op_vehicles = frappe.get_all("Vehicle", {"operator": operator}, pluck='name')
+                total_odometer = sum(frappe.get_all("Vehicle Log", {
+                    "docstatus": 1,
+                    "license_plate": ['in', op_vehicles],
+                    "select_purpose": "Goods Supply",
+                    "date": date,
+                }, pluck="today_odometer_value")) or 1
+
+                if operator not in operator_salary:
+                    operator_salary[operator] = 0
+
+                               
+                salary = (per_day_salary or 0) * len((operator_trips_on_date.get(operator, {}) or {}).get(date, []) or []) * odometer / total_odometer
+                operator_salary[operator] += (salary or 0)
+
+        return operator_salary
 
     def get_fuel_maintenance_cost(self):
         fuel_cost = 0
@@ -70,7 +125,7 @@ class SiteTransportCost:
             distance = (vl.get("odometer", 0) or 0) - (vl.get("last_odometer", 0) or 0)
             maint_rate = frappe.db.get_value("Vehicle", vl.get("license_plate"), "maintenance_per_km") or 0
             maintenance_cost += ((maint_rate or 0) * (distance or 0)) or 0
-            mileage = frappe.db.get_value("Vehicle", vl.get("license_plate"), "mileage") or 0
+            mileage = vl.get("mileage")
             cost = ((distance*rate/(mileage or 1)) or 0)
 
             fuel_cost += cost or 0
@@ -93,15 +148,16 @@ class SiteTransportCost:
 
         for date in date_vehicle_wise_logs:
             for vehicle in date_vehicle_wise_logs.get(date, {}) or {}:
-                count = len(frappe.get_all("Vehicle Log", {
-                    "docstatus": 1,
-                    "date": date,
+                total_odometer = sum(frappe.get_all("Vehicle Log", {
                     "license_plate": vehicle,
-                }))
+                    "date": date,
+                    "select_purpose": "Goods Supply"
+                }, pluck="today_odometer_value"))
+
                 if date not in yearl_maintenance:
                     yearl_maintenance[date] = 0
                 main_cost = frappe.db.get_value("Vehicle", vehicle, "yearly_maintenance_cost")            
-                cost = ((main_cost or 0)/365) * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) / count
+                cost = ((main_cost or 0)/312) * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / total_odometer
                 yearl_maintenance[date] += (cost or 0)
 
         return yearl_maintenance
@@ -130,7 +186,9 @@ class SiteTransportCost:
 @frappe.whitelist()
 def update_transport_cost(sitename):
     cost = SiteTransportCost(sitename)
-    frappe.db.set_value("Project", sitename, "transporting_cost", cost.get_transport_cost(), update_modified=False)
+    trans_cost = cost.get_transport_cost()
+    frappe.db.set_value("Project", sitename, "transporting_cost", trans_cost.get("value", 0) or 0, update_modified=False)
+    frappe.db.set_value("Project", sitename, "transport_cost_details", trans_cost.get("description", "") or "", update_modified=False)
 
 def update_transport_cost_of_all_sites(self, event = None):
     if self.delivery_note:

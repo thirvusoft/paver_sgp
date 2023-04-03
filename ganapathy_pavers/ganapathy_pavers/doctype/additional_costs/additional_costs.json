@@ -10,10 +10,12 @@
   "nos",
   "amount",
   "mode_of_payment",
+  "branch",
   "customer",
   "area",
   "no_of_labours",
   "column_break_7",
+  "date",
   "job_worker",
   "currency",
   "exchange_rate",
@@ -165,12 +167,25 @@
    "fieldtype": "Currency",
    "label": "Tax Amount",
    "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "mandatory_depends_on": "eval:doc.description==\"Site Advance\" && doc.amount>0",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "mandatory_depends_on": "eval:doc.description==\"Site Advance\" && doc.amount>0"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-03-06 19:04:52.246249",
+ "modified": "2023-03-31 18:02:48.654595",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Additional Costs",

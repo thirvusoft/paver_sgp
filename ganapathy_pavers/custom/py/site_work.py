@@ -126,13 +126,15 @@ def validate(self,event):
                 except:
                     frappe.throw(("Please set Company and Default account for ({0}) mode of payment").format(mode))
 
+                employee_advance = create_jw_advance(row.job_worker, row.currency, amount, row.advance_account, row.mode_of_payment_for_advance, self.company, self.name, row.exchange_rate, row.date, row.branch)
 
                 doc=frappe.new_doc('Payment Entry')
                 doc.update({
                     'company': self.company,
                     'source_exchange_rate': 1,
                     'payment_type': 'Receive',
-                    'posting_date': nowdate(),
+                    'posting_date': row.date or nowdate(),
+                    'branch': row.branch,
                     'mode_of_payment': mode,
                     'party_type': 'Customer',
                     'party': row.customer if(self.is_multi_customer) else self.customer,
@@ -142,11 +144,12 @@ def validate(self,event):
                     'site_work': self.name,
                     'received_amount': amount,
                     'target_exchange_rate': 1,
-                    'paid_to_account_currency': frappe.db.get_value('Account',acc_paid_to,'account_currency')
+                    'paid_to_account_currency': frappe.db.get_value('Account',acc_paid_to,'account_currency'),
+                    'employee_advance': employee_advance
                 })
                 doc.insert()
                 doc.submit()
-                create_jw_advance(row.job_worker, row.currency, amount, row.advance_account, row.mode_of_payment_for_advance, self.company, self.name, row.exchange_rate)
+                
                 if(row.name and event=='after_insert'):
                     frappe.db.set_value("Additional Costs", row.name, 'amount', 0)
         else:
@@ -238,13 +241,14 @@ def validate_jw_qty(self):
                 </div>
             """)
 
-def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, exchange_rate):
+def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, exchange_rate, date=None, branch=None):
     doc=frappe.new_doc('Employee Advance')
     doc.update({
         'employee': emp_name,
-        'posting_date': frappe.utils.nowdate(),
+        'posting_date': date or frappe.utils.nowdate(),
         'repay_unclaimed_amount_from_salary': 1,
         'currency': currency,
+        'branch': branch,
         'advance_amount': adv_amt,
         'advance_account': adv_act,
         'exchange_rate' : (exchange_rate or 1),
@@ -258,6 +262,7 @@ def create_jw_advance(emp_name, currency, adv_amt, adv_act, mop, company ,sw, ex
     doc.flags.ignore_mandatory = True
     doc.save()
     doc.submit()
+    return doc.name
 
 def reduce_advance_amount(self, event=None):
     if self.project:
