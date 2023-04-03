@@ -44,7 +44,7 @@ def execute(filters=None):
 		SUM(total_operator_wages) as total_operator_cost,
 		AVG(total_labour_wages + labour_expense_for_curing)/AVG(production_sqft) as labour_cost,
 		AVG(total_operator_wages)/AVG(production_sqft) as operator_cost,
-		SUM(production_sqft) as production_sqft
+		SUM(ts_production_sqft) as production_sqft
 		from `tabCW Manufacturing` {0}
 		GROUP BY CASE
             WHEN type not in ('Post', 'Slab') 

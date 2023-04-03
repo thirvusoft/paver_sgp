@@ -295,17 +295,6 @@ def get_supplier_credit_acc(supplier, company):
 		frappe.throw(f"""Please set <b>Default Payable Account</b> in company <a href="/app/company/{company}"><b>{company}</b></a>""")
 	return acc
 
-@frappe.whitelist()
-def supplier_fuel_entry_patch():
-    created_logs = frappe.get_all("Journal Entry", {"docstatus": 1, "vehicle_log": ["is", "set"]}, pluck="vehicle_log")
-    fuel_logs=frappe.get_all("Vehicle Log", {"docstatus": 1, "select_purpose": "Fuel", "total_fuel": [">", 0], "name": ["not in", created_logs]}, pluck="name")
-    if not fuel_logs:
-        frappe.msgprint(f"""Journal Entry Already created""")
-        return
-    for log in fuel_logs:
-        self=frappe.get_doc("Vehicle Log", log)
-        supplier_journal_entry(self)
-    frappe.msgprint(f"""Journal Entry created successfully""")
 
 def update_vehicle_jea_exp(self, exp):
     for row in exp:

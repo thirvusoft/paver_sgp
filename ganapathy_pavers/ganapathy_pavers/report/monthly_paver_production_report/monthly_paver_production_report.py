@@ -163,7 +163,7 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 	if not exp.paver_group:
 		return [], 0, 0
 	machine=None
-	if ("Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", [])) and "Machine3" in filters.get("machine", []):
+	if ("Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", [])) and "Machine3 Day" in filters.get("machine", []):
 		pass
 	elif "Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", []):
 		machine="machine_12"

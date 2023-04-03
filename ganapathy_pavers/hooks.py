@@ -35,7 +35,6 @@ app_include_js = "/assets/js/ganapathy_pavers.min.js"
 
 doctype_list_js = {
 	"Project" : "/custom/js/sw_quick_entry.js",
-	"Vehicle Log": "/custom/js/vehicle_log_list.js",
 	"Item Price": "/custom/js/item_price_list.js",
 	}
 
@@ -366,7 +365,7 @@ doctype_js = {
 				"Employee":"/custom/js/employee.js",
 				"Delivery Note":"/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
-				"Journal Entry": "/custom/js/journal_entry.js",
+				# "Journal Entry": "/custom/js/journal_entry.js",
 				"Vehicle Log":[
 								"/custom/js/vehicle_log.js", 
 								"/custom/js/vehicle_log_service.js"
