@@ -38,6 +38,13 @@ frappe.query_reports["Itemwise Monthly Paver Production Report"] = {
 					name: ["in", machines]
 				});
 			}
+		},
+		{
+			"fieldname": "report_type",
+			"label": __("Report Type"),
+			"fieldtype": "Select",
+			"options": "Summary\nReport",
+			"default": "Summary"
 		}
 	]
 };
