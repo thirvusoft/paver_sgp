@@ -58,19 +58,22 @@ def get_columns(filters):
             "label": _("Strapping Cost"),
             "fieldtype": "Float",
             "fieldname": "strapping_cost",
-            "width": 100
+            "width": 100,
+            "hidden": filters.get("report_type") == "Summary"
         },
          {
             "label": _("Shot Blasting Cost"),
             "fieldtype": "Float",
             "fieldname": "shot_blasting_cost",
-            "width": 100
+            "width": 100,
+            "hidden": filters.get("report_type") == "Summary"
         },
         {
             "label": _("Labour Operator Cost"),
             "fieldtype": "Float",
             "fieldname": "labour_operator_cost",
-            "width": 160
+            "width": 160,
+            "hidden": filters.get("report_type") == "Summary"
         },
         {
             "label": _("Expense Cost"),
