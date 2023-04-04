@@ -1,7 +1,7 @@
 
 import frappe
 
-def sales_invoice_print_format(doc, field_name="item_name"):
+def sales_invoice_print_format(doc, field_name="item_code"):
     data={}
     for row in doc.items:
         if row.get(field_name):
@@ -18,8 +18,8 @@ def sales_invoice_print_format(doc, field_name="item_name"):
             })
                 data[_key]=row
             else:
-                data[_key]["amount"] += row.get("amount")
-                data[_key]["qty"] += row.get("qty")
+                data[_key].amount += row.get("amount")
+                data[_key].qty += row.get("qty")
         else:
             _key=f"""{row.get("item_name")} {row.get("rate")}  {row.get("uom")}"""
             if _key not in data:
@@ -34,8 +34,8 @@ def sales_invoice_print_format(doc, field_name="item_name"):
             })
                 data[_key]=row
             else:
-                data[_key]["amount"] += row.get("amount")
-                data[_key]["qty"] += row.get("qty")
+                data[_key].amount += row.get("amount")
+                data[_key].qty += row.get("qty")
 
     data=list(data.values())
     return data
