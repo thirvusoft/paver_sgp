@@ -125,7 +125,6 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value('rack_shifting_total_expense1', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost)
 	},
 	production_qty: function (frm) {
-		cur_frm.set_value('total_no_of_produced_qty', frm.doc.production_qty);
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty)
 		frappe.db.get_value("Item", { "name": frm.doc.item_to_manufacture }, "pavers_per_sqft", (sqft) => {
 			cur_frm.set_value('production_sqft', frm.doc.total_completed_qty / sqft.pavers_per_sqft)
@@ -141,7 +140,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value('no_of_bundle', frm.doc.no_of_bundle - frm.doc.curing_damaged_qty)
 	},
 	rack_shift_damage_qty: function (frm) {
-		cur_frm.set_value('total_no_of_produced_qty', frm.doc.production_qty - frm.doc.rack_shift_damage_qty)
+		cur_frm.trigger("total_no_of_produced_qty");
 	},
 	rate_per_hrs: function (frm) {
 		cur_frm.set_value('labour_cost', (frm.doc.rate_per_hrs * frm.doc.total_hrs) / frm.doc.no_of_division)
@@ -191,6 +190,9 @@ frappe.ui.form.on('Material Manufacturing', {
 	strapping_cost_per_sqft: function (frm) {
 		cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft * frm.doc.production_sqft);
 	},
+	total_completed_qty: function (frm) {
+		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_completed_qty);
+	},
 	total_no_of_produced_qty: function (frm) {
 		frm.set_value("remaining_qty", 0)
 		var bundle_cf = 0
@@ -215,7 +217,7 @@ frappe.ui.form.on('Material Manufacturing', {
 					default_cf = i.conversion_factor
 				}
 			}
-			var total_amount = (frm.doc.total_no_of_produced_qty * nos_cf) / bundle_cf
+			var total_amount = ((frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty) * nos_cf) / bundle_cf
 			if (total_amount >= 1) {
 				cur_frm.set_value('total_no_of_bundle', total_amount);
 			}

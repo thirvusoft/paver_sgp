@@ -182,7 +182,7 @@ def make_stock_entry(doc,type1):
        if(not frappe.get_value('Item', doc.get("item_to_manufacture"), 'has_batch_no')):
            frappe.throw(f'Please choose {frappe.bold("Has Batch No")} for an item {doc.get("item_to_manufacture")}')
 
-   if doc.get("production_qty") == 0 or doc.get("cement_item") == '' or doc.get("ggbs_item") == '' or doc.get("total_expense") == 0:
+   if doc.get("total_completed_qty") == 0 or doc.get("cement_item") == '' or doc.get("ggbs_item") == '' or doc.get("total_expense") == 0:
            frappe.throw("Please Enter the Production Qty and From Time - To Time in Manufacture Section and Save This Form")
    default_scrap_warehouse = frappe.db.get_singles_value("USB Setting", "scrap_warehouse")
    expenses_included_in_valuation = frappe.get_cached_value("Company", doc.get("company"), "expenses_included_in_valuation")
@@ -211,7 +211,7 @@ def make_stock_entry(doc,type1):
        else:
            frappe.throw("Kindly Save this Form")
        stock_entry.append('items', dict(
-           t_warehouse = doc.get("target_warehouse"), item_code = doc.get("item_to_manufacture"), qty = uom_conversion(doc.get("item_to_manufacture"), 'Nos', doc.get("production_qty"), default_nos), uom = default_nos,is_finished_item = 1,
+           t_warehouse = doc.get("target_warehouse"), item_code = doc.get("item_to_manufacture"), qty = uom_conversion(doc.get("item_to_manufacture"), 'Nos', doc.get("total_completed_qty"), default_nos), uom = default_nos,is_finished_item = 1,
            basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos),
            basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos)
            ))
@@ -242,7 +242,7 @@ def make_stock_entry(doc,type1):
 
        qty = doc.get("total_no_of_bundle") 
        stock_entry.append('items', dict(
-       s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), "Nos", (doc.get("total_no_of_produced_qty")+doc.get("rack_shift_damage_qty")), default_nos),uom = default_nos ,batch_no = doc.get("batch_no_manufacture"),
+       s_warehouse = doc.get("rack_shift_source_warehouse"), item_code = doc.get("item_to_manufacture"),qty = uom_conversion(doc.get("item_to_manufacture"), "Nos", (doc.get("total_no_of_produced_qty")), default_nos),uom = default_nos ,batch_no = doc.get("batch_no_manufacture"),
        basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos),
         basic_rate_hidden = uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_nos)
        ))
