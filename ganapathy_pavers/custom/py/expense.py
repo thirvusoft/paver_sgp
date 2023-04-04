@@ -3,7 +3,7 @@ import frappe
 import erpnext
 from erpnext.accounts.utils import get_children
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
-
+P=[]
 machine_wise_prod_info = {}
 WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
 
@@ -82,12 +82,23 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
 
     query=f"""
         select
-            *
+            *,
+            CASE
+                WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
+                    THEN gl.debit/
+                    TIMESTAMPDIFF(MONTH, gl.from_date ,  DATE_ADD(gl.to_date, INTERVAL 1 DAY))*
+                    (DATEDIFF(DATE_ADD('{to_date}', INTERVAL 1 DAY), '{from_date}') / DAY(LAST_DAY('{to_date}')))    
+                ELSE gl.debit
+            END as debit
         from `tabGL Entry` gl
         where
             gl.company='{company}' and
-            date(gl.posting_date)>='{from_date}' and
-            date(gl.posting_date)<='{to_date}' and
+            CASE
+                WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
+                THEN (gl.from_date<='{from_date}' and gl.to_date>='{to_date}')
+                ELSE (date(gl.posting_date)>='{from_date}' and
+                     date(gl.posting_date)<='{to_date}')
+                END and
             gl.is_cancelled=0
             and gl.account="{account['value']}"
             {conditions}
