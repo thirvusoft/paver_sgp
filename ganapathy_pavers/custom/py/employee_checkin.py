@@ -69,14 +69,12 @@ from frappe.model.document import Document
 
 
 def get_employees_for_shift():
-	print("3")
 	total_employees=frappe.db.get_all('Employee', filters={"attendance_device_id":['is', 'set'],'status':'Active'}, pluck='name')
 	return total_employees
 
 
 @frappe.whitelist()
 def scheduler_for_employee_shift():
-	print("1)")
 	create_workers_attendance()
 
 		
@@ -84,13 +82,8 @@ def scheduler_for_employee_shift():
 
 
 def create_datewise_checkin(employee,employee_checkin,date_wise_checkin,checkin_name):
-
-	print("4")
-
 	for data in employee_checkin:
 		if data.time.date() in date_wise_checkin:
-			frappe.log_error(title="gggg",message=data.time.date())
-			frappe.log_error(title="gggg",message=employee)
 			adding_checkin_datewise(date_wise_checkin,data.time.date(),[{'log_type':data['log_type'],'time':data['time']}])
 			adding_checkin_datewise(checkin_name,data.time.date(),[data['name']])
 		else:
@@ -116,7 +109,7 @@ def adding_checkin_datewise(checkin_date, checkin_date_key, checkin_details):
 
 def create_workers_attendance():
 	"""Workers Attendance"""
-	print("2")
+	
 
 	employee_list = get_employees_for_shift()
 	for employee in employee_list:
@@ -144,19 +137,19 @@ def create_workers_attendance():
 			if date_wise_checkin[data][0]['log_type']=='IN':
 				in_time = date_wise_checkin[data][0]['time'].time()
 				in_time_date = date_wise_checkin[data][0]['time']
-				print(in_time_date)
+			
 
 				
 
 			if date_wise_checkin[data][len(date_wise_checkin[data]) - 1]:
 				out_time = date_wise_checkin[data][len(date_wise_checkin[data]) - 1]['time'].time()
 				out_time_date = date_wise_checkin[data][len(date_wise_checkin[data]) - 1]['time']
-				print(out_time_date)
+				
 				
 
 					
 			if in_time or out_time:
-				print("hhhhhhhhhhhhhhhhhhhhh")
+				
 				if not frappe.db.exists("Attendance",{"employee":employee,"attendance_date":data}):
 					attendance.update({
 						"attendance_date":data,
@@ -174,7 +167,7 @@ def create_workers_attendance():
 					# else:
 					# 	attendance_doc=frappe.get_doc("Attendance",{"employee":employee,"attendance_date":data})
 					except Exception as e:
-						frappe.log_error(e)
+						frappe.log_error(title="Attendance Creation",message=e)
 			
 
 
