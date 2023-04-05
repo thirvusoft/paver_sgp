@@ -3,7 +3,7 @@ import frappe
 import erpnext
 from erpnext.accounts.utils import get_children
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
-P=[]
+
 machine_wise_prod_info = {}
 WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
 
@@ -22,6 +22,15 @@ def filter_empty(gl_entries):
 
     return res
 
+def flatten_hierarchy(gl_entries):
+    if len(gl_entries)==1:
+        if len(gl_entries[0]['child_nodes'])==1:
+            gl_entries = flatten_hierarchy(gl_entries[0]['child_nodes'])
+        else:
+            gl_entries=gl_entries[0]['child_nodes']
+        
+    return gl_entries
+
 @frappe.whitelist()
 def total_expense(*args, **_args):
     res = expense_tree(*args, **_args)
@@ -39,22 +48,79 @@ def calculate_total(gl_entries):
     return res
 
 @frappe.whitelist()
-def expense_tree(from_date, to_date, company=erpnext.get_default_company(), parent = "", doctype='Account', vehicle=None, machine=[], expense_type=None, prod_details = []) -> list:
+def expense_tree(from_date, to_date, company=erpnext.get_default_company(), parent = "", doctype='Account', vehicle=None, machine=[], expense_type=None, prod_details = [], filter_unwanted_groups=True) -> list:
     prod_details = [frappe.scrub(prod) for prod in prod_details]
-    root = get_account_balances(get_children(doctype, parent or company, company), company, from_date, to_date, vehicle, machine, expense_type, prod_details)
-    return filter_empty(get_tree(root, company, from_date, to_date, vehicle, machine, expense_type, prod_details))
+    root = get_account_balances(
+                accounts=get_children(
+                            doctype=doctype, 
+                            parent=parent or company, 
+                            company=company), 
+                company=company, 
+                from_date=from_date, 
+                to_date=to_date, 
+                vehicle=vehicle, 
+                machine=machine, 
+                expense_type=expense_type, 
+                prod_details=prod_details)
+    
+    res = get_tree(
+            root=root, 
+            company=company, 
+            from_date=from_date, 
+            to_date=to_date, 
+            vehicle=vehicle, 
+            machine=machine, 
+            expense_type=expense_type, 
+            prod_details=prod_details
+            )
+    
+    res = filter_empty(res)
+
+    if filter_unwanted_groups:
+        res = flatten_hierarchy(res)
+    
+    return res
 
 def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = []):
         for i in root:
-            child = get_tree(get_children('Account', i.value, company), company, from_date, to_date, vehicle, machine, expense_type, prod_details)
-            i['child_nodes']=get_account_balances(child, company, from_date, to_date, vehicle, machine, expense_type, prod_details)
+            child = get_tree(
+                        root=get_children(
+                                doctype='Account',
+                                parent=i.value,
+                                company=company
+                                ), 
+                        company=company, 
+                        from_date=from_date, 
+                        to_date=to_date, 
+                        vehicle=vehicle, 
+                        machine=machine, 
+                        expense_type=expense_type, 
+                        prod_details=prod_details)
+            i['child_nodes']=get_account_balances(
+                                accounts=child, 
+                                company=company, 
+                                from_date=from_date, 
+                                to_date=to_date, 
+                                vehicle=vehicle, 
+                                machine=machine, 
+                                expense_type=expense_type, 
+                                prod_details=prod_details
+                                )
         return root
 
 def get_account_balances(accounts, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = []):
     for account in accounts:
-        account['balance'] = get_account_balance_on(account, company, from_date, to_date, vehicle, machine, expense_type, prod_details)
-        # account['value'] = frappe.db.get_value("Account", account["value"], "account_name")
-
+        account['balance'] = get_account_balance_on(
+                                account=account, 
+                                company=company, 
+                                from_date=from_date, 
+                                to_date=to_date, 
+                                vehicle=vehicle, 
+                                machine=machine, 
+                                expense_type=expense_type, 
+                                prod_details=prod_details
+                                )
+        account['account_name'] = frappe.db.get_value("Account", account["value"], "account_name")
     return accounts
 
 def get_account_balance_on(account, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = []):
@@ -78,7 +144,6 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 f''' IFNULL(gl.{frappe.scrub(macn)}, 0) '''
              for macn in machine])})
         """
-
 
     query=f"""
         select
@@ -106,15 +171,28 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
 
     gl_entries=frappe.db.sql(query, as_dict=True)
 
-    balance = calculate_exp_from_gl_entries(gl_entries, from_date, to_date, prod_details)
+    balance = calculate_exp_from_gl_entries(
+        gl_entries=gl_entries,
+        from_date=from_date,
+        to_date=to_date,
+        expense_type=expense_type,
+        prod_details=prod_details
+        )
 
     return balance or 0
 
-def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, prod_details=[]):
+def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=None, prod_details=[]):
     amount = 0
     for gl in gl_entries:
         rate = gl.get("debit", 0) or 0
-        prod_sqf = get_gl_production_rate(gl, from_date, to_date, prod_details)
+        if expense_type=="Manufacturing":
+            prod_sqf = get_gl_production_rate(
+                        gl=gl,
+                        from_date=from_date,
+                        to_date=to_date,
+                        prod_details=prod_details)
+        else:
+            prod_sqf=1
         amount += (rate) * prod_sqf
 
     return amount
@@ -142,7 +220,8 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details=[]):
 
     machines.sort()
 
-    if machines==sorted(WORKSTATIONS):  # If all machines are true then make it [], to get all machines prod_details
+    if machines==sorted(WORKSTATIONS):  
+        # If all machines, then make it [], to get all machines prod_details
         machines=[]
 
     machine_key = json.dumps(machines)
@@ -182,7 +261,7 @@ def a(_type):
 
 # paver production report
 """
-	from ganapathy_pavers.custom.py.expense import  expense_tree
+	from ganapathy_pavers.custom.py.expense import expense_tree
 
 	exp_tree=expense_tree(
 		from_date=filters.get('from_date'),
@@ -192,5 +271,17 @@ def a(_type):
         expense_type="Manufacturing",
 		machine = machine
 	)
-	
+"""
+
+# transport report
+"""
+    from ganapathy_pavers.custom.py.expense import expense_tree
+
+    exp_tree=exp_tree=expense_tree(
+		from_date=filters.get('from_date'),
+        to_date=filters.get('to_date'),
+        parent="Expenses - GP",
+		vehicle="TN42AK6293",
+        expense_type="Vehicle",
+	)
 """ 

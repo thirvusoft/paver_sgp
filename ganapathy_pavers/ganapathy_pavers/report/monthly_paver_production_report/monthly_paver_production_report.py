@@ -5,6 +5,7 @@
 import frappe
 from frappe import _
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
+from ganapathy_pavers.custom.py.expense import  expense_tree
 
 def execute(filters=None):
 	from_date = filters.get("from_date")
@@ -169,7 +170,18 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 		machine="machine_12"
 	elif filters.get("machine", []):
 		machine="machine_3"
-	exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine )
+	if filters.get("new_method"):
+		exp_tree=exp_tree=expense_tree(
+							from_date=filters.get('from_date'),
+							to_date=filters.get('to_date'),
+							parent="Expenses - GP",
+							prod_details=["Paver"],
+							expense_type="Manufacturing",
+							machine = machine
+							)
+	else:
+		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine )
+	
 	res=[]
 	for i in exp_tree:
 		dic={}
