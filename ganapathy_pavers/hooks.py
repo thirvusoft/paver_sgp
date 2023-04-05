@@ -314,6 +314,8 @@ doc_events = {
 		],
 	},
 	"Attendance": {
+		"on_trash":"ganapathy_pavers.custom.py.employee_checkin.unlink_logs",
+
 		"on_submit": [
 					"ganapathy_pavers.custom.py.attendance.attendance_submit",
 				],
@@ -391,7 +393,8 @@ scheduler_events = {
 			"ganapathy_pavers.custom.py.vehicle.vehicle_maintenance_notification",
 		],
 		"0 1 * * *": [
-			"ganapathy_pavers.custom.py.employee_checkin.mark_attendance",
+			# "ganapathy_pavers.custom.py.employee_checkin.mark_attendance",
+			"ganapathy_pavers.custom.py.employee_checkin.scheduler_for_employee_shift"
 		]
 	},
 
