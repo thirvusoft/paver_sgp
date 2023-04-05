@@ -102,7 +102,7 @@ def create_workers_attendance():
 		date_wise_checkin = frappe._dict()
 		checkin_name = frappe._dict()
 		emp_checkin = frappe.db.get_all("Employee Checkin", 
-			filters={"employee": employee,}, 
+			filters={"employee": employee, "device_id": ["is", ["set"]]}, 
 			order_by="time",
 			fields=['time', 'log_type', 'name']
 			)
