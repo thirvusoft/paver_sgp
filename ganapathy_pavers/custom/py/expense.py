@@ -49,6 +49,13 @@ def calculate_total(gl_entries):
 
 @frappe.whitelist()
 def expense_tree(from_date, to_date, company=erpnext.get_default_company(), parent = "", doctype='Account', vehicle=None, machine=[], expense_type=None, prod_details = [], filter_unwanted_groups=True) -> list:
+    if not parent:
+        parent=frappe.db.get_all("Account", {"root_type": "Expense", "parent_account":["is", "not set"], "is_group": 1, "company": company}, pluck="name")
+        if parent:
+            parent=parent[0]
+        else:
+            parent=None
+
     prod_details = [frappe.scrub(prod) for prod in prod_details]
     root = get_account_balances(
                 accounts=get_children(
