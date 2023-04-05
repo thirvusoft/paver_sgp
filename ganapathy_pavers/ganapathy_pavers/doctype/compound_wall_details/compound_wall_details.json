@@ -26,28 +26,32 @@
    "fieldname": "wo_bolt",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "WO Bolt"
+   "label": "WO Bolt",
+   "read_only": 1
   },
   {
    "columns": 1,
    "fieldname": "with_bolt",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "With Bolt"
+   "label": "With Bolt",
+   "read_only": 1
   },
   {
    "columns": 1,
    "fieldname": "pc_wo_bolt",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "PC WO Bolt"
+   "label": "PC WO Bolt",
+   "read_only": 1
   },
   {
    "columns": 1,
    "fieldname": "pc_with_bolt",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "PC With Bolt"
+   "label": "PC With Bolt",
+   "read_only": 1
   },
   {
    "columns": 2,
@@ -61,7 +65,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-11-24 20:11:06.747116",
+ "modified": "2023-04-05 10:35:02.510575",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Compound Wall Details",
