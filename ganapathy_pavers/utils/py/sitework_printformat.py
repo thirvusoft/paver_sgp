@@ -167,7 +167,6 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
         if row.item_code not in f_res:
             f_res[row.item_code] = []
         f_res[row.item_code].append(row)
-    # frappe.errprint(f_res)
     return f_res
 
 def get_item_price_list_rate(item, date):

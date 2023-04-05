@@ -4327,7 +4327,7 @@
    "doctype_or_field": "DocField",
    "field_name": "naming_series",
    "idx": 0,
-   "modified": "2022-11-02 11:11:42.761940",
+   "modified": "2023-04-05 16:48:26.864213",
    "modified_by": "Administrator",
    "name": "Sales Invoice-naming_series-default",
    "owner": "Administrator",
@@ -4337,7 +4337,7 @@
    "property": "default",
    "property_type": "Text",
    "row_name": null,
-   "value": "{abbr_sales}.-"
+   "value": "{abbr_sales}.-.FY.-.###"
   },
   {
    "_assign": null,
@@ -4351,7 +4351,7 @@
    "doctype_or_field": "DocField",
    "field_name": "naming_series",
    "idx": 0,
-   "modified": "2022-11-02 11:11:42.691792",
+   "modified": "2023-04-05 16:48:26.844085",
    "modified_by": "Administrator",
    "name": "Sales Invoice-naming_series-options",
    "owner": "Administrator",
@@ -4361,7 +4361,7 @@
    "property": "options",
    "property_type": "Text",
    "row_name": null,
-   "value": "{abbr_sales}.-"
+   "value": "{abbr_sales}.-.FY.-.###"
   },
   {
    "_assign": null,
