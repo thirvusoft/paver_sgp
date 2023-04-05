@@ -53,6 +53,13 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"fieldname": "expense_summary",
 			"label": __("Expense Summary"),
 			"fieldtype": "Check",
+		},
+		{
+			"fieldname": "new_method",
+			"label": __("New Expense Method"),
+			"fieldtype": "Check",
+			"default": 0,
+			"hidden": frappe.session.user!="Administrator"
 		}
 	]
 };
