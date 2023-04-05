@@ -129,7 +129,28 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
             SUM(dni.qty) as qty,
             dni.uom,
             AVG(rate) as rate,
-            SUM(dni.amount) as amount
+            SUM(dni.amount) as amount,
+            (
+                (
+                    SELECT avg(sle.valuation_rate)
+                    FROM `tabStock Ledger Entry` sle
+                    WHERE
+                        sle.is_cancelled=0 and
+                        sle.voucher_type = 'Delivery Note' and
+                        sle.voucher_no = dn.name and
+                        sle.voucher_detail_no = dni.name
+                ) *
+                ifnull((
+                    SELECT
+                        uom.conversion_factor
+                    FROM `tabUOM Conversion Detail` uom
+                    WHERE
+                        uom.parenttype='Item' and
+                        uom.parent=dni.item_code and
+                        uom.uom=dni.uom
+                )    
+                , 1)
+            ) as valuation_rate
         FROM `tabDelivery Note Item` dni
         LEFT OUTER JOIN `tabDelivery Note` dn
         ON dn.name=dni.parent AND dni.parenttype="Delivery Note"
@@ -146,7 +167,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
         if row.item_code not in f_res:
             f_res[row.item_code] = []
         f_res[row.item_code].append(row)
-
+    # frappe.errprint(f_res)
     return f_res
 
 def get_item_price_list_rate(item, date):
