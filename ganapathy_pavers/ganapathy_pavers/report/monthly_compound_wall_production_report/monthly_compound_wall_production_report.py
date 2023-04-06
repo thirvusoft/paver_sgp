@@ -186,7 +186,6 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group, 
 		exp_tree=exp_tree=expense_tree(
 							from_date=filters.get('from_date'),
 							to_date=filters.get('to_date'),
-							parent="Expenses - GP",
 							prod_details=[exp],
 							expense_type="Manufacturing",
 							)
