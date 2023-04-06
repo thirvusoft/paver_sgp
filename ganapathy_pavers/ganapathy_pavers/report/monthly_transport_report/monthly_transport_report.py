@@ -280,7 +280,7 @@ def get_expense_data(total_delivery_sqft, filters, paver_sqft, cw_sqft, total_km
 	if not exp.vehicle_expense:
 		return []
 	if filters.get("new_method"):
-		exp_tree=exp_tree=expense_tree(
+		exp_tree=expense_tree(
 							from_date=filters.get('from_date'),
 							to_date=filters.get('to_date'),
 							expense_type="Vehicle",

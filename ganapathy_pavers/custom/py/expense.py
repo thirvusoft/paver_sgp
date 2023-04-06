@@ -26,7 +26,7 @@ def flatten_hierarchy(gl_entries):
     if len(gl_entries)==1:
         if len(gl_entries[0]['child_nodes'])==1:
             gl_entries = flatten_hierarchy(gl_entries[0]['child_nodes'])
-        else:
+        elif len(gl_entries[0]['child_nodes'])>1:
             gl_entries=gl_entries[0]['child_nodes']
         
     return gl_entries
