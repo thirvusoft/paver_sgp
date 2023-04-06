@@ -106,6 +106,15 @@ class MessExpense(PayrollEntry):
             emp_list = remove_payrolled_employees(emp_list, self.start_date, self.end_date)
             return emp_list
 
+    def make_filters(self):
+        filters = frappe._dict()
+        filters['company'] = self.company
+        # filters['branch'] = self.branch
+        filters['department'] = self.department
+        filters['designation'] = self.designation
+
+        return filters
+
     @frappe.whitelist()
     def create_salary_slips(self):
         self.check_permission("write")
