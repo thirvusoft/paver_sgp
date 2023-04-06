@@ -30,7 +30,6 @@ frappe.query_reports["Monthly Lego Block Production Report"] = {
 			"label": __("New Expense Method"),
 			"fieldtype": "Check",
 			"default": 0,
-			"hidden": frappe.session.user!="Administrator"
 		}
 	]
 };
