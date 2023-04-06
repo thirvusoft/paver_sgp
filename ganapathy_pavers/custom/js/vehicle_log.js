@@ -54,7 +54,6 @@ frappe.ui.form.on("Vehicle Log", {
             await frappe.db.get_doc("Vehicle Settings").then(vs => {
                 frm.set_value("payment_to_supplier", vs.payment_to_supplier);
                 frm.set_value("fastag_supplier", vs.fastag_supplier);
-                frm.set_value("credit_account", vs.credit_account);
                 frm.set_value("fastag_exp_account", vs.fastag_exp_account);
             });
         } else {
