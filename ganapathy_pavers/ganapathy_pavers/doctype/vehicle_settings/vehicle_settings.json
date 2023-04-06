@@ -27,6 +27,8 @@
   "fastag_details_section",
   "payment_to_supplier",
   "fastag_supplier",
+  "credit_account",
+  "column_break_22",
   "fastag_exp_account"
  ],
  "fields": [
@@ -132,9 +134,19 @@
    "label": "FASTag Details"
   },
   {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "fastag_exp_account",
    "fieldtype": "Link",
    "label": "FASTag Exp Account (Debit)",
+   "options": "Account"
+  },
+  {
+   "fieldname": "credit_account",
+   "fieldtype": "Link",
+   "label": "Credit Account",
    "options": "Account"
   },
   {
@@ -155,7 +167,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-04-06 13:11:37.417907",
+ "modified": "2023-03-03 18:08:16.541021",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Settings",
