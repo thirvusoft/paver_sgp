@@ -3,6 +3,7 @@
 
 # import frappe
 import frappe
+import json
 from frappe import _
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
 from ganapathy_pavers.custom.py.expense import  expense_tree
@@ -155,6 +156,12 @@ def get_columns():
 		_("Rate") + ":Data:200",
 		_("Amount") + ":Data:150",
 		_("Cost Per SQFT") + ":Data:100",
+		{
+			"fieldname": "reference_data",
+			"label": "Reference Data",
+			"fieldtype": "Data",
+			"hidden": 1,
+		}
 		]
 
 	return columns
@@ -202,6 +209,7 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 				total_sqf+=(round(i["balance"]/prod_sqft, 4) or 0)
 				dic["uom"]=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
 				total_amt+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
+				dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
 				res.append(dic)	
 	return res, total_sqf, total_amt
 
@@ -215,6 +223,7 @@ def get_expense_from_child(prod_sqft, account, sqft, total_sqf, total_amt):
 			total_sqf+=(round(i["balance"]/prod_sqft, 4) or 0)
 			dic["uom"]=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
 			total_amt+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
+			dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
 			res.append(dic)
 		if i['child_nodes']:
 			res1, total_sqf, total_amt=(get_expense_from_child(prod_sqft, i['child_nodes'], sqft, total_sqf, total_amt))

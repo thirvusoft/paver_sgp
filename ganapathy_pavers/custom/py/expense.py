@@ -136,6 +136,7 @@ def get_account_balances(accounts, company, from_date, to_date, vehicle=None, ma
 def get_account_balance_on(account, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = []):
     if(account.get('expandable')):
         account['balance'] = 0
+        account["references"] = []
         return account
     conditions=""
 
@@ -208,7 +209,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 """
             gl_entries=frappe.db.sql(query, as_dict=True)
             
-            balance = calculate_exp_from_gl_entries(
+            balance, references = calculate_exp_from_gl_entries(
                 gl_entries=gl_entries,
                 from_date=from_date,
                 to_date=to_date,
@@ -223,11 +224,13 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                     "parent": account['value'],
                     "child_nodes": [],
                     "balance": balance,
+                    "references": references,
                     "account_name": f"""{veh} {account["account_name"]}"""
                 })
             
         account['balance']=0
         account["expandable"]=1
+        account["references"] = []
         account["child_nodes"] = gl_veh_accounts
 
         return account
@@ -258,7 +261,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
 
     gl_entries=frappe.db.sql(query, as_dict=True)
 
-    balance = calculate_exp_from_gl_entries(
+    balance, references = calculate_exp_from_gl_entries(
         gl_entries=gl_entries,
         from_date=from_date,
         to_date=to_date,
@@ -266,11 +269,17 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
         prod_details=prod_details
         )
     account['balance'] = balance or 0
+    account["references"] = references or []
     return account
 
 def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=None, prod_details=[]):
     amount = 0
+    references = []
     for gl in gl_entries:
+        references.append({
+            "doctype": gl.voucher_type,
+            "docname": gl.voucher_no
+        })
         rate = gl.get("debit", 0) or 0
         if expense_type=="Manufacturing":
             prod_sqf = get_gl_production_rate(
@@ -282,7 +291,7 @@ def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=N
             prod_sqf=1
         amount += (rate) * prod_sqf
 
-    return amount
+    return amount, references or []
 
 def get_gl_production_rate(gl, from_date, to_date, prod_details=[]):
     paver, cw, fp, lego = 0, 0, 0, 0
