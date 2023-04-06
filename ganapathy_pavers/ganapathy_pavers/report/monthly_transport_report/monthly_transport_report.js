@@ -36,5 +36,11 @@ frappe.query_reports["Monthly Transport Report"] = {
 			"width": "200",
 			"default":"Report"
 		},
+		{
+			"fieldname": "new_method",
+			"label": __("New Expense Method"),
+			"fieldtype": "Check",
+			"default": 0,
+		}
 	]
 };
