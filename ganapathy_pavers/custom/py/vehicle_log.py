@@ -385,9 +385,9 @@ def fastag_expense(self, event=None):
     else:
         credit_acc = self.credit_account
         if not credit_acc:
-            credit_acc=frappe.db.get_single_value("Vehicle Settings", "credit_account")
+            credit_acc=frappe.db.get_value("Vehicle", self.license_plate, "fastag_credit_acc")
         if not credit_acc:
-            frappe.throw(f"""Please enter <b>Credit Account</b>""")        
+            frappe.throw(f"""Please enter <b>Fastag Credit Account</b> in Vehicle""")        
     
     doc=frappe.new_doc("Journal Entry")
     doc.update({
