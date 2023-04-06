@@ -176,7 +176,7 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 							to_date=filters.get('to_date'),
 							prod_details=["Paver"],
 							expense_type="Manufacturing",
-							machine = machine
+							machine = filters.get("machine", []) or []
 							)
 	else:
 		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine )
