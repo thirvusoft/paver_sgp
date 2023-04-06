@@ -119,7 +119,8 @@ def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expens
 
 def get_account_balances(accounts, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = []):
     for account in accounts:
-        account['balance'] = get_account_balance_on(
+        account['account_name'] = frappe.db.get_value("Account", account["value"], "account_name")
+        account = get_account_balance_on(
                                 account=account, 
                                 company=company, 
                                 from_date=from_date, 
@@ -129,12 +130,13 @@ def get_account_balances(accounts, company, from_date, to_date, vehicle=None, ma
                                 expense_type=expense_type, 
                                 prod_details=prod_details
                                 )
-        account['account_name'] = frappe.db.get_value("Account", account["value"], "account_name")
+        
     return accounts
 
 def get_account_balance_on(account, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = []):
     if(account.get('expandable')):
-        return 0
+        account['balance'] = 0
+        return account
     conditions=""
 
     if prod_details:
@@ -153,7 +155,83 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 f''' IFNULL(gl.{frappe.scrub(macn)}, 0) '''
              for macn in machine])})
         """
+    gl_vehicles = []
 
+    if expense_type == "Manufacturing":
+        gl_vehicles = frappe.db.sql(f"""
+            select
+                DISTINCT(gl.vehicle)
+            from `tabGL Entry` gl
+            where
+                gl.company='{company}' and
+                CASE
+                    WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
+                    THEN (gl.from_date<='{from_date}' and gl.to_date>='{to_date}')
+                    ELSE (date(gl.posting_date)>='{from_date}' and
+                        date(gl.posting_date)<='{to_date}')
+                    END and
+                gl.is_cancelled=0
+                and gl.account="{account['value']}"
+                {conditions}
+                ORDER BY gl.vehicle
+        """, as_list=True)
+
+    if gl_vehicles:
+        # get vehicle wise expense for each account
+        gl_veh_accounts=[]
+        for veh in gl_vehicles:
+            veh=veh[0]
+            
+            query=f"""
+                    select
+                        *,
+                        CASE
+                            WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
+                                THEN gl.debit/
+                                TIMESTAMPDIFF(MONTH, gl.from_date ,  DATE_ADD(gl.to_date, INTERVAL 1 DAY))*
+                                (DATEDIFF(DATE_ADD('{to_date}', INTERVAL 1 DAY), '{from_date}') / DAY(LAST_DAY('{to_date}')))    
+                            ELSE gl.debit
+                        END as debit
+                    from `tabGL Entry` gl
+                    where
+                        gl.company='{company}' and
+                        CASE
+                            WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
+                            THEN (gl.from_date<='{from_date}' and gl.to_date>='{to_date}')
+                            ELSE (date(gl.posting_date)>='{from_date}' and
+                                date(gl.posting_date)<='{to_date}')
+                            END and
+                        gl.is_cancelled=0
+                        and gl.account="{account['value']}"
+                        {conditions}
+                        and gl.vehicle='{veh}'
+                """
+            gl_entries=frappe.db.sql(query, as_dict=True)
+            
+            balance = calculate_exp_from_gl_entries(
+                gl_entries=gl_entries,
+                from_date=from_date,
+                to_date=to_date,
+                expense_type=expense_type,
+                prod_details=prod_details
+                )
+            gl_veh_accounts.append({
+                    "value": f"""{veh} {account["value"]}""",
+                    "expandable": 0,
+                    "root_type": account["root_type"],
+                    "account_currency": account["account_currency"],
+                    "parent": account['value'],
+                    "child_nodes": [],
+                    "balance": balance,
+                    "account_name": f"""{veh} {account["account_name"]}"""
+                })
+            
+        account['balance']=0
+        account["expandable"]=1
+        account["child_nodes"] = gl_veh_accounts
+
+        return account
+    
     query=f"""
         select
             *,
@@ -187,8 +265,8 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
         expense_type=expense_type,
         prod_details=prod_details
         )
-
-    return balance or 0
+    account['balance'] = balance or 0
+    return account
 
 def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=None, prod_details=[]):
     amount = 0
