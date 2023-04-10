@@ -48,7 +48,12 @@ def calculate_total(gl_entries):
     return res
 
 @frappe.whitelist()
-def expense_tree(from_date, to_date, company=erpnext.get_default_company(), parent = "", doctype='Account', vehicle=None, machine=[], expense_type=None, prod_details = [], filter_unwanted_groups=True) -> list:
+def expense_tree(from_date, to_date, company=erpnext.get_default_company(), parent = "", doctype='Account', vehicle=None, machine=[], expense_type=None, prod_details = "", filter_unwanted_groups=True) -> list:
+    if isinstance(prod_details, list):
+        if prod_details:
+            prod_details=prod_details[0]
+        else:
+            prod_details=""
     if not machine:
         machine=[]
     if not parent:
@@ -58,7 +63,7 @@ def expense_tree(from_date, to_date, company=erpnext.get_default_company(), pare
         else:
             parent=None
 
-    prod_details = [frappe.scrub(prod) for prod in prod_details]
+    prod_details = frappe.scrub(prod_details)
     root = get_account_balances(
                 accounts=get_children(
                             doctype=doctype, 
@@ -87,10 +92,10 @@ def expense_tree(from_date, to_date, company=erpnext.get_default_company(), pare
 
     if filter_unwanted_groups:
         res = flatten_hierarchy(res)
-    
+
     return res
 
-def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = []):
+def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = ""):
         for i in root:
             child = get_tree(
                         root=get_children(
@@ -117,7 +122,7 @@ def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expens
                                 )
         return root
 
-def get_account_balances(accounts, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = []):
+def get_account_balances(accounts, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = ""):
     for account in accounts:
         account['account_name'] = frappe.db.get_value("Account", account["value"], "account_name")
         account = get_account_balance_on(
@@ -133,7 +138,7 @@ def get_account_balances(accounts, company, from_date, to_date, vehicle=None, ma
         
     return accounts
 
-def get_account_balance_on(account, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = []):
+def get_account_balance_on(account, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = ""):
     if(account.get('expandable')):
         account['balance'] = 0
         account["references"] = []
@@ -141,7 +146,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
     conditions=""
 
     if prod_details:
-        conditions+=f""" and ({" or ".join([f"gl.{frappe.scrub(prod)}=1" for prod in prod_details])} 
+        conditions+=f""" and (gl.{frappe.scrub(prod_details)}=1
         or (gl.paver=0 and gl.compound_wall=0 and gl.lego_block=0 and gl.fencing_post=0) 
         or (gl.paver=1 and gl.compound_wall=1 and gl.lego_block=1 and gl.fencing_post=1)) """
 
@@ -152,9 +157,19 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
         conditions+=f" and IFNULL(gl.vehicle, '')!='' and gl.vehicle='{vehicle}'"
     if machine and sorted(machine)!=sorted(WORKSTATIONS):
         conditions+=f"""  AND
-            ({" OR ".join([
-                f''' IFNULL(gl.{frappe.scrub(macn)}, 0) '''
-             for macn in machine])})
+            (
+                ({" OR ".join([
+                    f''' IFNULL(gl.{frappe.scrub(macn)}, 0) '''
+                for macn in machine])}
+                ) OR
+                ({" AND ".join([
+                    f''' IFNULL(gl.{frappe.scrub(wrk)}, 0)=0 '''
+                for wrk in WORKSTATIONS ])})
+                 OR
+                ({" AND ".join([
+                    f''' IFNULL(gl.{frappe.scrub(wrk)}, 0)=1 '''
+                for wrk in WORKSTATIONS ])})
+            )
         """
     gl_vehicles = []
 
@@ -167,7 +182,10 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 gl.company='{company}' and
                 CASE
                     WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
-                    THEN (gl.from_date<='{from_date}' and gl.to_date>='{to_date}')
+                    THEN (
+                        (gl.from_date BETWEEN '{from_date}' AND '{to_date}' OR gl.to_date BETWEEN '{from_date}' AND '{to_date}')
+                        OR ('{from_date}' BETWEEN gl.from_date AND gl.to_date OR '{to_date}' BETWEEN gl.from_date AND gl.to_date)
+                    )
                     ELSE (date(gl.posting_date)>='{from_date}' and
                         date(gl.posting_date)<='{to_date}')
                     END and
@@ -177,7 +195,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 ORDER BY gl.vehicle
         """, as_list=True)
 
-    if gl_vehicles:
+    if gl_vehicles and gl_vehicles[0] and gl_vehicles[0][0]:
         # get vehicle wise expense for each account
         gl_veh_accounts=[]
         for veh in gl_vehicles:
@@ -189,8 +207,8 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                         CASE
                             WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
                                 THEN gl.debit/
-                                TIMESTAMPDIFF(MONTH, gl.from_date ,  DATE_ADD(gl.to_date, INTERVAL 1 DAY))*
-                                (DATEDIFF(DATE_ADD('{to_date}', INTERVAL 1 DAY), '{from_date}') / DAY(LAST_DAY('{to_date}')))    
+                                TIMESTAMPDIFF(DAY, gl.from_date ,  DATE_ADD(gl.to_date, INTERVAL 1 DAY))*
+                                DATEDIFF(DATE_ADD(LEAST('{to_date}', gl.to_date), INTERVAL 1 DAY), GREATEST('{from_date}', gl.from_date))
                             ELSE gl.debit
                         END as debit
                     from `tabGL Entry` gl
@@ -198,7 +216,10 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                         gl.company='{company}' and
                         CASE
                             WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
-                            THEN (gl.from_date<='{from_date}' and gl.to_date>='{to_date}')
+                            THEN (
+                                (gl.from_date BETWEEN '{from_date}' AND '{to_date}' OR gl.to_date BETWEEN '{from_date}' AND '{to_date}')
+                                OR ('{from_date}' BETWEEN gl.from_date AND gl.to_date OR '{to_date}' BETWEEN gl.from_date AND gl.to_date)
+                            )
                             ELSE (date(gl.posting_date)>='{from_date}' and
                                 date(gl.posting_date)<='{to_date}')
                             END and
@@ -207,6 +228,8 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                         {conditions}
                         and gl.vehicle='{veh}'
                 """
+
+
             gl_entries=frappe.db.sql(query, as_dict=True)
             
             balance, references = calculate_exp_from_gl_entries(
@@ -214,7 +237,8 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 from_date=from_date,
                 to_date=to_date,
                 expense_type=expense_type,
-                prod_details=prod_details
+                prod_details=prod_details,
+                machines=machine
                 )
             gl_veh_accounts.append({
                     "value": f"""{veh} {account["value"]}""",
@@ -241,8 +265,8 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
             CASE
                 WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
                     THEN gl.debit/
-                    TIMESTAMPDIFF(MONTH, gl.from_date ,  DATE_ADD(gl.to_date, INTERVAL 1 DAY))*
-                    (DATEDIFF(DATE_ADD('{to_date}', INTERVAL 1 DAY), '{from_date}') / DAY(LAST_DAY('{to_date}')))    
+                    TIMESTAMPDIFF(DAY, gl.from_date ,  DATE_ADD(gl.to_date, INTERVAL 1 DAY))*
+                    DATEDIFF(DATE_ADD(LEAST('{to_date}', gl.to_date), INTERVAL 1 DAY), GREATEST('{from_date}', gl.from_date))    
                 ELSE gl.debit
             END as debit
         from `tabGL Entry` gl
@@ -250,7 +274,10 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
             gl.company='{company}' and
             CASE
                 WHEN IFNULL(gl.from_date, "")!="" and IFNULL(gl.to_date, "")!=""
-                THEN (gl.from_date<='{from_date}' and gl.to_date>='{to_date}')
+                THEN (
+                    (gl.from_date BETWEEN '{from_date}' AND '{to_date}' OR gl.to_date BETWEEN '{from_date}' AND '{to_date}')
+                    OR ('{from_date}' BETWEEN gl.from_date AND gl.to_date OR '{to_date}' BETWEEN gl.from_date AND gl.to_date)
+                )
                 ELSE (date(gl.posting_date)>='{from_date}' and
                      date(gl.posting_date)<='{to_date}')
                 END and
@@ -266,13 +293,14 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
         from_date=from_date,
         to_date=to_date,
         expense_type=expense_type,
-        prod_details=prod_details
+        prod_details=prod_details,
+        machines=machine
         )
     account['balance'] = balance or 0
     account["references"] = references or []
     return account
 
-def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=None, prod_details=[]):
+def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=None, prod_details="", machines=[]):
     amount = 0
     references = []
     for gl in gl_entries:
@@ -286,14 +314,18 @@ def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=N
                         gl=gl,
                         from_date=from_date,
                         to_date=to_date,
-                        prod_details=prod_details)
+                        prod_details=prod_details,
+                        machines=machines
+                    )
         else:
             prod_sqf=1
         amount += (rate) * prod_sqf
 
     return amount, references or []
 
-def get_gl_production_rate(gl, from_date, to_date, prod_details=[]):
+def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[]):
+    if not machines:
+        machines=WORKSTATIONS
     paver, cw, fp, lego = 0, 0, 0, 0
     if (gl.get("paver") and gl.get("compound_wall") and gl.get("lego_block") and gl.get("fencing_post")):
         paver, cw, fp, lego = 1, 1, 1 ,1
@@ -309,75 +341,28 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details=[]):
         if gl.get("fencing_post"):
             fp = 1
     
-    machines=[]
+    gl_machines=[]
     for wrk in WORKSTATIONS:
         if frappe.scrub(wrk) in gl and gl.get(frappe.scrub(wrk)):
-            machines.append(wrk)
+            gl_machines.append(wrk)
 
-    machines.sort()
+    gl_machines.sort()
 
-    if machines==sorted(WORKSTATIONS):  
+    
+    machines=sorted([i for i in machines if ((i in gl_machines) or not gl_machines)])
+    if gl_machines==sorted(WORKSTATIONS):  
         # If all machines, then make it [], to get all machines prod_details
-        machines=[]
+        gl_machines=[]
 
+    gl_machine_key = json.dumps(gl_machines)
     machine_key = json.dumps(machines)
 
+    if gl_machine_key not in machine_wise_prod_info:
+        machine_wise_prod_info[gl_machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=gl_machines)
     if machine_key not in machine_wise_prod_info:
         machine_wise_prod_info[machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=machines)
-    
-    num_total = sum([(machine_wise_prod_info[machine_key][i] or 0) for i in machine_wise_prod_info[machine_key] if ({'paver': "paver", 'cw': "compound_wall", "lego": "lego_block", "fp": "fencing_post"}.get(i) in prod_details)])
-    den_total = sum([(machine_wise_prod_info[machine_key][i] or 0) for i in machine_wise_prod_info[machine_key] if {'paver': paver, 'cw': cw, "lego": lego, "fp": fp}.get(i) ])
-    
+
+    num_total = machine_wise_prod_info[machine_key].get({"paver": 'paver', "compound_wall": 'cw', "lego_block": "lego", "fencing_post": "fp"}.get(prod_details)) or 0
+    den_total = sum([(machine_wise_prod_info[gl_machine_key][i] or 0) for i in machine_wise_prod_info[gl_machine_key] if {'paver': paver, 'cw': cw, "lego": lego, "fp": fp}.get(i) ])
+
     return (num_total or 0) / (den_total or 1)
-
-
-
-month_start = "2023-03-01"
-month_end = "2023-03-31"
-def a(_type):
-    res = expense_tree(
-        month_start,
-        month_end,
-        parent="Expenses - GP",
-        prod_details=["Paver"],
-        expense_type="Manufacturing",
-        # machine = ["Machine1", "Machine2"]
-    )
-    # print(
-    #     res,
-        # total_expense(month_start,
-        # month_end,
-        # parent="Expenses - GP",
-        # prod_details=[_type],
-        # expense_type="Manufacturing",
-        # # machine = ["Machine1", "Machine2"]
-        # )
-        # )
-
-
-# paver production report
-"""
-	from ganapathy_pavers.custom.py.expense import expense_tree
-
-	exp_tree=expense_tree(
-		from_date=filters.get('from_date'),
-        to_date=filters.get('to_date'),
-        parent="Expenses - GP",
-        prod_details=["Paver"],
-        expense_type="Manufacturing",
-		machine = machine
-	)
-"""
-
-# transport report
-"""
-    from ganapathy_pavers.custom.py.expense import expense_tree
-
-    exp_tree=exp_tree=expense_tree(
-		from_date=filters.get('from_date'),
-        to_date=filters.get('to_date'),
-        parent="Expenses - GP",
-		vehicle="TN42AK6293",
-        expense_type="Vehicle",
-	)
-""" 

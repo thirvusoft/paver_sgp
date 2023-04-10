@@ -167,9 +167,6 @@ def get_columns():
 	return columns
 
 def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
-	exp=frappe.get_single("Expense Accounts")
-	if not exp.paver_group:
-		return [], 0, 0
 	machine=None
 	if ("Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", [])) and "Machine3 Day" in filters.get("machine", []):
 		pass
@@ -181,11 +178,14 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 		exp_tree=exp_tree=expense_tree(
 							from_date=filters.get('from_date'),
 							to_date=filters.get('to_date'),
-							prod_details=["Paver"],
+							prod_details="Paver",
 							expense_type="Manufacturing",
 							machine = filters.get("machine", []) or []
 							)
 	else:
+		exp=frappe.get_single("Expense Accounts")
+		if not exp.paver_group:
+			return [], 0, 0
 		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine )
 	
 	res=[]
