@@ -142,6 +142,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
     if(account.get('expandable')):
         account['balance'] = 0
         account["references"] = []
+        account['vehicle'] = ""
         return account
     conditions=""
 
@@ -249,12 +250,14 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                     "child_nodes": [],
                     "balance": balance,
                     "references": references,
-                    "account_name": f"""{veh} {account["account_name"]}"""
+                    "account_name": f"""{veh} {account["account_name"]}""",
+                    "vehicle": veh
                 })
             
         account['balance']=0
         account["expandable"]=1
         account["references"] = []
+        account['vehicle'] = ""
         account["child_nodes"] = gl_veh_accounts
 
         return account
@@ -298,16 +301,13 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
         )
     account['balance'] = balance or 0
     account["references"] = references or []
+    account["vehicle"] = ""
     return account
 
 def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=None, prod_details="", machines=[]):
     amount = 0
     references = []
     for gl in gl_entries:
-        references.append({
-            "doctype": gl.voucher_type,
-            "docname": gl.voucher_no
-        })
         rate = gl.get("debit", 0) or 0
         if expense_type=="Manufacturing":
             prod_sqf = get_gl_production_rate(
@@ -320,7 +320,12 @@ def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=N
         else:
             prod_sqf=1
         amount += (rate) * prod_sqf
-
+        
+        references.append({
+            'doctype': gl.voucher_type,
+            'docname': gl.voucher_no,
+            'amount': (rate) * prod_sqf
+        })
     return amount, references or []
 
 def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[]):

@@ -3,6 +3,10 @@
         "public/js/employee_formatter.js",
         "public/js/production_report_item_filter.js",
         "public/js/templates/je_loading.html",
-        "public/js/templates/je_production_dashboard.html"
+        "public/js/templates/je_production_dashboard.html",
+        "public/js/expense_report.js"
+    ],
+    "css/ganapathy_pavers.min.css": [
+        "public/css/expense_report.css"
     ]
 }

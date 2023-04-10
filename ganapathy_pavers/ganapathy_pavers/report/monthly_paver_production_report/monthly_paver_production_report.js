@@ -60,7 +60,18 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"fieldtype": "Check",
 			"default": 0,
 		}
-	]
+	],
+	formatter: function (value, row, column, data, default_formatter) {
+		if (data.reference_data) {
+			value = __(default_formatter(value, row, column, data));
+			value = $(`<span ondblclick=\'ganapathy_pavers.show_reference(\"${data.qty}\", ${JSON.stringify(data.reference_data)}, \"${data.uom}\")\'>${value}</span>`);
+			var $value = $(value);
+			value = $value.wrap("<p></p>").parent().html();
+		} else {
+			value = __(default_formatter(value, row, column, data));
+		}
+		return value
+	}
 };
 
 async function on_change() {
@@ -71,4 +82,47 @@ async function on_change() {
 		frappe.query_report.get_filter("item")
 		)
 	frappe.query_report.refresh()
+}
+
+
+frappe.provide("ganapathy_pavers")
+
+ganapathy_pavers.show_reference = function (title, reference, total_amount) {
+	reference = JSON.parse(reference)
+    if (cur_dialog) {
+        cur_dialog.hide()
+    }
+	let opt='<ul>'
+
+	reference.forEach(e => {
+		opt += `
+			<li>
+				<div class="expense-reference-dialog-row">
+					<div>
+						${frappe.utils.get_form_link(e.doctype, e.docname, true, e.doctype + '-' +e.docname)}
+					</div>
+					<div>
+						<b>${format_currency(e.amount)}</b>
+					</div>
+				</div>
+			</li>
+		`
+	});
+
+	opt += `</ul>
+	<div class="expense-reference-dialog-total-row">
+		<b>Total Amount:</b><b> ${format_currency(total_amount)}</b>
+	</div>`
+
+	let d = new frappe.ui.Dialog({
+        title: title || "Reference",
+        fields: [
+            {
+                fieldname: 'ref',
+                fieldtype: 'HTML',
+                options: opt,
+            }
+        ],
+    })
+    d.show()
 }
