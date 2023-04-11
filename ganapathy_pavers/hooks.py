@@ -145,7 +145,10 @@ doc_events = {
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
 		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset",
-        "validate" : "ganapathy_pavers.custom.py.stock_entry.basic_rate_validation"
+        "validate" : [
+    			"ganapathy_pavers.custom.py.stock_entry.basic_rate_validation",
+				"ganapathy_pavers.custom.py.stock_entry.expense_account",
+			]
 		
 	},
 	"Payment Entry":{

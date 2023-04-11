@@ -209,7 +209,9 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
     if expense_type == "Manufacturing":
         gl_vehicles = frappe.db.sql(f"""
             select
-                DISTINCT(gl.vehicle)
+                DISTINCT 
+                    gl.vehicle as vehicle,
+                    gl.internal_fuel_consumption as internal_fuel_consumption
             from `tabGL Entry` gl
             where
                 gl.company='{company}' and
@@ -225,15 +227,15 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 gl.is_cancelled=0
                 and gl.account="{account['value']}"
                 {conditions}
-                ORDER BY gl.vehicle
-        """, as_list=True)
-
-    if gl_vehicles and gl_vehicles[0] and gl_vehicles[0][0]:
+                ORDER BY gl.vehicle, gl.internal_fuel_consumption
+        """, as_dict=True)
+    
+    if gl_vehicles and gl_vehicles[0] and sum([1 for gl_veh in gl_vehicles if gl_veh.get("vehicle") or gl_veh.get("internal_fuel_consumption")]):
         # get vehicle wise expense for each account
         gl_veh_accounts=[]
-        for veh in gl_vehicles:
-            veh=veh[0]
-            
+        for gl_veh in gl_vehicles:
+            veh=gl_veh.get("vehicle")
+            ifc = gl_veh.get("internal_fuel_consumption")
             query=f"""
                     select
                         *,
@@ -259,7 +261,8 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                         gl.is_cancelled=0
                         and gl.account="{account['value']}"
                         {conditions}
-                        and gl.vehicle='{veh}'
+                        and IFNULL(gl.vehicle, "")="{veh or ""}"
+                        and IFNULL(gl.internal_fuel_consumption, "")="{ifc or ""}"
                 """
 
 
@@ -274,7 +277,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 machines=machine
                 )
             gl_veh_accounts.append({
-                    "value": f"""{veh} {account["value"]}""",
+                    "value": f"""{f'''{veh} ''' if veh else ""}{f'''{ifc} ''' if ifc else ""}{account["value"]}""",
                     "expandable": 0,
                     "root_type": account["root_type"],
                     "account_currency": account["account_currency"],
@@ -283,7 +286,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                     "balance": balance,
                     "references": references,
                     "account_name": f"""{account["account_name"]}""",
-                    "vehicle": veh
+                    "vehicle": f"""{f'''{veh} ''' if veh else ""}{f'''{ifc} ''' if ifc else ""}"""
                 })
             
         account['balance']=0
