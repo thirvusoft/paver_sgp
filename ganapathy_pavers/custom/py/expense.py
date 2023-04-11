@@ -7,15 +7,30 @@ from ganapathy_pavers.custom.py.journal_entry import get_production_details
 machine_wise_prod_info = {}
 WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
 
+VEHICLE_WISE = {}
 
-def filter_empty(gl_entries):
+def filter_empty(gl_entries, vehicle_summary):
     res = []
 
     for acc in gl_entries:
-        if acc.get("expandable"):
-            acc["child_nodes"] = filter_empty(acc.get("child_nodes") or [])
+        if acc.get("vehicle") and vehicle_summary:
+
+            for i in acc['references']:
+                    i["account"] = acc.get("account_name")
+
+            if acc.get("vehicle") not in VEHICLE_WISE:
+                _par_acc = acc.copy()
+                _par_acc["account_name"] = _par_acc["value"] = acc.get("vehicle")
+                VEHICLE_WISE[acc.get("vehicle")] = _par_acc
+            else:
+                VEHICLE_WISE[acc.get("vehicle")]["balance"] += acc.get("balance") or 0
+                VEHICLE_WISE[acc.get("vehicle")]["references"].extend(acc.get("references") or {})
+
+        elif acc.get("expandable"):
+            acc["child_nodes"] = filter_empty(acc.get("child_nodes") or [], vehicle_summary)
             if acc["child_nodes"]:
                 res.append(acc)
+
         else:
             if acc.get("balance"):
                 res.append(acc)
@@ -48,7 +63,12 @@ def calculate_total(gl_entries):
     return res
 
 @frappe.whitelist()
-def expense_tree(from_date, to_date, company=erpnext.get_default_company(), parent = "", doctype='Account', vehicle=None, machine=[], expense_type=None, prod_details = "", filter_unwanted_groups=True) -> list:
+def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False) -> list:
+    WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
+
+    if not company:
+        company=erpnext.get_default_company()
+        
     if isinstance(prod_details, list):
         if prod_details:
             prod_details=prod_details[0]
@@ -88,11 +108,23 @@ def expense_tree(from_date, to_date, company=erpnext.get_default_company(), pare
             prod_details=prod_details
             )
     
-    res = filter_empty(res)
+    res = filter_empty(res, vehicle_summary)
 
     if filter_unwanted_groups:
         res = flatten_hierarchy(res)
 
+    if VEHICLE_WISE:
+        vehicle_accs = {
+            "expandable": 1,
+            "value": "Vehicle Expenses",
+            "account_name": "Vehicle Expenses",
+            "child_nodes": sorted(list(VEHICLE_WISE.values()), key = lambda x: x.get("vehicle") or "")
+        }
+        res.append(vehicle_accs)
+
+    machine_wise_prod_info.clear()
+    VEHICLE_WISE.clear()
+    WORKSTATIONS.clear()
     return res
 
 def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = ""):
@@ -165,11 +197,11 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 ) OR
                 ({" AND ".join([
                     f''' IFNULL(gl.{frappe.scrub(wrk)}, 0)=0 '''
-                for wrk in WORKSTATIONS ])})
+                for wrk in WORKSTATIONS ] + [" 1=1 "])})
                  OR
                 ({" AND ".join([
                     f''' IFNULL(gl.{frappe.scrub(wrk)}, 0)=1 '''
-                for wrk in WORKSTATIONS ])})
+                for wrk in WORKSTATIONS ] + [" 1=1 "])})
             )
         """
     gl_vehicles = []
@@ -250,7 +282,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                     "child_nodes": [],
                     "balance": balance,
                     "references": references,
-                    "account_name": f"""{veh} {account["account_name"]}""",
+                    "account_name": f"""{account["account_name"]}""",
                     "vehicle": veh
                 })
             

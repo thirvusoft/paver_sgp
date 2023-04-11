@@ -12,7 +12,10 @@ ganapathy_pavers.show_reference = function (title, reference, total_amount) {
 			<li>
 				<div class="expense-reference-dialog-row">
 					<div>
-						${frappe.utils.get_form_link(e.doctype, e.docname, true, e.doctype + '-' +e.docname)}
+						${frappe.utils.get_form_link(e.doctype, e.docname, true, e.doctype + " " + e.docname)}
+					</div>
+					<div>
+						${e.account || ""}
 					</div>
 					<div>
 						<b>${format_currency(e.amount)}</b>
@@ -28,7 +31,7 @@ ganapathy_pavers.show_reference = function (title, reference, total_amount) {
 	</div>`
 
 	let d = new frappe.ui.Dialog({
-        title: title || "Reference",
+        title: title || "Expense Reference",
         fields: [
             {
                 fieldname: 'ref',

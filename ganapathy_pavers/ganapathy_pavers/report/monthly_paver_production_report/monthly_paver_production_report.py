@@ -180,7 +180,8 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 							to_date=filters.get('to_date'),
 							prod_details="Paver",
 							expense_type="Manufacturing",
-							machine = filters.get("machine", []) or []
+							machine = filters.get("machine", []) or [],
+							vehicle_summary = filters.get("vehicle_summary")
 							)
 	else:
 		exp=frappe.get_single("Expense Accounts")

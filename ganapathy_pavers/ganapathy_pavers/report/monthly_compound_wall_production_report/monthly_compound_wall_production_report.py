@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
  
+import json
 import frappe
 from frappe import _
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
@@ -168,9 +169,13 @@ def get_columns():
 		"fieldname":"cost_per_sqft",
 		"label":"<b>Cost Per SQFT</b>",
 		"width":100
+		},
+		{
+			"fieldname": "reference_data",
+			"label": "Reference Data",
+			"fieldtype": "Data",
+			"hidden": 1,
 		}
-	
-	
 	]
 	
 	return columns
@@ -184,6 +189,7 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group, 
 							to_date=filters.get('to_date'),
 							prod_details=exp,
 							expense_type="Manufacturing",
+							vehicle_summary = filters.get("vehicle_summary")
 							)
 	else:
 		exp=frappe.get_single("Expense Accounts")
@@ -209,6 +215,7 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group, 
 					res.append({})
 				dic['qty']=i['value']
 				dic["uom"]=round(i["balance"], 4)
+				dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
 				total_amt+=(dic["uom"] or 0)
 				dic["consumption"]=round(i["balance"]/prod_sqft, 4)
 				total_sqf+=(dic["consumption"] or 0)
@@ -222,6 +229,7 @@ def get_expense_from_child(prod_sqft, account, sqft, total_sqf, total_amt):
 			dic={}
 			dic['qty']=i['value']
 			dic["uom"]=round(i["balance"], 4)
+			dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
 			total_amt+=(dic["uom"] or 0)
 			dic["consumption"]=round(i["balance"]/prod_sqft, 4)
 			total_sqf+=(dic["consumption"] or 0)
