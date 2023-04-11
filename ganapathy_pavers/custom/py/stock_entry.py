@@ -70,6 +70,7 @@ class _StockController(StockController):
                             expense_account = item_row.expense_account
 
                         gl_list.append(self.get_gl_dict({
+                            "internal_fuel_consumption": self.get("internal_fuel_consumption"), # Customization
                             "vehicle": item_row.get("vehicle"), # Customization
                             "expense_type": item_row.get("expense_type"), # Customization
                             "paver": item_row.get("paver"), # Customization
@@ -89,6 +90,7 @@ class _StockController(StockController):
                         }, warehouse_account[sle.warehouse]["account_currency"], item=item_row))
 
                         gl_list.append(self.get_gl_dict({
+                            "internal_fuel_consumption": self.get("internal_fuel_consumption"), # Customization
                             "vehicle": item_row.get("vehicle"), # Customization
                             "expense_type": item_row.get("expense_type"), # Customization
                             "paver": item_row.get("paver"), # Customization
