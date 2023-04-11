@@ -230,9 +230,6 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 ORDER BY gl.vehicle, gl.internal_fuel_consumption
         """, as_dict=True)
     
-    if account['value'] == "Fuel - GP":
-        frappe.errprint(f"""{gl_vehicles}""")
-    
     if gl_vehicles and gl_vehicles[0] and sum([1 for gl_veh in gl_vehicles if gl_veh.get("vehicle") or gl_veh.get("internal_fuel_consumption")]):
         # get vehicle wise expense for each account
         gl_veh_accounts=[]
@@ -297,7 +294,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
         account["references"] = []
         account['vehicle'] = ""
         account["child_nodes"] = gl_veh_accounts
-        frappe.errprint(account)
+
         return account
     
     query=f"""
