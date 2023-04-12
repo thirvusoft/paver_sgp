@@ -467,14 +467,14 @@ def fuel_stock_entry(self, event=None):
         "posting_time": self.time,
         "set_posting_time": bool(self.time),
         "from_warehouse": from_warehouse,
-        "items": [{
+        "items": update_vehicle_jea_exp(self, [{
             "item_code": fuel_item,
             "s_warehouse": from_warehouse,
             "qty": self.fuel_qty,
             "valuation_rate": self.price,
             "basic_rate": self.price,
             "branch": branch,
-        }]
+        }])
     })
     doc.save()
     doc.submit()
@@ -514,12 +514,12 @@ def adblue_stock_entry(self, event=None):
         "posting_time": self.time,
         "set_posting_time": bool(self.time),
         "from_warehouse": from_warehouse,
-        "items": [{
+        "items": update_vehicle_jea_exp(self, [{
             "item_code": adblue_item,
             "s_warehouse": from_warehouse,
             "qty": self.adblue_qty,
             "branch": branch,
-        }]
+        }])
     })
     doc.save()
     doc.submit()
