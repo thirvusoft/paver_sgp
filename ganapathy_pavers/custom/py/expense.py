@@ -63,7 +63,7 @@ def calculate_total(gl_entries):
     return res
 
 @frappe.whitelist()
-def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False) -> list:
+def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False, vehicle_purpose=[]) -> list:
     WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
 
     if not company:
@@ -84,6 +84,17 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
             parent=None
 
     prod_details = frappe.scrub(prod_details)
+
+    get_km_based_vehicle_expense(
+        from_date=from_date,
+        to_date=to_date,
+        vehicle=vehicle,
+        machine=machine,
+        expense_type=expense_type,
+        prod_details=prod_details,
+        purpose=vehicle_purpose or []
+        )
+
     root = get_account_balances(
                 accounts=get_children(
                             doctype=doctype, 
@@ -406,3 +417,73 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[])
     den_total = sum([(machine_wise_prod_info[gl_machine_key][i] or 0) for i in machine_wise_prod_info[gl_machine_key] if {'paver': paver, 'cw': cw, "lego": lego, "fp": fp}.get(i) ])
 
     return (num_total or 0) / (den_total or 1)
+
+def get_km_based_vehicle_expense(from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = []):
+    WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
+
+    wrk_fields = ",".join([f""" CASE WHEN (
+        SELECT COUNT(ts_wrk.workstation)
+        FROM `tabTS Workstation` ts_wrk 
+        WHERE ts_wrk.parenttype = "Vehicle Log" and ts_wrk.parent = vl.name and ts_wrk.workstation = '{wrk}'
+    ) THEN 1 ELSE 0 END as {frappe.scrub(wrk)}""" for wrk in WORKSTATIONS])
+
+    conditions = ""
+    
+    if from_date:
+        conditions += f""" and date(vl.date)>='{from_date}' """
+    if to_date:
+        conditions += f""" and date(vl.date)<='{to_date}' """
+    if vehicle:
+        conditions += f""" and vl.license_plate='{vehicle}' """
+    if expense_type:
+        conditions += f""" and vl.expense_type='{expense_type}' """
+    if prod_details:
+        conditions += f""" and vl.{frappe.scrub(prod_details)}=1 """
+    if machine:
+        conditions += f""" and (
+                select 
+                    count(ts_wrk.workstation) 
+                from `tabTS Workstation` ts_wrk 
+                WHERE 
+                    ts_wrk.parenttype = "Vehicle Log" and 
+                    ts_wrk.parent = vl.name and 
+                    ts_wrk.workstation in {f"('{machine[0]}')" if len(machine)==1 else tuple(machine)}
+            )
+        """
+    
+    query = f"""
+        select 
+            vl.license_plate as vehicle,
+            md.maintenance as account,
+            vl.today_odometer_value as distance,
+            vl.today_odometer_value * ifnull(md.expense, 0) as debit,
+            vl.paver,
+            vl.compound_wall,
+            vl.fencing_post,
+            vl.lego_block,
+            "Vehicle Log" as voucher_type,
+            vl.name as voucher_no
+            {f", {wrk_fields}" if wrk_fields else ""}
+        from `tabVehicle Log` vl
+        inner join `tabMaintenance Details` md on md.parenttype = "Vehicle" and md.parent = vl.license_plate
+        inner join `tabVehicle Log Purpose` vlp on vlp.parenttype = "Maintenance type" and vlp.parent = md.maintenance and vlp.parentfield = "vehicle_log_purpose_per_km"
+        where 
+            vl.docstatus = 1 and
+            md.expense_calculation_per_km = 1 and
+            {f'''vl.select_purpose in {f"('{purpose[0]}')" if len(purpose)==1 else tuple(purpose)} and ''' if purpose else ""}
+            vl.select_purpose = vlp.select_purpose 
+            {conditions}
+        
+        order by vl.license_plate
+    """
+    
+    vl_entries = frappe.db.sql(query, as_dict=True)
+
+    res = calculate_exp_from_gl_entries(
+        gl_entries=vl_entries,
+        from_date=from_date,
+        to_date=to_date,
+        expense_type=expense_type,
+        prod_details=prod_details,
+        machines=machine
+    )
