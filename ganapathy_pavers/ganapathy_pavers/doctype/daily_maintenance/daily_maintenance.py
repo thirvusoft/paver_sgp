@@ -300,11 +300,11 @@ def paver_item(warehouse, date, time, warehouse_colour):
 	colour_details=list(colour_details.values())
 	for item in colour_details:
 		if 'pigment' in frappe.scrub(item['colour']):
-			item['sqft']=round(item['stock']/3*100)
-			item['no_of_days']=round(item['stock']/3*100/3000)
+			item['sqft']=round(uom_conversion(item = item["colour"], from_qty=item['stock'], to_uom="SQF"))
+			item['no_of_days']=round(item['sqft']/3000)
 		elif 'dolamite' in frappe.scrub(item['colour']):
-			item['sqft']=round(item['stock']*49/75*100)
-			item['no_of_days']=round(item['stock']*49/75*100/3000)
+			item['sqft']=round(uom_conversion(item = item["colour"], from_qty=item['stock'], to_uom="SQF"))
+			item['no_of_days']=round(item["sqft"]/3000)
 	# slab type item
 	slab_item=frappe.db.get_all("Item", filters={'item_group':'Compound Walls', 'compound_wall_type':'Slab', 'disabled':0}, pluck='name')
 	
