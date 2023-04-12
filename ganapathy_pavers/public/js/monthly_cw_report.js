@@ -37,7 +37,7 @@ ganapathy_pavers.monthly_compound_wall_report = {
         }
     ],
 	formatter: function (value, row, column, data, default_formatter) {
-		if (data.reference_data) {
+		if (column.fieldname == "qty" && data.reference_data) {
 			value = __(default_formatter(value, row, column, data));
 			value = $(`<span ondblclick=\'ganapathy_pavers.show_reference(\"${data.qty}\", ${JSON.stringify(data.reference_data)}, \"${data.uom}\")\'>${value}</span>`);
 			var $value = $(value);

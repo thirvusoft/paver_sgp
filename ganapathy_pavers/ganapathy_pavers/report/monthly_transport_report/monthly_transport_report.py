@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
 
+import json
 import frappe
 from frappe import _
 from ganapathy_pavers import uom_conversion
@@ -272,6 +273,12 @@ def get_columns():
             "fieldname": "3",
             "width": 150
         },
+		{
+            "label": _("Reference Data"),
+            "fieldtype": "Data",
+            "fieldname": "reference_data",
+            "hidden": 1
+        },
 	]
 	return columns
 
@@ -319,6 +326,7 @@ def get_expense_data(total_delivery_sqft, filters, paver_sqft, cw_sqft, total_km
 					"2": (i["balance"])*(paver/total) or 0,
 					"3": (i["balance"])*(cw/total) or 0,
 					"is_km_exp": is_km_exp,
+					"reference_data": json.dumps(i.get("references")) if i.get("references") else ""
 				})	
 	return res
 
@@ -352,6 +360,7 @@ def get_expense_from_child(total_delivery_sqft, account, paver_sqft, cw_sqft, to
 				"2": (i["balance"])*(paver/total) or 0,
 				"3": (i["balance"])*(cw/total) or 0,
 				"is_km_exp": is_km_exp,
+				"reference_data": json.dumps(i.get("references")) if i.get("references") else ""
 			})
 		if i['child_nodes']:
 			res1=(get_expense_from_child(total_delivery_sqft, i['child_nodes'], paver_sqft, cw_sqft, total_km, paver_km, cw_km, filters))

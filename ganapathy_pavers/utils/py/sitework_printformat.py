@@ -172,7 +172,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
     return f_res
 
 def get_item_price_list_rate(item, date):
-    price_list=frappe.db.get_value("Price List", {"site_work_print_format": 1}, "name")
+    price_list=frappe.db.get_value("Price List", {"site_work_print_format": 1, "selling": 1}, "name")
     if not price_list:
         return 0
     args = {
