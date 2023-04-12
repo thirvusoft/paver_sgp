@@ -452,6 +452,11 @@ def fuel_stock_entry(self, event=None):
     if not fuel_item:
         frappe.throw(f"""<b>Fuel Item</b> is required to create <b>Fuel Stock Entry</b> in <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>. Please Enter the <b>Default Item</b> for Fuel in <a href="/app/vehicle-settings"><b>Vehicle Settings</b></a>""")
 
+    fuel_expense_acc = frappe.db.get_single_value("Vehicle Settings", "fuel_expense")
+
+    if not fuel_expense_acc:
+        frappe.throw("Please enter <b>Default Expense Account for Fuel Entry</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+
     company=erpnext.get_default_company()
     branch=frappe.db.get_single_value("Vehicle Settings", "default_branch")
     if not branch:
@@ -474,6 +479,7 @@ def fuel_stock_entry(self, event=None):
             "valuation_rate": self.price,
             "basic_rate": self.price,
             "branch": branch,
+            "expense_account": fuel_expense_acc,
         }])
     })
     doc.save()
@@ -499,6 +505,10 @@ def adblue_stock_entry(self, event=None):
     if not adblue_item:
         frappe.throw(f"""<b>Adblue Item</b> is required to create <b>Adblue Stock Entry</b> in <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>. Please Enter the <b>Default Item</b> for Adblue in <a href="/app/vehicle-settings"><b>Vehicle Settings</b></a>""")
 
+    adblue_expense_acc = frappe.db.get_single_value("Vehicle Settings", "adblue_expense_account")
+    if not adblue_expense_acc:
+        frappe.throw("Please enter <b>Adblue Expense Account</b> in <a href='/app/vehicle-settings/Vehicle Settings'><b>Vehicle Settings</b></a>")
+
     company=erpnext.get_default_company()
     branch=frappe.db.get_single_value("Vehicle Settings", "default_branch")
     if not branch:
@@ -519,6 +529,7 @@ def adblue_stock_entry(self, event=None):
             "s_warehouse": from_warehouse,
             "qty": self.adblue_qty,
             "branch": branch,
+            "expense_account": adblue_expense_acc,
         }])
     })
     doc.save()
