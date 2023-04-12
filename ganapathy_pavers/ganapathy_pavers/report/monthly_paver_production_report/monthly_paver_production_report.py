@@ -3,8 +3,10 @@
 
 # import frappe
 import frappe
+import json
 from frappe import _
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
+from ganapathy_pavers.custom.py.expense import  expense_tree
 
 def execute(filters=None):
 	from_date = filters.get("from_date")
@@ -154,14 +156,17 @@ def get_columns():
 		_("Rate") + ":Data:200",
 		_("Amount") + ":Data:150",
 		_("Cost Per SQFT") + ":Data:100",
+		{
+			"fieldname": "reference_data",
+			"label": "Reference Data",
+			"fieldtype": "Data",
+			"hidden": 1,
+		}
 		]
 
 	return columns
 
 def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
-	exp=frappe.get_single("Expense Accounts")
-	if not exp.paver_group:
-		return [], 0, 0
 	machine=None
 	if ("Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", [])) and "Machine3 Day" in filters.get("machine", []):
 		pass
@@ -169,7 +174,21 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 		machine="machine_12"
 	elif filters.get("machine", []):
 		machine="machine_3"
-	exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine )
+	if filters.get("new_method"):
+		exp_tree=exp_tree=expense_tree(
+							from_date=filters.get('from_date'),
+							to_date=filters.get('to_date'),
+							prod_details="Paver",
+							expense_type="Manufacturing",
+							machine = filters.get("machine", []) or [],
+							vehicle_summary = filters.get("vehicle_summary")
+							)
+	else:
+		exp=frappe.get_single("Expense Accounts")
+		if not exp.paver_group:
+			return [], 0, 0
+		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine )
+	
 	res=[]
 	for i in exp_tree:
 		dic={}
@@ -191,6 +210,7 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 				total_sqf+=(round(i["balance"]/prod_sqft, 4) or 0)
 				dic["uom"]=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
 				total_amt+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
+				dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
 				res.append(dic)	
 	return res, total_sqf, total_amt
 
@@ -204,6 +224,7 @@ def get_expense_from_child(prod_sqft, account, sqft, total_sqf, total_amt):
 			total_sqf+=(round(i["balance"]/prod_sqft, 4) or 0)
 			dic["uom"]=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
 			total_amt+=(round((i["balance"]/prod_sqft)*sqft, 4) if prod_sqft else 0)
+			dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
 			res.append(dic)
 		if i['child_nodes']:
 			res1, total_sqf, total_amt=(get_expense_from_child(prod_sqft, i['child_nodes'], sqft, total_sqf, total_amt))

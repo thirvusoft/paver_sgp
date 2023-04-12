@@ -20,6 +20,13 @@ frappe.query_reports["Itemwise Monthly CW Production Report"] = {
 		width: "80",
 		reqd: 1,
 	  },
+	  {
+		  fieldname: "report_type",
+		  label: __("Report Type"),
+		  fieldtype: "Select",
+		  options: "Summary\nReport",
+		  default: "Summary"
+	  }
 	],
   };
   

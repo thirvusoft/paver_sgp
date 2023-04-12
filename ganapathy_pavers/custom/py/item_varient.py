@@ -50,7 +50,8 @@ def color_details_fields(j):
             dict(
                 fieldname=frappe.scrub(j),
                 label=f"{j}",
-                fieldtype="Float",   
+                fieldtype="Float",
+                read_only=1   
             ),]
     }
     create_custom_fields(custom_fields)
@@ -65,6 +66,7 @@ def color_details_sb_fields(j):
                 fieldname=frappe.scrub(j),
                 label=f"{j}",
                 fieldtype="Float",
+                read_only=1
                 
             ),]
     }

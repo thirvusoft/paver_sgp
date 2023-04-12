@@ -53,8 +53,31 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"fieldname": "expense_summary",
 			"label": __("Expense Summary"),
 			"fieldtype": "Check",
+		},
+		{
+			"fieldname": "new_method",
+			"label": __("New Expense Method"),
+			"fieldtype": "Check",
+			"default": 0,
+		},
+		{
+			"fieldname": "vehicle_summary",
+			"label": __("Vehicle Summary"),
+			"fieldtype": "Check",
+			"default": 0,
 		}
-	]
+	],
+	formatter: function (value, row, column, data, default_formatter) {
+		if (data.reference_data) {
+			value = __(default_formatter(value, row, column, data));
+			value = $(`<span ondblclick=\'ganapathy_pavers.show_reference(\"${data.qty}\", ${JSON.stringify(data.reference_data)}, \"${data.uom}\")\'>${value}</span>`);
+			var $value = $(value);
+			value = $value.wrap("<p></p>").parent().html();
+		} else {
+			value = __(default_formatter(value, row, column, data));
+		}
+		return value
+	}
 };
 
 async function on_change() {

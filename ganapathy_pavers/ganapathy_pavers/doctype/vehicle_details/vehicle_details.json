@@ -21,13 +21,14 @@
    "fieldname": "sqft",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Sqft"
+   "label": "Sqft",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-11-16 13:18:42.045834",
+ "modified": "2023-04-05 10:33:38.485152",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Details",

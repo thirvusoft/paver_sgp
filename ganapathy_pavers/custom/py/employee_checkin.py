@@ -1,5 +1,5 @@
 import frappe
-from frappe.utils.data import time_diff_in_hours
+from frappe.utils.data import get_link_to_form, time_diff_in_hours
 from datetime import date, timedelta, datetime
 
 from erpnext.hr.doctype.shift_type.shift_type import process_auto_attendance_for_all_shifts
@@ -38,7 +38,7 @@ def check_in_out(self, event):
 				hours_to_reduce = row.hours_to_reduce
 
 	for j in total_hours:
-	   hours+=(time_diff_in_hours(j[1],j[0]))
+		hours+=(time_diff_in_hours(j[1],j[0]))
 	if self.ts_employee_attendance_tool and hours_to_reduce:
 		hours-=hours_to_reduce
 	frappe.db.set_value(self.doctype, self.name, 'working_hours',hours)
@@ -58,28 +58,20 @@ def ot_hours_cal(self, hours):
 import frappe
 from frappe.utils import cint, get_datetime, getdate, to_timedelta, time_diff_in_hours,get_time 
 from frappe.utils import time_diff_in_hours
-from frappe import utils
+from frappe import _, utils
 from datetime import datetime, timedelta
 import datetime
 
 import frappe
 from frappe.model.document import Document
 
-
-
-
 def get_employees_for_shift():
 	total_employees=frappe.db.get_all('Employee', filters={"attendance_device_id":['is', 'set'],'status':'Active'}, pluck='name')
 	return total_employees
 
-
 @frappe.whitelist()
 def scheduler_for_employee_shift():
 	create_workers_attendance()
-
-		
-
-
 
 def create_datewise_checkin(employee,employee_checkin,date_wise_checkin,checkin_name):
 	for data in employee_checkin:
@@ -95,21 +87,14 @@ def create_datewise_checkin(employee,employee_checkin,date_wise_checkin,checkin_
 		
 		[logs_res.append(x) for x in date_wise_checkin[logs] if x not in logs_res]
 		date_wise_checkin.update({logs:logs_res})
-	
-
-
 
 def adding_checkin_datewise(checkin_date, checkin_date_key, checkin_details):
 	if checkin_date_key not in checkin_date:
 		checkin_date[checkin_date_key] = list()
 	checkin_date[checkin_date_key].extend(checkin_details)
 
-
-
-
 def create_workers_attendance():
 	"""Workers Attendance"""
-	
 
 	employee_list = get_employees_for_shift()
 	for employee in employee_list:
@@ -117,37 +102,24 @@ def create_workers_attendance():
 		date_wise_checkin = frappe._dict()
 		checkin_name = frappe._dict()
 		emp_checkin = frappe.db.get_all("Employee Checkin", 
-			filters={"employee": employee,}, 
+			filters={"employee": employee, "device_id": ["is", "set"]}, 
 			order_by="time",
 			fields=['time', 'log_type', 'name']
 			)
-
+		create_datewise_checkin(employee, emp_checkin, date_wise_checkin, checkin_name)
 		
-		create_datewise_checkin(employee,emp_checkin,date_wise_checkin,checkin_name)
-		
-
 		for data in date_wise_checkin:
-		
-		
-		
 			attendance = frappe._dict()
 			in_time = out_time = 0
-			
-			
+
 			if date_wise_checkin[data][0]['log_type']=='IN':
 				in_time = date_wise_checkin[data][0]['time'].time()
-				in_time_date = date_wise_checkin[data][0]['time']
-			
-
-				
+				in_time_date = date_wise_checkin[data][0]['time']	
 
 			if date_wise_checkin[data][len(date_wise_checkin[data]) - 1]:
 				out_time = date_wise_checkin[data][len(date_wise_checkin[data]) - 1]['time'].time()
 				out_time_date = date_wise_checkin[data][len(date_wise_checkin[data]) - 1]['time']
-				
-				
-
-					
+						
 			if in_time or out_time:
 				
 				if not frappe.db.exists("Attendance",{"employee":employee,"attendance_date":data}):
@@ -157,47 +129,42 @@ def create_workers_attendance():
 						"status":"Present" 
 					})
 					
-					
 					try:
 						attendance_doc = frappe.new_doc("Attendance")
 						attendance_doc.update(attendance)
 						attendance_doc.insert()
 						if attendance['status']== "Present":
 							attendance_doc.submit()
-					# else:
-					# 	attendance_doc=frappe.get_doc("Attendance",{"employee":employee,"attendance_date":data})
 					except Exception as e:
 						frappe.log_error(title="Attendance Creation",message=e)
 			
 
-
-
-
-
-
-
-
-
 def unlink_logs(doc,event):
-	Attendance.unlink_attendance_from_checkins(doc)
+	unlink_attendance_from_checkins(doc)
 
-	
-@frappe.whitelist()
-def saturday_checkin(logtime):
-	emp_list = frappe.db.get_list("Employee", filters={"status":"Active"}, fields="name",pluck="name")
-	for emp in emp_list:
-		checkout=frappe.new_doc("Employee Checkin")
-		checkout.employee= emp
-		checkout.log_type="OUT"
-		checkout.time=logtime
-		checkout.insert()
+def unlink_attendance_from_checkins(self):
+	EmployeeCheckin = frappe.qb.DocType("Employee Checkin")
+	linked_logs = (
+		frappe.qb.from_(EmployeeCheckin)
+		.select(EmployeeCheckin.name)
+		.where(EmployeeCheckin.attendance == self.name)
+		.for_update()
+		.run(as_dict=True)
+	)
 
-
-
-
-
-
-
-
-
+	if linked_logs:
+		(
+			frappe.qb.update(EmployeeCheckin)
+			.set("attendance", "")
+			.where(EmployeeCheckin.attendance == self.name)
+		).run()
 		
+		frappe.msgprint(
+			msg=_("Unlinked Attendance record from Employee Checkins: {}").format(
+				", ".join(get_link_to_form("Employee Checkin", log.name) for log in linked_logs)
+			),
+			title=_("Unlinked logs"),
+			indicator="blue",
+			is_minimizable=True,
+			wide=True,
+		)

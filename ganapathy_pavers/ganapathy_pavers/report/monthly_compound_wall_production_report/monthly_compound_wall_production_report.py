@@ -1,9 +1,11 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
  
+import json
 import frappe
 from frappe import _
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
+from ganapathy_pavers.custom.py.expense import  expense_tree
 
 def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw"):
 	from_date = filters.get("from_date")
@@ -101,7 +103,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 		total_amt=0
 		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'))
 		if prod_details.get(prod):
-			exp, total_sqf, total_amt=get_expense_data(prod_details.get(prod),filters, (production_qty[0]['production_sqft']), total_sqf, total_amt, exp_group)
+			exp, total_sqf, total_amt=get_expense_data(prod_details.get(prod),filters, (production_qty[0]['production_sqft']), total_sqf, total_amt, exp_group, prod)
 			if exp:
 				data.append({
 					"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Details</b>"
@@ -167,19 +169,34 @@ def get_columns():
 		"fieldname":"cost_per_sqft",
 		"label":"<b>Cost Per SQFT</b>",
 		"width":100
+		},
+		{
+			"fieldname": "reference_data",
+			"label": "Reference Data",
+			"fieldtype": "Data",
+			"hidden": 1,
 		}
-	
-	
 	]
 	
 	return columns
 
 
-def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group):
-	exp=frappe.get_single("Expense Accounts")
-	if not exp.get(exp_group):
-		return [], 0, 0
-	exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.get(exp_group))
+def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group, prod='cw'):
+	if filters.get("new_method"):
+		exp={'cw': "compound_wall", "lego": "lego_block", "fp": "fencing_post"}.get(prod)
+		exp_tree=exp_tree=expense_tree(
+							from_date=filters.get('from_date'),
+							to_date=filters.get('to_date'),
+							prod_details=exp,
+							expense_type="Manufacturing",
+							vehicle_summary = filters.get("vehicle_summary")
+							)
+	else:
+		exp=frappe.get_single("Expense Accounts")
+		if not exp.get(exp_group):
+			return [], 0, 0
+		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.get(exp_group))
+
 	res=[]
 	for i in exp_tree:
 		dic={}
@@ -198,6 +215,7 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group):
 					res.append({})
 				dic['qty']=i['value']
 				dic["uom"]=round(i["balance"], 4)
+				dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
 				total_amt+=(dic["uom"] or 0)
 				dic["consumption"]=round(i["balance"]/prod_sqft, 4)
 				total_sqf+=(dic["consumption"] or 0)
@@ -211,6 +229,7 @@ def get_expense_from_child(prod_sqft, account, sqft, total_sqf, total_amt):
 			dic={}
 			dic['qty']=i['value']
 			dic["uom"]=round(i["balance"], 4)
+			dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
 			total_amt+=(dic["uom"] or 0)
 			dic["consumption"]=round(i["balance"]/prod_sqft, 4)
 			total_sqf+=(dic["consumption"] or 0)

@@ -1,0 +1,19 @@
+.expense-reference-dialog-row {
+    border-radius: 7px;
+    border-bottom: 1px solid grey;
+    padding: 4px 13px 4px 13px;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.expense-reference-dialog-total-row {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+
+.expense-reference-dialog-row:hover {
+    background-color: #0000000d;
+}

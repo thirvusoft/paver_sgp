@@ -2,7 +2,8 @@ import copy
 from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost
 import frappe
 from frappe.utils import nowdate, get_first_day, get_last_day
-from ganapathy_pavers import get_valuation_rate, uom_conversion
+from ganapathy_pavers import uom_conversion
+from erpnext.stock.get_item_details import get_item_price
 
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -58,42 +59,43 @@ def site_work(doc):
     dn_items+=frappe.get_all("Sales Invoice Item", {"parenttype": "Sales Invoice", "parent": ["in", si], "item_code": ["in", delivered_items]}, ["creation", "item_code", "warehouse"])
     
     paver_prod_details = []
-    cw_types={}
+    # cw_types={}
     for item in dn_items:
-        if frappe.db.get_value("Item", item['item_code'], "item_group") == "Pavers":
+        # if frappe.db.get_value("Item", item['item_code'], "item_group") == "Pavers":
             if item['item_code'] not in production_rate:
                 production_rate[item['item_code']] = []
             
             if [item["item_code"], get_first_day(item["creation"])] not in paver_prod_details:
-                prod_cost=get_paver_production_rate(item["item_code"], item["creation"])
+                prod_cost=get_item_price_list_rate(item["item_code"], item["creation"])
+                # get_paver_production_rate(item["item_code"], item["creation"])
                 paver_prod_details.append([item["item_code"], get_first_day(item["creation"])])
                 if prod_cost:
                     production_rate[item['item_code']].append(prod_cost)
         
-        if frappe.db.get_value("Item", item['item_code'], "item_group") == "Compound Walls":
-            _type = frappe.db.get_value("Item", item['item_code'], "compound_wall_type")
-            if item['item_code'] not in production_rate:
-                production_rate[item['item_code']] = 0
+        # if frappe.db.get_value("Item", item['item_code'], "item_group") == "Compound Walls":
+        #     _type = frappe.db.get_value("Item", item['item_code'], "compound_wall_type")
+        #     if item['item_code'] not in production_rate:
+        #         production_rate[item['item_code']] = 0
             
-            month = get_first_day(item["creation"])
+        #     month = get_first_day(item["creation"])
 
-            if month not in cw_types:
-                cw_types[month]=[]
+        #     if month not in cw_types:
+        #         cw_types[month]=[]
 
-            if _type not in cw_types[month]:
-                cw_types[month].append(_type)
+        #     if _type not in cw_types[month]:
+        #         cw_types[month].append(_type)
     
-    prod_cost = []
-    for i in cw_types:
-        cost = get_cw_production_rate(_type=cw_types[i], date = i)
-        if cost:
-            prod_cost.append(cost)
+    # prod_cost = []
+    # for i in cw_types:
+    #     cost = get_cw_production_rate(_type=cw_types[i], date = i)
+    #     if cost:
+    #         prod_cost.append(cost)
     
-    prod_cost = (sum(prod_cost) / len(prod_cost)) if prod_cost else 0
+    # prod_cost = (sum(prod_cost) / len(prod_cost)) if prod_cost else 0
     
-    for item in dn_items:
-        if frappe.db.get_value("Item", item['item_code'], "item_group") == "Compound Walls":
-            production_rate[item['item_code']] = prod_cost
+    # for item in dn_items:
+    #     if frappe.db.get_value("Item", item['item_code'], "item_group") == "Compound Walls":
+    #         production_rate[item['item_code']] = prod_cost
 
     for item in production_rate:
         if isinstance(production_rate[item], list):
@@ -127,7 +129,30 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
             SUM(dni.qty) as qty,
             dni.uom,
             AVG(rate) as rate,
-            SUM(dni.amount) as amount
+            SUM(dni.amount) as amount,
+            ROUND(
+                ifnull((
+                    SELECT avg(sle.valuation_rate)
+                    FROM `tabStock Ledger Entry` sle
+                    WHERE
+                        sle.is_cancelled=0 and
+                        sle.voucher_type = 'Purchase Invoice' and
+                        sle.item_code = dni.item_code and
+                        sle.posting_date <= dn.posting_date and
+                        sle.posting_time <= dn.posting_time and
+                        sle.is_cancelled = 0
+                ), 0) *
+                ifnull((
+                    SELECT
+                        uom.conversion_factor
+                    FROM `tabUOM Conversion Detail` uom
+                    WHERE
+                        uom.parenttype='Item' and
+                        uom.parent=dni.item_code and
+                        uom.uom=dni.uom
+                )    
+                , 0)
+            , 2) as valuation_rate
         FROM `tabDelivery Note Item` dni
         LEFT OUTER JOIN `tabDelivery Note` dn
         ON dn.name=dni.parent AND dni.parenttype="Delivery Note"
@@ -144,8 +169,22 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
         if row.item_code not in f_res:
             f_res[row.item_code] = []
         f_res[row.item_code].append(row)
-
     return f_res
+
+def get_item_price_list_rate(item, date):
+    price_list=frappe.db.get_value("Price List", {"site_work_print_format": 1, "selling": 1}, "name")
+    if not price_list:
+        return 0
+    args = {
+	'item_code': item, 
+		'price_list': price_list, 
+		'uom': frappe.db.get_value("Item", item, "stock_uom"), 
+		'transaction_date': None, 
+		'posting_date': date or nowdate(), 
+		'batch_no': None,
+	}
+    item_price=get_item_price(args=args, item_code=item)
+    return item_price[0][1] if len(item_price) and len(item_price[0])>1 else 0
 
 def get_paver_production_rate(item, date=None):
     def get_paver_production_date(filters, item):

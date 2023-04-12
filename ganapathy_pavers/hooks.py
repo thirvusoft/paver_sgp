@@ -14,7 +14,7 @@ app_license = "MIT"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/ganapathy_pavers/css/ganapathy_pavers.css"
+app_include_css = "/assets/css/ganapathy_pavers.min.css"
 app_include_js = "/assets/js/ganapathy_pavers.min.js"
 
 # include js, css files in header of web template
@@ -145,7 +145,10 @@ doc_events = {
 	"Stock Entry": {
 		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
 		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset",
-        "validate" : "ganapathy_pavers.custom.py.stock_entry.basic_rate_validation"
+        "validate" : [
+    			"ganapathy_pavers.custom.py.stock_entry.basic_rate_validation",
+				"ganapathy_pavers.custom.py.stock_entry.expense_account",
+			]
 		
 	},
 	"Payment Entry":{

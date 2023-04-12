@@ -8,7 +8,7 @@ from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing
 
 
 def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group="cw_group"):
-	columns = get_columns()
+	columns = get_columns(filters)
 
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
@@ -80,7 +80,7 @@ def get_expense_from_child(account, total_sqf):
 			total_sqf+=i["balance"] or 0
 	return total_sqf
 
-def get_columns():
+def get_columns(filters):
 
 	columns = [
 		{
@@ -124,19 +124,22 @@ def get_columns():
 			"fieldname":"strapping_cost",
 			"label":_("Strapping Cost"),
 			"width":120,
-			"fieldtype":"Currency"
+			"fieldtype":"Currency",
+            "hidden": filters.get("report_type") == "Summary"
 		},
 		{
 			"fieldname":"labour_operator_cost",
 			"label":_("Labour and Operator Cost"),
 			"width":190,
-			"fieldtype":"Currency"
+			"fieldtype":"Currency",
+            "hidden": filters.get("report_type") == "Summary"
 		},
 		{
 			"fieldname":"additional_cost",
 			"label":_("Additional Cost"),
 			"width":120,
-			"fieldtype":"Currency"
+			"fieldtype":"Currency",
+            "hidden": filters.get("report_type") == "Summary"
 		},
 		{
 			"fieldname":"expense",
