@@ -2,6 +2,7 @@
     "js/ganapathy_pavers.min.js": [
         "public/js/employee_formatter.js",
         "public/js/production_report_item_filter.js",
+        "public/js/uom_converstion.js",
         "public/js/templates/je_loading.html",
         "public/js/templates/je_production_dashboard.html"
     ]

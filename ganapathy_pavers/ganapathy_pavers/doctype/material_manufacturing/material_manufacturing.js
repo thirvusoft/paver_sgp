@@ -124,18 +124,16 @@ frappe.ui.form.on('Material Manufacturing', {
 	strapping_cost: function (frm) {
 		cur_frm.set_value('rack_shifting_total_expense1', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost)
 	},
-	production_qty: function (frm) {
+	production_qty: async function (frm) {
 		cur_frm.set_value('total_no_of_produced_qty', frm.doc.production_qty);
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty)
-		frappe.db.get_value("Item", { "name": frm.doc.item_to_manufacture }, "pavers_per_sqft", (sqft) => {
-			cur_frm.set_value('production_sqft', frm.doc.total_completed_qty / sqft.pavers_per_sqft)
-		});
+		let res = await ganapathy_pavers.uom_converstion(frm.doc.item_to_manufacture, "Nos", frm.doc.total_completed_qty, "SQF")
+		cur_frm.set_value('production_sqft', res)
 	},
-	damage_qty: function (frm) {
+	damage_qty: async function (frm) {
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty)
-		frappe.db.get_value("Item", { "name": frm.doc.item_to_manufacture }, "pavers_per_sqft", (sqft) => {
-			cur_frm.set_value('production_sqft', frm.doc.total_completed_qty / sqft.pavers_per_sqft)
-		});
+		let res = await ganapathy_pavers.uom_converstion(frm.doc.item_to_manufacture, "Nos", frm.doc.total_completed_qty, "SQF")
+		cur_frm.set_value('production_sqft', res)
 	},
 	curing_damaged_qty: function (frm) {
 		cur_frm.set_value('no_of_bundle', frm.doc.no_of_bundle - frm.doc.curing_damaged_qty)
@@ -191,38 +189,18 @@ frappe.ui.form.on('Material Manufacturing', {
 	strapping_cost_per_sqft: function (frm) {
 		cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft * frm.doc.production_sqft);
 	},
-	total_no_of_produced_qty: function (frm) {
+	total_no_of_produced_qty: async function (frm) {
 		frm.set_value("remaining_qty", 0)
-		var bundle_cf = 0
-		var nos_cf = 0
-		var default_cf = 0
+
 		frappe.db.get_single_value("USB Setting", "default_manufacture_uom").then(value => {
 			uom_nos = value
 		})
 		frappe.db.get_single_value("USB Setting", "default_rack_shift_uom").then(value => {
 			uom_bundle = value
 		})
-		frappe.db.get_doc('Item', frm.doc.item_to_manufacture).then((doc) => {
-			var default_uom = doc.stock_uom
-			for (var i of doc.uoms) {
-				if (uom_bundle == i.uom) {
-					bundle_cf = i.conversion_factor
-				}
-				if (uom_nos == i.uom) {
-					nos_cf = i.conversion_factor
-				}
-				if (default_uom == i.uom) {
-					default_cf = i.conversion_factor
-				}
-			}
-			var total_amount = (frm.doc.total_no_of_produced_qty * nos_cf) / bundle_cf
-			if (total_amount >= 1) {
-				cur_frm.set_value('total_no_of_bundle', total_amount);
-			}
-			else {
-				cur_frm.set_value('total_no_of_bundle', 0);
-			}
-		});
+		
+		let res = await ganapathy_pavers.uom_converstion(frm.doc.item_to_manufacture, "Nos", frm.doc.total_no_of_produced_qty, "Bdl")
+		cur_frm.set_value('total_no_of_bundle', res)
 	},
 	total_no_of_bundle: function (frm) {
 		cur_frm.set_value('no_of_bundle', frm.doc.total_no_of_bundle);
