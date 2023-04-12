@@ -42,5 +42,15 @@ frappe.query_reports["Monthly Transport Report"] = {
 			"fieldtype": "Check",
 			"default": 0,
 		}
-	]
+	],
+	formatter: function (value, row, column, data, default_formatter) {
+		if (column.fieldname == "item" && data.reference_data) {
+			value = $(`<span ondblclick=\'ganapathy_pavers.show_reference(\"${data.item}\", ${JSON.stringify(data.reference_data)}, \"${data.qty}\")\'>${value}</span>`);
+			var $value = $(value);
+			value = $value.wrap("<p></p>").parent().html();
+		} else {
+			value = __(default_formatter(value, row, column, data));
+		}
+		return value
+	}
 };
