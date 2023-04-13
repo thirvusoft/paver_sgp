@@ -449,6 +449,28 @@ def get_vehicle_expense_based_on_km(from_date, to_date, vehicle = None, machine 
         group by vl.license_plate, md.maintenance
     """, as_dict=True)
     
+    if machine and sorted(machine) != sorted(WORKSTATIONS):
+        conditions += f""" and ((
+                select 
+                    count(ts_wrk.workstation) 
+                from `tabTS Workstation` ts_wrk 
+                WHERE 
+                    ts_wrk.parenttype = "Vehicle Log" and 
+                    ts_wrk.parent = vl.name and 
+                    ts_wrk.workstation in {f"('{machine[0]}')" if len(machine)==1 else tuple(machine)}
+            )
+             OR
+            IFNULL((
+                SELECT GROUP_CONCAT(DISTINCT ts_wrk.workstation SEPARATOR ', ') 
+                FROM `tabTS Workstation` ts_wrk 
+                WHERE 
+                    ts_wrk.parenttype = "Vehicle Log" and 
+                    ts_wrk.parent = vl.name
+                ORDER BY ts_wrk.workstation
+            ), "") in ("", "{", ".join(sorted(WORKSTATIONS))}")
+            )
+        """
+
     vehicle_accs=[]
     for veh in veh_maint:
         balance, references = get_vehicle_expense(
@@ -493,17 +515,6 @@ def get_vehicle_expense(from_date, to_date, vehicle = None, machine = [], expens
         conditions += f""" and vl.license_plate='{vehicle}' """
     if maintenance:
         conditions += f""" and md.maintenance = "{maintenance}" """
-    if machine:
-        conditions += f""" and (
-                select 
-                    count(ts_wrk.workstation) 
-                from `tabTS Workstation` ts_wrk 
-                WHERE 
-                    ts_wrk.parenttype = "Vehicle Log" and 
-                    ts_wrk.parent = vl.name and 
-                    ts_wrk.workstation in {f"('{machine[0]}')" if len(machine)==1 else tuple(machine)}
-            )
-        """
     
     query = f"""
         select 
