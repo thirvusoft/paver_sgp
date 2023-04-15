@@ -624,7 +624,7 @@ def get_vehicle_driver_operator_salary(from_date, to_date, driver_employee=None,
     """, as_dict=True)
 
     res = []
-    for employee_field in ["employee", "operator"]:
+    for employee_field in ["employee"]: #["employee", "operator"]:
         vehicle_accs = []
         for veh in veh_details:
             balance, references = get_vehicle_salary(
