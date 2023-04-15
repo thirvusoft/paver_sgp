@@ -7,20 +7,20 @@ ganapathy_pavers.show_reference = function (title, reference, total_amount) {
 	}
 	let opt = '<ul class="expense-account-details">'
 
-	let previous = "", current = "", current_amount = 0, total_accounts = 0;
+	let previous_acc = "", current_acc = "", current_amount = 0, amount_disp_count = 0;
 	let idx = 0;
 	reference.forEach(e => {
 		idx++;
-		current = e.account || "";
-		if (current != previous && idx != 1) {
+		current_acc = e.account || "";
+		if (current_acc != previous_acc && idx != 1) {
+			amount_disp_count++;
 			opt += `</ul>
 			<div class="expense-reference-dialog-total-row">
 				<b>AMOUNT</b><b> ${format_currency(current_amount)}</b>
 			</div><ul class="expense-account-details">`;
 			current_amount = 0;
-			total_accounts++;
 		}
-		if ((idx == 1 || current != previous) && e.account) {
+		if ((idx == 1 || current_acc != previous_acc) && e.account) {
 			opt += `
 			<div class="expense-details-title">${e.account}</div>
 			`
@@ -41,16 +41,17 @@ ganapathy_pavers.show_reference = function (title, reference, total_amount) {
 			</li>
 		`
 		current_amount += (parseFloat(e.amount) || 0)
-		previous = current || "";
+		previous_acc = current_acc || "";
 	});
 
-	if (total_accounts >= 1) {
+	if (reference.length > 1) {
+		amount_disp_count++;
 		opt += `</ul>
 			<div class="expense-reference-dialog-total-row">
 				<b>AMOUNT</b><b> ${format_currency(current_amount)}</b>
 			</div><ul class="expense-account-details">`;
 	}
-	if (reference.length > 1) {
+	if (amount_disp_count > 1) {
 		opt += `</ul>
 		<div class="expense-reference-dialog-total-row expense-final-total-row">
 			<b>TOTAL AMOUNT</b><b> ${format_currency(total_amount)}</b>
