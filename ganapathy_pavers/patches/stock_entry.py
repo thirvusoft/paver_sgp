@@ -18,6 +18,7 @@ def fuel():
         for i in frappe.get_all("Stock Entry Detail", {"parent": se.name}, pluck="name"):
             frappe.db.set_value("Stock Entry Detail", i, "expense_account", "Fuel - GP", update_modified=False)
 
+            frappe.db.set_value("Stock Entry Detail", i, "vehicle", vl.license_plate, update_modified=False)
             frappe.db.set_value("Stock Entry Detail", i, "expense_type", vl.expense_type, update_modified=False)
 
             frappe.db.set_value("Stock Entry Detail", i, "paver", vl.paver, update_modified=False)
@@ -37,6 +38,7 @@ def fuel():
             else:
                 frappe.db.set_value("GL Entry", i, "against", "Fuel - GP", update_modified=False)
 
+            frappe.db.set_value("GL Entry", i, "vehicle", vl.license_plate, update_modified=False)
             frappe.db.set_value("GL Entry", i, "expense_type", vl.expense_type, update_modified=False)
 
             frappe.db.set_value("GL Entry", i, "paver", vl.paver, update_modified=False)
@@ -62,6 +64,7 @@ def adblue():
         for i in frappe.get_all("Stock Entry Detail", {"parent": se.name}, pluck="name"):
             frappe.db.set_value("Stock Entry Detail", i, "expense_account", "ADBLUE - GP", update_modified=False)
 
+            frappe.db.set_value("Stock Entry Detail", i, "vehicle", vl.license_plate, update_modified=False)
             frappe.db.set_value("Stock Entry Detail", i, "expense_type", vl.expense_type, update_modified=False)
 
             frappe.db.set_value("Stock Entry Detail", i, "paver", vl.paver, update_modified=False)
@@ -81,6 +84,7 @@ def adblue():
             else:
                 frappe.db.set_value("GL Entry", i, "against", "ADBLUE - GP", update_modified=False)
             
+            frappe.db.set_value("GL Entry", i, "vehicle", vl.license_plate, update_modified=False)
             frappe.db.set_value("GL Entry", i, "expense_type", vl.expense_type, update_modified=False)
 
             frappe.db.set_value("GL Entry", i, "paver", vl.paver, update_modified=False)
