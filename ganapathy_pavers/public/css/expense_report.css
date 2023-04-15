@@ -11,9 +11,33 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
+    padding: 5px;
+    background: #ffe8b261;
+    border-radius: 5px;
+    font-size: 125%
 }
 
+.expense-final-total-row {
+    background: #fba5a5;
+    font-size: 140%;
+}
 
 .expense-reference-dialog-row:hover {
     background-color: #0000000d;
+}
+
+.expense-account-details {
+    background: #629ffd17;
+}
+
+.expense-account-details {
+    margin-top: 1rem !important;
+    margin-bottom: 0 !important;
+}
+
+.expense-details-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 120%;
+    background: #629ffd21;
 }
