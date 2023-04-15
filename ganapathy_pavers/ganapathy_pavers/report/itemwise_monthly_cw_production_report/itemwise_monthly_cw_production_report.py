@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
+from ganapathy_pavers.custom.py.expense import  total_expense
 import frappe
 from frappe import _
 from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
@@ -18,7 +19,15 @@ def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group=
 
 	if doc:
 		data = get_cw_cost(doc)
-	sqf_exp=get_sqft_expense(filters, exp_group)
+	if filters.get("new_method"):
+		sqf_exp=total_expense(
+			from_date=filters.get('from_date'), 
+			prod_details="Compound Wall",
+			to_date=filters.get('to_date'), 
+			expense_type="Manufacturing", 
+		)
+	else:
+		sqf_exp=get_sqft_expense(filters, exp_group)
 	prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
 	for row in  data:
 		row["prod_cost"] = (row.get("prod_cost", 0) or 0) + (row.get("strapping_cost", 0) or 0)
