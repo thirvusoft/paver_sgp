@@ -20,9 +20,10 @@ def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group=
 	if doc:
 		data = get_cw_cost(doc)
 	if filters.get("new_method"):
+		exp={'cw': "compound_wall", "lego": "lego_block", "fp": "fencing_post"}.get(prod_exp_sqft)
 		sqf_exp=total_expense(
 			from_date=filters.get('from_date'), 
-			prod_details="Compound Wall",
+			prod_details=exp,
 			to_date=filters.get('to_date'), 
 			expense_type="Manufacturing", 
 		)
@@ -32,7 +33,7 @@ def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group=
 	for row in  data:
 		row["prod_cost"] = (row.get("prod_cost", 0) or 0) + (row.get("strapping_cost", 0) or 0)
 		row['pieces']=uom_conversion(item=row['item'], from_uom="SQF", from_qty=row['production_sqft'], to_uom="Nos")
-		row["expense"]=sqf_exp/prod_details.get(prod_exp_sqft, 1)
+		row["expense"]=sqf_exp/(prod_details.get(prod_exp_sqft, 1) or 1)
 		row["expense"] = (row.get("expense", 0) or 0) + (row.get("labour_operator_cost", 0) or 0) + (row.get("additional_cost", 0) or 0)
 		row['total_cost_per_sqft']=(row.get("prod_cost", 0) or 0)+(row.get("expense", 0) or 0)
 	return columns, data
