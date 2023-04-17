@@ -15,15 +15,20 @@ def filter_empty(gl_entries, vehicle_summary):
     for acc in gl_entries:
         acc["references"] = sorted(acc.get("references") or [], key=lambda x: (x.get("account") or ""))
         if acc.get("vehicle") and vehicle_summary:
+            _key = acc.get("vehicle")
+            if frappe.db.get_value("Vehicle", acc.get("vehicle"), "wheels") == 2:
+                _key = "TWO WHEELER"
+                for ref in acc["references"]:
+                    ref["title"] = acc.get("vehicle")
             for i in acc['references']:
                     i["account"] = acc.get("account_name")
-            if acc.get("vehicle") not in VEHICLE_WISE:
+            if _key not in VEHICLE_WISE:
                 _par_acc = acc.copy()
-                _par_acc["account_name"] = _par_acc["value"] = acc.get("vehicle")
-                VEHICLE_WISE[acc.get("vehicle")] = _par_acc
+                _par_acc["account_name"] = _par_acc["value"] = _key
+                VEHICLE_WISE[_key] = _par_acc
             else:
-                VEHICLE_WISE[acc.get("vehicle")]["balance"] += acc.get("balance") or 0
-                VEHICLE_WISE[acc.get("vehicle")]["references"].extend(acc.get("references") or {})
+                VEHICLE_WISE[_key]["balance"] += acc.get("balance") or 0
+                VEHICLE_WISE[_key]["references"].extend(acc.get("references") or {})
 
         elif acc.get("expandable"):
             acc["child_nodes"] = filter_empty(acc.get("child_nodes") or [], vehicle_summary)
