@@ -159,7 +159,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
                 'price_list': price_list_doc[0], 
                 'uom': j["uom"], 
                 'transaction_date': None, 
-                'posting_date': nowdate(), 
+                'posting_date': j["creation"] or nowdate(), 
                 'batch_no': None,
             }
             item_price=get_item_price(args=args, item_code=j["item_code"])
