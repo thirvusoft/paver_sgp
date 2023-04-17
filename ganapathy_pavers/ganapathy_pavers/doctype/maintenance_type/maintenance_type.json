@@ -53,6 +53,7 @@
    "description": "Based on Vehicle Log",
    "fieldname": "expense_calculation_per_vehicle_log",
    "fieldtype": "Check",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Expense calculation per vehicle log"
   },
@@ -60,6 +61,7 @@
    "depends_on": "eval: doc.expense_calculation_per_vehicle_log",
    "fieldname": "vehicle_log_purpose_per_log",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Vehicle Log Purpose (per log)",
    "mandatory_depends_on": "eval: doc.expense_calculation_per_vehicle_log",
    "options": "Vehicle Log Purpose"
@@ -77,6 +79,7 @@
    "description": "Based on Vehicle Log",
    "fieldname": "expense_calculation_per_day",
    "fieldtype": "Check",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Expense calculation per day"
   },
@@ -84,6 +87,7 @@
    "depends_on": "eval: doc.expense_calculation_per_day",
    "fieldname": "vehicle_log_purpose_per_day",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Vehicle Log Purpose (per day)",
    "mandatory_depends_on": "eval: doc.expense_calculation_per_day",
    "options": "Vehicle Log Purpose"
@@ -92,12 +96,14 @@
    "depends_on": "eval:doc.expense_calculation_based_on_field",
    "fieldname": "choose_fields",
    "fieldtype": "HTML",
+   "hidden": 1,
    "label": "Vehicle Expense Fields"
   },
   {
    "depends_on": "eval:doc.expense_calculation_based_on_field",
    "fieldname": "vl_fieldname",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "VL Field",
    "mandatory_depends_on": "eval:doc.expense_calculation_based_on_field",
    "read_only": 1
@@ -106,6 +112,7 @@
    "depends_on": "eval:doc.expense_calculation_based_on_field",
    "fieldname": "vl_doctype",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "VL Doctype",
    "mandatory_depends_on": "eval:doc.expense_calculation_based_on_field",
    "read_only": 1
@@ -114,6 +121,7 @@
    "default": "0",
    "fieldname": "expense_calculation_based_on_field",
    "fieldtype": "Check",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Expense calculation based on field"
   },
@@ -127,7 +135,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-02-07 18:37:58.917754",
+ "modified": "2023-04-13 11:33:54.553483",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Maintenance type",

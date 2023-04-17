@@ -300,11 +300,11 @@ def paver_item(warehouse, date, time, warehouse_colour):
 	colour_details=list(colour_details.values())
 	for item in colour_details:
 		if 'pigment' in frappe.scrub(item['colour']):
-			item['sqft']=round(item['stock']/3*100)
-			item['no_of_days']=round(item['stock']/3*100/3000)
+			item['sqft']=round(uom_conversion(item = item["colour"], from_qty=item['stock'], to_uom="SQF"))
+			item['no_of_days']=round(item['sqft']/3000)
 		elif 'dolamite' in frappe.scrub(item['colour']):
-			item['sqft']=round(item['stock']*49/75*100)
-			item['no_of_days']=round(item['stock']*49/75*100/3000)
+			item['sqft']=round(uom_conversion(item = item["colour"], from_qty=item['stock'], to_uom="SQF"))
+			item['no_of_days']=round(item["sqft"]/3000)
 	# slab type item
 	slab_item=frappe.db.get_all("Item", filters={'item_group':'Compound Walls', 'compound_wall_type':'Slab', 'disabled':0}, pluck='name')
 	
@@ -334,7 +334,7 @@ def paver_item(warehouse, date, time, warehouse_colour):
 	
 	normal_total_stock=size_details(items_stock, _type='Normal')
 	normal_total_stock+=size_details(items_stock_shot, _type='Shot Blast')
-	raw_material_stock=raw_material_stock_details()
+	raw_material_stock=raw_material_stock_details(date= date, time=time)
 	total_stock_shot= sorted(list(total_stock_shot.values()), key=lambda x: x.get("colour", ""))
 	total_stock=sorted(list(total_stock.values()), key=lambda x: x.get("colour", ""))
 	return items_stock, total_stock, items_stock_shot, total_stock_shot, list(sqf.values()), production,  sorted(list(post_item.values()), key=lambda x: x.get("post_length", "") or ""), colour_details, sorted(slab_details, key=lambda x: x.get("item", "") or ""), normal_total_stock, raw_material_stock
@@ -365,9 +365,9 @@ def size_details(items, _type):
 			total_size[size]['total_stock']+=row.get(field, 0)
 	return sorted(list(total_size.values()), key=lambda x: x.get("num_size", 0) or 0)
 
-def raw_material_stock_details():
+def raw_material_stock_details(date= "", time= ""):
 	dsm=frappe.get_single("DSM Defaults")
-	raw_material_stock = [get_stock_details_from_warehosue(item.warehouse, item.machine or "", item.type or "") for item in dsm.raw_material_details]
+	raw_material_stock = [get_stock_details_from_warehosue(item.warehouse, item.machine or "", item.type or "", date= date, time=time) for item in dsm.raw_material_details]
 
 	total_stock=[]
 	for item in raw_material_stock:
@@ -376,7 +376,7 @@ def raw_material_stock_details():
 	return total_stock
 	
 
-def get_stock_details_from_warehosue(warehouse, machine="", prefix=""):
+def get_stock_details_from_warehosue(warehouse, machine="", prefix="", date= "", time=""):
 	dsm=frappe.get_single("DSM Defaults")
 	item_filters=[]
 	for row in dsm.items:
@@ -384,15 +384,23 @@ def get_stock_details_from_warehosue(warehouse, machine="", prefix=""):
 	_prefix=prefix
 	if _prefix and _prefix[-1]!=" ":
 		_prefix+=" "
-	condition=""
-	if item_filters and len(item_filters)>1:
-		condition=f' and bin.item_code in {tuple(item_filters)}'
-	elif item_filters:
-		condition=f' and bin.item_code="{item_filters[0]}"'
-	condition=condition+" order by item asc"
+
+	filters={"disabled": 0, "item_group": 'Raw Material'}
 	
-	stock=frappe.db.sql(f"""select concat('{_prefix}', bin.item_code) as item, bin.actual_qty as qty, '{prefix}' as type, '{machine}' as machine from `tabBin` as bin
-		left outer join `tabItem` as item on item.item_code=bin.item_code where item.item_group='Raw Material'
-		and bin.warehouse='{warehouse}' and bin.actual_qty>0 {condition}; """, as_dict=True)
+	if item_filters:
+		filters["item_code"] = ["in", item_filters]
 	
+	items = frappe.get_all("Item", filters, order_by = "name asc")
+	stock = []
+	
+	for i in items:
+		qty = get_stock_qty(item_code=i.name,  warehouse=[warehouse], date= date, time=time)
+		if qty:
+			stock.append({
+				'item': f"{_prefix}{i.name}",
+				'qty': qty, 
+				'type': _prefix,
+				'machine': machine
+			})
+
 	return stock

@@ -13,11 +13,10 @@ def filter_empty(gl_entries, vehicle_summary):
     res = []
 
     for acc in gl_entries:
+        acc["references"] = sorted(acc.get("references") or [], key=lambda x: (x.get("account") or ""))
         if acc.get("vehicle") and vehicle_summary:
-
             for i in acc['references']:
                     i["account"] = acc.get("account_name")
-
             if acc.get("vehicle") not in VEHICLE_WISE:
                 _par_acc = acc.copy()
                 _par_acc["account_name"] = _par_acc["value"] = acc.get("vehicle")
@@ -63,7 +62,7 @@ def calculate_total(gl_entries):
     return res
 
 @frappe.whitelist()
-def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False) -> list:
+def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False, vehicle_purpose=[]) -> list:
     WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
 
     if not company:
@@ -84,6 +83,7 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
             parent=None
 
     prod_details = frappe.scrub(prod_details)
+
     root = get_account_balances(
                 accounts=get_children(
                             doctype=doctype, 
@@ -108,10 +108,36 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
             prod_details=prod_details
             )
     
+    res.append(get_vehicle_expense_based_on_km(
+        from_date=from_date,
+        to_date=to_date,
+        vehicle=vehicle,
+        machine=machine,
+        expense_type=expense_type,
+        prod_details=prod_details,
+        purpose=vehicle_purpose or []
+        ))
+    driver_operator_salary = get_vehicle_driver_operator_salary(
+        from_date=from_date,
+        to_date=to_date,
+        vehicle=vehicle,
+        machine=machine,
+        expense_type=expense_type,
+        prod_details=prod_details,
+        purpose=(vehicle_purpose or [])+["Goods Supply", "Raw Material"],
+        driver_employee=None,
+        operator_employee=None,
+    )
+    res.extend(driver_operator_salary)
+
+
     res = filter_empty(res, vehicle_summary)
 
     if filter_unwanted_groups:
         res = flatten_hierarchy(res)
+    
+    for veh in VEHICLE_WISE:
+        VEHICLE_WISE[veh]["references"] = sorted(VEHICLE_WISE[veh].get("references") or [], key=lambda x: x.get("account") or "")
 
     if VEHICLE_WISE:
         vehicle_accs = {
@@ -286,7 +312,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                     "balance": balance,
                     "references": references,
                     "account_name": f"""{account["account_name"]}""",
-                    "vehicle": f"""{f'''{veh} ''' if veh else ""}{f'''{ifc} ''' if ifc else ""}"""
+                    "vehicle": f"""{f'''{veh} ''' if veh else ""}{f'''{ifc} ''' if ifc else ""}""".strip()
                 })
             
         account['balance']=0
@@ -406,3 +432,282 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[])
     den_total = sum([(machine_wise_prod_info[gl_machine_key][i] or 0) for i in machine_wise_prod_info[gl_machine_key] if {'paver': paver, 'cw': cw, "lego": lego, "fp": fp}.get(i) ])
 
     return (num_total or 0) / (den_total or 1)
+
+def get_vehicle_expense_based_on_km(from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = []):
+    conditions = ""
+    
+    if from_date:
+        conditions += f""" and date(vl.date)>='{from_date}' """
+    if to_date:
+        conditions += f""" and date(vl.date)<='{to_date}' """
+    if vehicle:
+        conditions += f""" and vl.license_plate='{vehicle}' """
+    if expense_type:
+        conditions += f""" and vl.expense_type='{expense_type}' """
+    if prod_details:
+        conditions += f""" and vl.{frappe.scrub(prod_details)}=1 """
+    
+    veh_maint = frappe.db.sql(f"""
+        select
+            vl.license_plate as vehicle,
+            md.maintenance
+        from `tabVehicle Log` vl
+        inner join `tabMaintenance Details` md on md.parenttype = "Vehicle" and md.parent = vl.license_plate
+        inner join `tabVehicle Log Purpose` vlp on vlp.parenttype = "Maintenance type" and vlp.parent = md.maintenance and vlp.parentfield = "vehicle_log_purpose_per_km"
+        where 
+            vl.docstatus = 1 and
+            md.expense_calculation_per_km = 1 and
+            {f'''vl.select_purpose in {f"('{purpose[0]}')" if len(purpose)==1 else tuple(purpose)} and ''' if purpose else ""}
+            vl.select_purpose = vlp.select_purpose 
+            {conditions}
+        group by vl.license_plate, md.maintenance
+    """, as_dict=True)
+    
+    if machine and sorted(machine) != sorted(WORKSTATIONS):
+        conditions += f""" and ((
+                select 
+                    count(ts_wrk.workstation) 
+                from `tabTS Workstation` ts_wrk 
+                WHERE 
+                    ts_wrk.parenttype = "Vehicle Log" and 
+                    ts_wrk.parent = vl.name and 
+                    ts_wrk.workstation in {f"('{machine[0]}')" if len(machine)==1 else tuple(machine)}
+            )
+             OR
+            IFNULL((
+                SELECT GROUP_CONCAT(DISTINCT ts_wrk.workstation SEPARATOR ', ') 
+                FROM `tabTS Workstation` ts_wrk 
+                WHERE 
+                    ts_wrk.parenttype = "Vehicle Log" and 
+                    ts_wrk.parent = vl.name
+                ORDER BY ts_wrk.workstation
+            ), "") in ("", "{", ".join(sorted(WORKSTATIONS))}")
+            )
+        """
+
+    vehicle_accs=[]
+    for veh in veh_maint:
+        balance, references = get_vehicle_expense(
+            from_date=from_date,
+            to_date=to_date,
+            vehicle=veh.vehicle,
+            machine=machine,
+            expense_type=expense_type,
+            prod_details=prod_details,
+            purpose=purpose or [],
+            maintenance=veh.maintenance,
+            conditions=conditions
+            )
+
+        vehicle_accs.append({
+            "expandable": 0,
+            "value": f"{veh.vehicle} {veh.maintenance}",
+            "account_name": veh.maintenance,
+            "vehicle": veh.vehicle,
+            "balance": balance,
+            "references": references,
+            "child_nodes": []
+        })
+
+    return {
+            "expandable": 1,
+            "value": f"VEHICLE",
+            "account_name": "VEHICLE",
+            "balance": 0,
+            "references": [],
+            "child_nodes": vehicle_accs,
+        }
+
+def get_vehicle_expense(from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = [], maintenance = "", conditions = ""):
+    wrk_fields = ",".join([f""" CASE WHEN (
+        SELECT COUNT(ts_wrk.workstation)
+        FROM `tabTS Workstation` ts_wrk 
+        WHERE ts_wrk.parenttype = "Vehicle Log" and ts_wrk.parent = vl.name and ts_wrk.workstation = '{wrk}'
+    ) THEN 1 ELSE 0 END as {frappe.scrub(wrk)}""" for wrk in WORKSTATIONS])
+
+    if vehicle:
+        conditions += f""" and vl.license_plate='{vehicle}' """
+    if maintenance:
+        conditions += f""" and md.maintenance = "{maintenance}" """
+    
+    query = f"""
+        select 
+            vl.license_plate as vehicle,
+            md.maintenance as account,
+            vl.today_odometer_value as distance,
+            vl.today_odometer_value * ifnull(md.expense, 0) as debit,
+            vl.paver,
+            vl.compound_wall,
+            vl.fencing_post,
+            vl.lego_block,
+            "Vehicle Log" as voucher_type,
+            vl.name as voucher_no
+            {f", {wrk_fields}" if wrk_fields else ""}
+        from `tabVehicle Log` vl
+        inner join `tabMaintenance Details` md on md.parenttype = "Vehicle" and md.parent = vl.license_plate
+        inner join `tabVehicle Log Purpose` vlp on vlp.parenttype = "Maintenance type" and vlp.parent = md.maintenance and vlp.parentfield = "vehicle_log_purpose_per_km"
+        where 
+            vl.docstatus = 1 and
+            md.expense_calculation_per_km = 1 and
+            {f'''vl.select_purpose in {f"('{purpose[0]}')" if len(purpose)==1 else tuple(purpose)} and ''' if purpose else ""}
+            vl.select_purpose = vlp.select_purpose 
+            {conditions}
+    """
+    
+    vl_entries = frappe.db.sql(query, as_dict=True)
+
+    res = calculate_exp_from_gl_entries(
+        gl_entries=vl_entries,
+        from_date=from_date,
+        to_date=to_date,
+        expense_type=expense_type,
+        prod_details=prod_details,
+        machines=machine
+    )
+    return res
+
+def get_vehicle_driver_operator_salary(from_date, to_date, driver_employee=None, operator_employee=None, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = []):
+    conditions = ""
+
+    if driver_employee:
+        conditions += f""" and vl.employee="{driver_employee}" """
+    if operator_employee:
+        conditions += f""" and vl.operator="{operator_employee}" """
+    if from_date:
+        conditions += f""" and vl.date >= "{from_date}" """
+    if to_date:
+        conditions += f""" and vl.date <= "{to_date}" """
+    if vehicle:
+        conditions += f""" and vl.license_plate = "{vehicle}" """
+    if expense_type:
+        conditions += f""" and vl.expense_type = "{expense_type}" """
+    if prod_details:
+        conditions += f""" and vl.{prod_details} = 1 """
+    if purpose:
+        conditions += f""" and vl.select_purpose in {f"('{purpose[0]}')" if len(purpose)==1 else tuple(purpose)} """
+    if machine and sorted(machine) != sorted(WORKSTATIONS):
+        conditions += f""" and 
+            ((
+                select 
+                    count(ts_wrk.workstation) 
+                from `tabTS Workstation` ts_wrk 
+                WHERE 
+                    ts_wrk.parenttype = "Vehicle Log" and 
+                    ts_wrk.parent = vl.name and 
+                    ts_wrk.workstation in {f"('{machine[0]}')" if len(machine)==1 else tuple(machine)}
+            )
+             OR
+            IFNULL((
+                SELECT GROUP_CONCAT(DISTINCT ts_wrk.workstation SEPARATOR ', ') 
+                FROM `tabTS Workstation` ts_wrk 
+                WHERE 
+                    ts_wrk.parenttype = "Vehicle Log" and 
+                    ts_wrk.parent = vl.name
+                ORDER BY ts_wrk.workstation
+                ), "") in ("", "{", ".join(sorted(WORKSTATIONS))}")
+            )
+        """
+        
+    wrk_fields = ",".join([f""" CASE WHEN (
+        SELECT COUNT(ts_wrk.workstation)
+        FROM `tabTS Workstation` ts_wrk 
+        WHERE ts_wrk.parenttype = "Vehicle Log" and ts_wrk.parent = vl.name and ts_wrk.workstation = '{wrk}'
+    ) THEN 1 ELSE 0 END as {frappe.scrub(wrk)}""" for wrk in WORKSTATIONS])
+
+    veh_details = frappe.db.sql(f"""
+        select
+            DISTINCT vl.license_plate as vehicle
+        from `tabVehicle Log` vl
+        where 
+            vl.docstatus = 1 
+            {conditions}
+    """, as_dict=True)
+
+    res = []
+    for employee_field in ["employee"]: #["employee", "operator"]:
+        vehicle_accs = []
+        for veh in veh_details:
+            balance, references = get_vehicle_salary(
+                from_date=from_date,
+                to_date=to_date,
+                vehicle=veh.vehicle,
+                machine=machine,
+                expense_type=expense_type,
+                prod_details=prod_details,
+                wrk_fields = wrk_fields,
+                conditions = conditions,
+                employee_field = employee_field,
+                purpose=purpose,
+            )
+            vehicle_accs.append({
+                "expandable": 0,
+                "value": f"""{veh.vehicle} {"DRIVER" if employee_field == "employee" else "OPERATOR" if employee_field == "operator" else ""} SALARY""",
+                "account_name": f"""{"DRIVER" if employee_field == "employee" else "OPERATOR" if employee_field == "operator" else ""} SALARY""",
+                "vehicle": veh.vehicle,
+                "balance": balance,
+                "references": references,
+                "child_nodes": []
+            })
+
+        res.append({
+            "expandable": 1,
+            "value": f"""VEHICLE {"DRIVER" if employee_field == "employee" else "OPERATOR" if employee_field == "operator" else ""} SALARY""",
+            "account_name": f"""VEHICLE {"DRIVER" if employee_field == "employee" else "OPERATOR" if employee_field == "operator" else ""} SALARY""",
+            "balance": 0,
+            "references": [],
+            "child_nodes": vehicle_accs,
+        })
+    
+    return res
+
+def get_vehicle_salary(from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", wrk_fields = "", conditions = "", employee_field = "employee", purpose=""):
+    if vehicle:
+        conditions += f""" and vl.license_plate = "{vehicle}" """
+    
+    query = f"""
+        SELECT
+            vl.license_plate as vehicle,
+            "{"Driver" if employee_field == "employee" else "Operator" if employee_field == "operator" else ""} Salary" as account,
+            vl.{employee_field} as employee,
+            vl.today_odometer_value as distance,
+            (
+                vl.today_odometer_value/(
+                    select sum(_vl.today_odometer_value)
+                    from `tabVehicle Log` _vl
+                    where 
+                        _vl.docstatus = 1 and
+                        _vl.{employee_field} = vl.{employee_field} and
+                        _vl.date = vl.date and
+                        _vl.select_purpose in ("Raw Material", "Goods Supply", "Material Shifting")
+                )*ifnull((
+                    select drv.salary_per_day
+                    from `tabDriver` drv
+                    where drv.employee = vl.{employee_field}
+                    limit 1
+                ), 0)
+            ) as debit,
+            "Vehicle Log" as voucher_type,
+            vl.name as voucher_no,
+            vl.paver,
+            vl.compound_wall,
+            vl.fencing_post,
+            vl.lego_block
+            {f", {wrk_fields}" if wrk_fields else ""}
+        FROM `tabVehicle Log` vl
+        WHERE
+            vl.docstatus = 1
+            {conditions}
+        
+    """   
+    
+    vl_entries = frappe.db.sql(query, as_dict=True)
+    res = calculate_exp_from_gl_entries(
+        gl_entries=vl_entries,
+        from_date=from_date,
+        to_date=to_date,
+        expense_type=expense_type,
+        prod_details=prod_details,
+        machines=machine
+    )
+
+    return res

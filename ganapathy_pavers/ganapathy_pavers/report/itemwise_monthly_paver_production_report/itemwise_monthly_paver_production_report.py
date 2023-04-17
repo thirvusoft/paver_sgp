@@ -2,13 +2,10 @@
 # For license information, please see license.txt
 
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
-from ganapathy_pavers.ganapathy_pavers.report.monthly_paver_production_report.monthly_paver_production_report import get_expense_data
+from ganapathy_pavers.custom.py.expense import  total_expense
 from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
 import frappe 
 from frappe import _
-
-
-
 
 def execute(filters=None):
     columns, data = [], [{}]
@@ -114,7 +111,16 @@ def get_data(filters):
         # data['pieces']=0
     data=list(data.values())
     prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=(filters.get("machine", []) or []))
-    expense_cost=get_sqft_expense(filters)
+    if filters.get("new_method"):
+        expense_cost=total_expense(
+            from_date=filters.get('from_date'), 
+            prod_details="Paver",
+            to_date=filters.get('to_date'), 
+            expense_type="Manufacturing", 
+            machine=filters.get("machine")
+        )
+    else:
+        expense_cost=get_sqft_expense(filters)
     for row in data:
         row["prod_cost"] = (row.get("prod_cost", 0) or 0) + (row.get("strapping", 0) or 0) + (row.get("shot_blasting", 0) or 0)
         row["strapping_cost"]=(row["strapping"] or 0)
