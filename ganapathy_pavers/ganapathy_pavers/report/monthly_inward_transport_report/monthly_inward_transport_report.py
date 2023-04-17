@@ -1,9 +1,11 @@
 # Copyright (c) 2022, Thirvusoft and contributors
 # For license information, please see license.txt
 
+import json
 import frappe
 from frappe import _
 from ganapathy_pavers import uom_conversion
+from ganapathy_pavers.custom.py.expense import  expense_tree
 
 def execute(filters=None):
 	columns = get_columns()
@@ -28,10 +30,10 @@ def execute(filters=None):
 		except:
 			pass
 
-	invoice_grand_total = frappe.get_list("Purchase Invoice",{"name":["in",pi_doc], 'purpose': ["!=", "Service"]},['sum(ts_total_amount) as grand_total'],pluck="grand_total")
+	invoice_grand_total = sum(frappe.get_list("Purchase Invoice",{"name":["in",pi_doc], 'purpose': ["!=", "Service"]}, pluck='ts_total_amount'))
 
 	if not invoice_grand_total:
-		invoice_grand_total = [0]
+		invoice_grand_total = 0
 	
 	if not doc:
 		return columns, data
@@ -89,7 +91,7 @@ def execute(filters=None):
 
 	data.append({
 		"item": "<b>Total Amount</b>",
-		"1": f"<b>{invoice_grand_total[0] }</b>",
+		"1": f"<b>{invoice_grand_total or 0 }</b>",
 	})
 
 	data.append({})
@@ -118,7 +120,7 @@ def execute(filters=None):
 				"1": round(j['expense']/total_unit,3),
 			})
 	expense_details = get_expense_data(total_unit or 1, filters) or []
-	total_amount=sum([i['qty'] for i in expense_details])
+	total_amount=sum([i['qty'] for i in expense_details]) or 0
 	total_per_unit=sum([i['1'] for i in expense_details])
 	data += expense_details
 
@@ -132,7 +134,7 @@ def execute(filters=None):
 
 	data.append({
 		"item": "<b>Total Expense</b>",
-		"qty": f"<b>{(invoice_grand_total[0])+total_amount}</b>",
+		"qty": f"<b>{(invoice_grand_total or 0)+(total_amount or 0)}</b>",
 	})
 
 	return columns, data
@@ -141,7 +143,15 @@ def get_expense_data(total_purchase_unit, filters):
 	exp=frappe.get_single("Expense Accounts")
 	if not exp.vehicle_expense:
 		return []
-	exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.vehicle_expense, vehicle=filters.get("vehicle_no"))
+	if filters.get("new_method"):
+		exp_tree=expense_tree(
+							from_date=filters.get('from_date'),
+							to_date=filters.get('to_date'),
+							expense_type="Vehicle",
+							vehicle=filters.get("vehicle_no")
+							)
+	else:
+		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.vehicle_expense, vehicle=filters.get("vehicle_no"))
 	res=[]
 	for i in exp_tree:
 		if i.get("expandable"):
@@ -154,6 +164,7 @@ def get_expense_data(total_purchase_unit, filters):
 					"item": i['value'],
 					"qty": i["balance"],
 					"1": (i["balance"]/total_purchase_unit) or 0,
+					"reference_data": json.dumps(i.get("references")) if i.get("references") else ""
 				})	
 	return res
 
@@ -165,6 +176,7 @@ def get_expense_from_child(total_purchase_unit, account):
 				"item": i['value'],
 				"qty": i["balance"],
 				"1": (i["balance"]/total_purchase_unit) or 0,
+				"reference_data": json.dumps(i.get("references")) if i.get("references") else ""
 			})
 		if i['child_nodes']:
 			res1=(get_expense_from_child(total_purchase_unit, i['child_nodes']))
@@ -204,5 +216,11 @@ def get_columns():
 			"fieldtype": "Data",
 			"width": 150
 		},
+		{
+            "label": _("Reference Data"),
+            "fieldtype": "Data",
+            "fieldname": "reference_data",
+            "hidden": 1
+        },
 	]
 	return columns
