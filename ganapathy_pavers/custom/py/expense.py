@@ -140,6 +140,22 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
     )
     res.extend(driver_operator_salary)
 
+    purchase_expense = get_purchase_expense(
+        company=company, 
+        from_date=from_date, 
+        to_date=to_date, 
+        vehicle=vehicle, 
+        machine=machine, 
+        expense_type=expense_type, 
+        prod_details=prod_details,
+        all_expenses=all_expenses
+    )
+    res.append({
+        "value": "OTHER EXP",
+        "account_name": "OTHER EXP",
+        "expandable": 1,
+        "child_nodes": purchase_expense,
+    })
 
     res = filter_empty(res, vehicle_summary)
 
@@ -198,6 +214,7 @@ def get_account_balances(accounts, company, from_date, to_date, vehicle=None, ma
         account['account_name'] = frappe.db.get_value("Account", account["value"], "account_name")
         account = get_account_balance_on(
                                 account=account, 
+                                account_condition=f""" and gl.account="{account['value']}" """,
                                 company=company, 
                                 from_date=from_date, 
                                 to_date=to_date, 
@@ -210,7 +227,7 @@ def get_account_balances(accounts, company, from_date, to_date, vehicle=None, ma
         
     return accounts
 
-def get_account_balance_on(account, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
+def get_account_balance_on(account, account_condition, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
     if(account.get('expandable')):
         account['balance'] = 0
         account["references"] = []
@@ -265,7 +282,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                         date(gl.posting_date)<='{to_date}')
                     END and
                 gl.is_cancelled=0
-                and gl.account="{account['value']}"
+                {account_condition}
                 and ifnull(gl.expense_type, "") != ""
                 {conditions}
                 ORDER BY gl.vehicle, gl.internal_fuel_consumption
@@ -300,7 +317,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                                 date(gl.posting_date)<='{to_date}')
                             END and
                         gl.is_cancelled=0
-                        and gl.account="{account['value']}"
+                        {account_condition}
                         and ifnull(gl.expense_type, "") != ""
                         {conditions}
                         and IFNULL(gl.vehicle, "")="{veh or ""}"
@@ -361,11 +378,11 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                     OR ('{from_date}' BETWEEN gl.from_date AND gl.to_date OR '{to_date}' BETWEEN gl.from_date AND gl.to_date)
                 )
                 ELSE (date(gl.posting_date)>='{from_date}' and
-                     date(gl.posting_date)<='{to_date}')
+                    date(gl.posting_date)<='{to_date}')
                 END
             and gl.is_cancelled=0
             and ifnull(gl.expense_type, "") != ""
-            and gl.account="{account['value']}"
+            {account_condition}
             {conditions}
     """
 
@@ -443,11 +460,20 @@ def calculate_exp_from_gl_entries(account, gl_entries, from_date, to_date, expen
             prod_sqf=1
         amount += (rate) * prod_sqf
         
-        references.append({
-            'doctype': gl.voucher_type,
-            'docname': gl.voucher_no,
-            'amount': (rate) * prod_sqf
-        })
+        _add = True
+        for ref in references:
+            if ref.get("doctype") == gl.voucher_type and ref.get("docname") == gl.voucher_no:
+                if not ref.get("amount"):
+                    ref["amount"] = 0
+                ref["amount"] += (rate) * prod_sqf
+                _add = False
+                break
+        if _add:
+            references.append({
+                'doctype': gl.voucher_type,
+                'docname': gl.voucher_no,
+                'amount': (rate) * prod_sqf
+            })
 
     account['balance'] = amount or 0
     account["references"] = references or []
@@ -783,3 +809,49 @@ def get_vehicle_salary(account, from_date, to_date, vehicle = None, machine = []
     )
 
     return account
+
+def expense_map(expense):
+    return {
+        "value": expense,
+        "balance": 0,
+        "account_name": expense,
+        "expandable": 0,
+        "child_nodes": [],
+        "parent": "OTHER EXP"
+    }
+
+def get_purchase_expense(company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
+    expense_names = list(set(frappe.get_all("GL Entry", filters={"expense_name": ["is", "set"], "is_cancelled": 0}, pluck="expense_name")))
+    
+    accounts = list(map(expense_map, expense_names))
+    res = get_purchase_account_balances(
+                accounts=accounts,
+                company=company, 
+                from_date=from_date, 
+                to_date=to_date, 
+                vehicle=vehicle, 
+                machine=machine, 
+                expense_type=expense_type, 
+                prod_details=prod_details,
+                all_expenses=all_expenses
+                )
+    frappe.errprint(res)
+    return res
+
+def get_purchase_account_balances(accounts, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
+    for account in accounts:
+        account['account_name'] = account["value"]
+        account = get_account_balance_on(
+                                account=account, 
+                                account_condition=f""" and gl.expense_name="{account['value']}" """,
+                                company=company, 
+                                from_date=from_date, 
+                                to_date=to_date, 
+                                vehicle=vehicle, 
+                                machine=machine, 
+                                expense_type=expense_type, 
+                                prod_details=prod_details,
+                                all_expenses=all_expenses
+                                )
+        
+    return accounts
