@@ -67,7 +67,7 @@ def calculate_total(gl_entries):
     return res
 
 @frappe.whitelist()
-def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False, vehicle_purpose=[]) -> list:
+def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False, vehicle_purpose=[], all_expenses=False) -> list:
     WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
 
     if not company:
@@ -100,7 +100,9 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
                 vehicle=vehicle, 
                 machine=machine, 
                 expense_type=expense_type, 
-                prod_details=prod_details)
+                prod_details=prod_details,
+                all_expenses=all_expenses
+                )
     
     res = get_tree(
             root=root, 
@@ -110,7 +112,8 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
             vehicle=vehicle, 
             machine=machine, 
             expense_type=expense_type, 
-            prod_details=prod_details
+            prod_details=prod_details,
+            all_expenses=all_expenses
             )
     
     res.append(get_vehicle_expense_based_on_km(
@@ -120,7 +123,8 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
         machine=machine,
         expense_type=expense_type,
         prod_details=prod_details,
-        purpose=vehicle_purpose or []
+        purpose=vehicle_purpose or [],
+        all_expenses=all_expenses
         ))
     driver_operator_salary = get_vehicle_driver_operator_salary(
         from_date=from_date,
@@ -132,6 +136,7 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
         purpose=(vehicle_purpose or [])+["Goods Supply", "Raw Material"],
         driver_employee=None,
         operator_employee=None,
+        all_expenses=all_expenses
     )
     res.extend(driver_operator_salary)
 
@@ -158,7 +163,7 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
     WORKSTATIONS.clear()
     return res
 
-def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = ""):
+def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
         for i in root:
             child = get_tree(
                         root=get_children(
@@ -172,7 +177,9 @@ def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expens
                         vehicle=vehicle, 
                         machine=machine, 
                         expense_type=expense_type, 
-                        prod_details=prod_details)
+                        prod_details=prod_details,
+                        all_expenses=all_expenses
+                        )
             i['child_nodes']=get_account_balances(
                                 accounts=child, 
                                 company=company, 
@@ -181,11 +188,12 @@ def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expens
                                 vehicle=vehicle, 
                                 machine=machine, 
                                 expense_type=expense_type, 
-                                prod_details=prod_details
+                                prod_details=prod_details,
+                                all_expenses=all_expenses
                                 )
         return root
 
-def get_account_balances(accounts, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = ""):
+def get_account_balances(accounts, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
     for account in accounts:
         account['account_name'] = frappe.db.get_value("Account", account["value"], "account_name")
         account = get_account_balance_on(
@@ -196,12 +204,13 @@ def get_account_balances(accounts, company, from_date, to_date, vehicle=None, ma
                                 vehicle=vehicle, 
                                 machine=machine, 
                                 expense_type=expense_type, 
-                                prod_details=prod_details
+                                prod_details=prod_details,
+                                all_expenses=all_expenses
                                 )
         
     return accounts
 
-def get_account_balance_on(account, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = ""):
+def get_account_balance_on(account, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
     if(account.get('expandable')):
         account['balance'] = 0
         account["references"] = []
@@ -237,7 +246,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
         """
     gl_vehicles = []
 
-    if expense_type == "Manufacturing":
+    if expense_type == "Manufacturing" or all_expenses:
         gl_vehicles = frappe.db.sql(f"""
             select
                 DISTINCT 
@@ -257,6 +266,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                     END and
                 gl.is_cancelled=0
                 and gl.account="{account['value']}"
+                and ifnull(gl.expense_type, "") != ""
                 {conditions}
                 ORDER BY gl.vehicle, gl.internal_fuel_consumption
         """, as_dict=True)
@@ -291,6 +301,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                             END and
                         gl.is_cancelled=0
                         and gl.account="{account['value']}"
+                        and ifnull(gl.expense_type, "") != ""
                         {conditions}
                         and IFNULL(gl.vehicle, "")="{veh or ""}"
                         and IFNULL(gl.internal_fuel_consumption, "")="{ifc or ""}"
@@ -299,26 +310,28 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
 
             gl_entries=frappe.db.sql(query, as_dict=True)
             
-            balance, references = calculate_exp_from_gl_entries(
-                gl_entries=gl_entries,
-                from_date=from_date,
-                to_date=to_date,
-                expense_type=expense_type,
-                prod_details=prod_details,
-                machines=machine
-                )
-            gl_veh_accounts.append({
+            _account = {
                     "value": f"""{f'''{veh} ''' if veh else ""}{f'''{ifc} ''' if ifc else ""}{account["value"]}""",
                     "expandable": 0,
                     "root_type": account["root_type"],
                     "account_currency": account["account_currency"],
                     "parent": account['value'],
                     "child_nodes": [],
-                    "balance": balance,
-                    "references": references,
                     "account_name": f"""{account["account_name"]}""",
                     "vehicle": f"""{f'''{veh} ''' if veh else ""}{f'''{ifc} ''' if ifc else ""}""".strip()
-                })
+                }
+            
+            _account = calculate_exp_from_gl_entries(
+                account=_account,
+                gl_entries=gl_entries,
+                from_date=from_date,
+                to_date=to_date,
+                expense_type=expense_type,
+                prod_details=prod_details,
+                machines=machine,
+                all_expenses=all_expenses
+                )
+            gl_veh_accounts.append(_account)
             
         account['balance']=0
         account["expandable"]=1
@@ -349,39 +362,82 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
                 )
                 ELSE (date(gl.posting_date)>='{from_date}' and
                      date(gl.posting_date)<='{to_date}')
-                END and
-            gl.is_cancelled=0
+                END
+            and gl.is_cancelled=0
+            and ifnull(gl.expense_type, "") != ""
             and gl.account="{account['value']}"
             {conditions}
     """
 
     gl_entries=frappe.db.sql(query, as_dict=True)
 
-    balance, references = calculate_exp_from_gl_entries(
+    account = calculate_exp_from_gl_entries(
+        account=account,
         gl_entries=gl_entries,
         from_date=from_date,
         to_date=to_date,
         expense_type=expense_type,
         prod_details=prod_details,
-        machines=machine
+        machines=machine,
+        all_expenses=all_expenses
         )
-    account['balance'] = balance or 0
-    account["references"] = references or []
     account["vehicle"] = ""
     return account
 
-def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=None, prod_details="", machines=[]):
+def calculate_exp_from_gl_entries(account, gl_entries, from_date, to_date, expense_type=None, prod_details="", machines=[], all_expenses=False):
+    if all_expenses and expense_type!="Vehicle":
+        production_details = {"paver": WORKSTATIONS, "compound_wall": [], "fencing_post": [], "lego_block": []}
+        for prod in production_details:
+            amount = 0
+            if not production_details.get(prod):
+                for gl in gl_entries:
+                    rate = gl.get("debit", 0) or 0
+                    if expense_type=="Manufacturing" and prod:
+                        prod_sqf = get_gl_production_rate(
+                                    gl=gl,
+                                    from_date=from_date,
+                                    to_date=to_date,
+                                    prod_details=prod,
+                                    all_expenses=all_expenses
+                                )
+                    else:
+                        prod_sqf=1
+                    amount += (rate) * prod_sqf
+                    
+                account[prod] = amount or 0
+            
+            else:
+                for _machine in production_details.get(prod):
+                    amount = 0
+                    for gl in gl_entries:
+                        rate = gl.get("debit", 0) or 0
+                        if expense_type=="Manufacturing" and prod:
+                            prod_sqf = get_gl_production_rate(
+                                        gl=gl,
+                                        from_date=from_date,
+                                        to_date=to_date,
+                                        prod_details=prod,
+                                        machines=[_machine],
+                                        all_expenses=all_expenses
+                                    )
+                        else:
+                            prod_sqf=1
+                        amount += (rate) * prod_sqf
+                        
+                    account[frappe.scrub(_machine)] = amount or 0
+
     amount = 0
     references = []
     for gl in gl_entries:
         rate = gl.get("debit", 0) or 0
-        if expense_type=="Manufacturing":
+        if expense_type=="Manufacturing" and prod_details:
             prod_sqf = get_gl_production_rate(
                         gl=gl,
                         from_date=from_date,
                         to_date=to_date,
                         prod_details=prod_details,
-                        machines=machines
+                        machines=machines,
+                        all_expenses=all_expenses
                     )
         else:
             prod_sqf=1
@@ -392,9 +448,12 @@ def calculate_exp_from_gl_entries(gl_entries, from_date, to_date, expense_type=N
             'docname': gl.voucher_no,
             'amount': (rate) * prod_sqf
         })
-    return amount, references or []
 
-def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[]):
+    account['balance'] = amount or 0
+    account["references"] = references or []
+    return account
+
+def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[], all_expenses=False):
     if not machines:
         machines=WORKSTATIONS
     paver, cw, fp, lego = 0, 0, 0, 0
@@ -418,9 +477,11 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[])
             gl_machines.append(wrk)
 
     gl_machines.sort()
-
-    
     machines=sorted([i for i in machines if ((i in gl_machines) or not gl_machines)])
+
+    if all_expenses and ((not gl.get(prod_details) and (sum([gl.get(i) for i in ["paver", "compound_wall", "fencing_post", "lego_block"]]))) or (prod_details=="paver" and (not machines and gl_machines))):
+        return 0
+    
     if gl_machines==sorted(WORKSTATIONS):  
         # If all machines, then make it [], to get all machines prod_details
         gl_machines=[]
@@ -435,10 +496,10 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[])
 
     num_total = machine_wise_prod_info[machine_key].get({"paver": 'paver', "compound_wall": 'cw', "lego_block": "lego", "fencing_post": "fp"}.get(prod_details)) or 0
     den_total = sum([(machine_wise_prod_info[gl_machine_key][i] or 0) for i in machine_wise_prod_info[gl_machine_key] if {'paver': paver, 'cw': cw, "lego": lego, "fp": fp}.get(i) ])
-
+    
     return (num_total or 0) / (den_total or 1)
 
-def get_vehicle_expense_based_on_km(from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = []):
+def get_vehicle_expense_based_on_km(from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = [], all_expenses=False):
     conditions = ""
     
     if from_date:
@@ -492,7 +553,16 @@ def get_vehicle_expense_based_on_km(from_date, to_date, vehicle = None, machine 
 
     vehicle_accs=[]
     for veh in veh_maint:
-        balance, references = get_vehicle_expense(
+        _account={
+            "expandable": 0,
+            "value": f"{veh.vehicle} {veh.maintenance}",
+            "account_name": veh.maintenance,
+            "vehicle": veh.vehicle,
+            "child_nodes": []
+        }
+
+        _account = get_vehicle_expense(
+            account=_account,
             from_date=from_date,
             to_date=to_date,
             vehicle=veh.vehicle,
@@ -501,18 +571,11 @@ def get_vehicle_expense_based_on_km(from_date, to_date, vehicle = None, machine 
             prod_details=prod_details,
             purpose=purpose or [],
             maintenance=veh.maintenance,
-            conditions=conditions
+            conditions=conditions,
+            all_expenses=all_expenses
             )
 
-        vehicle_accs.append({
-            "expandable": 0,
-            "value": f"{veh.vehicle} {veh.maintenance}",
-            "account_name": veh.maintenance,
-            "vehicle": veh.vehicle,
-            "balance": balance,
-            "references": references,
-            "child_nodes": []
-        })
+        vehicle_accs.append(_account)
 
     return {
             "expandable": 1,
@@ -523,7 +586,7 @@ def get_vehicle_expense_based_on_km(from_date, to_date, vehicle = None, machine 
             "child_nodes": vehicle_accs,
         }
 
-def get_vehicle_expense(from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = [], maintenance = "", conditions = ""):
+def get_vehicle_expense(account, from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = [], maintenance = "", conditions = "", all_expenses = False):
     wrk_fields = ",".join([f""" CASE WHEN (
         SELECT COUNT(ts_wrk.workstation)
         FROM `tabTS Workstation` ts_wrk 
@@ -561,17 +624,19 @@ def get_vehicle_expense(from_date, to_date, vehicle = None, machine = [], expens
     
     vl_entries = frappe.db.sql(query, as_dict=True)
 
-    res = calculate_exp_from_gl_entries(
+    account = calculate_exp_from_gl_entries(
+        account=account,
         gl_entries=vl_entries,
         from_date=from_date,
         to_date=to_date,
         expense_type=expense_type,
         prod_details=prod_details,
-        machines=machine
+        machines=machine,
+        all_expenses=all_expenses
     )
-    return res
+    return account
 
-def get_vehicle_driver_operator_salary(from_date, to_date, driver_employee=None, operator_employee=None, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = []):
+def get_vehicle_driver_operator_salary(from_date, to_date, driver_employee=None, operator_employee=None, vehicle = None, machine = [], expense_type = None, prod_details = "", purpose = [], all_expenses = False):
     conditions = ""
 
     if driver_employee:
@@ -632,7 +697,15 @@ def get_vehicle_driver_operator_salary(from_date, to_date, driver_employee=None,
     for employee_field in ["employee"]: #["employee", "operator"]:
         vehicle_accs = []
         for veh in veh_details:
-            balance, references = get_vehicle_salary(
+            account = {
+                "expandable": 0,
+                "value": f"""{veh.vehicle} {"DRIVER" if employee_field == "employee" else "OPERATOR" if employee_field == "operator" else ""} SALARY""",
+                "account_name": f"""{"DRIVER" if employee_field == "employee" else "OPERATOR" if employee_field == "operator" else ""} SALARY""",
+                "vehicle": veh.vehicle,
+                "child_nodes": []
+            }
+            account = get_vehicle_salary(
+                account = account,
                 from_date=from_date,
                 to_date=to_date,
                 vehicle=veh.vehicle,
@@ -642,17 +715,9 @@ def get_vehicle_driver_operator_salary(from_date, to_date, driver_employee=None,
                 wrk_fields = wrk_fields,
                 conditions = conditions,
                 employee_field = employee_field,
-                purpose=purpose,
+                all_expenses=all_expenses
             )
-            vehicle_accs.append({
-                "expandable": 0,
-                "value": f"""{veh.vehicle} {"DRIVER" if employee_field == "employee" else "OPERATOR" if employee_field == "operator" else ""} SALARY""",
-                "account_name": f"""{"DRIVER" if employee_field == "employee" else "OPERATOR" if employee_field == "operator" else ""} SALARY""",
-                "vehicle": veh.vehicle,
-                "balance": balance,
-                "references": references,
-                "child_nodes": []
-            })
+            vehicle_accs.append(account)
 
         res.append({
             "expandable": 1,
@@ -665,7 +730,7 @@ def get_vehicle_driver_operator_salary(from_date, to_date, driver_employee=None,
     
     return res
 
-def get_vehicle_salary(from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", wrk_fields = "", conditions = "", employee_field = "employee", purpose=""):
+def get_vehicle_salary(account, from_date, to_date, vehicle = None, machine = [], expense_type = None, prod_details = "", wrk_fields = "", conditions = "", employee_field = "employee", all_expenses=False):
     if vehicle:
         conditions += f""" and vl.license_plate = "{vehicle}" """
     
@@ -706,13 +771,15 @@ def get_vehicle_salary(from_date, to_date, vehicle = None, machine = [], expense
     """   
     
     vl_entries = frappe.db.sql(query, as_dict=True)
-    res = calculate_exp_from_gl_entries(
+    account = calculate_exp_from_gl_entries(
+        account=account,
         gl_entries=vl_entries,
         from_date=from_date,
         to_date=to_date,
         expense_type=expense_type,
         prod_details=prod_details,
-        machines=machine
+        machines=machine,
+        all_expenses=all_expenses
     )
 
-    return res
+    return account
