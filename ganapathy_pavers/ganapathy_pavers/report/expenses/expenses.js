@@ -39,7 +39,7 @@ frappe.query_reports["Expenses"] = {
 	formatter: function (value, row, column, data, default_formatter) {
 		value = __(default_formatter(value, row, column, data));
 		if (column.fieldname == "expense" && data.reference_data) {
-			value = $(`<span ondblclick=\'ganapathy_pavers.show_reference(\"${data.total_amount}\", ${JSON.stringify(data.reference_data)}, \"${data.uom}\")\'>${value}</span>`);
+			value = $(`<span ondblclick=\'ganapathy_pavers.show_reference(\"${data.expense}\", ${JSON.stringify(data.reference_data)}, \"${data.total_amount}\")\'>${value}</span>`);
 			let $value = $(value);
 			value = $value.wrap("<p></p>").parent().html();
 		}
