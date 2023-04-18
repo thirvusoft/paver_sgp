@@ -3,7 +3,7 @@ import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.model.utils.rename_field import rename_field
          
-wrk_dt = ["Journal Entry Account", "Stock Entry Detail", "GL Entry"]
+wrk_dt = ["Journal Entry Account", "Stock Entry Detail", "GL Entry", "Purchase Invoice"]
 
 def total_no_salary(doc,action):
     if doc.ts_operators_table:
