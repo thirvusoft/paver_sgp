@@ -159,7 +159,24 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Expenses Report",
+   "label": "Production Expense",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Production Expense",
+   "link_to": "Production Expense",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Labours&Operators Expenses Report",
    "link_to": "",
    "link_type": "DocType",
    "onboard": 0,
@@ -173,18 +190,9 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Expenses report",
-   "link_to": "Expenses",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
   }
  ],
- "modified": "2023-04-18 10:14:25.841873",
+ "modified": "2023-04-18 13:17:44.642641",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "SGP Manufacturing",

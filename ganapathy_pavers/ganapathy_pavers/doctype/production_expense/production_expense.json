@@ -1,0 +1,41 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-04-18 13:01:10.706091",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "production_expense"
+ ],
+ "fields": [
+  {
+   "fieldname": "production_expense",
+   "fieldtype": "Table",
+   "label": "Production Expense",
+   "options": "Production Expense Table"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2023-04-18 13:01:10.706091",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Production Expense",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
