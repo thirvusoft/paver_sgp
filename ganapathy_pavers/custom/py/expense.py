@@ -246,7 +246,7 @@ def get_account_balance_on(account, company, from_date, to_date, vehicle=None, m
         """
     gl_vehicles = []
 
-    if expense_type == "Manufacturing":
+    if expense_type == "Manufacturing" or all_expenses:
         gl_vehicles = frappe.db.sql(f"""
             select
                 DISTINCT 
