@@ -157,6 +157,21 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
         "child_nodes": purchase_expense,
     })
 
+    if expense_type == "Manufacturing":
+        per_sqf_exp = per_sqft_production_expense(
+            from_date=from_date, 
+            to_date=to_date, 
+            machines=machine, 
+            prod_details=prod_details, 
+            all_expenses=all_expenses
+        )
+        res.append({
+            "value": "OTHER EXP",
+            "account_name": "OTHER EXP",
+            "expandable": 1,
+            "child_nodes": per_sqf_exp,
+        })
+
     res = filter_empty(res, vehicle_summary)
 
     if filter_unwanted_groups:
@@ -822,7 +837,6 @@ def expense_map(expense):
 
 def get_purchase_expense(company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
     expense_names = list(set(frappe.get_all("GL Entry", filters={"expense_name": ["is", "set"], "is_cancelled": 0}, pluck="expense_name")))
-    
     accounts = list(map(expense_map, expense_names))
     res = get_purchase_account_balances(
                 accounts=accounts,
@@ -835,7 +849,6 @@ def get_purchase_expense(company, from_date, to_date, vehicle=None, machine=[], 
                 prod_details=prod_details,
                 all_expenses=all_expenses
                 )
-    frappe.errprint(res)
     return res
 
 def get_purchase_account_balances(accounts, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
@@ -855,3 +868,165 @@ def get_purchase_account_balances(accounts, company, from_date, to_date, vehicle
                                 )
         
     return accounts
+
+def per_sqft_production_expense(from_date, to_date, machines, prod_details, all_expenses=False):
+    conditions = ""
+    WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
+    
+    if not machines:
+        machines = WORKSTATIONS
+
+    if prod_details:
+        conditions+=f""" and (exp.{frappe.scrub(prod_details)}=1
+        or (exp.paver=0 and exp.compound_wall=0 and exp.lego_block=0 and exp.fencing_post=0) 
+        or (exp.paver=1 and exp.compound_wall=1 and exp.lego_block=1 and exp.fencing_post=1)) """
+
+    if machines and sorted(machines)!=sorted(WORKSTATIONS):
+        conditions+=f"""  AND
+            (
+                ({" OR ".join([
+                    f''' IFNULL(exp.{frappe.scrub(macn)}, 0) '''
+                for macn in machines])}
+                ) OR
+                ({" AND ".join([
+                    f''' IFNULL(exp.{frappe.scrub(wrk)}, 0)=0 '''
+                for wrk in WORKSTATIONS ] + [" 1=1 "])})
+                OR
+                ({" AND ".join([
+                    f''' IFNULL(exp.{frappe.scrub(wrk)}, 0)=1 '''
+                for wrk in WORKSTATIONS ] + [" 1=1 "])})
+            )
+        """
+
+    query = f"""
+        select
+            DISTINCT exp.expense_name
+        from `tabProduction Expense Table` exp
+        where
+            exp.parenttype="Production Expense"
+            and exp.parent="Production Expense"
+            {conditions}
+    """
+
+    res = []
+    entries = frappe.db.sql(query, as_dict=True)
+    for row in entries:
+        exp_child = {
+            "value": row.expense_name,
+            "account_name": row.expense_name,
+            "child_nodes": [],
+            "parent": "OTHER EXP",
+            "expandable": 0,
+            "balance": 0
+        }
+        if all_expenses:
+            exp={"paver": WORKSTATIONS, "compound_wall": [], "lego_block": [], "fencing_post": []}
+            for prod in exp:
+                if not exp[prod]:
+                    expense = get_per_sqft_expense(
+                            from_date=from_date, 
+                            to_date=to_date, 
+                            machines=[], 
+                            prod_details=prod,
+                            expense_name=row.expense_name, 
+                            all_expenses=all_expenses
+                        )
+                    exp_child["balance"] += (expense or 0)
+                    exp_child[prod] = expense or 0
+                else:
+                    for mach in exp[prod]:
+                        expense = get_per_sqft_expense(
+                                from_date=from_date, 
+                                to_date=to_date, 
+                                machines=[mach], 
+                                prod_details=prod,
+                                expense_name=row.expense_name, 
+                                all_expenses=all_expenses
+                            )
+                        if not exp_child.get(prod):
+                            exp_child[prod] = 0
+                        exp_child[prod] += (expense or 0)
+                        exp_child["balance"] += (expense or 0)
+                        exp_child[frappe.scrub(mach)] = expense or 0
+        else:
+            expense = get_per_sqft_expense(
+                    from_date=from_date, 
+                    to_date=to_date, 
+                    machines=machines, 
+                    prod_details=prod_details,
+                    expense_name=row.expense_name, 
+                    all_expenses=all_expenses
+                )
+            exp_child["balance"] = expense
+        
+        res.append(exp_child)
+
+    return res
+
+def get_per_sqft_expense(from_date, to_date, machines, prod_details, expense_name, all_expenses=False):
+    conditions = ""
+    WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
+    
+    if not machines:
+        machines = WORKSTATIONS
+
+    if prod_details:
+        conditions+=f""" and (exp.{frappe.scrub(prod_details)}=1
+        or (exp.paver=0 and exp.compound_wall=0 and exp.lego_block=0 and exp.fencing_post=0) 
+        or (exp.paver=1 and exp.compound_wall=1 and exp.lego_block=1 and exp.fencing_post=1)) """
+
+    if expense_name:
+        conditions+=f""" and exp.expense_name='{expense_name}' """
+
+    if machines and sorted(machines)!=sorted(WORKSTATIONS):
+        conditions+=f"""  AND
+            (
+                ({" OR ".join([
+                    f''' IFNULL(exp.{frappe.scrub(macn)}, 0) '''
+                for macn in machines])}
+                ) OR
+                ({" AND ".join([
+                    f''' IFNULL(exp.{frappe.scrub(wrk)}, 0)=0 '''
+                for wrk in WORKSTATIONS ] + [" 1=1 "])})
+                OR
+                ({" AND ".join([
+                    f''' IFNULL(exp.{frappe.scrub(wrk)}, 0)=1 '''
+                for wrk in WORKSTATIONS ] + [" 1=1 "])})
+            )
+        """
+
+    query = f"""
+        select
+            *
+        from `tabProduction Expense Table` exp
+        where
+            exp.parenttype="Production Expense"
+            and exp.parent="Production Expense"
+            {conditions}
+    """
+
+    entries = frappe.db.sql(query, as_dict=True)
+    expense_amount = 0
+
+    for row in entries:
+        exp_machines=[]
+        for wrk in WORKSTATIONS:
+            if frappe.scrub(wrk) in row and row.get(frappe.scrub(wrk)):
+                exp_machines.append(wrk)
+
+        exp_machines.sort()
+        exp_machines=sorted([i for i in machines if ((i in exp_machines) or not exp_machines)])
+        
+        if exp_machines==sorted(WORKSTATIONS):  
+            # If all machines, then make it [], to get all machines prod_details
+            exp_machines=[]
+        
+        exp_machine_key = json.dumps(exp_machines)
+        if exp_machine_key not in machine_wise_prod_info:
+            machine_wise_prod_info[exp_machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=exp_machines)
+        
+        sqf = machine_wise_prod_info[exp_machine_key].get({"paver": 'paver', "compound_wall": 'cw', "lego_block": "lego", "fencing_post": "fp"}.get(prod_details)) or 0
+
+        expense_amount+=(sqf or 0) * (row.cost_per_sqft or 0)
+
+    return expense_amount
