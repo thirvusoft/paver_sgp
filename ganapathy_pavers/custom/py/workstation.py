@@ -24,17 +24,24 @@ def operator_salary(operator):
 def make_custom_field(self, event=None):
     if self.used_in_expense_splitup:
         for doctype in wrk_dt:
-            custom_fields={
-                doctype: [
-                        dict(
-                            fieldname=frappe.scrub(self.name),
-                            label=f"{self.name}",
-                            fieldtype="Check",
-                            insert_after="workstation",
-                            depends_on="""eval:doc.expense_type=="Manufacturing" """,
-                        ),]
-                }
-            create_custom_fields(custom_fields)
+            meta=frappe.get_meta(doctype)
+            create = True
+            for row in meta.fields:
+                if (row.fieldname == frappe.scrub(self.name) and row.fieldtype == "Check"):
+                    create=False
+                    continue
+            if create:
+                custom_fields={
+                    doctype: [
+                            dict(
+                                fieldname=frappe.scrub(self.name),
+                                label=f"{self.name}",
+                                fieldtype="Check",
+                                insert_after="workstation",
+                                depends_on="""eval:doc.expense_type=="Manufacturing" """,
+                            ),]
+                    }
+                create_custom_fields(custom_fields)
     else:
         remove_custom_field(self)
 
