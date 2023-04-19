@@ -3,5 +3,6 @@
 *.egg-info
 *.swp
 tags
+__pycache__
 ganapathy_pavers/docs/current
 ganapathy_pavers/ganapathy_pavers/custom/maintenance_details.json

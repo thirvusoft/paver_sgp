@@ -132,15 +132,19 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
             SUM(dni.amount) as amount,
             ROUND(
                 ifnull((
-                    SELECT avg(sle.valuation_rate)
+                    SELECT sle.valuation_rate
                     FROM `tabStock Ledger Entry` sle
                     WHERE
                         sle.is_cancelled=0 and
                         sle.voucher_type = 'Purchase Invoice' and
                         sle.item_code = dni.item_code and
+                        timestamp(sle.posting_date, sle.posting_time)
+				        <= timestamp(dn.posting_date, dn.posting_time) and
                         sle.posting_date <= dn.posting_date and
                         sle.posting_time <= dn.posting_time and
                         sle.is_cancelled = 0
+                    order by posting_date desc
+                    limit 1
                 ), 0) *
                 ifnull((
                     SELECT
