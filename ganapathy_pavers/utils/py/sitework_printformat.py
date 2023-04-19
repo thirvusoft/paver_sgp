@@ -3,7 +3,6 @@ from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_
 import frappe
 from frappe.utils import nowdate, get_first_day, get_last_day
 from ganapathy_pavers import uom_conversion
-from frappe.utils import getdate
 from erpnext.stock.get_item_details import get_item_price
 
 DATE_FORMAT = "%Y-%m-%d"
@@ -12,8 +11,8 @@ def site_work(doc):
     doc=frappe.get_doc("Project",doc)
     items={}
     exp={}
-    without_transport_cost=doc.total
     production_rate={}
+    without_transport_cost=doc.total
     nos=0
     supply_sqf=0
     sqf=doc.measurement_sqft or 0
@@ -57,11 +56,8 @@ def site_work(doc):
             exp[row.description.lower().strip()]["supply_sqft_amount"]+=(row.amount or 0)/supply_sqf if supply_sqf else 0
     
     for i in list(exp.values()):
-
         if "transport" in i["description"].lower():
-            
             without_transport_cost -= i["amount"]
-           
 
     delivered_items=(items.keys())
     dn_items=frappe.get_all("Delivery Note Item", {"parenttype": "Delivery Note", "parent": ["in", dn], "item_code": ["in", delivered_items]}, ["creation", "item_code", "warehouse"])
@@ -139,7 +135,33 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
             dni.uom,
             AVG(rate) as rate,
             SUM(dni.amount) as amount,
-            dn.creation 
+            ROUND(
+                ifnull((
+                    SELECT sle.valuation_rate
+                    FROM `tabStock Ledger Entry` sle
+                    WHERE
+                        sle.is_cancelled=0 and
+                        sle.voucher_type = 'Purchase Invoice' and
+                        sle.item_code = dni.item_code and
+                        timestamp(sle.posting_date, sle.posting_time)
+				        <= timestamp(dn.posting_date, dn.posting_time) and
+                        sle.posting_date <= dn.posting_date and
+                        sle.posting_time <= dn.posting_time and
+                        sle.is_cancelled = 0
+                    order by posting_date desc
+                    limit 1
+                ), 0) *
+                ifnull((
+                    SELECT
+                        uom.conversion_factor
+                    FROM `tabUOM Conversion Detail` uom
+                    WHERE
+                        uom.parenttype='Item' and
+                        uom.parent=dni.item_code and
+                        uom.uom=dni.uom
+                )    
+                , 0)
+            , 2) as valuation_rate
         FROM `tabDelivery Note Item` dni
         LEFT OUTER JOIN `tabDelivery Note` dn
         ON dn.name=dni.parent AND dni.parenttype="Delivery Note"
@@ -150,20 +172,6 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
         GROUP BY dni.item_code, dni.uom
     """
     res = frappe.db.sql(query, as_dict=True)
-    price_list_doc=frappe.get_all("Price List",filters={"buying":1,"site_work_print_format":1},pluck="name")
-    
-    if price_list_doc:
-        for j in res:
-            args = {
-            'item_code': j["item_code"], 
-                'price_list': price_list_doc[0], 
-                'uom': j["uom"], 
-                'transaction_date': None, 
-                'posting_date': j["creation"] or nowdate(), 
-                'batch_no': None,
-            }
-            item_price=get_item_price(args=args, item_code=j["item_code"])
-            j["valuation_rate"]= item_price[0][1] if len(item_price) and len(item_price[0])>1 else 0
     f_res = {}
 
     for row in res:
