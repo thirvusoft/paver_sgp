@@ -277,7 +277,7 @@ def get_account_balance_on(account, company, from_date, to_date, expense_name=""
         account['vehicle'] = ""
         return account
     
-    conditions=""
+    conditions=" and gl.debit>0 "
     account_condition = f""" and gl.account="{account['value']}" """
 
     if expense_name:
