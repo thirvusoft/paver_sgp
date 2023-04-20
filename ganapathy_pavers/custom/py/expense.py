@@ -143,7 +143,6 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
             prod_details=prod_details,
             all_expenses=all_expenses
             )
-    frappe.errprint(res)
 
     res.append(get_vehicle_expense_based_on_km(
         from_date=from_date,
@@ -453,7 +452,6 @@ def get_account_balance_on(account, company, from_date, to_date, expense_name=""
     return account
 
 def calculate_exp_from_gl_entries(account, gl_entries, from_date, to_date, expense_type=None, prod_details="", machines=[], all_expenses=False):
-    # frappe.errprint(gl_entries)
     if all_expenses and expense_type!="Vehicle":
         production_details = {"paver": WORKSTATIONS, "compound_wall": [], "fencing_post": [], "lego_block": []}
         for prod in production_details:
