@@ -77,6 +77,7 @@ def add_expense_to_gl_entries(self, gl_entries):
                 "lego_block": self.get("lego_block"), # Customization
                 "from_date": self.get("from_date"), # Customization
                 "to_date": self.get("to_date"), # Customization
+                "split_equally": self.get("split_equally"), # Customization
             })
             # Customization start
             for wrk in get_workstations(): 
@@ -94,7 +95,7 @@ def merge_similar_entries(gl_map, precision=None):
 	for entry in gl_map:
 		# if there is already an entry in this account then just add it
 		# to that entry
-		same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block", "from_date", "to_date"] + get_workstations()) # Customization
+		same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block", "from_date", "to_date", "split_equally"] + get_workstations()) # Customization
 		if same_head:
 			same_head.debit	= flt(same_head.debit) + flt(entry.debit)
 			same_head.debit_in_account_currency	= \

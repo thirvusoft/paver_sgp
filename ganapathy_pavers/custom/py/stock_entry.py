@@ -1,13 +1,16 @@
+from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import get_accounting_dimensions
+from erpnext.accounts.general_ledger import check_if_in_list, make_reverse_gl_entries, save_entries, update_net_values, validate_accounting_period
+from frappe.model.meta import get_field_precision
 from ganapathy_pavers.custom.py.journal_entry_override import get_workstations
 import erpnext
-from erpnext.accounts.general_ledger import process_gl_map
 from erpnext.controllers.stock_controller import StockController
 from erpnext.stock import get_warehouse_account_map
 from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
 from erpnext.stock.stock_ledger import get_valuation_rate
 import frappe
 from frappe import _
-from frappe.utils.data import flt
+from frappe.utils.data import cint, flt
+from six import iteritems
 from ganapathy_pavers import uom_conversion
 
 def update_asset(self, event):
@@ -40,6 +43,26 @@ def update_asset(self, event):
             doc.save('Update')
 
 class _StockController(StockController):
+    def make_gl_entries(self, gl_entries=None, from_repost=False):
+        if self.docstatus == 2:
+            make_reverse_gl_entries(voucher_type=self.doctype, voucher_no=self.name)
+
+        provisional_accounting_for_non_stock_items = \
+            cint(frappe.db.get_value('Company', self.company, 'enable_provisional_accounting_for_non_stock_items'))
+
+        if cint(erpnext.is_perpetual_inventory_enabled(self.company)) or provisional_accounting_for_non_stock_items:
+            warehouse_account = get_warehouse_account_map(self.company)
+
+            if self.docstatus==1:
+                if not gl_entries:
+                    gl_entries = self.get_gl_entries(warehouse_account)
+                make_gl_entries(gl_entries, from_repost=from_repost)
+
+        elif self.doctype in ['Purchase Receipt', 'Purchase Invoice'] and self.docstatus == 1:
+            gl_entries = []
+            gl_entries = self.get_asset_gl_entry(gl_entries)
+            make_gl_entries(gl_entries, from_repost=from_repost)
+            
     def get_gl_entries(self, warehouse_account=None, default_expense_account=None,
         default_cost_center=None):
 
@@ -80,6 +103,7 @@ class _StockController(StockController):
                             "lego_block": item_row.get("lego_block"), # Customization
                             "from_date": item_row.get("from_date"), # Customization
                             "to_date": item_row.get("to_date"), # Customization
+                            "split_equally": item_row.get("split_equally"), # Customization
                             "account": warehouse_account[sle.warehouse]["account"],
                             "against": expense_account,
                             "cost_center": item_row.cost_center,
@@ -100,6 +124,7 @@ class _StockController(StockController):
                             "lego_block": item_row.get("lego_block"), # Customization
                             "from_date": item_row.get("from_date"), # Customization
                             "to_date": item_row.get("to_date"), # Customization
+                            "split_equally": item_row.get("split_equally"), # Customization
                             "account": expense_account,
                             "against": warehouse_account[sle.warehouse]["account"],
                             "cost_center": item_row.cost_center,
@@ -126,7 +151,122 @@ class _StockController(StockController):
 
         return process_gl_map(gl_list, precision=precision)
 
+def process_gl_map(gl_map, merge_entries=True, precision=None):
+    if merge_entries:
+        gl_map = merge_similar_entries(gl_map, precision)
+    for entry in gl_map:
+        # toggle debit, credit if negative entry
+        if flt(entry.debit) < 0:
+            entry.credit = flt(entry.credit) - flt(entry.debit)
+            entry.debit = 0.0
+
+        if flt(entry.debit_in_account_currency) < 0:
+            entry.credit_in_account_currency = \
+                flt(entry.credit_in_account_currency) - flt(entry.debit_in_account_currency)
+            entry.debit_in_account_currency = 0.0
+
+        if flt(entry.credit) < 0:
+            entry.debit = flt(entry.debit) - flt(entry.credit)
+            entry.credit = 0.0
+
+        if flt(entry.credit_in_account_currency) < 0:
+            entry.debit_in_account_currency = \
+                flt(entry.debit_in_account_currency) - flt(entry.credit_in_account_currency)
+            entry.credit_in_account_currency = 0.0
+
+        update_net_values(entry)
+    return gl_map
+
+def merge_similar_entries(gl_map, precision=None):
+    merged_gl_map = []
+    accounting_dimensions = get_accounting_dimensions()
+    for entry in gl_map:
+        # if there is already an entry in this account then just add it
+        # to that entry
+        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block", "from_date", "to_date", "split_equally"] + get_workstations())
+        if same_head:
+            same_head.debit	= flt(same_head.debit) + flt(entry.debit)
+            same_head.debit_in_account_currency	= \
+                flt(same_head.debit_in_account_currency) + flt(entry.debit_in_account_currency)
+            same_head.credit = flt(same_head.credit) + flt(entry.credit)
+            same_head.credit_in_account_currency = \
+                flt(same_head.credit_in_account_currency) + flt(entry.credit_in_account_currency)
+        else:
+            merged_gl_map.append(entry)
+
+    company = gl_map[0].company if gl_map else erpnext.get_default_company()
+    company_currency = erpnext.get_company_currency(company)
+
+    if not precision:
+        precision = get_field_precision(frappe.get_meta("GL Entry").get_field("debit"), company_currency)
+
+    # filter zero debit and credit entries
+    merged_gl_map = filter(lambda x: flt(x.debit, precision)!=0 or flt(x.credit, precision)!=0, merged_gl_map)
+    merged_gl_map = list(merged_gl_map)
+    return merged_gl_map
+
 class Tsstockentry(StockEntry, _StockController):
+    def get_gl_entries(self, warehouse_account):
+        gl_entries = super(StockEntry, self).get_gl_entries(warehouse_account)
+
+        if self.purpose in ("Repack", "Manufacture"):
+            total_basic_amount = sum(flt(t.basic_amount) for t in self.get("items") if t.is_finished_item)
+        else:
+            total_basic_amount = sum(flt(t.basic_amount) for t in self.get("items") if t.t_warehouse)
+
+        divide_based_on = total_basic_amount
+
+        if self.get("additional_costs") and not total_basic_amount:
+            # if total_basic_amount is 0, distribute additional charges based on qty
+            divide_based_on = sum(item.qty for item in list(self.get("items")))
+
+        item_account_wise_additional_cost = {}
+
+        for t in self.get("additional_costs"):
+            for d in self.get("items"):
+                if self.purpose in ("Repack", "Manufacture") and not d.is_finished_item:
+                    continue
+                elif not d.t_warehouse:
+                    continue
+
+                item_account_wise_additional_cost.setdefault((d.item_code, d.name), {})
+                item_account_wise_additional_cost[(d.item_code, d.name)].setdefault(t.expense_account, {
+                    "amount": 0.0,
+                    "base_amount": 0.0
+                })
+
+                multiply_based_on = d.basic_amount if total_basic_amount else d.qty
+
+                item_account_wise_additional_cost[(d.item_code, d.name)][t.expense_account]["amount"] += \
+                    flt(t.amount * multiply_based_on) / divide_based_on
+
+                item_account_wise_additional_cost[(d.item_code, d.name)][t.expense_account]["base_amount"] += \
+                    flt(t.base_amount * multiply_based_on) / divide_based_on
+
+        if item_account_wise_additional_cost:
+            for d in self.get("items"):
+                for account, amount in iteritems(item_account_wise_additional_cost.get((d.item_code, d.name), {})):
+                    if not amount: continue
+
+                    gl_entries.append(self.get_gl_dict({
+                        "account": account,
+                        "against": d.expense_account,
+                        "cost_center": d.cost_center,
+                        "remarks": self.get("remarks") or _("Accounting Entry for Stock"),
+                        "credit_in_account_currency": flt(amount["amount"]),
+                        "credit": flt(amount["base_amount"])
+                    }, item=d))
+
+                    gl_entries.append(self.get_gl_dict({
+                        "account": d.expense_account,
+                        "against": account,
+                        "cost_center": d.cost_center,
+                        "remarks": self.get("remarks") or _("Accounting Entry for Stock"),
+                        "credit": -1 * amount['base_amount'] # put it as negative credit instead of debit purposefully
+                    }, item=d))
+
+        return process_gl_map(gl_entries)
+    
     def set_basic_rate(self, reset_outgoing_rate=True, raise_error_if_no_rate=True):
            # Set rate for outgoing items
             outgoing_items_cost = self.set_rate_for_outgoing_items(
@@ -200,3 +340,18 @@ def expense_account(self, event = None):
                         Please set <b>Default Internal Fuel Consumption Account</b> in Company <a href="/app/company/{self.company}"><b>{self.company}</b></a>
                     """)
                 row.expense_account = default_acc
+
+# general ledger functions
+
+def make_gl_entries(gl_map, cancel=False, adv_adj=False, merge_entries=True, update_outstanding='Yes', from_repost=False):
+	if gl_map:
+		if not cancel:
+			validate_accounting_period(gl_map)
+			gl_map = process_gl_map(gl_map, merge_entries)
+			if gl_map and len(gl_map) > 1:
+				save_entries(gl_map, adv_adj, update_outstanding, from_repost)
+			# Post GL Map proccess there may no be any GL Entries
+			elif gl_map:
+				frappe.throw(_("Incorrect number of General Ledger Entries found. You might have selected a wrong Account in the transaction."))
+		else:
+			make_reverse_gl_entries(gl_map, adv_adj=adv_adj, update_outstanding=update_outstanding)

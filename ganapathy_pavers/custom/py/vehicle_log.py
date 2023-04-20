@@ -301,6 +301,7 @@ def update_vehicle_jea_exp(self, exp):
         row.update({
             "expense_type": self.expense_type,
             "paver": self.paver,
+            "split_equally": self.split_equally,
             "is_shot_blast": self.is_shot_blast,
             "compound_wall": self.compound_wall,
             "lego_block": self.lego_block,
