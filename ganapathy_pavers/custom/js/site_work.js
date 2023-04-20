@@ -72,7 +72,7 @@ frappe.ui.form.on("Project",{
 		await frm.add_custom_button("Delivery Details", function() {
 			if (!frm.is_dirty()) {
 				frappe.call({
-					method: "ganapathy_pavers.custom.py.site_work.update_delivered_qty",
+					method: "ganapathy_pavers.custom.py.site_work.refill_delivery_detail",
 					args: {
 						site_work: [frm.doc.name]
 					},

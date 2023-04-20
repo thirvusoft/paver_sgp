@@ -599,3 +599,65 @@ def completed_and_required_area(self,event):
     self.total_completed_bundle=total_comp_bundle
     self.completed=(completed_area/total_area)*100 if total_area else 0
  
+
+@frappe.whitelist()
+def refill_delivery_detail(site_work, event=None):
+    if isinstance(site_work, str):
+        doc = frappe.get_doc("Project", json.loads(site_work)[0])
+    else:
+        doc=site_work
+    sales_order = frappe.db.sql(f"""
+        select
+            soi.item_code as item,
+            soi.item_group,
+            sum(soi.qty) as qty_to_deliver,
+            sum(case when soi.delivered_by_supplier = 1 then ifnull(soi.delivered_qty, 0) else 0 end) as delivered_stock_qty
+        from `tabSales Order Item` soi
+        inner join `tabSales Order` so
+        on soi.parent=so.name and soi.parenttype='Sales Order'
+        where
+            so.docstatus=1 and
+            so.site_work='{doc.name}' and
+            ifnull((
+                select group_concat(distinct _soi.work separator ', ')
+                from `tabSales Order Item` _soi
+                where _soi.parenttype='Sales Order' and _soi.parent=so.name
+            ), "") not in ("Supply Only")
+        group by soi.item_code
+    """, as_dict=True)
+
+    delivery_note = frappe.db.sql(f"""
+        select
+            dni.item_code as item,
+            dni.item_group,
+            sum(case when ifnull(dn.is_return, 0)=0 then dni.qty else 0 end) as delivered_stock_qty,
+            sum(case when ifnull(dn.is_return, 0)=0 then dni.ts_qty else 0 end) as delivered_bundle,
+            sum(case when ifnull(dn.is_return, 0)=0 then dni.pieces else 0 end) as delivered_pieces,
+            sum(case when dn.is_return then dni.qty else 0 end) as returned_stock_qty,
+            sum(case when dn.is_return then dni.ts_qty else 0 end) as returned_bundle,
+            sum(case when dn.is_return then dni.pieces else 0 end) as returned_pieces
+        from `tabDelivery Note Item` dni
+        inner join `tabDelivery Note` dn
+        on dni.parent=dn.name and dni.parenttype='Delivery Note'
+        where
+            dn.docstatus=1 and
+            dn.site_work='{doc.name}'
+        group by dni.item_code
+    """, as_dict=True)
+    
+    delivery_detail=[]
+    for dn_row in delivery_note:
+        new = True
+        for so_row in sales_order:
+            if so_row.item == dn_row.item:
+                new = False
+                dn_row["delivered_stock_qty"] = (dn_row.get("delivered_stock_qty") or 0) + (so_row.get("delivered_stock_qty") or 0)
+                so_row.update(dn_row)
+                so_row["pending_qty__to_deliver"] = (dn_row.get("qty_to_deliver") or 0) - ((dn_row.get("delivered_stock_qty") or 0) + (dn_row.get("returned_stock_qty") or 0))
+                if so_row.get("item_group") !="Raw Material":
+                    delivery_detail.append(so_row)
+        if new and dn_row.get("item_group") !="Raw Material":
+            delivery_detail.append(dn_row)
+    
+    doc.update({"delivery_detail": delivery_detail})
+    frappe.errprint(delivery_detail)
