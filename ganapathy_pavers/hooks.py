@@ -185,6 +185,7 @@ doc_events = {
 		"autoname":"ganapathy_pavers.custom.py.site_work.autoname",
 		"before_save":"ganapathy_pavers.custom.py.site_work.before_save",
 		"validate":[
+			"ganapathy_pavers.custom.py.site_work.refill_delivery_detail",
 			"ganapathy_pavers.custom.py.site_work.validate",
 			"ganapathy_pavers.custom.py.site_work.validate_status",
 			"ganapathy_pavers.custom.py.site_work.rework_count",
