@@ -5,6 +5,7 @@ import json
 import frappe
 from frappe import _
 from ganapathy_pavers import uom_conversion
+from frappe.utils import get_datetime
 from ganapathy_pavers.custom.py.expense import  expense_tree
 
 def execute(filters=None):
@@ -14,15 +15,38 @@ def execute(filters=None):
 	to_date = filters.get("to_date")
 	vehicle_no = filters.get("vehicle_no")
 	transport_based_on = filters.get("transport_based_on")
+	insurance_filter="INSURANCE"
+	pending_due_filter="VEHICLE DUE"
+	
 
 	doc = frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no, "docstatus": 1, "select_purpose": ["not in", ["Fuel", "Service"]]}, [
 							'last_odometer', 'odometer', 'delivery_note', 'sales_invoice', 'today_odometer_value'], order_by="date",)
 	dn_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'delivery_note':['is','set'], "docstatus": 1, "select_purpose": ["not in", ["Fuel", "Service"]]}, pluck='delivery_note')
 	si_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'sales_invoice':['is','set'], "docstatus": 1, "select_purpose": ["not in", ["Fuel", "Service"]]}, pluck='sales_invoice')
+	no_of_days=frappe.db.sql(""" select count(distinct(vl.date)) as days from `tabVehicle Log` vl where vl.select_purpose="Goods Supply" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
+	no_of_trips=frappe.db.sql(""" select count(distinct(vl.name)) as trips from `tabVehicle Log` vl where vl.select_purpose="Goods Supply" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
+	avg_mileage=frappe.db.sql(""" select avg(vl.mileage) as mileage from `tabVehicle Log` vl where vl.select_purpose="Goods Supply" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
+	due_months=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,to_date,pending_due_filter),as_dict=1) 
+	insurance=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,to_date,insurance_filter),as_dict=1) 
+	days=no_of_days[0]["days"] if no_of_days else 0
+	trips=no_of_trips[0]["trips"] if no_of_trips else 0
+	mileage=avg_mileage[0]["mileage"] if avg_mileage else 0
+	due=due_months[0]["date"] if due_months else 0
+	insurance=insurance[0]["date"] if insurance else 0
+
+
+	print(days)
+	
 	start_km = 0
 	end_km = 0
 	pavers_km = 0
 	cw_km = 0
+	
+
+
+
+
+
 
 	if not doc:
 		return columns, data
@@ -56,6 +80,15 @@ def execute(filters=None):
 		"item":f"Paver KM :{pavers_km}",
 		"1":f"CW KM :{cw_km}",
 		"3":"Total Sqrft :"
+	})
+	data.append({
+		"item":f"No Of Days :{days}",
+		"1":f"No Of Trips :{trips}",
+		"3":f"Avg Mileage :{mileage}",	
+	})
+	data.append({
+		"item":f"Insurance Due(Months) :{insurance}",
+		"1":f"Vehicle Due(Months):{due}",	
 	})
 
 	if  transport_based_on == "Report":
