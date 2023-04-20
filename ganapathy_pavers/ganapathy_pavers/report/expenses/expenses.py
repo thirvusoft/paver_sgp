@@ -11,7 +11,7 @@ def execute(filters=None):
 	return columns, data
 
 def get_columns(filters):
-	WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
+	WORKSTATIONS = frappe.get_all("Workstation", filters={"used_in_expense_splitup": 1}, fields=["name", "location"], order_by="name",)
 
 	columns = [
 		{
@@ -28,7 +28,7 @@ def get_columns(filters):
 		},
 		{
 			"fieldname": "total_amount",
-			"fieldtype": "currency",
+			"fieldtype": "Currency",
 			"label": "Total Amount",
 			"width": 150
 		},
@@ -76,18 +76,33 @@ def get_columns(filters):
 			"hidden": 1,
 		}
 	]
-	for wrk in WORKSTATIONS:
-		columns.append({
-			"fieldname": frappe.scrub(wrk),
-			"fieldtype": "Currency",
-			"label": wrk,
-			"width": 100,
-			"hidden": filters.get("expense_type") == "Vehicle"
-		})
+	if filters.get("all_machines"):
+		for wrk in WORKSTATIONS:
+			columns.append({
+				"fieldname": frappe.scrub(wrk.name),
+				"fieldtype": "Currency",
+				"label": wrk.name,
+				"width": 100,
+				"hidden": filters.get("expense_type") == "Vehicle"
+			})
+	else:
+		location = []
+		for wrk in WORKSTATIONS:
+			if wrk.location and wrk.location in location:
+				continue
+			elif wrk.location:
+				location.append(wrk.location)
+			columns.append({
+				"fieldname": frappe.scrub(wrk.location or wrk.name),
+				"fieldtype": "Currency",
+				"label": wrk.location or wrk.name,
+				"width": 100,
+				"hidden": filters.get("expense_type") == "Vehicle"
+			})
 	return columns
 
 def get_data(filters):
-	WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
+	WORKSTATIONS = frappe.get_all("Workstation", filters={"used_in_expense_splitup": 1}, fields=["name", "location"], order_by="name")
 
 	total_amount = {
 		"total_amount": 0,
@@ -97,7 +112,9 @@ def get_data(filters):
 		"lego_block": 0
 	}
 	for wrk in WORKSTATIONS:
-		total_amount[frappe.scrub(wrk)] = 0
+		total_amount[frappe.scrub(wrk.name or "")] = 0
+		if wrk.location:
+			total_amount[frappe.scrub(wrk.location)] = 0
 
 	exp_tree=expense_tree(
 				from_date=filters.get('from_date'),
@@ -136,11 +153,17 @@ def get_data(filters):
 				total_amount['total_amount']+=i.get('balance') or 0
 
 				for wrk in WORKSTATIONS:
-					dic['paver'] += i.get(frappe.scrub(wrk)) or 0
-					total_amount['paver'] += i.get(frappe.scrub(wrk)) or 0
+					dic['paver'] += i.get(frappe.scrub(wrk.name)) or 0
+					total_amount['paver'] += i.get(frappe.scrub(wrk.name)) or 0
 
-					total_amount[frappe.scrub(wrk)] += i.get(frappe.scrub(wrk)) or 0
-					dic[frappe.scrub(wrk)] = i.get(frappe.scrub(wrk)) or 0
+					total_amount[frappe.scrub(wrk.name)] += i.get(frappe.scrub(wrk.name)) or 0
+					dic[frappe.scrub(wrk.name)] = i.get(frappe.scrub(wrk.name)) or 0
+
+					if wrk.location:
+						total_amount[frappe.scrub(wrk.location)] += i.get(frappe.scrub(wrk.name)) or 0
+						if not dic.get(frappe.scrub(wrk.location)):
+							dic[frappe.scrub(wrk.location)] = 0
+						dic[frappe.scrub(wrk.location)] += i.get(frappe.scrub(wrk.name)) or 0
 
 				dic["total_amount"]=i.get("balance") or 0
 				dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
@@ -172,11 +195,17 @@ def get_expense_from_child(account, WORKSTATIONS, total_amount):
 			total_amount['total_amount']+=i.get('balance') or 0
 
 			for wrk in WORKSTATIONS:
-				dic['paver'] += i.get(frappe.scrub(wrk)) or 0
-				total_amount['paver'] += i.get(frappe.scrub(wrk)) or 0
+				dic['paver'] += i.get(frappe.scrub(wrk.name)) or 0
+				total_amount['paver'] += i.get(frappe.scrub(wrk.name)) or 0
 
-				total_amount[frappe.scrub(wrk)] += i.get(frappe.scrub(wrk)) or 0
-				dic[frappe.scrub(wrk)] = i.get(frappe.scrub(wrk)) or 0
+				total_amount[frappe.scrub(wrk.name)] += i.get(frappe.scrub(wrk.name)) or 0
+				dic[frappe.scrub(wrk.name)] = i.get(frappe.scrub(wrk.name)) or 0
+
+				if wrk.location:
+					total_amount[frappe.scrub(wrk.location)] += i.get(frappe.scrub(wrk.name)) or 0
+					if not dic.get(frappe.scrub(wrk.location)):
+						dic[frappe.scrub(wrk.location)] = 0
+					dic[frappe.scrub(wrk.location)] += i.get(frappe.scrub(wrk.name)) or 0
 
 			dic["total_amount"]=i["balance"] or 0
 			dic["reference_data"]=json.dumps(i.get("references")) if i.get("references") else ""
@@ -210,7 +239,9 @@ def group_total(child, WORKSTATIONS):
 		"group_total": 1
 	}
 	for wrk in WORKSTATIONS:
-		group[frappe.scrub(wrk)] = sum([i.get(frappe.scrub(wrk)) for i in child])
+		group[frappe.scrub(wrk.name)] = sum([i.get(frappe.scrub(wrk.name)) for i in child])
+		if wrk.location:
+			group[frappe.scrub(wrk.location)] = sum([i.get(frappe.scrub(wrk.location)) for i in child])
 	res.append(group)
 	return res
 	
