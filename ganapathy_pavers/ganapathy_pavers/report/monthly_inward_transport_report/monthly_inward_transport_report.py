@@ -13,6 +13,19 @@ def execute(filters=None):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 	vehicle_no = filters.get("vehicle_no")
+	insurance_filter="INSURANCE"
+	pending_due_filter="VEHICLE DUE"
+
+	no_of_days=frappe.db.sql(""" select count(distinct(vl.date)) as days from `tabVehicle Log` vl where vl.select_purpose="Raw Material" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
+	no_of_trips=frappe.db.sql(""" select count(distinct(vl.name)) as trips from `tabVehicle Log` vl where vl.select_purpose="Raw Material" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
+	
+	due_months=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,to_date,pending_due_filter),as_dict=1) 
+	insurance=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,to_date,insurance_filter),as_dict=1) 
+	days=no_of_days[0]["days"] if no_of_days else 0
+	trips=no_of_trips[0]["trips"] if no_of_trips else 0
+	
+	due=due_months[0]["date"] if due_months else 0
+	insurance=insurance[0]["date"] if insurance else 0
 
 	doc = frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no}, ['name',
 							'last_odometer', 'odometer', 'purchase_invoice', 'purchase_receipt', 'today_odometer_value'], order_by="date",)
@@ -46,6 +59,16 @@ def execute(filters=None):
 		"1": f"Total KM :{end_km-start_km}",
 		"3": f"Mileage :{mileage}",
 	})
+	data.append({
+		"item":f"No Of Days :{days}",
+		"1":f"No Of Trips :{trips}",
+			
+	})
+	data.append({
+		"item":f"Insurance Due(Months) :{insurance}",
+		"1":f"Vehicle Due(Months):{due}",	
+	})
+
 	data.append({})
 
 	data.append({
@@ -133,8 +156,8 @@ def execute(filters=None):
 	})
 
 	data.append({
-		"item": "<b>Total Expense</b>",
-		"qty": f"<b>{(invoice_grand_total or 0)+(total_amount or 0)}</b>",
+		"item": "<b>Profit</b>",
+		"qty": f"<b>{(invoice_grand_total or 0)-(total_amount or 0)}</b>",
 	})
 
 	return columns, data
