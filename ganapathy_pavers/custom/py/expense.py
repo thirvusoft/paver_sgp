@@ -9,7 +9,7 @@ WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, plu
 
 VEHICLE_WISE = {}
 
-def filter_empty(gl_entries, vehicle_summary):
+def filter_empty(gl_entries, vehicle_summary, workstations):
     res = []
 
     for acc in gl_entries:
@@ -27,11 +27,21 @@ def filter_empty(gl_entries, vehicle_summary):
                 _par_acc["account_name"] = _par_acc["value"] = _key
                 VEHICLE_WISE[_key] = _par_acc
             else:
+                for prod in ["paver", "compound_wall", "fencing_post", "lego_block"]:
+                    if not VEHICLE_WISE[_key].get(prod):
+                        VEHICLE_WISE[_key][prod] = 0
+                    VEHICLE_WISE[_key][prod] += (acc.get(prod) or 0)
+                    
+                for wrk in WORKSTATIONS:
+                    if not VEHICLE_WISE[_key].get(frappe.scrub(wrk)):
+                        VEHICLE_WISE[_key][frappe.scrub(frappe.scrub(wrk))] = 0
+                    VEHICLE_WISE[_key][frappe.scrub(wrk)] += (acc.get(frappe.scrub(wrk)) or 0)
+
                 VEHICLE_WISE[_key]["balance"] += acc.get("balance") or 0
                 VEHICLE_WISE[_key]["references"].extend(acc.get("references") or {})
 
         elif acc.get("expandable"):
-            acc["child_nodes"] = filter_empty(acc.get("child_nodes") or [], vehicle_summary)
+            acc["child_nodes"] = filter_empty(gl_entries=acc.get("child_nodes") or [], vehicle_summary=vehicle_summary, workstations=workstations)
             if acc["child_nodes"]:
                 res.append(acc)
 
@@ -172,7 +182,7 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
             "child_nodes": per_sqf_exp,
         })
 
-    res = filter_empty(res, vehicle_summary)
+    res = filter_empty(gl_entries=res, vehicle_summary=vehicle_summary, workstations=WORKSTATIONS)
 
     if filter_unwanted_groups:
         res = flatten_hierarchy(res)

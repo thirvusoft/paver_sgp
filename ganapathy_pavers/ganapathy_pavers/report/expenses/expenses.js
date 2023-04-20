@@ -34,6 +34,12 @@ frappe.query_reports["Expenses"] = {
 			label: __("Vehicle Summary"),
 			fieldtype: "Check",
 			width: "80"
+		},
+		{
+			fieldname: "all_machines",
+			label: __("Show all Machines"),
+			fieldtype: "Check",
+			width: "80"
 		}
 	],
 	formatter: function (value, row, column, data, default_formatter) {
