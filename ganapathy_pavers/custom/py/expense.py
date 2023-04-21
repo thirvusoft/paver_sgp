@@ -9,7 +9,7 @@ WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, plu
 
 VEHICLE_WISE = {}
 
-def filter_empty(gl_entries, vehicle_summary):
+def filter_empty(gl_entries, vehicle_summary, workstations):
     res = []
 
     for acc in gl_entries:
@@ -27,11 +27,21 @@ def filter_empty(gl_entries, vehicle_summary):
                 _par_acc["account_name"] = _par_acc["value"] = _key
                 VEHICLE_WISE[_key] = _par_acc
             else:
+                for prod in ["paver", "compound_wall", "fencing_post", "lego_block"]:
+                    if not VEHICLE_WISE[_key].get(prod):
+                        VEHICLE_WISE[_key][prod] = 0
+                    VEHICLE_WISE[_key][prod] += (acc.get(prod) or 0)
+                    
+                for wrk in WORKSTATIONS:
+                    if not VEHICLE_WISE[_key].get(frappe.scrub(wrk)):
+                        VEHICLE_WISE[_key][frappe.scrub(frappe.scrub(wrk))] = 0
+                    VEHICLE_WISE[_key][frappe.scrub(wrk)] += (acc.get(frappe.scrub(wrk)) or 0)
+
                 VEHICLE_WISE[_key]["balance"] += acc.get("balance") or 0
                 VEHICLE_WISE[_key]["references"].extend(acc.get("references") or {})
 
         elif acc.get("expandable"):
-            acc["child_nodes"] = filter_empty(acc.get("child_nodes") or [], vehicle_summary)
+            acc["child_nodes"] = filter_empty(gl_entries=acc.get("child_nodes") or [], vehicle_summary=vehicle_summary, workstations=workstations)
             if acc["child_nodes"]:
                 res.append(acc)
 
@@ -67,7 +77,7 @@ def calculate_total(gl_entries):
     return res
 
 @frappe.whitelist()
-def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False, vehicle_purpose=[], all_expenses=False) -> list:
+def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False, vehicle_purpose=[], all_expenses=False, with_liability=True) -> list:
     WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
 
     if not company:
@@ -103,6 +113,24 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
                 prod_details=prod_details,
                 all_expenses=all_expenses
                 )
+    if with_liability:
+        liability_acc=frappe.db.get_all("Account", {"root_type": "Liability", "parent_account":["is", "not set"], "is_group": 1, "company": company}, pluck="name")
+        if liability_acc:
+            liability_acc=liability_acc[0]
+            root += get_account_balances(
+                        accounts=get_children(
+                                    doctype=doctype, 
+                                    parent=liability_acc or company, 
+                                    company=company), 
+                        company=company, 
+                        from_date=from_date, 
+                        to_date=to_date, 
+                        vehicle=vehicle, 
+                        machine=machine, 
+                        expense_type=expense_type, 
+                        prod_details=prod_details,
+                        all_expenses=all_expenses
+                        )
     
     res = get_tree(
             root=root, 
@@ -115,7 +143,7 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
             prod_details=prod_details,
             all_expenses=all_expenses
             )
-    
+
     res.append(get_vehicle_expense_based_on_km(
         from_date=from_date,
         to_date=to_date,
@@ -154,6 +182,7 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
         "value": "OTHER EXP",
         "account_name": "OTHER EXP",
         "expandable": 1,
+        "balance": 0,
         "child_nodes": purchase_expense,
     })
 
@@ -172,7 +201,7 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
             "child_nodes": per_sqf_exp,
         })
 
-    res = filter_empty(res, vehicle_summary)
+    res = filter_empty(gl_entries=res, vehicle_summary=vehicle_summary, workstations=WORKSTATIONS)
 
     if filter_unwanted_groups:
         res = flatten_hierarchy(res)
@@ -229,7 +258,6 @@ def get_account_balances(accounts, company, from_date, to_date, vehicle=None, ma
         account['account_name'] = frappe.db.get_value("Account", account["value"], "account_name")
         account = get_account_balance_on(
                                 account=account, 
-                                account_condition=f""" and gl.account="{account['value']}" """,
                                 company=company, 
                                 from_date=from_date, 
                                 to_date=to_date, 
@@ -242,13 +270,20 @@ def get_account_balances(accounts, company, from_date, to_date, vehicle=None, ma
         
     return accounts
 
-def get_account_balance_on(account, account_condition, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
+def get_account_balance_on(account, company, from_date, to_date, expense_name="", vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
     if(account.get('expandable')):
         account['balance'] = 0
         account["references"] = []
         account['vehicle'] = ""
         return account
-    conditions=""
+    
+    conditions=" and gl.debit>0 "
+    account_condition = f""" and gl.account="{account['value']}" """
+
+    if expense_name:
+        account_condition = f""" and gl.expense_name="{account['value']}" """
+    else:
+        conditions+=""" and ifnull(gl.expense_name, "")="" """
 
     if prod_details:
         conditions+=f""" and (gl.{frappe.scrub(prod_details)}=1
@@ -529,6 +564,17 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[],
 
     gl_machine_key = json.dumps(gl_machines)
     machine_key = json.dumps(machines)
+
+    if gl.get("split_equally"):
+        num_total = 1
+        den_total = sum([paver, cw, fp, lego])
+
+        if prod_details == "paver":
+            res = (num_total or 0) / (den_total or 1)
+            num_total = (len(machines) or len(WORKSTATIONS)) * res
+            den_total = len(gl_machines) or len(WORKSTATIONS)
+        
+        return (num_total or 0) / (den_total or 1)
 
     if gl_machine_key not in machine_wise_prod_info:
         machine_wise_prod_info[gl_machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=gl_machines)
@@ -856,7 +902,7 @@ def get_purchase_account_balances(accounts, company, from_date, to_date, vehicle
         account['account_name'] = account["value"]
         account = get_account_balance_on(
                                 account=account, 
-                                account_condition=f""" and gl.expense_name="{account['value']}" """,
+                                expense_name=account['value'],
                                 company=company, 
                                 from_date=from_date, 
                                 to_date=to_date, 

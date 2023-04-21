@@ -39,7 +39,7 @@ def execute(filters=None):
                                             on emp.employee = jwd.name1
                                         {0}
                                     {2} order by jwd.sqft_allocated)as total_cal
-                                """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.completed_bundle), sum(jwd.sqft_allocated), avg(jwd.rate)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated, jwd.rate", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
+                                """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.completed_bundle), sum(jwd.sqft_allocated), avg(jwd.rate)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated, jwd.rate", (("sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))))
  
     if filters.get("hide_other_work"):
         report_data1=[]
@@ -81,14 +81,49 @@ def execute(filters=None):
     
     if not filters.get('show_only_other_work'):
         data+=get_employees_to_add(filters, [row[0] for row in data])
-    
+
     for row in data:
         if row[0] and frappe.db.exists("Employee", row[0]):
             row[8]=get_employee_salary_balance(employee=row[0], from_date=from_date, to_date=to_date)
 
     data.sort(key = lambda x:(x[0] or ""))
     
-    
+    _data = []
+    for idx in range(len(data)):
+        _data.append(data[idx])
+        if idx+1 == len(data) or data[idx+1][0] != data[idx][0]:
+            credit = frappe.db.sql(f"""
+                select
+                    jea.party,
+                    sum(jea.credit) as amount,
+                    je.salary_component as component
+                from `tabJournal Entry Account` jea
+                inner join `tabJournal Entry` je 
+                on jea.parenttype="Journal Entry" and jea.parent=je.name
+                where
+                    je.docstatus=1 and
+                    je.voucher_type="Credit Note" and
+                    je.posting_date between '{from_date}' and '{to_date}' and
+                    jea.party_type='Employee' and
+                    jea.party='{data[idx][0]}' and
+                    ifnull(je.salary_component, '')!=''
+            """, as_dict=True)
+            _data.append([
+                credit[0].party,
+                credit[0].component,
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                _data[idx][8],
+                credit[0].amount,
+                '',
+                '',
+            ])
+    data = _data
+
     if(len(data)):
         start = 0
         for i in range(len(data)-1):
@@ -320,7 +355,21 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
             AND dp.date between '{from_date}' and '{to_date}'
             AND ea.repay_unclaimed_amount_from_salary=1
     """)[0][0]
-    return round((planned_deduction or 0), 2) or 0#get_undeducted_advances(employee, from_date, to_date)
+    debit_note = frappe.db.sql(f"""
+                select
+                    sum(jea.debit) as amount
+                from `tabJournal Entry Account` jea
+                inner join `tabJournal Entry` je 
+                on jea.parenttype="Journal Entry" and jea.parent=je.name
+                where
+                    je.docstatus=1 and
+                    je.voucher_type="Debit Note" and
+                    je.posting_date between '{from_date}' and '{to_date}' and
+                    jea.party_type='Employee' and
+                    jea.party='{employee}' and
+                    ifnull(je.salary_component, '')!=''
+            """)[0][0]
+    return round(((planned_deduction or 0) + (debit_note or 0)), 2) or 0#get_undeducted_advances(employee, from_date, to_date)
 
 def get_undeducted_advances(employee, from_date, to_date):
     res= frappe.db.sql(f"""
