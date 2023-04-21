@@ -90,6 +90,73 @@ class CustomSalary(SalarySlip):
                 additional_salary,
                 is_recurring = additional_salary.is_recurring
             )
+    def update_component_row(self, component_data, amount, component_type, additional_salary=None, is_recurring = 0):
+        component_row = None
+        for d in self.get(component_type):
+            if d.salary_component != component_data.salary_component:
+                continue
+
+            if (
+                (
+                    not (d.additional_salary or d.journal_entry)
+                    and (not additional_salary or additional_salary.overwrite)
+                ) or (
+                    additional_salary
+                    and additional_salary.name in (d.additional_salary, d.journal_entry)
+                )
+            ):
+                component_row = d
+                break
+
+        if additional_salary and additional_salary.overwrite:
+            # Additional Salary with overwrite checked, remove default rows of same component
+            self.set(component_type, [
+                d for d in self.get(component_type)
+                if d.salary_component != component_data.salary_component
+                or ((d.additional_salary or d.journal_entry) and additional_salary.name not in (d.additional_salary, d.journal_entry))
+                or d == component_row
+            ])
+
+        if not component_row:
+            if not amount:
+                return
+
+            component_row = self.append(component_type)
+            for attr in (
+                'depends_on_payment_days', 'salary_component',
+                'do_not_include_in_total', 'is_tax_applicable',
+                'is_flexible_benefit', 'variable_based_on_taxable_salary',
+                'exempted_from_income_tax'
+            ):
+                component_row.set(attr, component_data.get(attr))
+
+            abbr = component_data.get('abbr') or component_data.get('salary_component_abbr')
+            component_row.set('abbr', abbr)
+
+        if additional_salary:
+            if additional_salary.overwrite:
+                component_row.additional_amount = flt(flt(amount) - flt(component_row.get("default_amount", 0)),
+                    component_row.precision("additional_amount"))
+            else:
+                component_row.default_amount = 0
+                component_row.additional_amount = amount
+
+            component_row.is_recurring_additional_salary = is_recurring
+            if additional_salary.get("doctype") == "Journal Entry":
+                component_row.journal_entry = additional_salary.name
+            else:
+                component_row.additional_salary = additional_salary.name
+            component_row.deduct_full_tax_on_selected_payroll_date = \
+                additional_salary.deduct_full_tax_on_selected_payroll_date
+        else:
+            component_row.default_amount = amount
+            component_row.additional_amount = 0
+            component_row.deduct_full_tax_on_selected_payroll_date = \
+                component_data.deduct_full_tax_on_selected_payroll_date
+
+        component_row.amount = amount
+
+        self.update_component_amount_based_on_payment_days(component_row)
 
 @frappe.whitelist(allow_guest=True)
 def site_work_details(employee,start_date,end_date):
@@ -100,6 +167,28 @@ def site_work_details(employee,start_date,end_date):
     for data in job_worker:
             if data.name1 == employee and (data.start_date and data.start_date >= start_date) and (data.start_date and data.start_date <= end_date) and (data.end_date and data.end_date >= start_date) and (data.end_date and data.end_date <= end_date):
                 site_work.append([data.parent,data.amount])
+    additional_salary_list = frappe.db.sql(f"""
+                select
+                    je.name,
+                    "Journal Entry" as doctype,
+                    sum(jea.credit) as amount,
+                    'Earning' as type,
+                    je.salary_component as component
+                from `tabJournal Entry Account` jea
+                inner join `tabJournal Entry` je 
+                on jea.parenttype="Journal Entry" and jea.parent=je.name
+                where
+                    je.docstatus=1 and
+                    je.voucher_type="Credit Note" and
+                    je.posting_date between '{start_date}' and '{end_date}' and
+                    jea.party_type='Employee' and
+                    jea.party='{employee}' and
+                    ifnull(je.salary_component, '')!=''
+                group by je.name
+            """, as_dict=True)
+    for row in additional_salary_list:
+        site_work.append([row.component, row.amount])
+
     employee_sal_bal=get_employee_salary_balance(employee, start_date)
     return {"site_work": site_work, "unbilled_salary_balance": employee_sal_bal[0], "last_salary_slip_date": employee_sal_bal[1], "undeducted_advances": get_undeducted_advances(start_date, end_date, employee)}
 
@@ -355,6 +444,27 @@ def get_additional_salaries(employee, start_date, end_date, component_type):
                 additional_sal.type = "{comp_type}" and additional_sal.salary_slip_amount < additional_sal.amount and
                 additional_sal.payroll_date <= "{end_date}"
         """, as_dict=True)
+
+        if comp_type=="Deduction":
+            additional_salary_list += frappe.db.sql(f"""
+                select
+                    je.name,
+                    "Journal Entry" as doctype,
+                    sum(jea.debit) as amount,
+                    'Deduction' as type,
+                    je.salary_component as component
+                from `tabJournal Entry Account` jea
+                inner join `tabJournal Entry` je 
+                on jea.parenttype="Journal Entry" and jea.parent=je.name
+                where
+                    je.docstatus=1 and
+                    je.voucher_type="Debit Note" and
+                    je.posting_date between '{start_date}' and '{end_date}' and
+                    jea.party_type='Employee' and
+                    jea.party='{employee}' and
+                    ifnull(je.salary_component, '')!=''
+                group by je.name
+            """, as_dict=True)
     else:
         additional_salary_list=frappe.db.sql(f"""
         select 
