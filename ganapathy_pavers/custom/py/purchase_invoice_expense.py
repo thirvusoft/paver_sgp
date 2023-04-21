@@ -52,7 +52,8 @@ class _PurchaseInvoice(PurchaseInvoice):
         self.make_write_off_gl_entry(gl_entries)
         self.make_gle_for_rounding_adjustment(gl_entries)
 
-        add_expense_to_gl_entries(self, gl_entries)
+        if self.get("expense_type"):
+            add_expense_to_gl_entries(self, gl_entries)
 
         return gl_entries
 
