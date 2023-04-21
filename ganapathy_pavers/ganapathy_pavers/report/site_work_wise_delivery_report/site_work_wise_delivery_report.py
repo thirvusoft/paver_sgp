@@ -29,7 +29,7 @@ def execute(filters=None):
         if item_group:
             conditions += f" and child.item_group in {tuple(item_group)}" if len(item_group)>1 else f" and child.item_group = '{item_group[0]}'"
         if vehicle:
-            conditions += f""" and doc.own_vehicle_no {f"= '{vehicle[0]}'" if len(vehicle)==1 else f"in {tuple(vehicle)}"} """
+            conditions += f""" and (doc.own_vehicle_no {f"= '{vehicle[0]}'" if len(vehicle)==1 else f"in {tuple(vehicle)}"} or doc.vehicle_no {f"= '{vehicle[0]}'" if len(vehicle)==1 else f"in {tuple(vehicle)}"} )"""
         
     report_data = frappe.db.sql(""" select
                                 doc.posting_date,
@@ -39,6 +39,12 @@ def execute(filters=None):
                                 doc.site_work,
                                 child.item_code,
                                 child.warehouse,
+                                case 
+                                    when ifnull(doc.own_vehicle_no, '')!='' 
+                                        then doc.own_vehicle_no
+                                    else
+                                        doc.vehicle_no
+                                end as own_vehicle_no,
                                 doc.own_vehicle_no,
                                 child.ts_qty,
                                 child.qty,
