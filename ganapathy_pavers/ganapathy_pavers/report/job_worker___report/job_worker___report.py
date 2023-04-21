@@ -108,20 +108,21 @@ def execute(filters=None):
                     jea.party='{data[idx][0]}' and
                     ifnull(je.salary_component, '')!=''
             """, as_dict=True)
-            _data.append([
-                credit[0].party,
-                credit[0].component,
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                _data[idx][8],
-                credit[0].amount,
-                '',
-                '',
-            ])
+            if credit[0].amount:
+                _data.append([
+                    credit[0].party,
+                    credit[0].component,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    _data[idx][8],
+                    credit[0].amount,
+                    '',
+                    '',
+                ])
     data = _data
 
     if(len(data)):
