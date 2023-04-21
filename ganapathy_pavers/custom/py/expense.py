@@ -350,7 +350,7 @@ def get_account_balance_on(account, account_condition, company, from_date, to_da
                     "parent": account['value'],
                     "child_nodes": [],
                     "account_name": f"""{account["account_name"]}""",
-                    "vehicle": f"""{f'''{veh} ''' if veh else ""}{f'''{ifc} ''' if ifc else ""}""".strip()
+                    "vehicle": veh or ifc
                 }
             
             _account = calculate_exp_from_gl_entries(
