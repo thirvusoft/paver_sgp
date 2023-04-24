@@ -96,7 +96,8 @@ def execute(filters=None):
                 select
                     jea.party,
                     sum(jea.credit) as amount,
-                    je.salary_component as component
+                    je.salary_component as component,
+                    group_concat(je.user_remark separator '\n') as remarks
                 from `tabJournal Entry Account` jea
                 inner join `tabJournal Entry` je 
                 on jea.parenttype="Journal Entry" and jea.parent=je.name
@@ -122,6 +123,9 @@ def execute(filters=None):
                     credit[0].amount,
                     '',
                     '',
+                    '',
+                    '',
+                    credit[0].remarks
                 ])
     data = _data
 
@@ -130,13 +134,18 @@ def execute(filters=None):
         for i in range(len(data)-1):
             if (data[i][0] != data[i+1][0]):
                 adv=get_employee_salary_slip_advance_deduction(data[i][0], from_date, to_date, data[i][10])
+                remarks=adv.get("remarks")
+                adv=adv.get("amount")
                 data[i][10]=None
                 data[i][11]=None
+                credit_remark=data[i][14] if len(data[i]) >= 15 else ''
+                if len(data[i]) >= 15:
+                    data[i][14]=None
                 employee_id=data[i][0]
                 data[i][0]=frappe.db.get_value("Employee", data[i][0], "employee_name")
-                final_data.append(data[i]+[None])
-                total = [" " for i in range(13)]
-                total[0] = f"""<b style="font-size: 20px;text-align: center; color:green">{data[i][0]}</b>"""
+                final_data.append(data[i]+[None, None, None])
+                total = [" " for i in range(15)]
+                total[0] = data[i][0]
                 total[2] = "Total"
                 total[3] = sum((data[i][3] or 0) for i in range(start,i+1))
                 total[4] = sum((data[i][4] or 0) for i in range(start,i+1))
@@ -152,6 +161,9 @@ def execute(filters=None):
                 total_amt=round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
                 total[11] = total_amt
                 total[12]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
+                total[13]=remarks
+                total[14] = credit_remark
+                
                 final_data[-1][8]=None
                 final_data.append(total)
                 start = i+1	
@@ -163,15 +175,20 @@ def execute(filters=None):
                 if(c==0):data[i][10]=None
                 else:data[i][10]=None
                 c+=1
-                final_data.append(data[i]+[None])
+                final_data.append(data[i]+[None, None, None])
         adv=get_employee_salary_slip_advance_deduction(data[-1][0], from_date, to_date, data[-1][10])
+        remarks=adv.get("remarks")
+        adv=adv.get("amount")
         data[-1][10]=None
         data[-1][11]=None
+        credit_remark=data[-1][14] if len(data[-1]) == 15 else ''
+        if len(data[-1]) >= 15:
+                    data[-1][14]=None
         employee_id=data[-1][0]
         data[-1][0]=frappe.db.get_value("Employee", data[-1][0], "employee_name")
-        final_data.append(data[-1]+[None])
-        total = [" " for i in range(13)]
-        total[0] = f"""<b style="font-size: 20px;text-align: center; color:green">{data[-1][0]}</b>"""
+        final_data.append(data[-1]+[None, None, None])
+        total = [" " for i in range(15)]
+        total[0] = data[-1][0]
         total[2] = "Total"
         total[3] = sum((data[i][3] or 0) for i in range(start,len(data)))
         total[4] = sum((data[i][4] or 0) for i in range(start,len(data)))
@@ -188,6 +205,8 @@ def execute(filters=None):
         total_amt = round(((amount or 0)+(salary_bal or 0)-(adv or 0)), 2)
         total[11] = total_amt
         total[12]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
+        total[13]=remarks
+        total[14] = credit_remark
         final_data[-1][8]=None
         final_data.append(total)
     other_work=0
@@ -199,7 +218,9 @@ def execute(filters=None):
             row[6]=""
             row[7]=""
     columns = get_columns(other_work)
-    return columns, add_total_row(final_data, index = 11)
+    data = add_total_row(final_data, index = 11)
+
+    return columns, data
 
 def add_total_row(data, index=None):
     res=[]
@@ -291,6 +312,24 @@ def get_columns(other_work):
             "default": None,
             "minWidth": 120,
             "ts_right_align": "text-right"
+        },
+        {
+            "fieldname": "debit_remarks",
+            "label": "Debit Remarks",
+            "fieldtype": "Small Text",
+            "default": None,
+            "minWidth": 120,
+            "hidden": 1,
+            "ts_right_align": "text-right"
+        },
+        {
+            "fieldname": "credit_remarks",
+            "label": "Credit Remarks",
+            "fieldtype": "Small Text",
+            "default": None,
+            "minWidth": 120,
+            "hidden": 1,
+            "ts_right_align": "text-right"
         }
 		]
 	
@@ -342,7 +381,7 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
             WHERE ss.docstatus=1 AND ss.employee='{employee}' AND ss.start_date >= '{from_date}' AND ss.end_date <= '{to_date}'
         """
         res=frappe.db.sql(query)[0][0]
-        return res
+        return {"amount": res}
     planned_deduction=0
     planned_deduction=frappe.db.sql(f"""
         SELECT 
@@ -358,7 +397,8 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
     """)[0][0]
     debit_note = frappe.db.sql(f"""
                 select
-                    sum(jea.debit) as amount
+                    sum(jea.debit) as amount,
+                    GROUP_CONCAT(je.user_remark SEPARATOR '\n') as remarks
                 from `tabJournal Entry Account` jea
                 inner join `tabJournal Entry` je 
                 on jea.parenttype="Journal Entry" and jea.parent=je.name
@@ -369,8 +409,15 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
                     jea.party_type='Employee' and
                     jea.party='{employee}' and
                     ifnull(je.salary_component, '')!=''
-            """)[0][0]
-    return round(((planned_deduction or 0) + (debit_note or 0)), 2) or 0#get_undeducted_advances(employee, from_date, to_date)
+                order by je.posting_date, je.creation
+            """, as_dict=True)
+    debit = 0
+    remarks = ""
+    if debit_note and debit_note[0] and debit_note[0].get("amount"):
+        debit = debit_note[0].get("amount")
+        remarks = debit_note[0].get("remarks")
+
+    return {"amount": round(((planned_deduction or 0) + (debit or 0)), 2) or 0, "remarks": remarks}#get_undeducted_advances(employee, from_date, to_date)
 
 def get_undeducted_advances(employee, from_date, to_date):
     res= frappe.db.sql(f"""
