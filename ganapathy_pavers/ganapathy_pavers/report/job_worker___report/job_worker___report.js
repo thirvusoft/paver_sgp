@@ -85,8 +85,7 @@ frappe.query_reports["Job Worker - Report"] = {
 	"formatter": function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 		if (data && (data.status == "Total" || data.job_worker == "Total" || data.bold)) {
-			value = `<b style="font-size: 117%;">${value}</b>`;
-
+			value = `<b style="font-size: 117%;${(column.fieldname=="job_worker" && data.job_worker!="Total")?'font-weight:bold;font-size: 20px;text-align: center; color:green':''}">${value}</b>`;
 		}
 		return value;
 	},
