@@ -10,6 +10,21 @@ from frappe.custom.doctype.property_setter.property_setter import make_property_
 from ganapathy_pavers.ganapathy_pavers.doctype.employee_advance_tool.employee_advance_tool import create_employee_advance
 
 class CustomSalary(SalarySlip):
+    def eval_condition_and_formula(self, d, data):
+        try:
+            condition = d.condition.strip().replace("\n", " ") if d.condition else None
+            if condition:
+                if not ganapathy_pavers.custom_safe_eval(condition, self.whitelisted_globals, data):
+                    return None
+            amount = d.amount
+            if d.amount_based_on_formula:
+                formula = d.formula.strip().replace("\n", " ") if d.formula else None
+                if formula:
+                    amount = flt(ganapathy_pavers.custom_safe_eval(formula, self.whitelisted_globals, data), d.precision("amount"))
+            if amount:
+                data[d.abbr] = amount
+
+            return amount
     def validate_days_calc(self, event=None):
         if (self.start_date and self.end_date):
             self.days=date_diff(self.end_date, self.start_date) + 1
