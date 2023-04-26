@@ -92,6 +92,45 @@ def get_buying_rate(item_code : str, warehouse : str, posting_date=None) -> floa
 		return 0
 	return rate[0]
 
+def custom_safe_eval(code, eval_globals=None, eval_locals=None):
+	"""A safer `eval`"""
+	whitelisted_globals = {"int": int, "float": float, "long": int, "round": round,"frappe":frappe,"len":len}
+
+	UNSAFE_ATTRIBUTES = {
+		# Generator Attributes
+		"gi_frame",
+		"gi_code",
+		# Coroutine Attributes
+		"cr_frame",
+		"cr_code",
+		"cr_origin",
+		# Async Generator Attributes
+		"ag_code",
+		"ag_frame",
+		# Traceback Attributes
+		"tb_frame",
+		"tb_next",
+		# Format Attributes
+		"format",
+		"format_map",
+	}
+
+	for attribute in UNSAFE_ATTRIBUTES:
+		if attribute in code:
+			throw('Illegal rule {0}. Cannot use "{1}"'.format(bold(code), attribute))
+
+	if "__" in code:
+		throw('Illegal rule {0}. Cannot use "__"'.format(bold(code)))
+
+	if not eval_globals:
+		eval_globals = {}
+
+	eval_globals["__builtins__"] = {}
+	eval_globals.update(whitelisted_globals)
+	return eval(code, eval_globals, eval_locals)
+
 def get_bank_details(company : str) -> dict:
 	doc=frappe.get_all("Bank Account", {"company": company, "account": frappe.get_value("Company", company, "default_bank_account")}, ["branch_name", "ifsc_code", "bank", "bank_account_no"])
 	return doc[0] if doc else {"branch_name":"", "ifsc_code":"", "bank":"", "bank_account_no":""}
+
+frappe.safe_eval=custom_safe_eval
