@@ -89,7 +89,7 @@
 	</tbody>
 </table>
 
-{% if debit_remarks %}
+{% if debit_remarks.length %}
 	<b style="font-size: 120%;">Debit Note Remarks: </b>
 	<table class="table table-bordered">
 	{% for remark in debit_remarks %}
@@ -101,7 +101,7 @@
 	</table>
 {% endif %}
 
-{% if credit_remarks %}
+{% if credit_remarks.length %}
 	<b style="font-size: 120%;">Credit Note Remarks: </b>
 	<table class="table table-bordered">
 	{% for remark in credit_remarks %}

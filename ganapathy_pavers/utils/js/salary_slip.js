@@ -32,6 +32,7 @@ frappe.ui.form.on('Salary Slip',{
                         var child = cur_frm.add_child("site_work_details");
                         frappe.model.set_value(child.doctype, child.name, "site_work_name", r.message["site_work"][data][0])     
                         frappe.model.set_value(child.doctype, child.name, "amount",r.message["site_work"][data][1] )
+                        frappe.model.set_value(child.doctype, child.name, "journal_entry",r.message["site_work"][data][2] )
                     }
                     cur_frm.refresh_field("site_work_details")
                     cur_frm.set_value("total_paid_amount",paid_amount);
