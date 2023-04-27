@@ -206,16 +206,24 @@ def site_work_details(employee,start_date,end_date):
                 inner join `tabJournal Entry` je 
                 on jea.parenttype="Journal Entry" and jea.parent=je.name
                 where
+                    ifnull((
+                        select count(ssc.name)
+                        from `tabSite work Details` ssc
+                        where 
+                            ssc.parenttype="Salary Slip" and
+                            ssc.docstatus=1 and
+                            ssc.journal_entry = je.name
+                    ), 0)=0 and 
                     je.docstatus=1 and
                     je.voucher_type="Credit Note" and
-                    je.posting_date between '{start_date}' and '{end_date}' and
+                    je.posting_date <= '{end_date}' and
                     jea.party_type='Employee' and
                     jea.party='{employee}' and
                     ifnull(je.salary_component, '')!=''
                 group by je.name
             """, as_dict=True)
     for row in additional_salary_list:
-        site_work.append([row.component, row.amount])
+        site_work.append([row.component, row.amount, row.name])
 
     employee_sal_bal=get_employee_salary_balance(employee, start_date)
     return {"site_work": site_work, "unbilled_salary_balance": employee_sal_bal[0], "last_salary_slip_date": employee_sal_bal[1], "undeducted_advances": get_undeducted_advances(start_date, end_date, employee)}

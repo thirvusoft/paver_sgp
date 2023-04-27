@@ -12,6 +12,8 @@
 {% endif %}
 <hr>
 
+{% var debit_remarks = [] %}
+{% var credit_remarks = [] %}
 <table class="table table-bordered">
 	<!-- heading -->
 	<thead>
@@ -40,9 +42,27 @@
 				<span> {{ row._index + 1 }} </span>
 			</td>
 			{% for col in columns %}
-				{% if col.name && col._id !== "_check" && !col.hidden %}
+				{% var value = col.fieldname ? row[col.fieldname] : row[col.id]; %}
+				{% if col.fieldname=="debit_remarks" && value %}
+					{% var _ = debit_remarks.push({employee:row['job_worker'], value: col.formatter
+						? col.formatter(row._index, col._index, value, col, format_data, true)
+						: col.format
+							? col.format(value, row, col, format_data)
+							: col.docfield
+								? frappe.format(value, col.docfield)
+								: value}) %}
+				{% endif %}
+				{% if col.fieldname=="credit_remarks" && value %}
+					{% var _ = credit_remarks.push({employee:row['job_worker'], value: col.formatter
+						? col.formatter(row._index, col._index, value, col, format_data, true)
+						: col.format
+							? col.format(value, row, col, format_data)
+							: col.docfield
+								? frappe.format(value, col.docfield)
+								: value}) %}
+				{% endif %}
 
-					{% var value = col.fieldname ? row[col.fieldname] : row[col.id]; %}
+				{% if col.name && col._id !== "_check" && !col.hidden %}
 
 					<td {% if row.bold == 1 || row.status=="<b>Total</b>"%} style="font-weight: bold" {% endif %} {% if col.ts_right_align%} class="text-right" {% endif %}>
 						<span {% if col._index == 0 %} style="padding-left: {%= cint(row.indent) * 2 %}em" {% endif %}>
@@ -68,3 +88,27 @@
 		{% endfor %}
 	</tbody>
 </table>
+
+{% if debit_remarks.length %}
+	<b style="font-size: 120%;">Debit Note Remarks: </b>
+	<table class="table table-bordered">
+	{% for remark in debit_remarks %}
+		<tr style="width: 100%;">
+				<td style="font-weight: bold; font-size: 110%;">{{ remark.employee }}</td>
+				<td>{{ remark.value }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+{% endif %}
+
+{% if credit_remarks.length %}
+	<b style="font-size: 120%;">Credit Note Remarks: </b>
+	<table class="table table-bordered">
+	{% for remark in credit_remarks %}
+		<tr style="width: 100%;">
+				<td style="font-weight: bold; font-size: 110%;">{{ remark.employee }}</td>
+				<td>{{ remark.value }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+{% endif %}
