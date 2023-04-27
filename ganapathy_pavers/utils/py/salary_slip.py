@@ -1,4 +1,5 @@
 import datetime
+import ganapathy_pavers
 from erpnext.hr.utils import validate_active_employee
 from frappe.utils import getdate
 from erpnext.payroll.doctype.salary_slip.salary_slip import SalarySlip, get_salary_component_data
@@ -10,6 +11,33 @@ from frappe.custom.doctype.property_setter.property_setter import make_property_
 from ganapathy_pavers.ganapathy_pavers.doctype.employee_advance_tool.employee_advance_tool import create_employee_advance
 
 class CustomSalary(SalarySlip):
+    def eval_condition_and_formula(self, d, data):
+        try:
+            condition = d.condition.strip().replace("\n", " ") if d.condition else None
+            if condition:
+                if not ganapathy_pavers.custom_safe_eval(condition, self.whitelisted_globals, data):
+                    return None
+            amount = d.amount
+            if d.amount_based_on_formula:
+                formula = d.formula.strip().replace("\n", " ") if d.formula else None
+                if formula:
+                    amount = flt(ganapathy_pavers.custom_safe_eval(formula, self.whitelisted_globals, data), d.precision("amount"))
+            if amount:
+                data[d.abbr] = amount
+
+            return amount
+
+        except NameError as err:
+            frappe.throw(
+                _("{0} <br> This error can be due to missing or deleted field.").format(err),
+                title=_("Name error"),
+            )
+        except SyntaxError as err:
+            frappe.throw(_("Syntax error in formula or condition: {0}").format(err))
+        except Exception as e:
+            frappe.throw(_("Error in formula or condition: {0}").format(e))
+            raise
+                
     def validate_days_calc(self, event=None):
         if (self.start_date and self.end_date):
             self.days=date_diff(self.end_date, self.start_date) + 1
