@@ -84,8 +84,8 @@ def execute(filters=None):
 
     for row in data:
         if row[0] and frappe.db.exists("Employee", row[0]):
-            row[8]=get_employee_salary_balance(employee=row[0], from_date=from_date, to_date=to_date)
-
+            emp_sal=get_employee_salary_balance(employee=row[0], from_date=from_date, to_date=to_date)
+            row[8]=emp_sal.get("amount")
     data.sort(key = lambda x:(x[0] or ""))
     
     _data = []
@@ -97,14 +97,22 @@ def execute(filters=None):
                     jea.party,
                     sum(jea.credit) as amount,
                     je.salary_component as component,
-                    group_concat(je.user_remark separator '\n') as remarks
+                    GROUP_CONCAT(CONCAT(je.name, '', round(jea.credit, 2), ' ', ifnull(je.user_remark, '')) SEPARATOR '\n') as remarks
                 from `tabJournal Entry Account` jea
                 inner join `tabJournal Entry` je 
                 on jea.parenttype="Journal Entry" and jea.parent=je.name
                 where
+                    ifnull((
+                        select count(ssc.name)
+                        from `tabSite work Details` ssc
+                        where 
+                            ssc.parenttype="Salary Slip" and
+                            ssc.docstatus=1 and
+                            ssc.journal_entry = je.name
+                    ), 0)=0 and 
                     je.docstatus=1 and
                     je.voucher_type="Credit Note" and
-                    je.posting_date between '{from_date}' and '{to_date}' and
+                    je.posting_date <= '{to_date}' and
                     jea.party_type='Employee' and
                     jea.party='{data[idx][0]}' and
                     ifnull(je.salary_component, '')!=''
@@ -119,7 +127,7 @@ def execute(filters=None):
                     '',
                     '',
                     '',
-                    _data[idx][8],
+                    data[idx][8],
                     credit[0].amount,
                     '',
                     '',
@@ -336,6 +344,7 @@ def get_columns(other_work):
 	return columns
 
 def get_employee_salary_balance(employee, from_date, to_date):
+    remarks = ""
     last_ss_date=frappe.db.sql(f"""
     SELECT MAX(ss.end_date) 
     FROM `tabSalary Slip` ss
@@ -347,6 +356,9 @@ def get_employee_salary_balance(employee, from_date, to_date):
     conditions=f"""
     where jwd.name1='{employee}' and jwd.end_date < '{from_date}' 
     """
+    credit_conditions = f"""
+    and je.posting_date < '{from_date}'
+    """
     if last_ss_date[0][0]:
         conditions+=f""" and jwd.start_date > '{datetime.datetime.strftime(last_ss_date[0][0], "%Y-%m-%d")}'"""
     if not last_ss_date[0][0] or datetime.datetime.strptime(from_date, "%Y-%m-%d").date()>last_ss_date[0][0]:
@@ -357,12 +369,39 @@ def get_employee_salary_balance(employee, from_date, to_date):
             on site.name = jwd.parent
         {conditions}
         """)[0][0] or 0
+
+        credit_note_amount = frappe.db.sql(f"""
+                select
+                    sum(jea.credit) as amount,
+                    GROUP_CONCAT(CONCAT(je.name, '', round(jea.credit, 2), ' ', ifnull(je.user_remark, '')) SEPARATOR '\n') as remarks
+                from `tabJournal Entry Account` jea
+                inner join `tabJournal Entry` je 
+                on jea.parenttype="Journal Entry" and jea.parent=je.name
+                where
+                    ifnull((
+                        select count(ssc.name)
+                        from `tabSite work Details` ssc
+                        where 
+                            ssc.parenttype="Salary Slip" and
+                            ssc.docstatus=1 and
+                            ssc.journal_entry = je.name
+                    ), 0)=0 and 
+                    je.docstatus=1 and
+                    je.voucher_type="Credit Note" and
+                    jea.party_type='Employee' and
+                    jea.party='{employee}' and
+                    ifnull(je.salary_component, '')!=''
+                    {credit_conditions}
+            """, as_dict=True)
+        if credit_note_amount and credit_note_amount[0] and credit_note_amount[0].get("amount"):
+            amount = (amount or 0) + (credit_note_amount[0].get("amount") or 0)
+
     if salary_slip:
-        return salary_slip[0]["total_unpaid_amount"]+amount
+        return {"amount": salary_slip[0]["total_unpaid_amount"]+amount, "remarks": remarks}
 
     elif(salary_slip1):
-        return salary_slip1[0]["total_unpaid_amount"]+amount
-    return round((amount or 0), 2)
+        return {"amount": salary_slip1[0]["total_unpaid_amount"]+amount, "remarks": remarks}
+    return {"amount": round((amount or 0), 2), "remarks": remarks}
 
 def get_employee_salary_slip_amount(employee, from_date, to_date):
     query=f"""
@@ -398,14 +437,23 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
     debit_note = frappe.db.sql(f"""
                 select
                     sum(jea.debit) as amount,
-                    GROUP_CONCAT(je.user_remark SEPARATOR '\n') as remarks
+                    GROUP_CONCAT(CONCAT(je.name, '', round(jea.debit, 2), ' ', ifnull(je.user_remark, '')) SEPARATOR '\n') as remarks
                 from `tabJournal Entry Account` jea
                 inner join `tabJournal Entry` je 
                 on jea.parenttype="Journal Entry" and jea.parent=je.name
                 where
                     je.docstatus=1 and
                     je.voucher_type="Debit Note" and
-                    je.posting_date between '{from_date}' and '{to_date}' and
+                    je.posting_date <= '{to_date}' and
+                    ifnull((
+                        select count(ssc.name)
+                        from `tabSalary Detail` ssc
+                        where 
+                            ssc.parenttype="Salary Slip" and
+                            ssc.parentfield="deductions" and
+                            ssc.docstatus=1 and
+                            ssc.journal_entry = je.name
+                    ), 0)=0 and 
                     jea.party_type='Employee' and
                     jea.party='{employee}' and
                     ifnull(je.salary_component, '')!=''
@@ -459,6 +507,6 @@ def get_employees_to_add(filters, employees):
     rem = frappe.get_all("Employee", emp_filters, pluck='name')
     return [[emp]+ [None for i in range(11)] for emp in rem if (
         get_undeducted_advances(emp, filters.get("from_date"), filters.get("to_date")) or
-        get_employee_salary_balance(emp, filters.get("from_date"), filters.get("to_date")) or
+        get_employee_salary_balance(emp, filters.get("from_date"), filters.get("to_date")).get("amount") or
         get_employee_salary_slip_amount(emp, filters.get("from_date"), filters.get("to_date"))
     )]
