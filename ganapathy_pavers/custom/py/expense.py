@@ -9,14 +9,14 @@ WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, plu
 
 VEHICLE_WISE = {}
 
-def filter_empty(gl_entries, vehicle_summary, workstations):
+def filter_empty(gl_entries, vehicle_summary, workstations, group_two_wheeler):
     res = []
 
     for acc in gl_entries:
         acc["references"] = sorted(acc.get("references") or [], key=lambda x: (x.get("account") or ""))
         if acc.get("vehicle") and vehicle_summary:
             _key = acc.get("vehicle")
-            if frappe.db.get_value("Vehicle", acc.get("vehicle"), "wheels") == 2:
+            if group_two_wheeler and frappe.db.get_value("Vehicle", acc.get("vehicle"), "wheels") == 2:
                 _key = "TWO WHEELER"
                 for ref in acc["references"]:
                     ref["title"] = acc.get("vehicle")
@@ -41,7 +41,7 @@ def filter_empty(gl_entries, vehicle_summary, workstations):
                 VEHICLE_WISE[_key]["references"].extend(acc.get("references") or {})
 
         elif acc.get("expandable"):
-            acc["child_nodes"] = filter_empty(gl_entries=acc.get("child_nodes") or [], vehicle_summary=vehicle_summary, workstations=workstations)
+            acc["child_nodes"] = filter_empty(gl_entries=acc.get("child_nodes") or [], vehicle_summary=vehicle_summary, workstations=workstations, group_two_wheeler=group_two_wheeler)
             if acc["child_nodes"]:
                 res.append(acc)
 
@@ -77,7 +77,24 @@ def calculate_total(gl_entries):
     return res
 
 @frappe.whitelist()
-def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Account', vehicle = None, machine = [], expense_type = None, prod_details = "", filter_unwanted_groups = True, vehicle_summary = False, vehicle_purpose=[], all_expenses=False, with_liability=True) -> list:
+def expense_tree(
+        from_date,
+        to_date, 
+        company = None, 
+        parent = "", 
+        doctype = 'Account', 
+        vehicle = None, 
+        machine = [], 
+        expense_type = None, 
+        prod_details = "", 
+        filter_unwanted_groups = True, 
+        vehicle_summary = False, 
+        vehicle_purpose=[], 
+        all_expenses=False, 
+        with_liability=True, 
+        group_two_wheeler=True
+    ) -> list:
+    
     WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
 
     if not company:
@@ -201,7 +218,7 @@ def expense_tree(from_date, to_date, company = None, parent = "", doctype = 'Acc
             "child_nodes": per_sqf_exp,
         })
 
-    res = filter_empty(gl_entries=res, vehicle_summary=vehicle_summary, workstations=WORKSTATIONS)
+    res = filter_empty(gl_entries=res, vehicle_summary=vehicle_summary, workstations=WORKSTATIONS, group_two_wheeler=group_two_wheeler)
 
     if filter_unwanted_groups:
         res = flatten_hierarchy(res)

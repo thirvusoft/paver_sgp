@@ -150,7 +150,8 @@ def get_vehicle_expenses(filters):
 					to_date=filters.get('to_date'),
 					expense_type="Vehicle",
 					vehicle_summary=1,
-					all_expenses=True
+					all_expenses=True,
+					group_two_wheeler=False
 				)
 	vehicle_wise_exp = {}
 	vehicle_wise_exp = calculate_expenses(exp_tree=exp_tree, vehicle_wise_exp=vehicle_wise_exp)
@@ -271,8 +272,7 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 			"vehicle": row,
 			"expense": exp,
 			"sqft": rental_sqft[row],
-			"sqft_cost": (exp or 0) / (rental_sqft[row] or 1),
-			"mileage": 0
+			"sqft_cost": (exp or 0) / (rental_sqft[row] or 1)
 		})
 	if len(rental_sqft) > 1:
 		data.append({
