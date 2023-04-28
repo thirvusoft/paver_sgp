@@ -125,7 +125,6 @@ frappe.ui.form.on('Material Manufacturing', {
 		cur_frm.set_value('rack_shifting_total_expense1', frm.doc.rack_shifting_additional_cost + frm.doc.total_rack_shift_expense + frm.doc.strapping_cost)
 	},
 	production_qty: async function (frm) {
-		cur_frm.set_value('total_no_of_produced_qty', frm.doc.production_qty);
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty)
 		let res = await ganapathy_pavers.uom_converstion(frm.doc.item_to_manufacture, "Nos", frm.doc.total_completed_qty, "SQF")
 		cur_frm.set_value('production_sqft', res)
@@ -189,6 +188,9 @@ frappe.ui.form.on('Material Manufacturing', {
 	strapping_cost_per_sqft: function (frm) {
 		cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft * frm.doc.production_sqft);
 	},
+	total_completed_qty: function (frm) {
+		cur_frm.set_value('total_no_of_produced_qty', frm.doc.total_completed_qty);
+	},
 	total_no_of_produced_qty: async function (frm) {
 		frm.set_value("remaining_qty", 0)
 
@@ -199,7 +201,7 @@ frappe.ui.form.on('Material Manufacturing', {
 			uom_bundle = value
 		})
 		
-		let res = await ganapathy_pavers.uom_converstion(frm.doc.item_to_manufacture, "Nos", frm.doc.total_no_of_produced_qty, "Bdl")
+		let res = await ganapathy_pavers.uom_converstion(frm.doc.item_to_manufacture, "Nos", (frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty), "Bdl")
 		cur_frm.set_value('total_no_of_bundle', res)
 	},
 	total_no_of_bundle: function (frm) {
