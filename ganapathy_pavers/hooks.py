@@ -405,8 +405,7 @@ scheduler_events = {
 
 	"daily":
 		[
-		"ganapathy_pavers.custom.py.purchase_order.purchasenotification",
-		"ganapathy_pavers.custom.py.site_work.update_delivered_qty"
+		"ganapathy_pavers.custom.py.purchase_order.purchasenotification"
 		],
 	"daily_long": [
 		"ganapathy_pavers.custom.py.bom.update_latest_price_in_all_boms"

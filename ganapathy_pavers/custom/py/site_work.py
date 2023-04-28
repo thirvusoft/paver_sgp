@@ -660,4 +660,5 @@ def refill_delivery_detail(site_work, event=None):
             delivery_detail.append(dn_row)
     
     doc.update({"delivery_detail": delivery_detail})
-    frappe.errprint(delivery_detail)
+    if isinstance(site_work, str):
+        doc.save()
