@@ -58,7 +58,7 @@ def execute(filters=None):
 		"1": "<b>Total Unit</b>",
 	})
 
-	pi_item=frappe.get_all("Purchase Invoice Item",{"parent":['in',pi_doc],"uom":"Unit"},['item_code','count(item_code) as count','sum(stock_qty) as stock_qty','stock_uom'],group_by='item_code')
+	pi_item=frappe.get_all("Purchase Invoice Item",{"parent":['in',pi_doc]},['item_code','count(item_code) as count','sum(stock_qty) as stock_qty','stock_uom'],group_by='item_code')
 	
 	from collections import Counter
 	purchase_uom = Counter()
@@ -75,12 +75,12 @@ def execute(filters=None):
 	total_unit= 0
 	for j in purchase_count:
 		total_load += purchase_count[j]
-		total_unit += (round(uom_conversion(j,purchase_uom[j],purchase_qty[j],"Unit"),2))
+		total_unit += (round(uom_conversion(j, purchase_uom[j], purchase_qty[j], "Unit", False), 2))
 		
 		data.append({
 			"item": j,
 			"qty": purchase_count[j],
-			"1": round(uom_conversion(j,purchase_uom[j],purchase_qty[j],"Unit"),2),
+			"1": round(uom_conversion(j, purchase_uom[j], purchase_qty[j], "Unit", False), 2),
 		})
 
 	data.append({

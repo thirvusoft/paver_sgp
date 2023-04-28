@@ -25,6 +25,24 @@
   {
    "hidden": 0,
    "is_query_report": 1,
+   "label": "Vehicle Summary",
+   "link_to": "Vehicle Summary",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Monthly Inward Transport Report",
+   "link_to": "Monthly Inward Transport Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
    "label": "Monthly Transport Report",
    "link_to": "Monthly Transport Report",
    "link_type": "Report",
@@ -50,7 +68,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-02-10 11:53:32.138853",
+ "modified": "2023-04-28 16:09:28.041778",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Maintenance",
