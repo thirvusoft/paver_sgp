@@ -4,7 +4,7 @@ __version__ = '0.0.1'
 from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import throw_error
 import frappe
 
-def uom_conversion(item : str, from_uom='', from_qty=0, to_uom='') -> float:
+def uom_conversion(item : str, from_uom='', from_qty=0, to_uom='', throw_err=True) -> float:
 	if (not to_uom):
 		return from_qty
 	if(not from_uom):
@@ -18,9 +18,16 @@ def uom_conversion(item : str, from_uom='', from_qty=0, to_uom='') -> float:
 		if(row.uom == to_uom):
 			to_conv = row.conversion_factor
 	if(not from_conv):
-		throw_error(from_uom + " Conversion", item)
+		if throw_err:
+			throw_error(from_uom + " Conversion", item)
+		else:
+			return 0
+	
 	if(not to_conv):
-		throw_error(to_uom + " Conversion", item)
+		if throw_err:
+			throw_error(to_uom + " Conversion", item)
+		else:
+			return 0
 
 	return (float(from_qty) * from_conv) / to_conv
 
