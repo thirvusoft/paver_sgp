@@ -12,6 +12,7 @@ def site_work(doc):
     items={}
     exp={}
     production_rate={}
+    without_transport_cost=doc.total
     nos=0
     supply_sqf=0
     sqf=doc.measurement_sqft or 0
@@ -54,6 +55,10 @@ def site_work(doc):
             exp[row.description.lower().strip()]["sqft_amount"]+=(row.amount or 0)/sqf if sqf else 0
             exp[row.description.lower().strip()]["supply_sqft_amount"]+=(row.amount or 0)/supply_sqf if supply_sqf else 0
     
+    for i in list(exp.values()):
+        if "transport" in i["description"].lower():
+            without_transport_cost -= i["amount"]
+
     delivered_items=(items.keys())
     dn_items=frappe.get_all("Delivery Note Item", {"parenttype": "Delivery Note", "parent": ["in", dn], "item_code": ["in", delivered_items]}, ["creation", "item_code", "warehouse"])
     dn_items+=frappe.get_all("Sales Invoice Item", {"parenttype": "Sales Invoice", "parent": ["in", si], "item_code": ["in", delivered_items]}, ["creation", "item_code", "warehouse"])
@@ -109,14 +114,14 @@ def site_work(doc):
             'nos':round(nos,2),
             'sqf':round(sqf,2), 
             'expense': list(exp.values()), 
-            'transporting_cost': doc.transporting_cost / sqf if sqf else 0,
-            'supply_transporting_cost': doc.transporting_cost / supply_sqf if supply_sqf else 0,
+            'transporting_cost': (doc.transporting_cost + (doc.total - without_transport_cost)) / sqf if sqf else 0,
+            'supply_transporting_cost': (doc.transporting_cost + (doc.total - without_transport_cost)) / supply_sqf if supply_sqf else 0,
             'total_job_worker_cost': total_job_worker_cost / sqf if sqf else 0,
             'total_other_worker_cost': total_other_worker_cost / sqf if sqf else 0,
             'supply_total_job_worker_cost': total_job_worker_cost / supply_sqf if supply_sqf else 0,
             'supply_total_other_worker_cost': total_other_worker_cost / supply_sqf if supply_sqf else 0,
-            'total': doc.total / sqf if sqf else 0, 
-            'supply_total': doc.total / supply_sqf if supply_sqf else 0,
+            'total': without_transport_cost / sqf if sqf else 0, 
+            'supply_total': without_transport_cost / supply_sqf if supply_sqf else 0,
             'supply_sqf': supply_sqf, 
             'production_rate': production_rate
         }
