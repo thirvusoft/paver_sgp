@@ -74,7 +74,8 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 				let r = [];
 				let item_groups = (await frappe.db.get_list("Delivery Note Item", { fields: ['item_group'], limit: 0 }))
 				item_groups.forEach(t => {
-					if (!r.includes(t.item_group)) { r.push(t.item_group) }
+					if (!r.includes(t.item_group)) {
+						 r.push(t.item_group) }
 				})
 				return frappe.db.get_link_options("Item Group", txt, {name: ["in", r]})
 			},
@@ -95,11 +96,15 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 				if (site) {
 					filters["site_work"] = site
 				}
-				let vehicles = (await frappe.db.get_list("Delivery Note", { filters: filters, fields: ['own_vehicle_no'], limit: 0 }))
+				let vehicles = (await frappe.db.get_list("Delivery Note", { filters: filters, fields: ['own_vehicle_no', 'vehicle_no'], limit: 0 }))
 				vehicles.forEach(t => {
-					if (!r.includes(t.own_vehicle_no)) { r.push(t.own_vehicle_no) }
+					if (!r.includes(t.own_vehicle_no?t.own_vehicle_no:t.vehicle_no)) { r.push(t.own_vehicle_no?t.own_vehicle_no:t.vehicle_no) }
 				})
-				return frappe.db.get_link_options("Vehicle", txt, {name: ["in", r]})
+				var result=[]
+				r.forEach(t => {
+					result.push({value:t,description:t})
+				})
+				return result
 			},
 		},
 		{
