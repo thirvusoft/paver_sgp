@@ -5,7 +5,6 @@ import json
 import frappe
 from frappe import _
 from ganapathy_pavers import uom_conversion
-from frappe.utils import get_datetime
 from ganapathy_pavers.custom.py.expense import  expense_tree
 
 def execute(filters=None):
@@ -33,21 +32,12 @@ def execute(filters=None):
 	mileage=avg_mileage[0]["mileage"] if avg_mileage else 0
 	due=due_months[0]["date"] if due_months else 0
 	insurance=insurance[0]["date"] if insurance else 0
-
-
-	print(days)
 	
 	start_km = 0
 	end_km = 0
 	pavers_km = 0
 	cw_km = 0
 	
-
-
-
-
-
-
 	if not doc:
 		return columns, data
 	start_km = (doc[0]["last_odometer"])
@@ -98,7 +88,6 @@ def execute(filters=None):
 	else:
 		data.append({})
 		
-
 	if  transport_based_on == "Report":
 		data.append({
 			"item":"<b>Item</b>",
