@@ -3,6 +3,7 @@ from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_
 import frappe
 from frappe.utils import nowdate, get_first_day, get_last_day
 from ganapathy_pavers import uom_conversion
+from frappe.utils import getdate
 from erpnext.stock.get_item_details import get_item_price
 
 DATE_FORMAT = "%Y-%m-%d"
