@@ -76,7 +76,7 @@ def get_attendance_details(date):
 class DailyMaintenance(Document):
 	pass
 @frappe.whitelist()
-def paver_item(warehouse, date, time, warehouse_colour):
+def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	warehouse = [row.get('warehouse') for row in json.loads(warehouse) if row.get('warehouse')]
 	warehouse_colour=[row.get('warehouse') for row in json.loads(warehouse_colour) if row.get('warehouse')]
 	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name',order_by='name')
@@ -166,19 +166,19 @@ def paver_item(warehouse, date, time, warehouse_colour):
   	#machine_details
 	production=[]
 	paver=frappe.db.sql(f"""select item_to_manufacture as item, work_station as machine, sum(production_sqft) as sqft,
-	sum(no_of_racks) as rack from `tabMaterial Manufacturing` where date(from_time) = '{date}' group by item_to_manufacture, work_station order by work_station, item_to_manufacture""", as_dict=True)
+	sum(no_of_racks) as rack from `tabMaterial Manufacturing` where date(from_time) = '{production_date}' group by item_to_manufacture, work_station order by work_station, item_to_manufacture""", as_dict=True)
 	if paver:
 		production+=paver
 		production+=frappe.db.sql(f"""select "Total Stock" as item, sum(production_sqft) as sqft,
-	sum(no_of_racks) as rack from `tabMaterial Manufacturing` where date(from_time) = '{date}' """, as_dict=True)
+	sum(no_of_racks) as rack from `tabMaterial Manufacturing` where date(from_time) = '{production_date}' """, as_dict=True)
 	
 	cw=frappe.db.sql(f"""select cwi.item as item, cwi.workstation as machine, cwi.production_sqft as sqft from `tabCW Items` as cwi
-	 	left outer join `tabCW Manufacturing` as cw on cwi.parent=cw.name where cw.molding_date='{date}' and cw.docstatus!=2 group by cwi.item, cwi.workstation order by cwi.workstation, cwi.item;
+	 	left outer join `tabCW Manufacturing` as cw on cwi.parent=cw.name where cw.molding_date='{production_date}' and cw.docstatus!=2 group by cwi.item, cwi.workstation order by cwi.workstation, cwi.item;
 	""", as_dict=True)
 	if cw:
 		production+=cw
 		production+=frappe.db.sql(f"""select "Total Stock" as item, sum(cwi.production_sqft) as sqft from `tabCW Items` as cwi
-	 	left outer join `tabCW Manufacturing` as cw on cwi.parent=cw.name where cw.molding_date='{date}' and cw.docstatus!=2;
+	 	left outer join `tabCW Manufacturing` as cw on cwi.parent=cw.name where cw.molding_date='{production_date}' and cw.docstatus!=2;
 	""", as_dict=True)
 	
 
