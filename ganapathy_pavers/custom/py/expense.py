@@ -452,6 +452,7 @@ def get_account_balance_on(account, company, from_date, to_date, expense_name=""
     return account
 
 def calculate_exp_from_gl_entries(account, gl_entries, from_date, to_date, expense_type=None, prod_details="", machines=[], all_expenses=False):
+    # frappe.errprint(gl_entries)
     if all_expenses and expense_type!="Vehicle":
         production_details = {"paver": WORKSTATIONS, "compound_wall": [], "fencing_post": [], "lego_block": []}
         for prod in production_details:
