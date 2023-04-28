@@ -369,51 +369,7 @@ def update_delivered_qty(site_work=[]):
                                         """, as_dict=True)
 
             for data in total_delivered_qty:
-                if frappe.get_value("Item", data.get('item_code'), "item_group") not in ["Raw Material"]:
-                    old_value=frappe.db.sql(f"""
-                        SELECT delivered_stock_qty, delivered_bundle, delivered_pieces
-                        FROM `tabDelivery Status`
-                        WHERE  parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
-                    """, as_dict=True)
-                    if old_value and (old_value[0].get("delivered_stock_qty") != data.get("stock_qty") or old_value[0].get("delivered_bundle") != data.get("bundle") or old_value[0].get("delivered_pieces") != data.get("pieces")):
-                        log_content+=f"""
-                        Site Work: {sw}\n
-                        {data.get("item_code")} Delivered Stock Qty old: {old_value[0].get("delivered_stock_qty")}   new: {data.get("stock_qty")}\n
-                        {data.get("item_code")} Delivered Bundle old: {old_value[0].get("delivered_bundle")}   new: {data.get("bundle")}\n
-                        {data.get("item_code")} Delivered Pieces old: {old_value[0].get("delivered_pieces")}   new: {data.get("pieces")}\n\n\n
-                        """
-                        frappe.db.sql(f"""
-                            UPDATE `tabDelivery Status`
-                            SET 
-                                delivered_stock_qty = {data.get("stock_qty")}, 
-                                delivered_bundle = {data.get("bundle")},
-                                delivered_pieces = {data.get("pieces")},
-                                pending_qty__to_deliver = qty_to_deliver-{data.get("stock_qty")}
-                            WHERE parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
-                        """)
-                    elif(not old_value):
-                        log_content+=f"""
-                        Site Work: {sw}\n
-                        ---------NEW RECORD---------\n
-                        Delivered Stock Qty new: {data.get("stock_qty")}\n
-                        Delivered Bundle new: {data.get("bundle")}\n
-                        Delivered Pieces new: {data.get("pieces")}\n\n\n
-                        """
-                        new_row={
-                            "parenttype": "Project",
-                            "parent": sw,
-                            "item": data.get('item_code'),
-                            "delivered_stock_qty": data.get("stock_qty"), 
-                            "delivered_bundle": data.get("bundle"),
-                            "delivered_pieces": data.get("pieces")
-                        }
-                        sw_doc=frappe.get_doc("Project", sw)
-                        sw_doc.update({
-                            "delivery_detail": sw_doc.get("delivery_detail", [])+[new_row]
-                        })
-                        sw_doc.run_method=lambda *arg,**args:0
-                        sw_doc.save()
-                elif frappe.get_value("Item", data.get('item_code'), "item_group")=="Raw Material":
+                if frappe.get_value("Item", data.get('item_code'), "item_group")=="Raw Material":
                     old_value=frappe.db.sql(f"""
                         SELECT delivered_quantity, item
                         FROM `tabRaw Materials`
@@ -468,50 +424,7 @@ def update_delivered_qty(site_work=[]):
                                                       ELSE 0 END
                                         """, as_dict=True)
             for data in total_returned_qty:
-                if frappe.get_value("Item", data.get('item_code'), "item_group") not in ["Raw Material"]:
-                    old_value=frappe.db.sql(f"""
-                        SELECT returned_stock_qty, returned_bundle, returned_pieces
-                        FROM `tabDelivery Status`
-                        WHERE  parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
-                    """, as_dict=True)
-                    if old_value and (old_value[0].get("returned_stock_qty") != data.get("stock_qty") or old_value[0].get("returned_bundle") != data.get("bundle") or old_value[0].get("returned_pieces") != data.get("pieces")):
-                        log_content+=f"""
-                        Site Work: {sw}\n
-                        {data.get("item_code")} Returned Stock Qty old: {old_value[0].get("returned_stock_qty")}   new: {data.get("stock_qty")}\n
-                        {data.get("item_code")} Returned Bundle old: {old_value[0].get("returned_bundle")}   new: {data.get("bundle")}\n
-                        {data.get("item_code")} Returned Pieces old: {old_value[0].get("returned_pieces")}   new: {data.get("pieces")}\n\n\n
-                        """
-                        frappe.db.sql(f"""
-                            UPDATE `tabDelivery Status`
-                            SET 
-                                returned_stock_qty = {data.get("stock_qty")}, 
-                                returned_bundle = {data.get("bundle")},
-                                returned_pieces = {data.get("pieces")}
-                            WHERE parenttype="Project" and parent="{sw}" and item="{data.get('item_code')}"
-                        """)
-                    elif(not old_value):
-                        log_content+=f"""
-                        Site Work: {sw}\n
-                        ---------NEW RECORD---------\n
-                        Returned Stock Qty new: {data.get("stock_qty")}\n
-                        Returned Bundle new: {data.get("bundle")}\n
-                        Returned Pieces new: {data.get("pieces")}\n\n\n
-                        """
-                        new_row={
-                            "parenttype": "Project",
-                            "parent": sw,
-                            "item": data.get('item_code'),
-                            "returned_stock_qty": data.get("stock_qty"), 
-                            "returned_bundle": data.get("bundle"),
-                            "returned_pieces": data.get("pieces")
-                        }
-                        sw_doc=frappe.get_doc("Project", sw)
-                        sw_doc.update({
-                            "delivery_detail": sw_doc.get("delivery_detail", [])+[new_row]
-                        })
-                        sw_doc.run_method=lambda *arg,**args:0
-                        sw_doc.save()
-                elif frappe.get_value("Item", data.get('item_code'), "item_group")=="Raw Material":
+                if frappe.get_value("Item", data.get('item_code'), "item_group")=="Raw Material":
                     old_value=frappe.db.sql(f"""
                         SELECT returned_quantity
                         FROM `tabRaw Materials`
@@ -645,6 +558,8 @@ def refill_delivery_detail(site_work, event=None):
         group by dni.item_code
     """, as_dict=True)
     
+    frappe.errprint(delivery_note)
+    frappe.errprint(sales_order)
     delivery_detail=[]
     for dn_row in delivery_note:
         new = True
