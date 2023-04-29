@@ -7,7 +7,7 @@ from erpnext.accounts.doctype.sales_invoice.sales_invoice import get_bank_cash_a
 from ganapathy_pavers.custom.py.sales_order import get_item_rate
 from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
 from ganapathy_pavers import get_valuation_rate, get_buying_rate, uom_conversion
-
+from ganapathy_pavers.utils.py.sitework_printformat import get_item_price_list_rate
 
 
 @frappe.whitelist()
@@ -31,43 +31,69 @@ def before_save(doc, action=None):
     item_details_total = 0
     job_worker_total = 0
     raw_material_total = 0
+    sales_invoice_amount=0
+
     for i in doc.additional_cost:
         additionalcost_total = additionalcost_total+ (i.amount or 0)
     doc.total = additionalcost_total
+
     for i in doc.item_details:
         item_details_total = item_details_total+(i.amount or 0)
     for i in doc.item_details_compound_wall:
         item_details_total = item_details_total+(i.amount or 0)
     doc.total_amount=item_details_total
+
     for i in doc.job_worker:
         job_worker_total = job_worker_total+(i.amount or 0)
     doc.total_job_worker_cost=job_worker_total
+
     for i in doc.raw_material:
         raw_material_total = raw_material_total+(i.amount or 0)
     doc.total_amount_of_raw_material=raw_material_total
-    total_costing=additionalcost_total+item_details_total+job_worker_total+raw_material_total
+
+    sales_invoice_amount = sum(frappe.get_all("Sales Invoice", {"docstatus": 1, "site_work": doc.name}, pluck="grand_total"))
+
+    total_costing=additionalcost_total+job_worker_total+sales_invoice_amount
 
     doc.total_expense_amount=total_costing
 
     item_cost=0
     rm_cost=0
+    
     for item in doc.item_details:
-        if(item.get('warehouse')):
-            bin_=get_valuation_rate(item_code=item.item, warehouse=item.warehouse, posting_date=frappe.utils.get_date_str(doc.creation))
-            item_cost+=(bin_ or 0)* (item.stock_qty or 0)
+        date = item.creation
+        if item.sales_order:
+            date = frappe.db.get_value("Sales Order", item.sales_order, "transaction_date")
+        bin_ = get_item_price_list_rate(item = item.item, date = date)
+        item_cost+=(bin_ or 0)* (item.stock_qty or 0)
 
     for item in doc.item_details_compound_wall:
-        if(item.get('warehouse')):
-            bin_=get_valuation_rate(item_code=item.item, warehouse=item.warehouse, posting_date=frappe.utils.get_date_str(doc.creation))
-            item_cost+=(bin_ or 0)* (item.stock_qty or 0)
+        date = item.creation
+        if item.sales_order:
+            date = frappe.db.get_value("Sales Order", item.sales_order, "transaction_date")
+        bin_ = get_item_price_list_rate(item = item.item, date = date)
+        item_cost+=(bin_ or 0)* (item.stock_qty or 0)
 
     for item in doc.raw_material:
-        warehouse=frappe.get_value("Sales Order Item", {"item_code":item.item, "parent":item.sales_order}, "warehouse")
-        if not warehouse:
-            warehouse=frappe.get_all("Sales Order Item", {"parent":item.sales_order, "warehouse":["is", "set"]}, pluck="warehouse")
-            if warehouse:
-                warehouse=warehouse[0]
-        rate=get_buying_rate(item_code=item.item, warehouse=warehouse, posting_date=frappe.utils.get_date_str(doc.creation))
+        date = item.creation
+        if item.sales_order:
+            date = frappe.db.get_value("Sales Order", item.sales_order, "transaction_date")
+        
+        rate=frappe.db.sql(f"""
+                SELECT 
+                    ifnull(sle.valuation_rate, 0),
+                    sle.name
+                FROM `tabStock Ledger Entry` sle
+                WHERE
+                    sle.is_cancelled=0 and
+                    sle.voucher_type = 'Purchase Invoice' and
+                    sle.item_code = 'Cement' and
+                    sle.posting_date  <= '2023-04-29' and
+                    sle.is_cancelled = 0
+                order by posting_date desc
+                limit 1
+        """)
+        rate = rate[0][0] if rate and rate[0] and rate[0][0] else 0
         rm_cost+=(rate or 0)*(item.stock_qty or 0)
     doc.actual_site_cost_calculation=(item_cost or 0)+(doc.total or 0)+(doc.total_job_worker_cost or 0)+ (rm_cost or 0) + (doc.transporting_cost or 0)
     doc.site_profit_amount=(doc.total_expense_amount or 0) - (doc.actual_site_cost_calculation or 0)
@@ -558,8 +584,6 @@ def refill_delivery_detail(site_work, event=None):
         group by dni.item_code
     """, as_dict=True)
     
-    frappe.errprint(delivery_note)
-    frappe.errprint(sales_order)
     delivery_detail=[]
     for dn_row in delivery_note:
         new = True
