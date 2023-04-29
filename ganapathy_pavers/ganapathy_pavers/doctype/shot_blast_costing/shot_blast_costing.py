@@ -10,6 +10,34 @@ from frappe import _
 from frappe.model.document import Document
 from erpnext.controllers.queries import get_fields
 
+uom_conv_query = lambda: f"""
+            taken_pieces * (
+                ifnull((
+                    SELECT
+                        uom.conversion_factor
+                    FROM `tabUOM Conversion Detail` uom
+                    WHERE
+                        uom.parenttype='Item' and
+                        uom.parent=item_name and
+                        uom.uom='Nos'
+                    limit 1
+                )    
+                , 0)
+                /
+                ifnull((
+                    SELECT
+                        uom.conversion_factor
+                    FROM `tabUOM Conversion Detail` uom
+                    WHERE
+                        uom.parenttype='Item' and
+                        uom.parent=item_name and
+                        uom.uom='Bdl'
+                    limit 1
+                )    
+                , 0)
+            )
+        """
+
 class ShotBlastCosting(Document):
     def validate(self):
         self.total_cost = (self.additional_cost or 0) + (self.labour_cost or 0)
@@ -34,8 +62,8 @@ class ShotBlastCosting(Document):
             frappe.throw("Process Incomplete. Create Stock Entry To Submit")
     def on_update(doc):
         if doc.docstatus<=1:
-            sbc=frappe.db.sql("""
-                select material_manufacturing, sum(bundle_taken) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2) group by material_manufacturing;
+            sbc=frappe.db.sql(f"""
+                select material_manufacturing, sum(bundle_taken + {uom_conv_query()}) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2) group by material_manufacturing;
             """, as_dict=True)
             mm = [i['material_manufacturing'] for i in sbc]
             other_mms = frappe.get_all("Material Manufacturing", filters = {"is_shot_blasting": 1, "name": ["not in", mm]}, fields = ["name as material_manufacturing"])
@@ -53,11 +81,11 @@ class ShotBlastCosting(Document):
 
     def on_trash(doc):
         sbc=frappe.db.sql(f"""
-            select material_manufacturing, sum(bundle_taken) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2 and name!='{doc.name}') group by material_manufacturing;
+            select material_manufacturing, sum(bundle_taken + {uom_conv_query()}) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2 and name!='{doc.name}') group by material_manufacturing;
         """, as_dict=True)
         # and name!= '{doc.name}'
         mm=frappe.db.sql(f"""
-            select material_manufacturing, sum(bundle_taken) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2 and name='{doc.name}') group by material_manufacturing;
+            select material_manufacturing, sum(bundle_taken + {uom_conv_query()}) as bundle_taken from `tabShot Blast Items` where parent in (select name from `tabShot Blast Costing` where docstatus!=2 and name='{doc.name}') group by material_manufacturing;
         """)
         for mm_doc in mm:
             mm1=frappe.db.sql(f"""
@@ -86,7 +114,7 @@ def make_stock_entry(doc):
     doc=json.loads(doc)
     if doc.get("total_cost") == 0:
         frappe.throw("Please Enter Total Expense Cost")
-    if doc.get("total_bundle") == 0 :
+    if not doc.get("total_bundle") and not doc.get("total_pieces"):
         frappe.throw("Please Enter Total Bundle")
     valid = frappe.get_all("Stock Entry",filters={"shot_blast":doc.get("name"),"stock_entry_type":"Material Transfer","docstatus":["!=",2]},pluck="name")
     if len(valid) >= 1:

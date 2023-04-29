@@ -156,6 +156,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
                         uom.parenttype='Item' and
                         uom.parent=dni.item_code and
                         uom.uom=dni.uom
+                    limit 1
                 )    
                 , 0)
             , 2) as valuation_rate

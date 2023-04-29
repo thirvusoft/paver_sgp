@@ -20,6 +20,7 @@
   "items",
   "section_break_4",
   "total_bundle",
+  "total_pieces",
   "total_damage_sqft",
   "column_break_6",
   "total_sqft",
@@ -214,12 +215,18 @@
    "fieldname": "no_of_labour",
    "fieldtype": "Int",
    "label": "No of Labour"
+  },
+  {
+   "fieldname": "total_pieces",
+   "fieldtype": "Float",
+   "label": "Total Pieces",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-19 11:21:47.993777",
+ "modified": "2023-04-29 13:45:23.969228",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Costing",
