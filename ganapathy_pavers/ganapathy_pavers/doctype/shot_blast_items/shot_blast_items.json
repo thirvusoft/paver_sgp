@@ -9,7 +9,8 @@
   "material_manufacturing",
   "item_name",
   "bundle_taken",
-  "Bdl",
+  "taken_pieces",
+  "bdl",
   "damages_in_nos",
   "sqft",
   "damages_in_sqft",
@@ -32,15 +33,6 @@
    "in_list_view": 1,
    "label": "Batch",
    "options": "Batch"
-  },
-  {
-   "columns": 1,
-   "fieldname": "Bdl",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Total Bundle",
-   "precision": "4",
-   "read_only": 1
   },
   {
    "columns": 1,
@@ -74,7 +66,7 @@
    "precision": "4"
   },
   {
-   "columns": 2,
+   "columns": 1,
    "fieldname": "material_manufacturing",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -84,12 +76,28 @@
   {
    "fieldname": "column_break_8",
    "fieldtype": "Column Break"
+  },
+  {
+   "columns": 1,
+   "fieldname": "taken_pieces",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Taken Pieces"
+  },
+  {
+   "columns": 1,
+   "fieldname": "bdl",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total Bundle",
+   "precision": "4",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-10-12 13:10:36.549066",
+ "modified": "2023-04-29 13:09:28.011863",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Items",

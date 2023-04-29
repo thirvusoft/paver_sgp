@@ -108,22 +108,28 @@ frappe.ui.form.on('Shot Blast Items', {
 			frappe.model.set_value(cdt, cdn, "batch", r.batch_no_curing)
 		});
 	},
-	damages_in_nos: function (frm, cdt, cdn) {
+	damages_in_nos: async function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
-		frappe.db.get_doc("Material Manufacturing", row.material_manufacturing).then((r) => {
-			frappe.db.get_value("Item", { "name": r.item_to_manufacture }, "pavers_per_sqft", (sqft) => {
-				frappe.model.set_value(cdt, cdn, "damages_in_sqft", row.damages_in_nos / sqft.pavers_per_sqft)
-			});
-		});
+		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Nos', row.damages_in_nos, 'SQF')
+		frappe.model.set_value(cdt, cdn, "damages_in_sqft", sqft)
 	},
-	bundle_taken: function (frm, cdt, cdn) {
+	bundle_taken: async function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
 		if (row.bundle_taken > row.Bdl) {
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
-		frappe.db.get_value("Item", { "name": row.item_name }, "bundle_per_sqr_ft", (sqft) => {
-			frappe.model.set_value(cdt, cdn, "sqft", row.bundle_taken * sqft.bundle_per_sqr_ft)
-		});
+		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
+		let sqft_pieces = await ganapathy_pavers.uom_converstion(row.item_name, 'Nos', row.taken_pieces, 'SQF')
+		frappe.model.set_value(cdt, cdn, "sqft", (sqft || 0) + (sqft_pieces || 0))
+	},
+	taken_pieces: async function(frm, cdt, cdn) {
+		var row = locals[cdt][cdn]
+		if (row.bundle_taken > row.Bdl) {
+			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
+		}
+		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
+		let sqft_pieces = await ganapathy_pavers.uom_converstion(row.item_name, 'Nos', row.taken_pieces, 'SQF')
+		frappe.model.set_value(cdt, cdn, "sqft", (sqft || 0) + (sqft_pieces || 0))
 	},
 	sqft: function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
@@ -160,16 +166,20 @@ frappe.ui.form.on('Shot Blast Items', {
 });
 function total(frm) {
 	var total_bundle = 0
+	var total_pieces = 0
 	var total_sqft = 0
 	for (var i = 0; i < frm.doc.items.length; i++) {
-		total_bundle += frm.doc.items[i].bundle_taken
-		total_sqft += frm.doc.items[i].sqft
+		total_bundle += frm.doc.items[i].bundle_taken || 0
+		total_sqft += frm.doc.items[i].sqft || 0
+		total_pieces += frm.doc.items[i].taken_pieces || 0
+
 		if (frm.doc.items[i].bundle_taken > frm.doc.items[i].Bdl) {
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
 	}
 	cur_frm.set_value("total_bundle", total_bundle)
 	cur_frm.set_value("total_sqft", total_sqft)
+	cur_frm.set_value("total_pieces", total_pieces)
 }
 function total_hrs(frm, field, from, to) {
 	frappe.call({

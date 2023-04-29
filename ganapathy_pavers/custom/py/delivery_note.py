@@ -4,6 +4,9 @@ import frappe
 
 def update_qty_sitework(self,event):
     if(self.doctype=='Sales Invoice' and self.update_stock==0):
+        if self.site_work:
+            doc=frappe.get_doc('Project', self.site_work)
+            doc.save()
         return
     if(not self.is_return):
         for row in self.items:
@@ -44,6 +47,9 @@ def update_qty_sitework(self,event):
 
 def reduce_qty_sitework(self,event):
     if(self.doctype=='Sales Invoice' and self.update_stock==0):
+        if self.site_work:
+            doc=frappe.get_doc('Project', self.site_work)
+            doc.save()
         return
     if(not self.is_return):
         for row in self.items:
