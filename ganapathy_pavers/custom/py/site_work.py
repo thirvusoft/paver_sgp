@@ -558,8 +558,6 @@ def refill_delivery_detail(site_work, event=None):
         group by dni.item_code
     """, as_dict=True)
     
-    frappe.errprint(delivery_note)
-    frappe.errprint(sales_order)
     delivery_detail=[]
     for dn_row in delivery_note:
         new = True

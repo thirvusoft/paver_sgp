@@ -45,7 +45,6 @@ def execute(filters=None):
                                     else
                                         doc.vehicle_no
                                 end as own_vehicle_no,
-                                doc.own_vehicle_no,
                                 child.ts_qty,
                                 child.qty,
                                 child.uom,
