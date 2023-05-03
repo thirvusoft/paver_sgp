@@ -102,7 +102,8 @@ def validate(self, event):
 
     if(self.select_purpose!='Goods Supply'):
         self.delivery_note=""
-        self.site_work=""
+        if self.select_purpose != "Site Visit":
+            self.site_work=""
         self.fastag_charge = 0
         self.payment_to_supplier = 0
         self.fastag_supplier = ""
@@ -111,8 +112,7 @@ def validate(self, event):
     
     if self.delivery_note:
         self.site_work=frappe.db.get_value("Delivery Note", self.delivery_note, "site_work")
-    else:
-        self.site_work=""
+   
 
 def update_transport_cost(self, event):
     sw=''

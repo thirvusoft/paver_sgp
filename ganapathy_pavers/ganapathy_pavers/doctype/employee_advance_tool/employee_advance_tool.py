@@ -12,13 +12,29 @@ class EmployeeAdvanceTool(Document):
 		self.total_advance_amount=total
 	
 	def on_submit(self):
-		i=0
-		for adv in self.employee_advance_details:
-			i+=1
-			if((adv.current_advance) and not (adv.mode_of_payment or self.mode_of_payment)):
-				frappe.throw(f"Mode of Payment is mandatory at #row {i}")
-		
-		for adv in self.employee_advance_details:
+		create_adv(self)
+
+@frappe.whitelist()
+def create_adv(self):
+	if isinstance(self, str):
+		self=frappe.get_doc("Employee Advance Tool", self)
+	i=0
+	for adv in self.employee_advance_details:
+		i+=1
+		if((adv.current_advance) and not (adv.mode_of_payment or self.mode_of_payment)):
+			frappe.throw(f"Mode of Payment is mandatory at #row {i}")
+	
+	for adv in self.employee_advance_details:
+		emp_adv = {
+			"employee": adv.employee,
+			"advance_amount": adv.current_advance,
+			"posting_date": self.date,
+			"employee_advance_tool": self.name,
+			"branch": self.branch,
+			"mode_of_payment": adv.mode_of_payment or self.mode_of_payment,
+			"repay_unclaimed_amount_from_salary": 1 if adv.payment_method=="Deduct from Salary" else 0
+		}
+		if not frappe.get_all("Employee Advance", emp_adv):
 			create_employee_advance(
 				amount=adv.current_advance,
 				name=adv.employee,
@@ -27,8 +43,8 @@ class EmployeeAdvanceTool(Document):
 				mode_of_payment=adv.mode_of_payment or self.mode_of_payment,
 				payment_type=adv.payment_method,
 				tool_name=self.name,
+				commit=False
 			)
-
 
 @frappe.whitelist()
 	

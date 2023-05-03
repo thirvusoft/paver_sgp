@@ -178,7 +178,7 @@ def expense_tree(
         machine=machine,
         expense_type=expense_type,
         prod_details=prod_details,
-        purpose=(vehicle_purpose or [])+["Goods Supply", "Raw Material"],
+        purpose=(vehicle_purpose or [])+["Goods Supply", "Raw Material", "Site Visit"],
         driver_employee=None,
         operator_employee=None,
         all_expenses=all_expenses
@@ -397,11 +397,11 @@ def get_account_balance_on(account, company, from_date, to_date, expense_name=""
             _account = {
                     "value": f"""{f'''{veh} ''' if veh else ""}{f'''{ifc} ''' if ifc else ""}{account["value"]}""",
                     "expandable": 0,
-                    "root_type": account["root_type"],
-                    "account_currency": account["account_currency"],
-                    "parent": account['value'],
+                    "root_type": account.get("root_type"),
+                    "account_currency": account.get("account_currency"),
+                    "parent": account.get('value'),
                     "child_nodes": [],
-                    "account_name": f"""{account["account_name"]}""",
+                    "account_name": f"""{account.get("account_name")}""",
                     "vehicle": veh or ifc
                 }
             
@@ -852,7 +852,7 @@ def get_vehicle_salary(account, from_date, to_date, vehicle = None, machine = []
                         _vl.docstatus = 1 and
                         _vl.{employee_field} = vl.{employee_field} and
                         _vl.date = vl.date and
-                        _vl.select_purpose in ("Raw Material", "Goods Supply", "Material Shifting")
+                        _vl.select_purpose in ("Raw Material", "Goods Supply", "Material Shifting", "Site Visit")
                 )*ifnull((
                     select drv.salary_per_day
                     from `tabDriver` drv
@@ -895,6 +895,7 @@ def expense_map(expense):
         "account_name": expense,
         "expandable": 0,
         "child_nodes": [],
+        "root_type": "",
         "parent": "OTHER EXP"
     }
 

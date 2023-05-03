@@ -14,7 +14,6 @@ def create_additional_salary(doc,action):
                 add_doc.ref_docname=i.reference_name
                 add_doc.insert()
                 add_doc.submit()
-                frappe.db.commit()
         
 def payment_entry_property_setter():                
     make_property_setter("Payment Entry", "branch", "reqd",1, "Check")
