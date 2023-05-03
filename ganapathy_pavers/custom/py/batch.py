@@ -4,6 +4,10 @@ from frappe.utils import get_date_str, format_date, cint
 
 
 def autoname(self, event=None):
+    if self.is_shot_blasting_batch:
+        self.name = f"SBC-{self.item}"
+        self.batch_id = f"SBC-{self.item}"
+        return
     try:
         date = None
         if(self.reference_doctype == "Stock Entry" and self.reference_name):

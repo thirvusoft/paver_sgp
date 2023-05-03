@@ -18,6 +18,7 @@
   "warehouse",
   "section_break_2",
   "items",
+  "update_batch_stock_qty",
   "section_break_4",
   "total_bundle",
   "total_pieces",
@@ -221,12 +222,17 @@
    "fieldtype": "Float",
    "label": "Total Pieces",
    "read_only": 1
+  },
+  {
+   "fieldname": "update_batch_stock_qty",
+   "fieldtype": "Button",
+   "label": "Update Batch Stock"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-04-29 15:20:51.983710",
+ "modified": "2023-05-03 12:01:50.904722",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Costing",
@@ -250,5 +256,7 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "track_changes": 1
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
 }
