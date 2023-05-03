@@ -179,13 +179,33 @@ def make_stock_entry(doc):
     frappe.msgprint("New Stock Entry Created "+stock_entry.name)
 
 @frappe.whitelist()
-def uom_conversion(mm, batch=None):
+def uom_conversion(mm, batch=None, date=None, warehouse=None):
+    res = {
+        "bundle": 0,
+        "stock": 0
+    }
     if batch:
-        batch_qty = frappe.get_value('Batch', batch, 'batch_qty')
-        return batch_qty
-    else:
-        batch_qty = frappe.get_value('Material Manufacturing', mm, 'shot_blasted_bundle')
-        return batch_qty
+        stock_conditions=""
+        if date:
+            stock_conditions += f""" and timestamp(sle.posting_date, sle.posting_time) <= "{date}" """
+        if warehouse:
+            stock_conditions += f""" and sle.warehouse='{warehouse}' """
+
+        batch_qty_query = f"""
+                    select 
+                        sum(sle.actual_qty)
+                    from `tabStock Ledger Entry` sle
+                    where 
+                        sle.is_cancelled = 0 and 
+                        sle.batch_no= '{batch}'
+                        {stock_conditions}
+            """
+        batch_qty = frappe.db.sql(batch_qty_query)
+        res['stock'] = batch_qty[0][0] if batch_qty and batch_qty[0] and batch_qty[0][0] else 0
+
+    batch_qty = frappe.get_value('Material Manufacturing', mm, 'shot_blasted_bundle')
+    res["bundle"] = batch_qty
+    return res
 
 @frappe.whitelist()
 def batch_query(doctype, txt, searchfield, start, page_len, filters, as_dict=False):
@@ -324,6 +344,7 @@ def material_manufacturing_query(doctype, txt, searchfield, start, page_len, fil
             and ({scond})
             {fcond} {mcond}
         order by
+            from_time, 
             if(locate(%(_txt)s, name), locate(%(_txt)s, name), 99999),
             if(locate(%(_txt)s, item_to_manufacture), locate(%(_txt)s, item_to_manufacture), 99999),
             idx desc,

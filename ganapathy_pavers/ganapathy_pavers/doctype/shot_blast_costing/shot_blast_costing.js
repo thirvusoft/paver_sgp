@@ -126,6 +126,7 @@ frappe.ui.form.on('Shot Blast Items', {
 	bundle_taken: async function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
 		if (row.bundle_taken > (row.bdl || 0)) {
+			frappe.model.set_value(cdt, cdn, "bundle_taken", 0)
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
 		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
@@ -135,6 +136,7 @@ frappe.ui.form.on('Shot Blast Items', {
 	taken_pieces: async function(frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
 		if (row.bundle_taken > (row.bdl || 0)) {
+			frappe.model.set_value(cdt, cdn, "bundle_taken", 0)
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
 		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
@@ -170,7 +172,8 @@ frappe.ui.form.on('Shot Blast Items', {
 				mm: row.material_manufacturing
 			},
 			callback(r) {
-				frappe.model.set_value(row.doctype, row.name, 'bdl', r.message || 0);
+				frappe.model.set_value(row.doctype, row.name, 'bdl', r.message["bundle"] || 0);
+				frappe.model.set_value(row.doctype, row.name, 'batch_stock', r.message["stock"] || 0);
 				cur_frm.refresh_field('items')
 
 			}
@@ -188,6 +191,7 @@ function total(frm) {
 		total_pieces += frm.doc.items[i].taken_pieces || 0
 
 		if (frm.doc.items[i].bundle_taken > frm.doc.items[i].bdl) {
+			frappe.model.set_value(frm.doc.items[i].doctype, frm.doc.items[i].name, "bundle_taken", 0)
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
 	}
