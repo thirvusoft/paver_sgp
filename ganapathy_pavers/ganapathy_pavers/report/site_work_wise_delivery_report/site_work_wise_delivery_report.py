@@ -23,7 +23,7 @@ def execute(filters=None):
         if site_name:
             conditions += " and doc.site_work = '{0}' ".format(site_name)
         if sales_type:
-            conditions += " and doc.type = '{0}' ".format(sales_type)
+            conditions += " and child.item_group = '{0}' ".format(sales_type)
         if item_code:
             conditions += " and child.item_code ='{0}' ".format(item_code)
         if item_group:
