@@ -5,20 +5,30 @@ frappe.ui.form.on('Shot Blast Costing', {
 	onload: async function (frm) {
 		frm.set_query("material_manufacturing", "items", function (f, cdt, cdn) {
 			let data = locals[cdt][cdn]
+			let args = {}
+			if (data.item_name) {
+				args["item_to_manufacture"] = data.item_name
+			}
+			args["is_shot_blasting"] = 1
+			args["docstatus"] = ["!=", 2]
+			args["shot_blasted_bundle"] = [">", 0]
+			if (frm.doc.to_time){
+				args["date"] = frm.doc.to_time
+			}
+			if (frm.doc.to_time){
+				args["warehouse"] = frm.doc.source_warehouse
+			}
+			
 			return {
-				filters: {
-					item_to_manufacture: data.item_name,
-					is_shot_blasting: 1,
-					docstatus: ["!=", 2],
-					shot_blasted_bundle: [">", 0]
-				}
+				query: "ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.material_manufacturing_query",
+				filters: args
 			}
 		})
 		frm.set_query("batch", "items", function (frm, cdt, cdn) {
 			let row = locals[cdt][cdn]
-			if (!row.material_manufacturing) {
-				frappe.throw({ message: `Please Enter Paver Manufacturing at row ${row.idx}`, title: "Missing Fields", indicator: 'red' })
-			}
+			// if (!row.material_manufacturing) {
+			// 	frappe.throw({ message: `Please Enter Paver Manufacturing at row ${row.idx}`, title: "Missing Fields", indicator: 'red' })
+			// }
 			return {
 				query: "ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.batch_query",
 				filters: {
@@ -115,7 +125,7 @@ frappe.ui.form.on('Shot Blast Items', {
 	},
 	bundle_taken: async function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
-		if (row.bundle_taken > row.Bdl) {
+		if (row.bundle_taken > (row.bdl || 0)) {
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
 		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
@@ -124,7 +134,7 @@ frappe.ui.form.on('Shot Blast Items', {
 	},
 	taken_pieces: async function(frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
-		if (row.bundle_taken > row.Bdl) {
+		if (row.bundle_taken > (row.bdl || 0)) {
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
 		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
@@ -143,8 +153,12 @@ frappe.ui.form.on('Shot Blast Items', {
 		cur_frm.set_value("total_damage_sqft", total_damage_sqft)
 		cur_frm.set_value("avg_damage_sqft", total_damage_sqft / frm.doc.items.length)
 	},
-	batch: function (frm, cdt, cdn) {
+	batch: async function (frm, cdt, cdn) {
 		let row = locals[cdt][cdn]
+		if (row.batch) {
+			let batch = await frappe.db.get_value("Batch", row.batch, "item")
+			frappe.model.set_value(cdt, cdn, "item_name", batch.message.item)
+		}
 		if (!row.material_manufacturing) {
 			frappe.show_alert({ message: `Kindly enter <b>Paver Manufacturing</b> at row ${row.idx}`, indicator: "red" })
 			return
@@ -156,7 +170,7 @@ frappe.ui.form.on('Shot Blast Items', {
 				mm: row.material_manufacturing
 			},
 			callback(r) {
-				frappe.model.set_value(row.doctype, row.name, 'Bdl', r.message || 0);
+				frappe.model.set_value(row.doctype, row.name, 'bdl', r.message || 0);
 				cur_frm.refresh_field('items')
 
 			}
@@ -173,7 +187,7 @@ function total(frm) {
 		total_sqft += frm.doc.items[i].sqft || 0
 		total_pieces += frm.doc.items[i].taken_pieces || 0
 
-		if (frm.doc.items[i].bundle_taken > frm.doc.items[i].Bdl) {
+		if (frm.doc.items[i].bundle_taken > frm.doc.items[i].bdl) {
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
 	}

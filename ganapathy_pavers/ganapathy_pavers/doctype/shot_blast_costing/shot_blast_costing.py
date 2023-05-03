@@ -6,9 +6,11 @@ import datetime
 import json
 from erpnext.stock.doctype.batch.batch import get_batch_qty
 import frappe
-from frappe import _
+from frappe import _, scrub
+from frappe.desk.reportview import get_filters_cond, get_match_cond
 from frappe.model.document import Document
 from erpnext.controllers.queries import get_fields
+from frappe.utils.data import nowdate
 
 uom_conv_query = lambda: f"""
             taken_pieces * (
@@ -112,6 +114,11 @@ class ShotBlastCosting(Document):
 @frappe.whitelist()
 def make_stock_entry(doc):
     doc=json.loads(doc)
+
+    valid = frappe.get_all("Stock Entry",filters={"shot_blast_costing":doc.get("name"),"docstatus":["!=",2]},pluck="name")
+    if len(valid) >= 1:
+           frappe.throw("Already Stock Entry("+valid[0]+") Created For Shot Blast Costing")
+
     if doc.get("total_cost") == 0:
         frappe.throw("Please Enter Total Expense Cost")
     if not doc.get("total_bundle") and not doc.get("total_pieces"):
@@ -131,12 +138,23 @@ def make_stock_entry(doc):
     stock_entry.set_posting_time = 1
     stock_entry.posting_date = _datetime.date()
     stock_entry.posting_time = _datetime.time()
+    stock_entry.shot_blast_costing = doc.get("name")
     default_nos = frappe.db.get_singles_value("USB Setting", "default_manufacture_uom")
     default_bundle = frappe.db.get_singles_value("USB Setting", "default_rack_shift_uom")
-    stock_entry.stock_entry_type = "Material Transfer"
+    stock_entry.stock_entry_type = "Repack"
     for i in doc.get("items"):
         stock_entry.append('items', dict(
-        s_warehouse = doc.get("source_warehouse"),t_warehouse = doc.get("warehouse"), item_code = i["item_name"],qty = i["sqft"]-i["damages_in_sqft"], uom = frappe.db.get_value("Item", i["item_name"], "stock_uom"),batch_no = i["batch"]
+            s_warehouse = doc.get("source_warehouse"), 
+            item_code = i["item_name"],
+            qty = i["sqft"]-i["damages_in_sqft"], 
+            uom = frappe.db.get_value("Item", i["item_name"], "stock_uom"),
+            batch_no = i["batch"]
+        ))
+        stock_entry.append('items', dict(
+            t_warehouse = doc.get("warehouse"), 
+            item_code = i["item_name"],
+            qty = i["sqft"]-i["damages_in_sqft"], 
+            uom = frappe.db.get_value("Item", i["item_name"], "stock_uom"),
         ))
 
         check_batch_stock_avalability(
@@ -163,23 +181,24 @@ def make_stock_entry(doc):
 @frappe.whitelist()
 def uom_conversion(mm, batch=None):
     if batch:
-        batch_qty = frappe.get_value('Material Manufacturing', mm, 'shot_blasted_bundle')
+        batch_qty = frappe.get_value('Batch', batch, 'batch_qty')
         return batch_qty
     else:
-        return 0
+        batch_qty = frappe.get_value('Material Manufacturing', mm, 'shot_blasted_bundle')
+        return batch_qty
 
 @frappe.whitelist()
 def batch_query(doctype, txt, searchfield, start, page_len, filters, as_dict=False):
     searchfield = frappe.get_meta(doctype).get_search_fields()
-    searchfield = "(" +"or ".join(field + " like %(txt)s" for field in searchfield)
+    searchfield = "(" +"or ".join(field + " like %(txt)s" for field in searchfield) + ")"
     if filters and filters.get('material_manufacturing'):
-        searchfield+=f""") and name='{frappe.get_value("Material Manufacturing", filters.get("material_manufacturing"), "batch_no_curing")}' """
+        searchfield+=f""" and name='{frappe.get_value("Material Manufacturing", filters.get("material_manufacturing"), "batch_no_curing")}' """
     fields = ', '.join(get_fields(doctype))
     res = frappe.db.sql(
         f"""SELECT 
                 {fields} 
             FROM 
-                `tab{doctype}` 
+                `tab{doctype}`
             WHERE
                 ({searchfield})
             ORDER BY
@@ -242,3 +261,84 @@ def move_stock(args):
     })
     doc.save()
     doc.submit()
+
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def material_manufacturing_query(doctype, txt, searchfield, start, page_len, filters, as_dict=False):
+    conditions = []
+
+    if isinstance(filters, str):
+        filters = json.loads(filters)
+
+    #Get searchfields from meta and use in DocType Link field query
+    meta = frappe.get_meta(doctype, cached=True)
+    searchfields = meta.get_search_fields() + ['batch_no_curing']
+
+    columns = ''
+    extra_searchfields = ['`tabMaterial Manufacturing`.batch_no_curing'] + [f"`tabMaterial Manufacturing`.{field}" for field in searchfields]
+
+    if extra_searchfields:
+        columns = ", " + ", ".join(extra_searchfields)
+
+    searchfields = searchfields + [field for field in [searchfield]
+        if not field in searchfields]
+    searchfields = " or ".join([field + " like %(txt)s" for field in searchfields])
+
+    date = ""
+    warehouse = ""
+    if filters.get("date"):
+        date=filters.get("date")
+        filters.pop("date")
+    if filters.get("warehouse"):
+        warehouse=filters.get("warehouse")
+        filters.pop("warehouse")
+
+    stock_conditions=""
+    if date:
+        stock_conditions += f""" and timestamp(sle.posting_date, sle.posting_time) <= "{date}" """
+    if warehouse:
+        stock_conditions += f""" and sle.warehouse='{warehouse}' """
+
+    batch_qty_query = f"""
+        case when ifnull(`tabMaterial Manufacturing`.batch_no_curing, "")!=""
+        then ifnull((
+                select 
+                    sum(sle.actual_qty)
+                from `tabStock Ledger Entry` sle
+                where 
+                    sle.is_cancelled = 0 and 
+                    sle.batch_no= `tabMaterial Manufacturing`.batch_no_curing
+                    {stock_conditions}
+            ), 0)
+        else 0 end
+        """
+        
+    return frappe.db.sql("""select
+            `tab{doctype}`.name,
+            CONCAT("Batch Qty: ", round({batch_qty_query}, 2)) as batch_qty
+        {columns}
+        from `tab{doctype}`
+        where `tab{doctype}`.docstatus < 2
+            and ifnull(`tabMaterial Manufacturing`.batch_no_curing, "")!=""
+            and ({scond})
+            {fcond} {mcond}
+        order by
+            if(locate(%(_txt)s, name), locate(%(_txt)s, name), 99999),
+            if(locate(%(_txt)s, item_to_manufacture), locate(%(_txt)s, item_to_manufacture), 99999),
+            idx desc,
+            name, item_to_manufacture
+        limit %(start)s, %(page_len)s """.format(
+            doctype=doctype,
+            columns=columns,
+            scond=searchfields,
+            batch_qty_query=batch_qty_query,
+            fcond=get_filters_cond(doctype, filters, conditions).replace('%', '%%'),
+            mcond=get_match_cond(doctype).replace('%', '%%')),
+            {
+                "today": nowdate(),
+                "txt": "%%%s%%" % txt,
+                "_txt": txt.replace("%", ""),
+                "start": start,
+                "page_len": page_len
+            }, as_dict=as_dict)
