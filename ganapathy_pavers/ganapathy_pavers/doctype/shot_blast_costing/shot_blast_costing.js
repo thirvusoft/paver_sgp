@@ -93,8 +93,28 @@ frappe.ui.form.on('Shot Blast Costing', {
 		var field = "total_hrs"
 		total_hrs(frm, field, frm.doc.from_time, frm.doc.to_time)
 	},
-	to_time: function (frm) {
+	update_batch_stock_qty: function(frm) {
+		frm.doc.items.forEach(async row => {
+			await frappe.call({
+				method: "ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.uom_conversion",
+				args: {
+					batch: row.batch,
+					mm: row.material_manufacturing,
+					date: frm.doc.to_time,
+					warehouse: frm.doc.source_warehouse
+				},
+				callback(r) {
+					frappe.model.set_value(row.doctype, row.name, 'bdl', r.message["bundle"] || 0);
+					frappe.model.set_value(row.doctype, row.name, 'batch_stock', r.message["stock"] || 0);
+					cur_frm.refresh_field('items')
+	
+				}
+			})	
+		})
+	},
+	to_time: async function (frm) {
 		var field = "total_hrs"
+		frm.trigger("update_batch_stock_qty")
 		total_hrs(frm, field, frm.doc.from_time, frm.doc.to_time)
 	},
 	total_hrs: function (frm) {
@@ -169,7 +189,9 @@ frappe.ui.form.on('Shot Blast Items', {
 			method: "ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.uom_conversion",
 			args: {
 				batch: row.batch,
-				mm: row.material_manufacturing
+				mm: row.material_manufacturing,
+				date: frm.doc.to_time,
+				warehouse: frm.doc.source_warehouse
 			},
 			callback(r) {
 				frappe.model.set_value(row.doctype, row.name, 'bdl', r.message["bundle"] || 0);
