@@ -53,48 +53,43 @@ def before_save(doc, action=None):
 
     sales_invoice_amount = sum(frappe.get_all("Sales Invoice", {"docstatus": 1, "site_work": doc.name}, pluck="grand_total"))
 
-    total_costing=additionalcost_total+job_worker_total+sales_invoice_amount
-
-    doc.total_expense_amount=total_costing
+    doc.total_expense_amount=sales_invoice_amount or 0
 
     item_cost=0
     rm_cost=0
     
-    for item in doc.item_details:
+    for item in doc.delivery_detail:
         date = item.creation
-        if item.sales_order:
-            date = frappe.db.get_value("Sales Order", item.sales_order, "transaction_date")
         bin_ = get_item_price_list_rate(item = item.item, date = date)
-        item_cost+=(bin_ or 0)* (item.stock_qty or 0)
+        item_cost+=(bin_ or 0)* (((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)))
 
-    for item in doc.item_details_compound_wall:
-        date = item.creation
-        if item.sales_order:
-            date = frappe.db.get_value("Sales Order", item.sales_order, "transaction_date")
-        bin_ = get_item_price_list_rate(item = item.item, date = date)
-        item_cost+=(bin_ or 0)* (item.stock_qty or 0)
-
-    for item in doc.raw_material:
-        date = item.creation
-        if item.sales_order:
-            date = frappe.db.get_value("Sales Order", item.sales_order, "transaction_date")
-        
-        rate=frappe.db.sql(f"""
+    rate=frappe.db.sql(f"""
                 SELECT 
-                    ifnull(sle.valuation_rate, 0),
-                    sle.name
-                FROM `tabStock Ledger Entry` sle
+                    SUM(dni.stock_qty) *
+                    ifnull((
+                            SELECT sle.valuation_rate
+                            FROM `tabStock Ledger Entry` sle
+                            WHERE
+                                sle.is_cancelled=0 and
+                                sle.voucher_type = 'Purchase Invoice' and
+                                sle.item_code = dni.item_code and
+                                sle.posting_date  <= dn.posting_date and
+                                sle.is_cancelled = 0
+                            order by posting_date desc
+                            limit 1
+                        ), 0) as valuation_rate
+                FROM `tabDelivery Note Item` dni
+                LEFT OUTER JOIN `tabDelivery Note` dn
+                ON dn.name=dni.parent AND dni.parenttype="Delivery Note"
                 WHERE
-                    sle.is_cancelled=0 and
-                    sle.voucher_type = 'Purchase Invoice' and
-                    sle.item_code = 'Cement' and
-                    sle.posting_date  <= '2023-04-29' and
-                    sle.is_cancelled = 0
-                order by posting_date desc
-                limit 1
+                    dni.item_group='Raw Material'
+                    AND dn.site_work='{doc.name}'
+                    AND dn.docstatus=1
+                GROUP BY dni.item_code, dni.uom
         """)
-        rate = rate[0][0] if rate and rate[0] and rate[0][0] else 0
-        rm_cost+=(rate or 0)*(item.stock_qty or 0)
+    rate = sum([r[0] for r in rate if r and r[0]])
+    rm_cost+=rate
+
     doc.actual_site_cost_calculation=(item_cost or 0)+(doc.total or 0)+(doc.total_job_worker_cost or 0)+ (rm_cost or 0) + (doc.transporting_cost or 0)
     doc.site_profit_amount=(doc.total_expense_amount or 0) - (doc.actual_site_cost_calculation or 0)
     return doc
