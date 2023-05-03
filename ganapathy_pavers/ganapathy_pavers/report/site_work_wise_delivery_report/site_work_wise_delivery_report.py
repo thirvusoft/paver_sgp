@@ -47,6 +47,27 @@ def execute(filters=None):
                                 end as own_vehicle_no,
                                 child.ts_qty,
                                 child.qty,
+                                (child.qty*ifnull((
+                                                SELECT
+                                                    uom.conversion_factor
+                                                FROM `tabUOM Conversion Detail` uom
+                                                WHERE
+                                                    uom.parenttype='Item' and
+                                                    uom.parent=child.item_code and
+                                                    uom.uom=child.uom
+                                            )
+                                            , 0)/
+                                            ifnull((
+                                                SELECT
+                                                    uom.conversion_factor
+                                                FROM `tabUOM Conversion Detail` uom
+                                                WHERE
+                                                    uom.parenttype='Item' and
+                                                    uom.parent=child.item_code and
+                                                    uom.uom='SQF'
+                                            )    
+                                            , 0)
+                                ) as sqf,
                                 child.uom,
                                 child.pieces,
                                 child.rate,
@@ -102,17 +123,18 @@ def get_columns():
         _("Document Name") + ":Link/Delivery Note:100",
         _("Customer Name") + ":Link/Customer:200",
         _("Sales Type") + ":Data:100",
-        _("Site Name") + ":Link/Project:150",
+        _("Site Name") + ":Link/Project:160",
         _("Item Name") + ":Link/Item:350",
-        _("Warehouse") + ":Link/Warehouse:150",
-        _("Vehicle") + ":Link/Vehicle:150",
+        _("Warehouse") + ":Link/Warehouse:160",
+        _("Vehicle") + ":Link/Vehicle:160",
         _("Bundle") + ":Data:80",
         _("Qty") + ":Data:80",
+        _("SQF") + ":Data:80",
         _("UOM") + ":Link/UOM:100",
         _("Pieces") + ":Data:80",
         _("Rate") + ":Data:100",
-        _("Amount") + ":Data:150",
-        _("Grand Total") + ":Data:150"
+        _("Amount") + ":Data:160",
+        _("Grand Total") + ":Data:160"
         ]
     
     return columns
@@ -125,15 +147,15 @@ def group_total(filters = {}, data = []):
     else:
         if(filters.get("group_by") == "Date"):
             ret_list = []
-            total = [0] * 15
-            data.append([None]*15)
+            total = [0] * 16
+            data.append([None]*16)
             for row in range(len(data)):
                 if(data[row][0] and row!=0 or row == len(data)-1):
                     total[3] = "Group Total"
                     ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else '' for i in total])
-                    ret_list.append([None] * 15)
+                    ret_list.append([None] * 16)
                     ret_list.append(data[row])
-                    total = [0] * 15
+                    total = [0] * 16
                     total = add_list(total, data[row])
                 else:
                     ret_list.append(data[row])
@@ -142,15 +164,15 @@ def group_total(filters = {}, data = []):
 
         elif(filters.get("group_by") == "Customer Wise"):
             ret_list = []
-            total = [0] * 15
-            data.append([None]*15)
+            total = [0] * 16
+            data.append([None]*16)
             for row in range(len(data)):
                 if(row!=0  and data[row][2]!=data[row-1][2]):
                     total[3] = "Group Total"
                     ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else '' for i in total])
-                    ret_list.append([None] * 15)
+                    ret_list.append([None] * 16)
                     ret_list.append(data[row])
-                    total = [0] * 15
+                    total = [0] * 16
                     total = add_list(total, data[row])
                 else:
                     ret_list.append(data[row])
@@ -159,15 +181,15 @@ def group_total(filters = {}, data = []):
 
         else:
             ret_list = []
-            total = [0] * 15
-            data.append([None]*15)
+            total = [0] * 16
+            data.append([None]*16)
             for row in range(len(data)):
                 if( row!=0 and data[row][5]!=data[row-1][5]):
                     total[3] = "Group Total"
                     ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else '' for i in total])
-                    ret_list.append([None] * 15)
+                    ret_list.append([None] * 16)
                     ret_list.append(data[row])
-                    total = [0] * 15
+                    total = [0] * 16
                     total = add_list(total, data[row])
                 else:
                     ret_list.append(data[row])
