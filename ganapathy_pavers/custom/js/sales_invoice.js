@@ -243,7 +243,7 @@ frappe.ui.form.on('Sales Invoice',{
             return {
                 filters:{
                     'customer': cur_frm.doc.customer,
-                    'status': 'Open',
+                    'status': 'To Bill',
                 }
             }
         })
