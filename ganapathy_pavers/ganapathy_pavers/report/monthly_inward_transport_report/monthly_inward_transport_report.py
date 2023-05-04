@@ -19,8 +19,8 @@ def execute(filters=None):
 	no_of_days=frappe.db.sql(""" select count(distinct(vl.date)) as days from `tabVehicle Log` vl where vl.select_purpose="Raw Material" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
 	no_of_trips=frappe.db.sql(""" select count(distinct(vl.name)) as trips from `tabVehicle Log` vl where vl.select_purpose="Raw Material" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
 	
-	due_months=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,to_date,pending_due_filter),as_dict=1) 
-	insurance=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,to_date,insurance_filter),as_dict=1) 
+	due_months=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,from_date,pending_due_filter),as_dict=1) 
+	insurance=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,from_date,insurance_filter),as_dict=1) 
 	days=no_of_days[0]["days"] if no_of_days else 0
 	trips=no_of_trips[0]["trips"] if no_of_trips else 0
 	
@@ -213,7 +213,7 @@ def get_columns():
 			"label": _("<b>Item</b>"),
 			"fieldtype": "Link",
 			"options": "Item",
-			"width": 150
+			"width": 200
 		},
 		{
 			"fieldname": "qty",
@@ -225,7 +225,7 @@ def get_columns():
 			"fieldname": "1",
 			"label": _("<b>1</b>"),
 			"fieldtype": "Data",
-			"width": 150
+			"width": 200
 		},
 		{
 			"fieldname": "2",

@@ -24,9 +24,9 @@ def execute(filters=None):
 	si_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'sales_invoice':['is','set'], "docstatus": 1, "select_purpose": ["not in", ["Fuel", "Service"]]}, pluck='sales_invoice')
 	no_of_days=frappe.db.sql(""" select count(distinct(vl.date)) as days from `tabVehicle Log` vl where vl.select_purpose="Goods Supply" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
 	no_of_trips=frappe.db.sql(""" select count(distinct(vl.name)) as trips from `tabVehicle Log` vl where vl.select_purpose="Goods Supply" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
-	avg_mileage=frappe.db.sql(""" select avg(vl.mileage) as mileage from `tabVehicle Log` vl where vl.select_purpose="Goods Supply" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
-	due_months=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,to_date,pending_due_filter),as_dict=1) 
-	insurance=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,to_date,insurance_filter),as_dict=1) 
+	avg_mileage=frappe.db.sql(""" select ifnull(avg(vl.mileage), 0) as mileage from `tabVehicle Log` vl where vl.select_purpose="Goods Supply" and vl.date between '{0}' and '{1}' and vl.license_plate='{2}'  and docstatus=1 """.format(from_date,to_date,vehicle_no),as_dict=1) 
+	due_months=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,from_date,pending_due_filter),as_dict=1) 
+	insurance=frappe.db.sql(""" select TIMESTAMPDIFF(MONTH,'{1}',md.to_date) as date from `tabMaintenance Details` md where parent='{0}' and md.maintenance='{2}'""".format(vehicle_no,from_date,insurance_filter),as_dict=1) 
 	days=no_of_days[0]["days"] if no_of_days else 0
 	trips=no_of_trips[0]["trips"] if no_of_trips else 0
 	mileage=avg_mileage[0]["mileage"] if avg_mileage else 0
@@ -281,7 +281,7 @@ def get_columns():
             "label": _("<b>1</b>"),
             "fieldtype": "Data",
             "fieldname": "1",
-            "width": 150
+            "width": 200
         },
 		 {
             "label": _("<b>2</b>"),
