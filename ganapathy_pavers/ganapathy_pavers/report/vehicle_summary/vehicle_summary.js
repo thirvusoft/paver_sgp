@@ -24,6 +24,17 @@ frappe.query_reports["Vehicle Summary"] = {
 		}
 	],
 	formatter: function(value, row, column, data, default_formatter) {
+		if (column.fieldname == "vehicle" && data.reference) {
+			value = $(`<span ondblclick=\'ganapathy_pavers.show_reference(\"${data.vehicle}\", ${JSON.stringify(data.reference)}, 0)\'>${value}</span>`);
+			let $value = $(value);
+			value = $value.wrap("<p></p>").parent().html();
+			if (data.bold) {
+				value = $(`<div style="font-weight: bold; background: ${["TOTAL", "AVERAGE"].includes(data.vehicle)?"rgb(127 221 253 / 85%)":"rgb(242 140 140 / 81%)"}">${value}</div>`);
+				let $value = $(value);
+				value = $value.wrap("<p></p>").parent().html();
+			}
+			return value
+		}
 		value = __(default_formatter(value, row, column, data));
 		if (data.bold) {
 			value = $(`<div style="font-weight: bold; background: ${["TOTAL", "AVERAGE"].includes(data.vehicle)?"rgb(127 221 253 / 85%)":"rgb(242 140 140 / 81%)"}">${value}</div>`);
