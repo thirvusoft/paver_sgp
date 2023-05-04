@@ -51,7 +51,7 @@ def before_save(doc, action=None):
         raw_material_total = raw_material_total+(i.amount or 0)
     doc.total_amount_of_raw_material=raw_material_total
 
-    sales_invoice_amount = sum(frappe.get_all("Sales Invoice", {"docstatus": 1, "site_work": doc.name}, pluck="grand_total"))
+    sales_invoice_amount = sum(frappe.get_all("Sales Invoice", {"docstatus": 1, "site_work": doc.name}, pluck="total"))
 
     doc.total_expense_amount=sales_invoice_amount or 0
 

@@ -3,8 +3,6 @@
 
 import frappe
 
-maintenance = ["INSURANCE", "VEHICLE DUE"]
-
 def execute(filters=None):
 	columns, data = get_columns(filters), get_data(filters)
 	return columns, data
@@ -17,52 +15,62 @@ def get_columns(filters):
 			"fieldtype": "Link",
 			"options": "Vehicle",
 			"width": 150,
+		},
+		{
+			"label": "Due Amount",
+			"fieldname": "amount",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": "Start Date",
+			"fieldname": "start_date",
+			"fieldtype": "Date",
+			"width": 150,
+		},
+		{
+			"label": "Total no of dues",
+			"fieldname": "total_due",
+			"fieldtype": "Int",
+			"width": 150,
+		},
+		{
+			"label": "Balance Due",
+			"fieldname": "balance_due",
+			"fieldtype": "Int",
+			"width": 150,
+		},
+		{
+			"label": "End Date",
+			"fieldname": "end_date",
+			"fieldtype": "Date",
+			"width": 150,
 		}
 	]
-	for m in maintenance:
-		columns.append({
-			"label": m,
-			"fieldname": frappe.scrub(m),
-			"fieldtype": "Float",
-			"width": 100,
-		})
-		columns.append({
-			"label": f"{m} End Date",
-			"fieldname": f"""{frappe.scrub(m)}_end_date""",
-			"fieldtype": "Date",
-			"width": 170,
-		})
 
 	return columns
 
 def get_data(filters):
+	maintenance = filters.get("maintenance_type")
 	date=filters.get("date") or frappe.utils.nowdate()
-	maintenance_query=[
-		f"""
-		(
-			select 
-				TIMESTAMPDIFF(MONTH,'{date}',md.to_date) as date 
-			from `tabMaintenance Details` md 
-			where parent=vl.name and md.maintenance='{m}'
-			limit 1
-		) as {frappe.scrub(m)},
-		(
-			select 
-				md.to_date
-			from `tabMaintenance Details` md 
-			where parent=vl.name and md.maintenance='{m}'
-			limit 1
-		) as {frappe.scrub(m)}_end_date
-		""" 
-		for m in maintenance
-	]
+	if not maintenance or not date:
+		return []
 
 	query=f"""
 		select
-			vl.name as vehicle
-			{(", " + ", ".join(maintenance_query)) if maintenance_query else ""}
+			vl.name as vehicle,
+			md.expense as amount,
+			md.from_date as start_date,
+			TIMESTAMPDIFF(MONTH, md.from_date, md.to_date) as total_due,
+			TIMESTAMPDIFF(MONTH, '{date}', md.to_date) as balance_due,
+			md.to_date as end_date
 		from `tabVehicle` vl
+		inner join `tabMaintenance Details` md
+		on md.parent=vl.name and md.parenttype="Vehicle"
+		where
+			md.maintenance='{maintenance}' and
+			ifnull(md.from_date, "")!="" and
+			ifnull(md.to_date, "")!=""
 	"""
 	data = frappe.db.sql(query, as_dict=True)
-	data = [d for d in data if sum([1 for m in maintenance if d.get(f"{frappe.scrub(m)}_end_date")])]
 	return data

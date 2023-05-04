@@ -13,6 +13,13 @@ frappe.query_reports["Vehicle Alerts"] = {
 			fieldtype: "Date",
 			reqd: 1,
 			default: prevMonthEnd
+		},
+		{
+			label: "Maintenance Type",
+			fieldname: "maintenance_type",
+			fieldtype: "Link",
+			reqd: 1,
+			options: "Maintenance type"
 		}
 	],
 };
