@@ -81,7 +81,7 @@ def execute(filters=None):
 		"1": "<b>Total Unit</b>",
 	})
 
-	pi_item=frappe.get_all("Purchase Invoice Item",{"parent":['in',pi_doc]},['item_code','count(item_code) as count','sum(stock_qty) as stock_qty','stock_uom'],group_by='item_code')
+	pi_item=frappe.get_all("Purchase Invoice Item",{"parent":['in',pi_doc], "docstatus": 1},['item_code','count(item_code) as count','sum(stock_qty) as stock_qty','stock_uom'],group_by='item_code')
 	
 	from collections import Counter
 	purchase_uom = Counter()
