@@ -584,9 +584,9 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[],
 
     if gl.get("split_equally"):
         num_total = 1
-        den_total = sum([cw, fp, lego]) + (len(list(set([frappe.db.get_value("Workstation", mac, "location") for mac in gl_machines]))) if gl.get("paver") else 0)
+        den_total = sum([cw, fp, lego]) + (len(list(set([frappe.db.get_value("Workstation", mac, "location") for mac in (gl_machines or WORKSTATIONS)]))) if gl.get("paver") else 0)
         if prod_details == "paver" and machines:
-            gl_m_location = [frappe.db.get_value("Workstation", mac, "location") for mac in gl_machines]
+            gl_m_location = [frappe.db.get_value("Workstation", mac, "location") for mac in (gl_machines or WORKSTATIONS)]
             gl_m_location.count(frappe.db.get_value("Workstation", machines[0], "location"))
             den_total *= gl_m_location.count(frappe.db.get_value("Workstation", machines[0], "location"))
         

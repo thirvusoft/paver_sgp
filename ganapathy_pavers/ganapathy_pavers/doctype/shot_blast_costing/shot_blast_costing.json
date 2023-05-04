@@ -232,7 +232,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-05-03 12:01:50.904722",
+ "modified": "2023-05-03 12:38:14.907648",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Costing",
@@ -257,6 +257,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "track_changes": 1,
- "track_seen": 1,
- "track_views": 1
+ "track_seen": 1
 }
