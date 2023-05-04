@@ -583,14 +583,18 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[],
     machine_key = json.dumps(machines)
 
     if gl.get("split_equally"):
-        num_total = 1
-        den_total = sum([cw, fp, lego]) + (len(list(set([frappe.db.get_value("Workstation", mac, "location") for mac in (gl_machines or WORKSTATIONS)]))) if (paver or (sum([paver, cw, lego, fp]) == 0)) else 0)
-        if prod_details == "paver" and machines:
-            gl_m_location = [frappe.db.get_value("Workstation", mac, "location") for mac in (gl_machines or WORKSTATIONS)]
-            gl_m_location.count(frappe.db.get_value("Workstation", machines[0], "location"))
-            den_total *= gl_m_location.count(frappe.db.get_value("Workstation", machines[0], "location"))
-        
-        return (num_total or 0) / (den_total or 1)
+        res = 0
+        for mach in machines:
+            num_total = 1
+            den_total = sum([cw, fp, lego]) + (len(list(set([frappe.db.get_value("Workstation", mac, "location") for mac in (gl_machines or WORKSTATIONS)]))) if (paver or (sum([paver, cw, lego, fp]) == 0)) else 0)
+            if prod_details == "paver" and mach:
+                gl_m_location = [frappe.db.get_value("Workstation", mac, "location") for mac in (gl_machines or WORKSTATIONS)]
+                den_total *= gl_m_location.count(frappe.db.get_value("Workstation", mach, "location"))
+            
+            res+= (num_total or 0) / (den_total or 1)
+            if prod_details != "paver":
+                break
+        return res
 
     if gl_machine_key not in machine_wise_prod_info:
         machine_wise_prod_info[gl_machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=gl_machines)
