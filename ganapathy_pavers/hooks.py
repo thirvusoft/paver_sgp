@@ -122,6 +122,7 @@ override_doctype_class = {
 
 jenv = {
 	"methods": [
+		"get_delivery_transport_detail:ganapathy_pavers.utils.py.sitework_printformat.get_delivery_transport_detail",
 		"get_bank_details:ganapathy_pavers.get_bank_details",
 		"uom_conversion:ganapathy_pavers.uom_conversion",
 		"print_item_name:ganapathy_pavers.utils.py.sales_invoice_printformat.sales_invoice_print_format",

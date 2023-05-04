@@ -64,44 +64,16 @@ def site_work(doc):
     dn_items+=frappe.get_all("Sales Invoice Item", {"parenttype": "Sales Invoice", "parent": ["in", si], "item_code": ["in", delivered_items]}, ["creation", "item_code", "warehouse"])
     
     paver_prod_details = []
-    # cw_types={}
     for item in dn_items:
-        # if frappe.db.get_value("Item", item['item_code'], "item_group") == "Pavers":
-            if item['item_code'] not in production_rate:
-                production_rate[item['item_code']] = []
-            
-            if [item["item_code"], get_first_day(item["creation"])] not in paver_prod_details:
-                prod_cost=get_item_price_list_rate(item["item_code"], item["creation"])
-                # get_paver_production_rate(item["item_code"], item["creation"])
-                paver_prod_details.append([item["item_code"], get_first_day(item["creation"])])
-                if prod_cost:
-                    production_rate[item['item_code']].append(prod_cost)
+        if item['item_code'] not in production_rate:
+            production_rate[item['item_code']] = []
         
-        # if frappe.db.get_value("Item", item['item_code'], "item_group") == "Compound Walls":
-        #     _type = frappe.db.get_value("Item", item['item_code'], "compound_wall_type")
-        #     if item['item_code'] not in production_rate:
-        #         production_rate[item['item_code']] = 0
-            
-        #     month = get_first_day(item["creation"])
-
-        #     if month not in cw_types:
-        #         cw_types[month]=[]
-
-        #     if _type not in cw_types[month]:
-        #         cw_types[month].append(_type)
-    
-    # prod_cost = []
-    # for i in cw_types:
-    #     cost = get_cw_production_rate(_type=cw_types[i], date = i)
-    #     if cost:
-    #         prod_cost.append(cost)
-    
-    # prod_cost = (sum(prod_cost) / len(prod_cost)) if prod_cost else 0
-    
-    # for item in dn_items:
-    #     if frappe.db.get_value("Item", item['item_code'], "item_group") == "Compound Walls":
-    #         production_rate[item['item_code']] = prod_cost
-
+        if [item["item_code"], get_first_day(item["creation"])] not in paver_prod_details:
+            prod_cost=get_item_price_list_rate(item["item_code"], item["creation"])
+            paver_prod_details.append([item["item_code"], get_first_day(item["creation"])])
+            if prod_cost:
+                production_rate[item['item_code']].append(prod_cost)
+        
     for item in production_rate:
         if isinstance(production_rate[item], list):
             if len(list(set(production_rate[item]))):
@@ -323,3 +295,58 @@ def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"], exp_group="cw_grou
                                 + (production_qty[0]['operator_cost_per_sqft'] or 0))
 
     return rm_cost, total_cost_per_sqft
+
+def get_delivery_transport_detail(sitename):
+    conv_query = """
+    ifnull((
+        SELECT
+            uom.conversion_factor
+        FROM `tabUOM Conversion Detail` uom
+        WHERE
+            uom.parenttype='Item' and
+            uom.parent=dni.item_code and
+            uom.uom=dni.uom
+    )
+    , 0)/
+    ifnull((
+        SELECT
+            uom.conversion_factor
+        FROM `tabUOM Conversion Detail` uom
+        WHERE
+            uom.parenttype='Item' and
+            uom.parent=dni.item_code and
+            uom.uom='SQF'
+    )    
+    , 0)
+    """
+    query = f"""
+        select
+            sum(
+                (case 
+                    when ifnull(dn.own_vehicle_no, '')!='' 
+                        then dni.qty
+                    else
+                        0
+                end)
+                *{conv_query}
+                ) as own_vehicle,
+            sum(
+                (case 
+                    when ifnull(dn.own_vehicle_no, '')='' and ifnull(dn.vehicle_no, '')!=''
+                        then dni.qty
+                    else
+                        0
+                end)
+                *{conv_query}
+                ) as rental_vehicle
+        from `tabDelivery Note Item` dni
+        inner join `tabDelivery Note` dn
+        on dni.parenttype='Delivery Note' and dni.parent=dn.name
+        where
+            dni.item_group in ("Pavers", "Compound Walls") and
+            dn.docstatus=1 and
+            dn.site_work='{sitename}'
+    """
+
+    res = frappe.db.sql(query, as_dict=True)
+    return res[0] if res and res[0] else {}
