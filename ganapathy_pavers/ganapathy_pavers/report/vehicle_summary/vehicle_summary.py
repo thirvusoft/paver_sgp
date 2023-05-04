@@ -1,6 +1,7 @@
 # Copyright (c) 2023, Thirvusoft and contributors
 # For license information, please see license.txt
 
+import json
 import frappe, erpnext
 from ganapathy_pavers.custom.py.expense import expense_tree
 
@@ -57,6 +58,12 @@ def get_columns(filters):
 		{
 			"fieldname": "bold",
 			"fieldtype": "Check",
+			"hidden": 1
+		},
+		{
+			"label": 'Reference',
+			"fieldname": "reference",
+			"fieldtype": "Data",
 			"hidden": 1
 		}
 	]
@@ -260,11 +267,14 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 		})
 
 	rental_sqft = get_rental_vehicle_sqft(filters=filters)
-	rental_exp = get_rental_vehicle_expense(filters=filters)
+	rental_exp_details = get_rental_vehicle_expense(filters=filters)
+	rental_exp = rental_exp_details.get("amount") or 0
+	rental_exp_reference = rental_exp_details.get("reference") or []
 	data.append({})
 	data.append({
 			"vehicle": "RENTAL VEHICLE",
-			"bold": 1
+			"bold": 1,
+			"reference": json.dumps(rental_exp_reference)
 		})
 	for row in rental_sqft:
 		exp = (rental_exp or 0) * (rental_sqft[row] or 0) / (sum(rental_sqft.values()) or 1)
@@ -358,14 +368,24 @@ def get_rental_vehicle_expense(filters):
 def get_account_balance_on(account, company, from_date, to_date):
 	query=f"""
 		select 
-			sum(gl.debit) as debit
+			*
 		from `tabGL Entry` gl 
 		where 
 			gl.company='{company}' and
+			gl.debit > 0 and
+			ifnull(gl.expense_type, "")="" and
 			date(gl.posting_date)>='{from_date}' and 
 			date(gl.posting_date)<='{to_date}' and 
 			gl.is_cancelled=0 and
 			gl.account="{account}"
 	"""
-	balance=frappe.db.sql(query, as_list=True)
-	return balance[0][0] if balance and balance[0] and balance[0][0] else 0
+	gl_entries=frappe.db.sql(query, as_dict=True)
+	res = {
+		"reference": [{
+			'doctype': gl.voucher_type,
+			'docname': gl.voucher_no,
+			'amount': gl.debit
+		} for gl in gl_entries],
+		"amount": sum([gl.get("debit") or 0 for gl in gl_entries])
+	}
+	return res
