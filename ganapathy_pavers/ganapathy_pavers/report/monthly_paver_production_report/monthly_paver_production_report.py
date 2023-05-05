@@ -42,12 +42,12 @@ def execute(filters=None):
 								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
 								avg(shot_blast_per_sqft) as shot_blast_per_sqft,
 								(
-									SELECT AVG((labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense))/AVG(total_production_sqft)
+									SELECT SUM(labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense)
 									from `tabMaterial Manufacturing`
 									WHERE name {1}
 								) as labour_cost,
 								(
-									SELECT AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(total_production_sqft)
+									SELECT SUM(operators_cost_in_manufacture+operators_cost_in_rack_shift)
 									from `tabMaterial Manufacturing`
 									WHERE name {1}
 								) as operator_cost
@@ -80,19 +80,6 @@ def execute(filters=None):
 			"amount":f"<b>₹{production_qty[0]['total_raw_material']:,.2f}</b>",
 			"cost_per_sqft":f"<b>₹{total_cost_per_sqft:,.3f}</b>"
 		})
-		test_data.append({
-			"rate":"<b>Labour Cost Per Sqft</b>",
-			"cost_per_sqft":f"<b>₹{production_qty[0]['labour_cost']:,.2f}</b>"
-		})
-		test_data.append({
-			"rate":"<b>Operator Cost Per Sqft</b>",
-			"cost_per_sqft":f"<b>₹{production_qty[0]['operator_cost']:,.2f}</b>"
-		})
-		test_data.append({
-			"rate":"<b style='color:rgb(255 82 0);'>Labour Expense Per Sqft</b>",
-			"cost_per_sqft":f"<b style='color:rgb(255 82 0);'>₹{(production_qty[0]['operator_cost']+production_qty[0]['labour_cost']):,.2f}</b>"
-		})
-
 
 		abstract_cost = {
 				"Strapping Cost":production_qty[0]['strapping_cost_per_sqft'],
@@ -106,8 +93,6 @@ def execute(filters=None):
 			})
 		production_cost_per_sqft= (
 				total_cost_per_sqft+
-				production_qty[0]['labour_cost']+
-				production_qty[0]['operator_cost']+
 				sum([abstract_cost[cost] or 0 for cost in abstract_cost]))
 
 		test_data.append({
@@ -124,7 +109,29 @@ def execute(filters=None):
 		total_amt=0
 		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
 		if prod_details.get('paver'):
-			exp, total_sqf, total_amt=get_expense_data(prod_details.get('paver'), filters, production_qty[0]['production_sqft'], total_sqf, total_amt)
+			labour_exp = {
+				"value": "Labour & Operator",
+				"account_name": "Labour & Operator",
+				"expandable": 1,
+				"balance": 0,
+				"child_nodes": [
+					{
+						"value": "Labour Expense",
+						"account_name": "Labour Expense",
+						"expandable": 0,
+						"balance": production_qty[0]["labour_cost"],
+						"child_nodes": []
+					},
+					{
+						"value": "Operator Expense",
+						"account_name": "Operator Expense",
+						"expandable": 0,
+						"balance": production_qty[0]["operator_cost"],
+						"child_nodes": []
+					}
+				]
+			}
+			exp, total_sqf, total_amt=get_expense_data(prod_details.get('paver'), filters, production_qty[0]['production_sqft'], total_sqf, total_amt, labour_exp)
 			if exp:
 				data.append({
 					"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Details</b>"
@@ -166,7 +173,7 @@ def get_columns():
 
 	return columns
 
-def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
+def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, labour_exp=[]):
 	machine=None
 	if ("Machine1" in filters.get("machine", []) or "Machine2" in filters.get("machine", [])) and "Machine3 Day" in filters.get("machine", []):
 		pass
@@ -189,6 +196,7 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt):
 			return [], 0, 0
 		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine )
 	
+	exp_tree.append(labour_exp)
 	res=[]
 	for i in exp_tree:
 		dic={}

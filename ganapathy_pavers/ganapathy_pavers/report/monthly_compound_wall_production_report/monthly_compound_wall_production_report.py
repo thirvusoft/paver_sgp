@@ -25,8 +25,8 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 								sum(raw_material_cost) as raw_material_cost,
 								sum(total_expense_for_unmolding) as total_expense_for_unmolding,
 								sum(labour_expense_for_curing) as total_expense_for_curing,
-								AVG(total_labour_wages + labour_expense_for_curing)/AVG(ts_production_sqft) as labour_cost_per_sqft,
-								AVG(total_operator_wages)/AVG(ts_production_sqft) as operator_cost_per_sqft,
+								SUM(total_labour_wages + labour_expense_for_curing) as labour_cost_per_sqft,
+								SUM(total_operator_wages) as operator_cost_per_sqft,
 								avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
 								avg(additional_cost_per_sqft) as additional_cost_per_sqft,
 								avg(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name {0}""".format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_dict=1)
@@ -80,9 +80,6 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 		})
 
 		abstract_cost = {#"Total Raw Material Cost":production_qty[0]['raw_material_cost_per_sqft'],
-				"Total Labour Cost":production_qty[0]["labour_cost_per_sqft"],
-				"Total Operator Cost":production_qty[0]['operator_cost_per_sqft'],
-				"<span style='color:rgb(255 82 0);'>Labour and Operator Cost</span>": f"""<b style='color:rgb(255 82 0);'>₹{(((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0))):,.2f}</b>""",
 				"Total Strapping Cost":production_qty[0]['strapping_cost_per_sqft'],
 				"Total Additional Cost":production_qty[0]['additional_cost_per_sqft']}
 
@@ -103,7 +100,29 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 		total_amt=0
 		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'))
 		if prod_details.get(prod):
-			exp, total_sqf, total_amt=get_expense_data(prod_details.get(prod),filters, (production_qty[0]['production_sqft']), total_sqf, total_amt, exp_group, prod)
+			labour_exp = {
+				"value": "Labour & Operator",
+				"account_name": "Labour & Operator",
+				"expandable": 1,
+				"balance": 0,
+				"child_nodes": [
+					{
+						"value": "Labour Expense",
+						"account_name": "Labour Expense",
+						"expandable": 0,
+						"balance": production_qty[0]["labour_cost_per_sqft"],
+						"child_nodes": []
+					},
+					{
+						"value": "Operator Expense",
+						"account_name": "Operator Expense",
+						"expandable": 0,
+						"balance": production_qty[0]["operator_cost_per_sqft"],
+						"child_nodes": []
+					}
+				]
+			}
+			exp, total_sqf, total_amt=get_expense_data(prod_details.get(prod),filters, (production_qty[0]['production_sqft']), total_sqf, total_amt, exp_group, prod, labour_exp)
 			if exp:
 				data.append({
 					"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Details</b>"
@@ -122,7 +141,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 					"uom": f"<b style='background: rgb(242 140 140 / 81%)'>{round(total_amt, 4)}</b>"
 				})
 		if data and len(data)>0:
-			data[0]['uom']=f"""<b>Production Cost per SQFT :</b> ₹{(production_qty[0]['strapping_cost_per_sqft'] + production_qty[0]['additional_cost_per_sqft'] + total_cost_per_sqft + round(total_sqf, 4) + (((production_qty[0]["labour_cost_per_sqft"] or 0) + (production_qty[0]['operator_cost_per_sqft'] or 0)))):,.3f}"""
+			data[0]['uom']=f"""<b>Production Cost per SQFT :</b> ₹{(production_qty[0]['strapping_cost_per_sqft'] + production_qty[0]['additional_cost_per_sqft'] + total_cost_per_sqft + round(total_sqf, 4)):,.3f}"""
 	columns = get_columns()
 	return columns, data
  
@@ -181,7 +200,7 @@ def get_columns():
 	return columns
 
 
-def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group, prod='cw'):
+def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group, prod='cw', labour_exp=[]):
 	if filters.get("new_method"):
 		exp={'cw': "compound_wall", "lego": "lego_block", "fp": "fencing_post"}.get(prod)
 		exp_tree=exp_tree=expense_tree(
@@ -197,6 +216,7 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group, 
 			return [], 0, 0
 		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.get(exp_group))
 
+	exp_tree.append(labour_exp)
 	res=[]
 	for i in exp_tree:
 		dic={}
