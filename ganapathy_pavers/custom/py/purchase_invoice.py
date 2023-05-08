@@ -2,6 +2,7 @@ import json
 import frappe
 
 def update_pi_items(self, event=None):
+    self.project = self.site_work
     if not self.site_work:
         self.items_add_under=""
 

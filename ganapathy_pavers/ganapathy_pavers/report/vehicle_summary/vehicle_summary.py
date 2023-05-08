@@ -131,6 +131,14 @@ def get_data(filters):
 			SELECT *
 			FROM `tabVehicle Log` _vl 
 			where
+				(
+					select 
+						count(*)
+					from `tabVehicle` vehicle
+					where
+						vehicle.name=_vl.license_plate and
+						vehicle.expense_type='Vehicle'
+				) > 0 and
 				_vl.docstatus=1
 				{conditions.replace("vl.", '_vl.')}
 			group by _vl.delivery_note, _vl.purchase_invoice

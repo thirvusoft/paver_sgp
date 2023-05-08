@@ -196,7 +196,10 @@ doc_events = {
 			"ganapathy_pavers.custom.py.site_work.job_worker_laying_details",
 		],
 		"after_insert":"ganapathy_pavers.custom.py.site_work.validate",
-		"on_update":"ganapathy_pavers.custom.py.site_work.update_status"
+		"on_update":[
+            	"ganapathy_pavers.custom.py.site_work.update_status",
+				"ganapathy_pavers.custom.py.site_work.update_delivered_qty"
+				]
 	},
 	"Sales Order":{
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields",

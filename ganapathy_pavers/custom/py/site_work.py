@@ -340,7 +340,7 @@ def job_worker(self, event=None):
             row.description_for_other_work=""
 
 @frappe.whitelist()
-def update_delivered_qty(site_work=[]):
+def update_delivered_qty(site_work=[], event = None):
     old_value=""
     sw=""
     log_content=""
@@ -350,6 +350,9 @@ def update_delivered_qty(site_work=[]):
         
         if not site_work:
             site_work=frappe.get_all("Project", pluck="name")
+
+        if not isinstance(site_work, list):
+            site_work = [site_work.name]
 
         for sw in site_work:
             total_delivered_qty = frappe.db.sql(f""" select
@@ -596,3 +599,4 @@ def refill_delivery_detail(site_work, event=None):
     doc.update({"delivery_detail": delivery_detail})
     if isinstance(site_work, str):
         doc.save()
+        update_delivered_qty([doc.name])

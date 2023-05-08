@@ -109,14 +109,15 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
             SUM(dni.amount) as amount,
             ROUND(
                 ifnull((
-                    SELECT sle.valuation_rate
+                    SELECT sle.incoming_rate
                     FROM `tabStock Ledger Entry` sle
                     WHERE
                         sle.is_cancelled=0 and
                         sle.voucher_type = 'Purchase Invoice' and
                         sle.item_code = dni.item_code and
                         sle.posting_date  <= dn.posting_date and
-                        sle.is_cancelled = 0
+                        sle.is_cancelled = 0 and
+                        sle.project='{site_work}'
                     order by posting_date desc
                     limit 1
                 ), 0) *
@@ -142,6 +143,26 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
         GROUP BY dni.item_code, dni.uom
     """
     res = frappe.db.sql(query, as_dict=True)
+    
+    res+=frappe.db.sql(f""" 
+        select
+            child.item_code,
+            SUM(child.qty) as qty,
+            child.uom,
+            AVG(child.rate) as rate,
+            AVG(child.rate) as valuation_rate,
+            SUM(child.amount) as amount
+        from `tabPurchase Order` as doc
+        left outer join `tabPurchase Order Item` as child
+            on doc.name = child.parent
+        where 
+            doc.docstatus = 1 
+            and doc.site_work = '{site_work}' 
+            and child.delivered_by_supplier = 1
+        group by 
+            child.item_code, 
+            child.uom
+        """, as_dict=True)
     f_res = {}
 
     for row in res:
