@@ -27,9 +27,9 @@ def execute(filters=None):
 	due=due_months[0]["date"] if due_months else 0
 	insurance=insurance[0]["date"] if insurance else 0
 
-	doc = frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no}, ['name',
+	doc = frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no, "docstatus": 1}, ['name',
 							'last_odometer', 'odometer', 'purchase_invoice', 'purchase_receipt', 'today_odometer_value'], order_by="date",)
-	pi_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'purchase_invoice':['is',"set"]}, pluck='purchase_invoice')
+	pi_doc=frappe.get_all("Vehicle Log", {"date": ["between", (from_date, to_date)], "license_plate": vehicle_no,'purchase_invoice':['is',"set"], "docstatus": 1}, pluck='purchase_invoice')
 	start_km = 0
 	end_km = 0
 	mileage = 0
@@ -43,8 +43,8 @@ def execute(filters=None):
 		except:
 			pass
 
-	invoice_grand_total = sum(frappe.get_list("Purchase Invoice",{"name":["in",pi_doc], 'purpose': ["!=", "Service"]}, pluck='ts_total_amount'))
-
+	invoice_grand_total = sum(frappe.get_list("Purchase Invoice",{"name":["in",pi_doc], 'purpose': ["!=", "Service"], 'docstatus': 1}, pluck='ts_total_amount'))
+	frappe.errprint(frappe.get_list("Purchase Invoice",{"name":["in",pi_doc], 'purpose': ["!=", "Service"], 'docstatus': 1}, pluck='ts_total_amount'))
 	if not invoice_grand_total:
 		invoice_grand_total = 0
 	
@@ -156,7 +156,7 @@ def execute(filters=None):
 	})
 
 	data.append({
-		"item": "<b>Profit</b>",
+		"item": "<b>Difference</b>",
 		"qty": f"<b>{(invoice_grand_total or 0)-(total_amount or 0)}</b>",
 	})
 

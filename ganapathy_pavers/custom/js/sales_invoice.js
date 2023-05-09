@@ -73,6 +73,14 @@ frappe.ui.form.on("Sales Invoice Item", {
 
 frappe.ui.form.on('Sales Invoice', {
     refresh: function(frm) {
+        frm.set_query('site_work',function(frm){
+            return {
+                filters:{
+                    'customer': cur_frm.doc.customer,
+                    'status': ["not in", ['Completed', 'Billed', 'Cancelled']],
+                }
+            }
+        })
         if (!cur_frm.doc.ewaybill && cur_frm.doc.einvoice_status == "Generated") {
             let bttn=cur_frm.add_custom_button("Get E-Way Bill No", async function() {
                 await frappe.call({
@@ -239,14 +247,6 @@ frappe.ui.form.on('Sales Invoice',{
     },
     customer:function(frm){
         cur_frm.set_value('site_work','')
-        frm.set_query('site_work',function(frm){
-            return {
-                filters:{
-                    'customer': cur_frm.doc.customer,
-                    'status': 'To Bill',
-                }
-            }
-        })
     },
 });
 
