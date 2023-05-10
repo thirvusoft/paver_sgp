@@ -44,7 +44,6 @@ def execute(filters=None):
 			pass
 
 	invoice_grand_total = sum(frappe.get_list("Purchase Invoice",{"name":["in",pi_doc], 'purpose': ["!=", "Service"], 'docstatus': 1}, pluck='ts_total_amount'))
-	frappe.errprint(frappe.get_list("Purchase Invoice",{"name":["in",pi_doc], 'purpose': ["!=", "Service"], 'docstatus': 1}, pluck='ts_total_amount'))
 	if not invoice_grand_total:
 		invoice_grand_total = 0
 	

@@ -27,7 +27,7 @@ ganapathy_pavers.monthly_compound_wall_report = {
             "fieldname": "new_method",
             "label": __("New Expense Method"),
             "fieldtype": "Check",
-            "default": 0,
+            "default": 1,
         },
         {
             "fieldname": "vehicle_summary",
@@ -79,7 +79,7 @@ ganapathy_pavers.itemwise_cw_filter = {
 		  fieldname: "new_method",
 		  label: __("New Expense Method"),
 		  fieldtype: "Check",
-		  default: 0,
+		  default: 1,
 	  },
 	  {
 		  fieldname: "vehicle_summary",

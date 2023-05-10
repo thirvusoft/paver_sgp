@@ -8,8 +8,28 @@ from frappe import _
 def execute(filters=None):
     columns, data = [], [{}]
     columns = get_columns(filters)
-    data = get_data(filters)
+    data = get_purchase_fuel_data(filters)
+    data += get_data(filters)
     return columns, data
+
+def get_purchase_fuel_data(filters):
+    query = f"""
+    select
+        fip.fuel_type as license_plate,
+        sum(poi.stock_qty) as fuel_qty,
+        sum(poi.amount) as total_fuel
+    from `tabPurchase Invoice Item` poi
+    inner join `tabPurchase Invoice` po on po.name=poi.parent and poi.parenttype="Purchase Invoice"
+    inner join `tabFuel Item Map` fip on fip.item_code=poi.item_code and fip.parenttype="Vehicle Settings"
+    where
+        po.docstatus=1 and
+        po.update_stock=1 and
+        po.posting_date between '{filters.get("from_date")}' and '{filters.get("to_date")}'
+    group by poi.item_code
+    """
+    data = frappe.db.sql(query, as_dict=True)
+    return ([{'license_plate': "FUEL PURCHASED", "bold": 1}] + data) if data else []
+
 def get_columns(filters):
     columns = [
         {
@@ -31,6 +51,16 @@ def get_columns(filters):
             "fieldname": "total_fuel",
             "width": 100
         },
+        {
+            "fieldname": 'bold',
+            "fieldtype": "Check",
+            "hidden": 1
+        },
+        {
+            "fieldname": 'only_bold',
+            "fieldtype": "Check",
+            "hidden": 1
+        }
         ]
     return columns
 
@@ -48,7 +78,13 @@ def get_data(filters):
         vehicle=frappe.get_all("Vehicle", filters={'fuel_type':fuel}, pluck='name')
         filters_1['license_plate']= ['in', vehicle]
     vehicle_log+=frappe.db.get_all("Vehicle Log", filters=filters_1, fields=['license_plate','sum(fuel_qty) as fuel_qty','sum(total_fuel) as total_fuel'], group_by='license_plate')
-    return vehicle_log
+    total = {"license_plate": "Total", "fuel_qty": 0, "total_fuel": 0, "only_bold": 1}
+    for row in vehicle_log:
+        total["fuel_qty"] += (row.get("fuel_qty") or 0)
+        total["total_fuel"] += (row.get("total_fuel") or 0)
+    vehicle_log.append(total)
+
+    return ([{'license_plate': "FUEL USED", "bold": 1}] + vehicle_log) if vehicle_log else []
 
 def get_stock_entry_data(filters):
     if not filters.get("from_barrel", 0):

@@ -40,7 +40,7 @@ frappe.query_reports["Monthly Transport Report"] = {
 			"fieldname": "new_method",
 			"label": __("New Expense Method"),
 			"fieldtype": "Check",
-			"default": 0,
+			"default": 1,
 		}
 	],
 	formatter: function (value, row, column, data, default_formatter) {
