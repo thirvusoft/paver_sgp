@@ -371,3 +371,36 @@ def get_delivery_transport_detail(sitename):
 
     res = frappe.db.sql(query, as_dict=True)
     return res[0] if res and res[0] else {}
+
+def get_retail_cost(doc):
+    doc=frappe.get_doc("Project",doc)
+    rental_cost = 0
+    add_cost = 0
+    for i in doc.additional_cost:
+
+        if "transport" in i.description.lower():
+            rental_cost += i.amount or 0
+        else:
+            add_cost += i.amount or 0
+    item_cost = []
+    for item in doc.delivery_detail:
+        date = item.creation
+        bin_ = get_item_price_list_rate(item = item.item, date = date)
+        cost=(bin_ or 0)* (((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)))
+        item_cost.append({
+         "item" : item.item,
+         "qty" : ((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)),
+         "rate" : bin_,
+         "amount": cost
+        })
+    
+    return {
+        "additional_cost" : add_cost,
+        "rental" : rental_cost,
+        "item_cost":item_cost,
+        "own_vehicle":doc.transporting_cost,
+        "job_work_rate": doc.total_job_worker_cost
+    }
+        
+
+           
