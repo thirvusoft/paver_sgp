@@ -123,6 +123,7 @@ def get_data(filters):
 				vehicle_summary=filters.get("vehicle_summary"),
 				all_expenses=True
 			)
+	exp_tree+=get_labour_operator_expense(filters)
 	res=[]
 	for i in exp_tree:
 		dic={}
@@ -244,4 +245,92 @@ def group_total(child, WORKSTATIONS):
 			group[frappe.scrub(wrk.location)] = sum([i.get(frappe.scrub(wrk.location)) for i in child])
 	res.append(group)
 	return res
+
+def get_labour_operator_expense(filters):
+	paver_labour_query = f"""
+				SELECT 
+					work_station as fieldname,
+					SUM(labour_cost_manufacture+labour_cost_in_rack_shift+labour_expense) as value
+				from `tabMaterial Manufacturing`
+				WHERE
+					from_time between '{filters.get("from_date")}' and '{filters.get("to_date")}'
+				group by work_station
+				"""
+	paver_operator_query=f"""
+				SELECT 
+					work_station as fieldname,
+					SUM(operators_cost_in_manufacture+operators_cost_in_rack_shift) as value
+				from `tabMaterial Manufacturing`
+				WHERE 
+					from_time between '{filters.get("from_date")}' and '{filters.get("to_date")}'
+				group by work_station
+				"""
+	cw_labour_query=f"""
+				SELECT 
+					case
+						when type in ('Post', 'Slab') then 'Compound Wall'
+						else type
+					end as fieldname,
+					SUM(total_labour_wages + labour_expense_for_curing) as value
+				from `tabCW Manufacturing`
+				WHERE 
+					molding_date between '{filters.get("from_date")}' and '{filters.get("to_date")}'
+				group by 
+					case
+						when type in ('Post', 'Slab') then 'Compound Wall'
+						else type
+					end
+				"""
+	cw_operator_query=f"""
+				SELECT 
+					case
+						when type in ('Post', 'Slab') then 'Compound Wall'
+						else type
+					end as fieldname,
+					SUM(total_operator_wages) as value
+				from `tabCW Manufacturing`
+				WHERE 
+					molding_date between '{filters.get("from_date")}' and '{filters.get("to_date")}'
+				group by 
+					case
+						when type in ('Post', 'Slab') then 'Compound Wall'
+						else type
+					end
+				"""
+	paver_labour_cost = frappe.db.sql(paver_labour_query, as_dict=True)
+	paver_operator_cost = frappe.db.sql(paver_operator_query, as_dict=True)
+	cw_labour_cost = frappe.db.sql(cw_labour_query, as_dict=True)
+	cw_operator_cost = frappe.db.sql(cw_operator_query, as_dict=True)
+
+	total_labour_cost = {
+			frappe.scrub(r.get('fieldname') or ''): r.get('value')
+			for r in paver_labour_cost+cw_labour_cost
+		}
+	total_labour_cost["balance"] = sum([i.get("value") or 0 for i in (paver_labour_cost+cw_labour_cost)])
+	total_labour_cost["value"] = "Labour Expense"
+	total_labour_cost["account_name"] = "Labour Expense"
+	total_labour_cost["expandable"] = 0
+	total_labour_cost["child_nodes"] = []
+
+	total_operator_cost = {
+			frappe.scrub(r.get('fieldname') or ''): r.get('value')
+			for r in paver_operator_cost+cw_operator_cost
+		}
+	total_operator_cost["balance"] = sum([i.get("value") or 0 for i in (paver_operator_cost+cw_operator_cost)])
+	total_operator_cost["value"] = "Operator Expense"
+	total_operator_cost["account_name"] = "Operator Expense"
+	total_operator_cost["expandable"] = 0
+	total_operator_cost["child_nodes"] = []
+
+	labour_opr_exp = {
+				"value": "Labour & Operator",
+				"account_name": "Labour & Operator",
+				"expandable": 1,
+				"balance": 0,
+				"child_nodes": [
+					total_labour_cost,
+					total_operator_cost
+				]
+			}
 	
+	return [labour_opr_exp]

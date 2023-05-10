@@ -8,7 +8,7 @@ frappe.query_reports["Diesel Consumption Summary"] = {
 			"fieldname": "from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",
-			"default": '2023-04-01',//frappe.datetime.month_start(),
+			"default": frappe.datetime.month_start(),
 			"width": "80",
 			"reqd": 1
 		},
