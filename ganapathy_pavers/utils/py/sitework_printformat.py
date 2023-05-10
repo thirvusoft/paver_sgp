@@ -295,14 +295,14 @@ def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"], exp_group="cw_grou
         bom_item = frappe.db.sql(""" 
                                 select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent {0} group by item_code """.format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_list=1)
         production_qty = frappe.db.sql(""" 
-                                select sum(ts_production_sqft) as production_sqft,
+                                select sum(production_sqft) as production_sqft,
                                 avg(total_cost_per_sqft) as total_cost_per_sqft,
                                 sum(total_expence) as total_expence,
                                 sum(raw_material_cost) as raw_material_cost,
                                 sum(total_expense_for_unmolding) as total_expense_for_unmolding,
                                 sum(labour_expense_for_curing) as total_expense_for_curing,
-                                AVG(total_labour_wages + labour_expense_for_curing)/AVG(ts_production_sqft) as labour_cost_per_sqft,
-                                AVG(total_operator_wages)/AVG(ts_production_sqft) as operator_cost_per_sqft,
+                                AVG(total_labour_wages + labour_expense_for_curing)/AVG(production_sqft) as labour_cost_per_sqft,
+                                AVG(total_operator_wages)/AVG(production_sqft) as operator_cost_per_sqft,
                                 avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
                                 avg(additional_cost_per_sqft) as additional_cost_per_sqft,
                                 avg(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name {0}""".format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_dict=1)

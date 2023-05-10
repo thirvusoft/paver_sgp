@@ -46,6 +46,9 @@ frappe.ui.form.on("CW Manufacturing", {
         })
         set_css(frm);
     },
+    get_total_no_of_batches: function(frm) {
+        frm.set_value("total_no_of_batche", (frm.doc.raw_material_consumption || []).length)
+    },
     get_bin_items: async function (frm) {
         frm.clear_table("bin_items");
         frm.fields_dict.bin_items?.refresh()
