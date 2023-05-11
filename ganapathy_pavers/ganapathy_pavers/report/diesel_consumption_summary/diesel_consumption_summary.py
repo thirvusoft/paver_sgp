@@ -26,11 +26,18 @@ def get_columns(filters):
             "width": 100
         },
         {
+            "label": _("Rate"),
+            "fieldtype": "Float",
+            "fieldname": "rate",
+            "width": 100
+        },
+        {
             "label": _("Amount"),
             "fieldtype": "Float",
             "fieldname": "total_fuel",
             "width": 100
         },
+
         ]
     return columns
 
@@ -87,3 +94,5 @@ def get_stock_entry_data(filters):
 
     res = frappe.db.sql(query, as_dict=True)
     return res
+
+
