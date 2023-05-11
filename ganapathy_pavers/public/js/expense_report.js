@@ -1,6 +1,10 @@
 frappe.provide("ganapathy_pavers")
 
 ganapathy_pavers.show_reference = function (title, reference, total_amount) {
+	let calculate_total_amount = total_amount ? false : true;
+	if (calculate_total_amount) {
+		total_amount = 0
+	}
 	reference = JSON.parse(reference)
 	if (cur_dialog) {
 		cur_dialog.hide()
@@ -52,6 +56,9 @@ ganapathy_pavers.show_reference = function (title, reference, total_amount) {
 					</div>
 				</li>
 			`
+			if (calculate_total_amount) {
+				total_amount += (parseFloat(e.amount) || 0)
+			}
 			current_amount += (parseFloat(e.amount) || 0)
 			previous_acc = current_acc || "";
 		});

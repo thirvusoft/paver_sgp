@@ -276,7 +276,6 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 
 	rental_sqft = get_rental_vehicle_sqft(filters=filters)
 	rental_exp_details = get_rental_vehicle_expense(filters=filters)
-	rental_exp = rental_exp_details.get("amount") or 0
 	rental_exp_reference = rental_exp_details.get("reference") or []
 	data.append({})
 	data.append({
@@ -285,19 +284,18 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 			"reference": json.dumps(rental_exp_reference)
 		})
 	for row in rental_sqft:
-		exp = (rental_exp or 0) * (rental_sqft[row] or 0) / (sum(rental_sqft.values()) or 1)
 		data.append({
 			"vehicle": row,
-			"expense": exp,
+			"expense": rental_exp_details.get(row),
 			"sqft": rental_sqft[row],
-			"sqft_cost": (exp or 0) / (rental_sqft[row] or 1)
+			"sqft_cost": (rental_exp_details.get(row) or 0) / (rental_sqft[row] or 1)
 		})
 	if len(rental_sqft) > 1:
 		data.append({
 			"vehicle": "TOTAL",
-			"expense": rental_exp,
+			"expense": rental_exp_details.get("amount"),
 			"sqft": sum(rental_sqft.values()),
-			"sqft_cost": (rental_exp or 0) / (sum(rental_sqft.values()) or 1),
+			"sqft_cost": (rental_exp_details.get("amount") or 0) / (sum(rental_sqft.values()) or 1),
 			"bold": 1
 		})
 
@@ -367,16 +365,30 @@ def get_rental_vehicle_sqft(filters, uom="SQF"):
 	return sqf
 
 def get_rental_vehicle_expense(filters):
-	return get_account_balance_on(
+	res = get_account_balance_on(
 				account="TRANSPORT - GP", 
 				company=erpnext.get_default_company(), 
 				from_date=filters.get("from_date"), 
 				to_date=filters.get("to_date"))
+	return res
 
 def get_account_balance_on(account, company, from_date, to_date):
 	query=f"""
 		select 
-			*
+			*,
+			(
+				select sw.type
+				from `tabProject` sw
+				where 
+					sw.name = (
+						select 
+							je.site_work 
+						from `tabJournal Entry` je 
+						where 
+							je.name=gl.voucher_no
+						limit 1
+					)
+			) as type
 		from `tabGL Entry` gl 
 		where 
 			gl.company='{company}' and
@@ -385,15 +397,36 @@ def get_account_balance_on(account, company, from_date, to_date):
 			date(gl.posting_date)>='{from_date}' and 
 			date(gl.posting_date)<='{to_date}' and 
 			gl.is_cancelled=0 and
+			gl.voucher_type = 'Journal Entry' and
+			(
+				select 
+					count(*) 
+				from `tabJournal Entry` je 
+				where 
+					je.name=gl.voucher_no and 
+					je.is_site_expense=1
+			) and
 			gl.account="{account}"
 	"""
 	gl_entries=frappe.db.sql(query, as_dict=True)
+
+	total_amout, paver, cw = 0, 0, 0
+	for gl in gl_entries:
+		total_amout += (gl.get("debit") or 0)
+		if gl.get("type") == "Pavers":
+			paver += (gl.get("debit") or 0)
+		if gl.get("type") == "Compound Wall":
+			cw += (gl.get("debit") or 0)
+	
 	res = {
-		"reference": [{
+		"reference": sorted([{
 			'doctype': gl.voucher_type,
 			'docname': gl.voucher_no,
-			'amount': gl.debit
-		} for gl in gl_entries],
-		"amount": sum([gl.get("debit") or 0 for gl in gl_entries])
+			'amount': gl.debit,
+			'account': gl.get('type')
+		} for gl in gl_entries], key = lambda x: x.get("account") or ""),
+		"amount": total_amout,
+		"PAVER": paver,
+		"COMPOUND WALL": cw
 	}
 	return res
