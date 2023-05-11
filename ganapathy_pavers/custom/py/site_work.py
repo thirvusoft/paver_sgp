@@ -67,17 +67,39 @@ def before_save(doc, action=None):
                 SELECT 
                     SUM(dni.stock_qty) *
                     ifnull((
-                            SELECT sle.valuation_rate
+                            SELECT sle.incoming_rate
                             FROM `tabStock Ledger Entry` sle
                             WHERE
                                 sle.is_cancelled=0 and
                                 sle.voucher_type = 'Purchase Invoice' and
                                 sle.item_code = dni.item_code and
                                 sle.posting_date  <= dn.posting_date and
+                                sle.project='{doc.name}' and
                                 sle.is_cancelled = 0
                             order by posting_date desc
                             limit 1
-                        ), 0) as valuation_rate
+                        ), ifnull(
+                            ((
+                            select 
+                                avg(rm.rate)
+                            from `tabRaw Materials` rm
+                            where 
+                                rm.item= dni.item_code and
+                                rm.parenttype="Project" and
+                                rm.parent='{doc.name}'
+                            ) /
+                            ifnull((
+                                SELECT
+                                    uom.conversion_factor
+                                FROM `tabUOM Conversion Detail` uom
+                                WHERE
+                                    uom.parenttype='Item' and
+                                    uom.parent=dni.item_code and
+                                    uom.uom=dni.uom
+                                limit 1
+                                ), 0)
+                        ))
+                        , 0) as valuation_rate
                 FROM `tabDelivery Note Item` dni
                 LEFT OUTER JOIN `tabDelivery Note` dn
                 ON dn.name=dni.parent AND dni.parenttype="Delivery Note"
@@ -87,6 +109,17 @@ def before_save(doc, action=None):
                     AND dn.docstatus=1
                 GROUP BY dni.item_code, dni.uom
         """)
+    rate+=frappe.db.sql(f""" 
+        select
+            SUM(child.amount) as amount
+        from `tabPurchase Order` as doc
+        left outer join `tabPurchase Order Item` as child
+            on doc.name = child.parent
+        where 
+            doc.docstatus = 1 
+            and doc.site_work = '{doc.name}' 
+            and child.delivered_by_supplier = 1
+       """)
     rate = sum([r[0] for r in rate if r and r[0]])
     rm_cost+=rate
 

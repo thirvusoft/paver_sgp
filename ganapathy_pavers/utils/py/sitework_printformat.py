@@ -120,7 +120,27 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
                         sle.project='{site_work}'
                     order by posting_date desc
                     limit 1
-                ), 0) *
+                ), ifnull(
+                            ((
+                            select 
+                                avg(rm.rate)
+                            from `tabRaw Materials` rm
+                            where 
+                                rm.item= dni.item_code and
+                                rm.parenttype="Project" and
+                                rm.parent='{site_work}'
+                            ) /
+                            ifnull((
+                                SELECT
+                                    uom.conversion_factor
+                                FROM `tabUOM Conversion Detail` uom
+                                WHERE
+                                    uom.parenttype='Item' and
+                                    uom.parent=dni.item_code and
+                                    uom.uom=dni.uom
+                                limit 1
+                                ), 0)
+                        ))) *
                 ifnull((
                     SELECT
                         uom.conversion_factor
@@ -163,6 +183,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
             child.item_code, 
             child.uom
         """, as_dict=True)
+    # frappe.errprint(res)
     f_res = {}
 
     for row in res:
@@ -295,14 +316,14 @@ def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"], exp_group="cw_grou
         bom_item = frappe.db.sql(""" 
                                 select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent {0} group by item_code """.format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_list=1)
         production_qty = frappe.db.sql(""" 
-                                select sum(ts_production_sqft) as production_sqft,
+                                select sum(production_sqft) as production_sqft,
                                 avg(total_cost_per_sqft) as total_cost_per_sqft,
                                 sum(total_expence) as total_expence,
                                 sum(raw_material_cost) as raw_material_cost,
                                 sum(total_expense_for_unmolding) as total_expense_for_unmolding,
                                 sum(labour_expense_for_curing) as total_expense_for_curing,
-                                AVG(total_labour_wages + labour_expense_for_curing)/AVG(ts_production_sqft) as labour_cost_per_sqft,
-                                AVG(total_operator_wages)/AVG(ts_production_sqft) as operator_cost_per_sqft,
+                                AVG(total_labour_wages + labour_expense_for_curing)/AVG(production_sqft) as labour_cost_per_sqft,
+                                AVG(total_operator_wages)/AVG(production_sqft) as operator_cost_per_sqft,
                                 avg(strapping_cost_per_sqft) as strapping_cost_per_sqft,
                                 avg(additional_cost_per_sqft) as additional_cost_per_sqft,
                                 avg(raw_material_cost_per_sqft) as raw_material_cost_per_sqft from `tabCW Manufacturing` where name {0}""".format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_dict=1)
@@ -371,3 +392,44 @@ def get_delivery_transport_detail(sitename):
 
     res = frappe.db.sql(query, as_dict=True)
     return res[0] if res and res[0] else {}
+
+def get_retail_cost(doc):
+    doc=frappe.get_doc("Project",doc)
+    rental_cost = 0
+    add_cost = 0
+    for i in doc.additional_cost:
+
+        if "transport" in i.description.lower():
+            rental_cost += i.amount or 0
+        else:
+            add_cost += i.amount or 0
+    other_cost = 0
+    job_work_cost = 0
+    for m in doc.job_worker:
+        if m.other_work == 1:
+            other_cost+= m.amount or 0
+        else:
+            job_work_cost += m.amount or 0
+    item_cost = []
+    for item in doc.delivery_detail:
+        date = item.creation
+        bin_ = get_item_price_list_rate(item = item.item, date = date)
+        cost=(bin_ or 0)* (((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)))
+        item_cost.append({
+         "item" : item.item,
+         "qty" : ((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)),
+         "rate" : bin_,
+         "amount": cost
+        })
+    
+    return {
+        "additional_cost" : add_cost,
+        "rental" : rental_cost,
+        "item_cost":item_cost,
+        "own_vehicle":doc.transporting_cost,
+        "job_work_rate": job_work_cost,
+        "other_rate": other_cost
+    }
+        
+
+           

@@ -44,11 +44,11 @@ def get_cw_cost(doc_list):
 	SELECT
 		MONTHNAME(cw.molding_date) as month,
 		item.item,
-		sum(item.ts_production_sqft) as production_sqft,
+		sum(item.production_sqft) as production_sqft,
 		COUNT(item.item) as no_of_days,
 		CONCAT(item.item, '----', MONTHNAME(cw.molding_date)) as data_key,
-		SUM((cw.total_labour_wages + cw.labour_expense_for_curing + cw.total_operator_wages)*item.ts_production_sqft/cw.ts_production_sqft)/SUM(item.ts_production_sqft) as labour_operator_cost,
-		SUM(cw.raw_material_cost*item.ts_production_sqft/cw.ts_production_sqft)/SUM(item.ts_production_sqft) as prod_cost,
+		SUM((cw.total_labour_wages + cw.labour_expense_for_curing + cw.total_operator_wages)*item.production_sqft/cw.production_sqft)/SUM(item.production_sqft) as labour_operator_cost,
+		SUM(cw.raw_material_cost*item.production_sqft/cw.production_sqft)/SUM(item.production_sqft) as prod_cost,
 		AVG(strapping_cost_per_sqft) as strapping_cost,
 		AVG(additional_cost_per_sqft) as additional_cost
 	FROM `tabCW Manufacturing` cw
@@ -57,7 +57,7 @@ def get_cw_cost(doc_list):
 			SELECT
 			cw_item.item,
 			cw_item.parent,
-			SUM(cw_item.ts_production_sqft) as ts_production_sqft
+			SUM(cw_item.production_sqft) as production_sqft
 			from `tabCW Items` cw_item
 			GROUP BY cw_item.item, cw_item.parent
 		) item

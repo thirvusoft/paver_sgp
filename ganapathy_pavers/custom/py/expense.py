@@ -665,7 +665,8 @@ def get_vehicle_expense_based_on_km(from_date, to_date, vehicle = None, machine 
             "value": f"{veh.vehicle} {veh.maintenance}",
             "account_name": veh.maintenance,
             "vehicle": veh.vehicle,
-            "child_nodes": []
+            "child_nodes": [],
+            "per_km_exp": 1
         }
 
         _account = get_vehicle_expense(

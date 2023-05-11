@@ -333,12 +333,11 @@ def get_expense_data(total_delivery_sqft, filters, paver_sqft, cw_sqft, total_km
 			if child:
 				res+=child
 		else:
-			for md in vehicle.maintanence_details_:
-				if md.default_expense_account == i['value'] and md.expense_calculation_per_km:
-					total=(total_km)
-					paver=paver_km
-					cw=cw_km
-					is_km_exp=1
+			if i.get("per_km_exp"):
+				total=(total_km)
+				paver=paver_km
+				cw=cw_km
+				is_km_exp=1
 
 			if i["balance"]:
 				res.append({
@@ -353,10 +352,6 @@ def get_expense_data(total_delivery_sqft, filters, paver_sqft, cw_sqft, total_km
 	return res
 
 def get_expense_from_child(total_delivery_sqft, account, paver_sqft, cw_sqft, total_km, paver_km, cw_km, filters):
-	vehicle=None
-	if filters.get("vehicle_no"):
-		vehicle=frappe.get_doc("Vehicle", filters.get("vehicle_no"))
-
 	res=[]
 	total=total_delivery_sqft
 	paver=paver_sqft
@@ -367,13 +362,11 @@ def get_expense_from_child(total_delivery_sqft, account, paver_sqft, cw_sqft, to
 		total=total_delivery_sqft
 		is_km_exp=0
 		if i["balance"]:
-			if vehicle:
-				for md in vehicle.maintanence_details_:
-					if md.default_expense_account == i['value'] and md.expense_calculation_per_km:
-						total=(total_km)
-						paver=paver_km
-						cw=cw_km
-						is_km_exp=1
+			if i.get("per_km_exp"):
+				total=(total_km)
+				paver=paver_km
+				cw=cw_km
+				is_km_exp=1
 
 			res.append({
 				"item": i['value'],

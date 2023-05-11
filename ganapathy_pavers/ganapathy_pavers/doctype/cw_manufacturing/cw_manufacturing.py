@@ -30,8 +30,7 @@ class CWManufacturing(Document):
                         type1.append(cw_type)
             if(len(list(set(type1))) != 1 or type1[0] != doc.type):
                 frappe.throw(f'Please enter Item with Compound Wall Type as {frappe.bold(doc.type)}')
-            elif(type1[0] == "Slab"):
-                doc.total_no_of_batche = len(doc.raw_material_consumption)
+            
 
             # for row in doc.item_details:
             #     if(row.get('item')):
@@ -51,8 +50,8 @@ class CWManufacturing(Document):
         for row in doc.item_details or []:
             if(row.item not in item_sqft):
                 item_sqft[row.item] = 0
-            item_sqft[row.item]+=row.ts_production_sqft
-            total_sqft+=row.ts_production_sqft
+            item_sqft[row.item]+=row.production_sqft
+            total_sqft+=row.production_sqft
         
         abstract = []
         for item in item_sqft:
