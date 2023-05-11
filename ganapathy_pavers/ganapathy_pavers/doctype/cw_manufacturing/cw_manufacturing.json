@@ -21,6 +21,7 @@
   "manufacturing_items",
   "item_details",
   "section_break_21",
+  "get_total_no_of_batches",
   "total_no_of_batche",
   "production_qty",
   "produced_qty",
@@ -544,12 +545,17 @@
    "fieldname": "get_bin_items",
    "fieldtype": "Button",
    "label": "Get Bin Items"
+  },
+  {
+   "fieldname": "get_total_no_of_batches",
+   "fieldtype": "Button",
+   "label": "Get Total Batches"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-02-17 11:34:54.593984",
+ "modified": "2023-05-10 17:13:41.905347",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

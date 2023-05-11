@@ -19,7 +19,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 		bom_item = frappe.db.sql(""" 
 								select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent {0} group by item_code """.format(f" in {tuple(cw_list)}" if len(cw_list)>1 else f" = '{cw_list[0]}'"),as_list=1)
 		production_qty = frappe.db.sql(""" 
-								select sum(ts_production_sqft) as production_sqft,
+								select sum(production_sqft) as production_sqft,
 								avg(total_cost_per_sqft) as total_cost_per_sqft,
 								sum(total_expence) as total_expence,
 								sum(raw_material_cost) as raw_material_cost,
