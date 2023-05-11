@@ -16,9 +16,11 @@ def get_data(filters=None):
 	
 	jw_data=get_jw_data(filters)
 	ss_data=get_salary_slip_data(filters)
+	debit_data = get_debit_note(filters)
+	credit_data = get_credit_note(filters)
 	emp_adv_data=get_emp_adv_data(filters)
 
-	data = jw_data + ss_data + emp_adv_data
+	data = jw_data + ss_data + emp_adv_data + debit_data + credit_data
 	data.sort(key = lambda x: x.get("order_date", x.get("date", "")))
 
 	data= opening_balance + data
@@ -33,12 +35,14 @@ def get_opening_balance(filters=None):
 	jw_opening_credit=get_jw_opening_balance(filters)
 	ss_opening_debit=get_salary_slip_opening_balance(filters)
 	emp_adv_opening_debit=get_emp_adv_opening_balance(filters)
+	opening_debit_note=get_debit_note_opening_balance(filters)
+	opening_credit_note=get_credit_note_opening_balance(filters)
 
 	data.append({
 		"voucher_type": "Opening Balance",
 		"debit": 0,
-		"debit": ss_opening_debit + emp_adv_opening_debit,
-		"credit": jw_opening_credit,
+		"debit": ss_opening_debit + emp_adv_opening_debit + opening_debit_note,
+		"credit": jw_opening_credit + opening_credit_note,
 		"bold": 1,
 	})
 
@@ -127,6 +131,62 @@ def get_emp_adv_opening_balance(filters):
 		data=frappe.db.sql(query, as_list=True)
 	return (data[0][0] if data and data[0] else 0) or 0
 
+def get_debit_note_opening_balance(filters=None):
+	data = []
+
+	ss_conditions = "WHERE je.docstatus = 1"
+
+	ss_conditions += " AND je.salary_component IS NOT NULL"
+
+	ss_conditions += " AND jea.party_type = 'Employee'"
+
+	ss_conditions += " AND ifnull(jea.debit_in_account_currency, 0)!=0 "
+
+	if filters.get("from_date"):
+		ss_conditions += f" AND je.posting_date<'{filters.get('from_date')}'"
+	
+	if filters.get("employee"):
+		ss_conditions += f" AND jea.party = '{filters.get('employee')}'"
+
+	query = f"""
+		SELECT
+			SUM(jea.debit_in_account_currency) AS debit
+		FROM `tabJournal Entry` AS je
+		LEFT JOIN `tabJournal Entry Account` jea ON jea.parent = je.name
+		{ss_conditions}
+	"""
+	
+	data = frappe.db.sql(query, as_list=True)
+	return (data[0][0] if data and data[0] else 0) or 0
+
+def get_credit_note_opening_balance(filters=None):
+	data = []
+
+	ss_conditions = "WHERE je.docstatus = 1"
+
+	ss_conditions += " AND je.salary_component IS NOT NULL"
+
+	ss_conditions += " AND jea.party_type = 'Employee'"
+
+	ss_conditions += " AND ifnull(jea.credit_in_account_currency, 0)!=0 "
+
+	if filters.get("from_date"):
+		ss_conditions += f" AND je.posting_date<'{filters.get('from_date')}'"
+	
+	if filters.get("employee"):
+		ss_conditions += f" AND jea.party = '{filters.get('employee')}'"
+
+	query = f"""
+		SELECT
+			SUM(jea.credit_in_account_currency) AS credit
+		FROM `tabJournal Entry` AS je
+		LEFT JOIN `tabJournal Entry Account` jea ON jea.parent = je.name
+		{ss_conditions}
+	"""
+
+	data = frappe.db.sql(query, as_list=True)
+	return (data[0][0] if data and data[0] else 0) or 0
+
 def get_salary_slip_data(filters=None):
 	data=[]
 
@@ -161,6 +221,90 @@ def get_salary_slip_data(filters=None):
 	
 	data=frappe.db.sql(query, as_dict = True)
 	
+	return data
+
+def get_debit_note(filters=None):
+	data = []
+
+	ss_conditions = "WHERE je.docstatus = 1"
+
+	ss_conditions += " AND je.salary_component IS NOT NULL"
+
+	ss_conditions += " AND jea.party_type = 'Employee'"
+
+	ss_conditions += " AND ifnull(jea.debit_in_account_currency, 0)!=0 "
+
+	if filters.get("from_date"):
+		ss_conditions += f" AND je.posting_date>='{filters.get('from_date')}'"
+	
+	if filters.get("to_date"):
+		ss_conditions += f" AND je.posting_date<='{filters.get('to_date')}'"
+
+	if filters.get("employee"):
+		ss_conditions += f" AND jea.party = '{filters.get('employee')}'"
+
+	query = f"""
+		SELECT
+			je.posting_date AS order_date,
+			je.posting_date AS date,
+			'Journal Entry' AS voucher_type,
+			je.name AS voucher_no,
+			(
+				SELECT
+					emp.employee_name
+				FROM `tabEmployee` emp
+				WHERE emp.name = jea.party
+			) AS employee,
+			(jea.debit_in_account_currency) AS debit,
+			0 AS credit
+		FROM `tabJournal Entry` AS je
+		LEFT JOIN `tabJournal Entry Account` jea ON jea.parent = je.name
+		{ss_conditions}
+	"""
+	
+	data = frappe.db.sql(query, as_dict=True)
+	return data
+
+def get_credit_note(filters=None):
+	data = []
+
+	ss_conditions = "WHERE je.docstatus = 1"
+
+	ss_conditions += " AND je.salary_component IS NOT NULL"
+
+	ss_conditions += " AND jea.party_type = 'Employee'"
+
+	ss_conditions += " AND ifnull(jea.credit_in_account_currency, 0)!=0 "
+
+	if filters.get("from_date"):
+		ss_conditions += f" AND je.posting_date>='{filters.get('from_date')}'"
+	
+	if filters.get("to_date"):
+		ss_conditions += f" AND je.posting_date<='{filters.get('to_date')}'"
+
+	if filters.get("employee"):
+		ss_conditions += f" AND jea.party = '{filters.get('employee')}'"
+
+	query = f"""
+		SELECT
+			je.posting_date AS order_date,
+			je.posting_date AS date,
+			'Journal Entry' AS voucher_type,
+			je.name AS voucher_no,
+			(
+				SELECT
+					emp.employee_name
+				FROM `tabEmployee` emp
+				WHERE emp.name = jea.party
+			) AS employee,
+			(jea.credit_in_account_currency) AS credit,
+			0 AS debit
+		FROM `tabJournal Entry` AS je
+		LEFT JOIN `tabJournal Entry Account` jea ON jea.parent = je.name
+		{ss_conditions}
+	"""
+
+	data = frappe.db.sql(query, as_dict=True)
 	return data
 
 def get_emp_adv_data(filters=None):
