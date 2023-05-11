@@ -125,6 +125,7 @@ def get_emp_adv_opening_balance(filters):
 		"""
 
 		data=frappe.db.sql(query, as_list=True)
+		
 	return (data[0][0] if data and data[0] else 0) or 0
 
 def get_salary_slip_data(filters=None):
@@ -160,7 +161,6 @@ def get_salary_slip_data(filters=None):
 	"""
 	
 	data=frappe.db.sql(query, as_dict = True)
-	
 	return data
 
 def get_emp_adv_data(filters=None):
@@ -196,6 +196,7 @@ def get_emp_adv_data(filters=None):
 	"""
 
 	data=frappe.db.sql(query, as_dict=True)
+	
 	return data
 
 def get_jw_data(filters=None):

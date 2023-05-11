@@ -120,7 +120,27 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
                         sle.project='{site_work}'
                     order by posting_date desc
                     limit 1
-                ), 0) *
+                ), ifnull(
+                            ((
+                            select 
+                                avg(rm.rate)
+                            from `tabRaw Materials` rm
+                            where 
+                                rm.item= dni.item_code and
+                                rm.parenttype="Project" and
+                                rm.parent='{site_work}'
+                            ) /
+                            ifnull((
+                                SELECT
+                                    uom.conversion_factor
+                                FROM `tabUOM Conversion Detail` uom
+                                WHERE
+                                    uom.parenttype='Item' and
+                                    uom.parent=dni.item_code and
+                                    uom.uom=dni.uom
+                                limit 1
+                                ), 0)
+                        ))) *
                 ifnull((
                     SELECT
                         uom.conversion_factor
@@ -163,6 +183,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
             child.item_code, 
             child.uom
         """, as_dict=True)
+    # frappe.errprint(res)
     f_res = {}
 
     for row in res:
@@ -382,6 +403,13 @@ def get_retail_cost(doc):
             rental_cost += i.amount or 0
         else:
             add_cost += i.amount or 0
+    other_cost = 0
+    job_work_cost = 0
+    for m in doc.job_worker:
+        if m.other_work == 1:
+            other_cost+= m.amount or 0
+        else:
+            job_work_cost += m.amount or 0
     item_cost = []
     for item in doc.delivery_detail:
         date = item.creation
@@ -399,7 +427,8 @@ def get_retail_cost(doc):
         "rental" : rental_cost,
         "item_cost":item_cost,
         "own_vehicle":doc.transporting_cost,
-        "job_work_rate": doc.total_job_worker_cost
+        "job_work_rate": job_work_cost,
+        "other_rate": other_cost
     }
         
 
