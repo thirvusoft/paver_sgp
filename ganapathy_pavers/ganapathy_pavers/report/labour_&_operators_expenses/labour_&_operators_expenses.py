@@ -6,13 +6,16 @@ def execute(filters=None):
 	to_date = filters.get("to_date")
 	machine=filters.get("machine", [])
 	pm_filt = "where docstatus!=2"
+	sbc_filt= "where docstatus!=2"
 	cw_filt = "where docstatus!=2 and IFNULL(type, '')!='' "
 
 	if from_date:
 		pm_filt += " and from_time >= '{0}' ".format(from_date)
+		sbc_filt += " and from_time >= '{0}' ".format(from_date)
 		cw_filt+=  " and molding_date>='{0}' ".format(from_date)
 	if to_date:
 		pm_filt += " and from_time <= '{0}' ".format(to_date + " 23:59:59")
+		sbc_filt += " and from_time <= '{0}' ".format(to_date + " 23:59:59")
 		cw_filt+=  " and molding_date <= '{0}' ".format(to_date)
 		
 	if machine:
@@ -32,6 +35,14 @@ def execute(filters=None):
 		AVG((operators_cost_in_manufacture+operators_cost_in_rack_shift))/AVG(total_production_sqft) as operator_cost,
 		SUM(total_production_sqft) as production_sqft
 		from `tabMaterial Manufacturing` {0}""".format(pm_filt), as_dict=1)
+	
+	shot_blast_costing=frappe.db.sql("""
+	select 
+		"Shot Blast" as type,
+		SUM(labour_cost) as total_labour_cost,
+		AVG(labour_cost)/AVG(total_sqft) as labour_cost,
+		SUM(total_sqft) as production_sqft
+		from `tabShot Blast Costing` {0}""".format(sbc_filt), as_dict=1)
 	
 	cw_manufacturing=frappe.db.sql("""
 	select 
@@ -72,6 +83,9 @@ def execute(filters=None):
 	
 	if pw_manufacturing and pw_manufacturing[0]:
 		data.append(pw_manufacturing[0])
+	
+	if shot_blast_costing and shot_blast_costing[0]:
+		data.append(shot_blast_costing[0])
 		
 	columns = get_columns()
 	data.sort(key = lambda row: row.get("type", ""))
