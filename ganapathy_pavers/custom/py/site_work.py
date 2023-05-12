@@ -67,7 +67,7 @@ def before_save(doc, action=None):
                 SELECT 
                     SUM(dni.stock_qty) *
                     ifnull((
-                            SELECT sle.valuation_rate
+                            SELECT sle.incoming_rate
                             FROM `tabStock Ledger Entry` sle
                             WHERE
                                 sle.is_cancelled=0 and
@@ -78,7 +78,28 @@ def before_save(doc, action=None):
                                 sle.is_cancelled = 0
                             order by posting_date desc
                             limit 1
-                        ), 0) as valuation_rate
+                        ), ifnull(
+                            ((
+                            select 
+                                avg(rm.rate)
+                            from `tabRaw Materials` rm
+                            where 
+                                rm.item= dni.item_code and
+                                rm.parenttype="Project" and
+                                rm.parent='{doc.name}'
+                            ) /
+                            ifnull((
+                                SELECT
+                                    uom.conversion_factor
+                                FROM `tabUOM Conversion Detail` uom
+                                WHERE
+                                    uom.parenttype='Item' and
+                                    uom.parent=dni.item_code and
+                                    uom.uom=dni.uom
+                                limit 1
+                                ), 0)
+                        ))
+                        , 0) as valuation_rate
                 FROM `tabDelivery Note Item` dni
                 LEFT OUTER JOIN `tabDelivery Note` dn
                 ON dn.name=dni.parent AND dni.parenttype="Delivery Note"

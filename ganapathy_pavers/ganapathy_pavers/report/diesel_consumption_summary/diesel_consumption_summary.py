@@ -123,3 +123,5 @@ def get_stock_entry_data(filters):
 
     res = frappe.db.sql(query, as_dict=True)
     return res
+
+
