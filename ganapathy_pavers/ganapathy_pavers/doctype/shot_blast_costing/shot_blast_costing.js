@@ -37,7 +37,7 @@ frappe.ui.form.on('Shot Blast Costing', {
 			}
 		})
 		var mm_items = [];
-		await frappe.db.get_list('Material Manufacturing', { filters: { is_shot_blasting: 1, docstatus: 0 }, fields: ['item_to_manufacture'] }).then((value) => {
+		await frappe.db.get_list('Material Manufacturing', { filters: { is_shot_blasting: 1, docstatus: 0 }, fields: ['item_to_manufacture'], limit: 0 }).then((value) => {
 			for (let i = 0; i < value.length; i++) {
 				if (!(mm_items.includes(value[i].item_to_manufacture))) {
 					mm_items.push(value[i].item_to_manufacture)

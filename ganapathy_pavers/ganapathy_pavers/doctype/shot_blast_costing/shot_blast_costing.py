@@ -59,7 +59,7 @@ class ShotBlastCosting(Document):
             self.workstation = wrk
 
     def before_submit(doc):
-        material = frappe.get_all("Stock Entry",filters={"shot_blast":doc.get("name"),"stock_entry_type":"Material Transfer"},pluck="name")
+        material = frappe.get_all("Stock Entry",filters={"shot_blast":doc.get("name")},pluck="name")
         if len(material) == 0:
             frappe.throw("Process Incomplete. Create Stock Entry To Submit")
     def on_update(doc):
