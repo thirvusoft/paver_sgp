@@ -320,11 +320,17 @@ class Tsstockentry(StockEntry, _StockController):
 
 
 def basic_rate_validation(doc,event):
-    if(doc.usb or doc.cw_usb):
+    if(doc.usb or doc.cw_usb or doc.shot_blast or doc.shot_blast_costing):
         for item in doc.items:
+            admin_exp = frappe.db.get_value("Item", item.item_code, "administrative_cost") or 0
+            
             if (item.basic_rate_hidden and item.conversion_factor):
                 item.basic_rate = item.basic_rate_hidden/(item.conversion_factor)
                 item.valuation_rate = item.basic_rate_hidden/(item.conversion_factor)
+            
+            if admin_exp:
+                item.basic_rate = (item.basic_rate or 0) + (admin_exp or 0)
+                item.valuation_rate = (item.basic_rate or 0)
 
 def expense_account(self, event = None):
     """
