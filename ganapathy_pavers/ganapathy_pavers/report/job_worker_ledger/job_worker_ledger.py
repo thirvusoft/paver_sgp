@@ -378,7 +378,7 @@ def get_jw_data(filters=None):
 			jw.amount as credit
 		FROM `tabTS Job Worker Details` jw
 		{jw_conditions}
-		ORDER BY jw.start_date
+		ORDER BY jw.start_date, jw.idx
 	"""
 
 	data=frappe.db.sql(query, as_dict = True)
