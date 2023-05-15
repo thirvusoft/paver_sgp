@@ -38,7 +38,7 @@ def execute(filters=None):
                                         left outer join `tabEmployee` as emp
                                             on emp.employee = jwd.name1
                                         {0}
-                                    {2} order by jwd.sqft_allocated)as total_cal
+                                    {2} order by jwd.idx, jwd.sqft_allocated)as total_cal
                                 """.format(conditions+ " and jwd.other_work = 0",adv_conditions, group_by_site, "sum(jwd.completed_bundle), sum(jwd.sqft_allocated), avg(jwd.rate)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated, jwd.rate", (("sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))))
  
     if filters.get("hide_other_work"):
@@ -53,7 +53,7 @@ def execute(filters=None):
                                         left outer join `tabEmployee` as emp
                                             on emp.employee = jwd.name1
                                         {0}
-                                    group by jwd.name1{2},jwd.sqft_allocated, jwd.start_date, jwd.end_date, jwd.description_for_other_work order by jwd.sqft_allocated)as total_cal
+                                    group by jwd.name1{2},jwd.sqft_allocated, jwd.start_date, jwd.end_date, jwd.description_for_other_work order by jwd.idx, jwd.sqft_allocated)as total_cal
                                 """.format(conditions+" and jwd.other_work = 1",adv_conditions, "", "sum(jwd.completed_bundle), sum(jwd.sqft_allocated), avg(jwd.rate)" if filters.get("group_site_work") else "jwd.completed_bundle, jwd.sqft_allocated, jwd.rate", "sum(jwd.amount)" if filters.get("group_site_work") else "jwd.amount"))
     data = [list(i) for i in (report_data or tuple())]
     final_data = []
