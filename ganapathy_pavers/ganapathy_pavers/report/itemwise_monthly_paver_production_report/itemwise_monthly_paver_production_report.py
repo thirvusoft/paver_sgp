@@ -130,7 +130,7 @@ def get_data(filters):
         row["expense_cost"]=(expense_cost or 0) if not expense_cost else (expense_cost)/(prod_details.get("paver") or 1)
         row["expense_cost"] = (row.get("expense_cost", 0) or 0) + (row.get("labour_operator_cost", 0) or 0)
         row["total_cost"]=(row["prod_cost"] or 0) + (row["expense_cost"] or 0)
-   
+        
     return data
 	
 

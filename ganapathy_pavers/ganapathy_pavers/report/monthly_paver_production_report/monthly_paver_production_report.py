@@ -19,6 +19,10 @@ def execute(filters=None):
 	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
 	if item:
 		filters1["item_to_manufacture"]=item
+
+	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
+
+	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
 	paver_list = frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
 	test_data = []
 
@@ -54,7 +58,7 @@ def execute(filters=None):
 								from `tabMaterial Manufacturing` where name  {0} """.format(condition, lo_condition),as_dict=1)
 
 		
-		
+
 		test_data.append({
 			"material":"-",
 			"qty":f"""<b>Item:</b> {production_qty[0]['item_to_manufacture']}"""   if filters.get("item") else "",
@@ -107,7 +111,9 @@ def execute(filters=None):
 			data += test_data
 		total_sqf=0
 		total_amt=0
+		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []), item=filters.get("item"))
 		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
+		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []), item=filters.get("item"))
 		if prod_details.get('paver'):
 			labour_exp = {
 				"value": "Labour & Operator",

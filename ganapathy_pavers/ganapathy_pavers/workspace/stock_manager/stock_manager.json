@@ -51,6 +51,24 @@
   {
    "hidden": 0,
    "is_query_report": 1,
+   "label": "Stock Balance",
+   "link_to": "Stock Balance",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Item Variant Details",
+   "link_to": "Item Variant Details",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
    "label": "Item Price Difference",
    "link_to": "Item Price Difference",
    "link_type": "Report",
@@ -67,7 +85,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-03-17 10:10:29.904249",
+ "modified": "2023-05-16 12:01:16.964335",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "STOCK MANAGER",
