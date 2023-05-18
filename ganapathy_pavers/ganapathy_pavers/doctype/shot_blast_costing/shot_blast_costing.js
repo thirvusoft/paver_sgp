@@ -72,7 +72,9 @@ frappe.ui.form.on('Shot Blast Costing', {
 		}
 	},
 	validate: function (frm) {
+		frm.trigger("total_cost")
 		total(frm)
+		total_damage_cost(frm)
 	},
 	no_of_labour: function (frm) {
 		total_cost(frm)
@@ -139,6 +141,7 @@ frappe.ui.form.on('Shot Blast Items', {
 		});
 	},
 	damages_in_nos: async function (frm, cdt, cdn) {
+		total_damage_cost(frm)
 		var row = locals[cdt][cdn]
 		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Nos', row.damages_in_nos, 'SQF')
 		frappe.model.set_value(cdt, cdn, "damages_in_sqft", sqft)
@@ -168,6 +171,7 @@ frappe.ui.form.on('Shot Blast Items', {
 		total(frm)
 	},
 	damages_in_sqft: function (frm, cdt, cdn) {
+		total_damage_cost(frm)
 		var total_damage_sqft = 0
 		for (var i = 0; i < frm.doc.items.length; i++) {
 			total_damage_sqft += frm.doc.items[i].damages_in_sqft
@@ -256,4 +260,10 @@ function make_stock_entry(frm, type) {
 			doc: frm.doc
 		},
 	})
+}
+
+function total_damage_cost(frm) {
+	frm.trigger("total_cost")
+	frm.trigger("damages_in_sqft")
+	frm.set_value("total_damage_cost", (frm.doc.total_damage_sqft || 0) * (frm.doc.total_cost_per_sqft || 1))
 }
