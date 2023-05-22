@@ -12,13 +12,13 @@ frappe.ui.form.on('Shot Blast Costing', {
 			args["is_shot_blasting"] = 1
 			args["docstatus"] = ["!=", 2]
 			args["shot_blasted_bundle"] = [">", 0]
-			if (frm.doc.to_time){
+			if (frm.doc.to_time) {
 				args["date"] = frm.doc.to_time
 			}
-			if (frm.doc.to_time){
+			if (frm.doc.to_time) {
 				args["warehouse"] = frm.doc.source_warehouse
 			}
-			
+
 			return {
 				query: "ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.material_manufacturing_query",
 				filters: args
@@ -95,7 +95,7 @@ frappe.ui.form.on('Shot Blast Costing', {
 		var field = "total_hrs"
 		total_hrs(frm, field, frm.doc.from_time, frm.doc.to_time)
 	},
-	update_batch_stock_qty: function(frm) {
+	update_batch_stock_qty: function (frm) {
 		frm.doc.items.forEach(async row => {
 			await frappe.call({
 				method: "ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.uom_conversion",
@@ -109,9 +109,9 @@ frappe.ui.form.on('Shot Blast Costing', {
 					frappe.model.set_value(row.doctype, row.name, 'bdl', r.message["bundle"] || 0);
 					frappe.model.set_value(row.doctype, row.name, 'batch_stock', r.message["stock"] || 0);
 					cur_frm.refresh_field('items')
-	
+
 				}
-			})	
+			})
 		})
 	},
 	to_time: async function (frm) {
@@ -156,7 +156,7 @@ frappe.ui.form.on('Shot Blast Items', {
 		let sqft_pieces = await ganapathy_pavers.uom_converstion(row.item_name, 'Nos', row.taken_pieces, 'SQF')
 		frappe.model.set_value(cdt, cdn, "sqft", (sqft || 0) + (sqft_pieces || 0))
 	},
-	taken_pieces: async function(frm, cdt, cdn) {
+	taken_pieces: async function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
 		if (row.bundle_taken > (row.bdl || 0)) {
 			frappe.model.set_value(cdt, cdn, "bundle_taken", 0)
@@ -262,8 +262,17 @@ function make_stock_entry(frm, type) {
 	})
 }
 
-function total_damage_cost(frm) {
-	frm.trigger("total_cost")
-	frm.trigger("damages_in_sqft")
-	frm.set_value("total_damage_cost", (frm.doc.total_damage_sqft || 0) * (frm.doc.total_cost_per_sqft || 1))
+async function total_damage_cost(frm) {
+	await frappe.call({
+		method: "run_doc_method",
+		args: { 
+			'docs': frm.doc, 
+			'method': 'calculate_total_damage_cost' 
+		},
+		callback: function (r) {
+			if (!r.exc) {
+				frm.refresh_fields();
+			}
+		}
+	});
 }

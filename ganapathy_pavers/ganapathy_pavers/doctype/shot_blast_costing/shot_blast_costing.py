@@ -11,6 +11,7 @@ from frappe.desk.reportview import get_filters_cond, get_match_cond
 from frappe.model.document import Document
 from erpnext.controllers.queries import get_fields
 from frappe.utils.data import nowdate
+from ganapathy_pavers.utils.py.sitework_printformat import get_paver_production_rate
 
 uom_conv_query = lambda: f"""
             taken_pieces * (
@@ -44,7 +45,18 @@ class ShotBlastCosting(Document):
     def validate(self):
         self.total_cost = (self.additional_cost or 0) + (self.labour_cost or 0)
         self.fetch_warehouses()
+        self.calculate_total_damage_cost()
     
+    @frappe.whitelist()
+    def calculate_total_damage_cost(self):
+        total_cost=0
+        for row in self.items:
+            if row.material_manufacturing and row.damages_in_sqft:
+                prod_date = frappe.get_value("Material Manufacturing", row.material_manufacturing, "from_time")
+                row.damage_cost = row.damages_in_sqft * (get_paver_production_rate(item=row.item_name, date=prod_date) or 0)
+                total_cost += row.damage_cost or 0
+        self.total_damage_cost = total_cost
+
     def fetch_warehouses(self):
         if not self.warehouse:
             curing_t = frappe.db.get_single_value("USB Setting", "default_curing_target_warehouse")
