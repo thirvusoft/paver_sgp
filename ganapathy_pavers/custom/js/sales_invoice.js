@@ -72,7 +72,9 @@ frappe.ui.form.on("Sales Invoice Item", {
 
 
 frappe.ui.form.on('Sales Invoice', {
-    refresh: function(frm) {
+    refresh: async function(frm) {
+        let sw_reqd = await frappe.db.get_single_value("Selling Settings", "sw_sales_invoice")
+        frm.set_df_property("site_work", "reqd", sw_reqd);
         frm.set_query('site_work',function(frm){
             return {
                 filters:{

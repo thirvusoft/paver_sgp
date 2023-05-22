@@ -51,6 +51,14 @@ async function bundle_calc(frm, cdt, cdn) {
 
 frappe.ui.form.on('Delivery Note', {
     onload: async function (frm) {
+        frm.set_query('site_work',function(frm){
+            return {
+                filters:{
+                    'customer': cur_frm.doc.customer,
+                    'status': ["not in", ['Completed', 'Billed', 'Cancelled']],
+                }
+            }
+        })
         if (cur_frm.is_new()) {
             for (let ind = 0; ind < cur_frm.doc.items.length; ind++) {
                 let cdt = cur_frm.doc.items[ind].doctype
