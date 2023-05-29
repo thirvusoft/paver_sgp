@@ -13,36 +13,42 @@ def mark_attendance():
 	process_auto_attendance_for_all_shifts()
 	
 def check_in_out(self, event):
-	emp_checkin_hours=frappe.get_all('Employee Checkin', 
-	{'attendance': self.name},
-	["log_type","time"])
-	current_log="IN"
-	total_hours=[]
-	temp_hour=[]
-	for i in emp_checkin_hours:
-		if i.log_type==current_log:
-			temp_hour.append(i.time)
-			if current_log=="OUT":
-				total_hours.append(temp_hour)
-				temp_hour=[]
-				current_log="IN"
-				continue
-			if current_log=="IN":
-				current_log="OUT"
-	hours=0
-	hours_to_reduce=0
-	if self.ts_employee_attendance_tool:
-		ts_emp=frappe.get_doc("TS Employee Attendance Tool", self.ts_employee_attendance_tool)
-		for row in ts_emp.employee_detail:
-			if row.employee == self.employee:
-				hours_to_reduce = row.hours_to_reduce
+	total_working_hours = 0
+	for emp_attendance_tool in self.working_area_list:
+		emp_checkin_hours=frappe.get_all('Employee Checkin', 
+		{'attendance': self.name, 'ts_emp_att_tool_name': emp_attendance_tool.get('emp_attendance_tool')},
+		["log_type","time"])
+		current_log="IN"
+		total_hours=[]
+		temp_hour=[]
+		for i in emp_checkin_hours:
+			if i.log_type==current_log:
+				temp_hour.append(i.time)
+				if current_log=="OUT":
+					total_hours.append(temp_hour)
+					temp_hour=[]
+					current_log="IN"
+					continue
+				if current_log=="IN":
+					current_log="OUT"
+		hours=0
+		hours_to_reduce=0
+		if emp_attendance_tool.get('emp_attendance_tool'):
+			ts_emp=frappe.get_doc("TS Employee Attendance Tool", emp_attendance_tool.get('emp_attendance_tool'))
+			for row in ts_emp.employee_detail:
+				if row.employee == self.employee:
+					hours_to_reduce = row.hours_to_reduce
 
-	for j in total_hours:
-		hours+=(time_diff_in_hours(j[1],j[0]))
-	if self.ts_employee_attendance_tool and hours_to_reduce:
-		hours-=hours_to_reduce
-	frappe.db.set_value(self.doctype, self.name, 'working_hours',hours)
-	return ot_hours_cal(self, float(hours))
+		for j in total_hours:
+			hours+=(time_diff_in_hours(j[1],j[0]) or 0)
+		if emp_attendance_tool.get('emp_attendance_tool') and hours_to_reduce:
+			hours-=hours_to_reduce
+		
+		total_working_hours += (hours or 0)
+		frappe.db.set_value(emp_attendance_tool.doctype, emp_attendance_tool.name, 'working_hours',hours)
+
+	frappe.db.set_value(self.doctype, self.name, 'working_hours',total_working_hours)
+	return ot_hours_cal(self, float(total_working_hours))
 
 def ot_hours_cal(self, hours):
 	day_ot=hours % 8.0

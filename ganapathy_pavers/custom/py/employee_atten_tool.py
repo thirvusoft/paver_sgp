@@ -124,7 +124,7 @@ def get_check_in(employee, name, logtype):
 
 
 @frappe.whitelist()
-def attendance(table_list, company, ts_name):
+def attendance(table_list, company = "", ts_name=""):
 	if(isinstance(table_list, str)):
 		table_list=json.loads(table_list)
 	validate_empty_field(table_list)
@@ -137,11 +137,12 @@ def attendance(table_list, company, ts_name):
 			doc.update({
 				'employee':i.get("employee"),
 				'status':"Present",
-				'attendance_date':  datetime.strptime(i.get('check_in'), DATE_TIME_FORMAT).date(),
+				'attendance_date':  i.get('check_in').date(),
 				'location': i.get('location'),
 				'machine': i.get('machine'),
+				'working_area_list': i.get('machine_list'),
 				'company': company if(company) else doc1.default_company,
-				'ts_employee_attendance_tool': ts_name
+				'ts_employee_attendance_tool': ts_name,
 			})
 			doc.insert(ignore_permissions=True)
 			doc.submit()
@@ -205,31 +206,39 @@ def fill_emp_cancel_detail(self, event):
 		doc.save('Update')
 
 def fill_attn_cancel_detail(self, event):
-	if self.ts_employee_attendance_tool and (self.ts_employee_attendance_tool in frappe.get_all('TS Employee Attendance Tool', {'docstatus': ['!=', 2]}, pluck='name')):
-		doc=frappe.get_doc("TS Employee Attendance Tool", self.ts_employee_attendance_tool )
-		emp=False
-		cancel_list=[]
-		for i in doc.ts_emp_checkin:
-			if i.employee_name ==self.employee:
-				i.attendance=self.name
-				i.working_hrs=self.working_hours
-				i.location=self.location
-				i.machine=self.machine
-				emp=True
-			cancel_list.append(i)
-		if(not emp):
-			cancel_list.append({
-				'employee_name':self.employee, 
-				'attendance': self.name, 
-				'working_hrs': self.working_hours, 
-				'location': self.location, 
-				'machine': self.machine
-				})
-		doc.update({
-			'ts_emp_checkin':cancel_list
-		})
-		doc.flags.ignore_mandatory=True
-		doc.save('Update')
+	emp_tools = []
+	if self.ts_employee_attendance_tool:
+		emp_tools.append({
+				'emp_attendance_tool': self.ts_employee_attendance_tool,
+				'working_area': self.machine,
+				'working_hours': self.working_hours
+			})
+	for row in self.working_area_list or emp_tools:
+		if row.emp_attendance_tool and (row.emp_attendance_tool in frappe.get_all('TS Employee Attendance Tool', {'docstatus': ['!=', 2]}, pluck='name')):
+			doc=frappe.get_doc("TS Employee Attendance Tool", row.emp_attendance_tool )
+			emp=False
+			cancel_list=[]
+			for i in doc.ts_emp_checkin:
+				if i.employee_name ==self.employee:
+					i.attendance=self.name
+					i.working_hrs=row.working_hours
+					i.location=self.location
+					i.machine=row.working_area
+					emp=True
+				cancel_list.append(i)
+			if(not emp):
+				cancel_list.append({
+					'employee_name':self.employee, 
+					'attendance': self.name, 
+					'working_hrs': row.working_hours, 
+					'location': self.location, 
+					'machine': row.working_area
+					})
+			doc.update({
+				'ts_emp_checkin':cancel_list
+			})
+			doc.flags.ignore_mandatory=True
+			doc.save('Update')
 
 
 
@@ -314,8 +323,27 @@ def create_and_delete_checkins(self, event):
 	check_in([i.__dict__ for i in self.employee_detail], self.name)
 	delete_check_in([i.__dict__ for i in self.employee_detail], self.name)
 
-def create_attendance(self, event):
-	attendance([i.__dict__ for i in self.employee_detail], self.company, self.name)
+@frappe.whitelist()
+def create_attendance(docnames):
+	if isinstance(docnames, str):
+		try:
+			docnames=json.loads(docnames)
+		except:
+			docnames=docnames
+	employee_wise_rows = {}
+	for d in docnames:
+		doc=frappe.get_doc("TS Employee Attendance Tool", d)
+		for row in doc.employee_detail:
+			if row.employee not in employee_wise_rows:
+				employee_wise_rows[row.employee] = row.__dict__
+			
+			if not employee_wise_rows[row.employee].get("machine_list"):
+				employee_wise_rows[row.employee]['machine_list'] = []
+			
+			employee_wise_rows[row.employee]['machine_list'].append({'working_area': doc.machine, 'emp_attendance_tool': doc.name})
+		
+	attendance(list(employee_wise_rows.values()))
+	return True
 
 def doc_cancel(self, event):
 	for checkin in frappe.get_all("Employee Checkin",{'ts_emp_att_tool_name':self.name,}):
