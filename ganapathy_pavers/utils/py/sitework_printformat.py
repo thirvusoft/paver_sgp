@@ -366,7 +366,7 @@ def get_delivery_transport_detail(sitename):
             sum(
                 (case 
                     when ifnull(dn.own_vehicle_no, '')!='' 
-                        then dni.qty
+                        then dni.qty - dni.returned_qty
                     else
                         0
                 end)
@@ -375,7 +375,7 @@ def get_delivery_transport_detail(sitename):
             sum(
                 (case 
                     when ifnull(dn.own_vehicle_no, '')='' and ifnull(dn.vehicle_no, '')!=''
-                        then dni.qty
+                        then dni.qty - dni.returned_qty
                     else
                         0
                 end)
@@ -387,7 +387,8 @@ def get_delivery_transport_detail(sitename):
         where
             dni.item_group in ("Pavers", "Compound Walls") and
             dn.docstatus=1 and
-            dn.site_work='{sitename}'
+            dn.site_work='{sitename}' and
+            dn.is_return=0
     """
 
     res = frappe.db.sql(query, as_dict=True)

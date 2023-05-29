@@ -99,7 +99,7 @@ frappe.ui.form.on("Project",{
 				}
 			})
 		}, "Update")
-        if(!cur_frm.is_new()){
+        if(!cur_frm.is_new()?cur_frm.doc.customer:true){
             cur_frm.set_df_property('is_multi_customer', 'read_only', 1)
             cur_frm.set_df_property('customer_name', 'read_only', 1)
             cur_frm.set_df_property('customer', 'read_only', 1)

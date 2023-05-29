@@ -580,7 +580,7 @@ def refill_delivery_detail(site_work, event=None):
         select
             soi.item_code as item,
             soi.item_group,
-            sum(soi.qty) as qty_to_deliver,
+            sum(soi.stock_qty) as qty_to_deliver,
             sum(case when soi.delivered_by_supplier = 1 then ifnull(soi.delivered_qty, 0) else 0 end) as delivered_stock_qty
         from `tabSales Order Item` soi
         inner join `tabSales Order` so
@@ -600,10 +600,10 @@ def refill_delivery_detail(site_work, event=None):
         select
             dni.item_code as item,
             dni.item_group,
-            sum(case when ifnull(dn.is_return, 0)=0 then dni.qty else 0 end) as delivered_stock_qty,
+            sum(case when ifnull(dn.is_return, 0)=0 then dni.stock_qty else 0 end) as delivered_stock_qty,
             sum(case when ifnull(dn.is_return, 0)=0 then dni.ts_qty else 0 end) as delivered_bundle,
             sum(case when ifnull(dn.is_return, 0)=0 then dni.pieces else 0 end) as delivered_pieces,
-            sum(case when dn.is_return then dni.qty else 0 end) as returned_stock_qty,
+            sum(case when dn.is_return then dni.stock_qty else 0 end) as returned_stock_qty,
             sum(case when dn.is_return then dni.ts_qty else 0 end) as returned_bundle,
             sum(case when dn.is_return then dni.pieces else 0 end) as returned_pieces
         from `tabDelivery Note Item` dni
