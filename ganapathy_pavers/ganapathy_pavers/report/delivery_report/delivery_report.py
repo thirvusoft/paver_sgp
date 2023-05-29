@@ -29,7 +29,7 @@ class PartyLedgerSummaryReport(object):
 		self.get_gl_entries()
 		self.get_return_invoices()
 		self.get_party_adjustment_amounts()
-		self.outstanding_amount()
+		# self.outstanding_amount()
 
 		columns = self.get_columns()
 		data = self.get_data()
