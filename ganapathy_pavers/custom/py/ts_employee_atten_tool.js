@@ -57,7 +57,8 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
                     'status': 'Active'
                 }
             }
-        })
+        });
+        frm.add_custom_button("Get Employees", () => get_data(frm));
     },
     onload_post_render: async function(frm){
         if (cur_frm.is_new()) {
@@ -92,21 +93,7 @@ frappe.ui.form.on('TS Employee Attendance Tool',{
             }
         }
     },
-    designation:function(frm, cdt, cdn){
-        get_data(frm, cdt, cdn)
-    },
-    location:function(frm, cdt, cdn){
-        get_data(frm, cdt, cdn)
-    },
-    branch:function(frm, cdt, cdn){
-        get_data(frm, cdt, cdn)
-    },
-    company:function(frm, cdt, cdn){
-        get_data(frm, cdt, cdn)
-    },
-    machine:function(frm, cdt, cdn){
-        get_data(frm, cdt, cdn)
-    },
+    
     after_save: async function(){
         cur_frm.reload_doc()
     },

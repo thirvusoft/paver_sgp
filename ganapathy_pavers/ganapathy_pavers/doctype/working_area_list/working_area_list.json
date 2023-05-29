@@ -1,0 +1,46 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-05-29 11:47:29.516222",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "working_area",
+  "working_hours",
+  "emp_attendance_tool"
+ ],
+ "fields": [
+  {
+   "fieldname": "working_area",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Working Area",
+   "options": "Working Area"
+  },
+  {
+   "fieldname": "working_hours",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Working Hours"
+  },
+  {
+   "fieldname": "emp_attendance_tool",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "EMP Attendance Tool",
+   "options": "TS Employee Attendance Tool"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-05-29 13:17:04.821582",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Working Area List",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
