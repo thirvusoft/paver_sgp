@@ -74,6 +74,13 @@ def selling_settings():
                 "label": "Site Work Mandatory in Sales Invoice",
                 "insert_after" : "col_break_sgp_4567"
             },
+            {
+                "fieldname": "sales_order_required",
+                "fieldtype": "Select",
+                "label": "Is Sales Order Required for Delivery Note Creation?",
+                "insert_after" : "so_required",
+                "options" : "No\nYes"
+            },
         ]
     }
     create_custom_fields(custom_fields)
