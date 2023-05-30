@@ -227,7 +227,8 @@ doc_events = {
 		# 			 ],
 		"validate":[
 			"ganapathy_pavers.custom.py.delivery_note.validate",
-			"ganapathy_pavers.custom.py.tax_validation.dn_tax_validation"
+			"ganapathy_pavers.custom.py.tax_validation.dn_tax_validation",
+			"ganapathy_pavers.custom.py.delivery_note.sales_order_required"
 			],
 		# "before_submit":"ganapathy_pavers.custom.py.vehicle_log.vehicle_log_creation",
 		# "on_update_after_submit": [
