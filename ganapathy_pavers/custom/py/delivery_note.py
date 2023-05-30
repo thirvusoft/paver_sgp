@@ -188,7 +188,11 @@ def validate(doc,action):
             doc.value_pieces = True
         if d.ts_qty:
             doc.value_bundle = True
-
-        
-
+     
+def sales_order_required(self,event):
+    """check in manage account if sales order required or not"""
+    if frappe.db.get_value("Selling Settings", None, "sales_order_required") == "Yes":
+        for d in self.get("items"):
+            if not d.against_sales_order:
+                frappe.throw(("Sales Order required for Item {0}").format(d.item_code))
 
