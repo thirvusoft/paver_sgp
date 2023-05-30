@@ -233,6 +233,32 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 				"mileage": row.mileage
 			})
 
+	rental_sqft = get_rental_vehicle_sqft(filters=filters)
+	rental_exp_details = get_rental_vehicle_expense(filters=filters)
+	rental_exp_reference = rental_exp_details.get("reference") or []
+
+	paver_exp += rental_exp_details.get("PAVER")
+	paver_sqf += rental_sqft["PAVER"]
+	paver_sqf_cost += (rental_exp_details.get("PAVER") or 0) / (rental_sqft["PAVER"] or 1)
+	paver.append({
+		"vehicle": 'RENTAL',
+		"expense": (rental_exp_details.get('PAVER') or 0),
+		"sqft": rental_sqft['PAVER'],
+		"sqft_cost": ( rental_exp_details.get('PAVER') or 0) / (rental_sqft['PAVER'] or 1),
+		"reference": json.dumps(rental_exp_reference.get("PAVER") or [])
+	})
+
+	cw_exp += rental_exp_details.get("COMPOUND WALL")
+	cw_sqf += rental_sqft["COMPOUND WALL"]
+	cw_sqf_cost += (rental_exp_details.get("COMPOUND WALL") or 0) / (rental_sqft["COMPOUND WALL"] or 1)
+	cw.append({
+		"vehicle": 'RENTAL',
+		"expense": (rental_exp_details.get('COMPOUND WALL') or 0),
+		"sqft": rental_sqft['COMPOUND WALL'],
+		"sqft_cost":  (rental_exp_details.get('COMPOUND WALL')  or 0) / (rental_sqft['COMPOUND WALL'] or 1),
+		"reference": json.dumps(rental_exp_reference.get("COMPOUND WALL") or [])
+	})
+
 	if paver:
 		data.append({
 			"vehicle": "PAVER",
@@ -271,31 +297,6 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 			"vehicle": "AVERAGE",
 			"sqft": cw_exp / (cw_sqf or 1),
 			"sqft_cost": cw_sqf_cost / len(cw),
-			"bold": 1
-		})
-
-	rental_sqft = get_rental_vehicle_sqft(filters=filters)
-	rental_exp_details = get_rental_vehicle_expense(filters=filters)
-	rental_exp_reference = rental_exp_details.get("reference") or []
-	data.append({})
-	data.append({
-			"vehicle": "RENTAL VEHICLE",
-			"bold": 1,
-			"reference": json.dumps(rental_exp_reference)
-		})
-	for row in rental_sqft:
-		data.append({
-			"vehicle": row,
-			"expense": rental_exp_details.get(row),
-			"sqft": rental_sqft[row],
-			"sqft_cost": (rental_exp_details.get(row) or 0) / (rental_sqft[row] or 1)
-		})
-	if len(rental_sqft) > 1:
-		data.append({
-			"vehicle": "TOTAL",
-			"expense": rental_exp_details.get("amount"),
-			"sqft": sum(rental_sqft.values()),
-			"sqft_cost": (rental_exp_details.get("amount") or 0) / (sum(rental_sqft.values()) or 1),
 			"bold": 1
 		})
 
@@ -417,14 +418,27 @@ def get_account_balance_on(account, company, from_date, to_date):
 			paver += (gl.get("debit") or 0)
 		if gl.get("type") == "Compound Wall":
 			cw += (gl.get("debit") or 0)
-	
-	res = {
-		"reference": sorted([{
+	paver_ref, cw_ref = [], []
+	for gl in gl_entries:
+		if gl.type == "Pavers":
+			paver_ref.append({
 			'doctype': gl.voucher_type,
 			'docname': gl.voucher_no,
 			'amount': gl.debit,
 			'account': gl.get('type')
-		} for gl in gl_entries], key = lambda x: x.get("account") or ""),
+		})
+		elif(gl.type == "Compound Wall"):
+			cw_ref.append({
+			'doctype': gl.voucher_type,
+			'docname': gl.voucher_no,
+			'amount': gl.debit,
+			'account': gl.get('type')
+		})
+	res = {
+		"reference": {
+			"PAVER":sorted(paver_ref,key = lambda x: x.get("account") or ""),
+			"COMPOUND WALL" :sorted(cw_ref,key = lambda x: x.get("account") or "")
+			},
 		"amount": total_amout,
 		"PAVER": paver,
 		"COMPOUND WALL": cw
