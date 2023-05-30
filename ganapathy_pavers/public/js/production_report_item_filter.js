@@ -80,3 +80,39 @@ ganapathy_pavers.apply_cwall_report_filters = async function (from_date, to_date
 
 }
 
+
+ganapathy_pavers.apply_sbc_report_filters = async function (from_date, to_date, field_class) {
+    let production_item_name = [], filters = { docstatus: ["<", 2] }
+    if (from_date) {
+        filters["to_time"] = [">=", from_date]
+    }
+    if (to_date) {
+        filters["to_time"] = ["<=", to_date]
+    }
+    if (from_date && to_date) {
+        filters["to_time"] = ["BETWEEN", [from_date, to_date]]
+    }
+   
+    await frappe.db.get_list("Shot Blast Costing", {
+        filters: filters,
+        fields: ["`tabShot Blast Items`.item_name"],
+        limit: 0
+    }).then(production_items => {
+        (production_items || []).forEach(data => {
+            if (!production_item_name.includes(data.item_name))
+                production_item_name.push(data.item_name)
+        })
+        field_class.get_query = function () {
+            return {
+                filters: {
+                    name: [
+                        "in",
+                        production_item_name
+                    ]
+                }
+            }
+        }
+    })
+
+}
+
