@@ -79,12 +79,13 @@ class DailyMaintenance(Document):
 def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	warehouse = [row.get('warehouse') for row in json.loads(warehouse) if row.get('warehouse')]
 	warehouse_colour=[row.get('warehouse') for row in json.loads(warehouse_colour) if row.get('warehouse')]
-	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name',order_by='name')
+	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1, 'disabled': 0},pluck='name',order_by='name')
 	items_stock=[]
 	total_stock={}
 	#paver_item_normal
 	for i in item:
 		item_1=frappe.db.get_all("Item", filters=[
+										['disabled', '=', 0],
 										['variant_of','=',i],
 										["Item Variant Attribute","attribute_value",'=','Normal'],
 																			])
@@ -114,6 +115,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	total_stock_shot={}
 	for i in item:
 		item_2=frappe.db.get_all("Item", filters=[
+										['disabled', '=', 0],
 										['variant_of','=',i],
 										["Item Variant Attribute","attribute_value",'=','Shot Blast']
 																			])
@@ -183,11 +185,11 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	
 
 	#compound_wall_items
-	compound_item=frappe.db.get_all("Item", filters={'item_group':"Compound Walls","compound_wall_type":"Post",'item_name':['like',"%FEET%"]},pluck='name',order_by='name')
+	compound_item=frappe.db.get_all("Item", filters={'disabled': 0, 'item_group':"Compound Walls","compound_wall_type":"Post",'item_name':['like',"%FEET%"]},pluck='name',order_by='name')
 	post_item={}
 	if compound_item:
 		# for i in compound_item:
-			ci_wo= frappe.db.get_all("Item", filters=[['item_name','like','%WITHOUT%'],['item_name','not like','%CORNER%'],['item_name','not like','%FENCING%'],['name','in',compound_item],['disabled','=',0]])
+			ci_wo= frappe.db.get_all("Item", filters=[['disabled', '=', 0],['item_name','like','%WITHOUT%'],['item_name','not like','%CORNER%'],['item_name','not like','%FENCING%'],['name','in',compound_item],['disabled','=',0]])
 			if ci_wo:
 				for j in ci_wo:
 					post=j['name'].split('FEET')[0]+ 'FEET'
@@ -271,12 +273,12 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 						post_item[post + "FENCING"]={'with_bolt':get_stock_qty(j.name, warehouse, date, time) or 0, 'post_length':post, 'type':"Fencing"}
 			
 	#colour powder items
-	colour_item=frappe.db.get_all("Item", filters={'item_group':"Raw Material",'has_variants':1},pluck='name')
+	colour_item=frappe.db.get_all("Item", filters={'item_group':"Raw Material",'has_variants':1, 'disabled': 0},pluck='name')
 	
 	colour_details={}
 	template={}
 	for col in colour_item:
-		item_col=frappe.db.get_all("Item", filters=[['name','like','%Pigment%'],['variant_of','in',col]],order_by='name')
+		item_col=frappe.db.get_all("Item", filters=[['name','like','%Pigment%'],['variant_of','in',col],['disabled', '=', 0]],order_by='name')
 
 		if item_col:
 			
@@ -293,7 +295,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 				if j.name not in colour_details:
 					colour_details[j.name]={'colour': j.name, 'attribute_value': colour, 'stock':0}
 				colour_details[j.name]['stock']+=color_stock
-	dolamite=frappe.db.get_all("Item", filters=[['name','like','%dolamite%']])
+	dolamite=frappe.db.get_all("Item", filters=[['disabled', '=', 0],['name','like','%dolamite%']])
 	for j in dolamite:
 		color_stock=get_stock_qty(j.name, warehouse_colour, date, time)
 		colour_details[j.name]={'colour': j.name, 'stock':color_stock}
@@ -321,11 +323,11 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 		slab_details.append(post)
  
 	#pavers size details 
-	paver_item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1},pluck='name',order_by="name")
+	paver_item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1, 'disabled': 0},pluck='name',order_by="name")
 
 	for i in paver_item:
 		normal=frappe.db.get_all("Item", filters=[
-										['variant_of','=',i],
+										['variant_of','=',i],['disabled', '=', 0],
 										["Item Variant Attribute","attribute_value",'=','Normal']], pluck='name',order_by='name')
 	
 		for j in normal:
