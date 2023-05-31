@@ -63,15 +63,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Shot Blast Costing",
-   "print_hide": 1,
-   "read_only": 1
-  },
-  {
    "fieldname": "items",
    "fieldtype": "Table",
    "label": "Items",
