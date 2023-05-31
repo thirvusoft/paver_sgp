@@ -90,7 +90,7 @@ frappe.ui.form.on('Shot Blast Costing', {
 		frm.trigger("get_operators");
 	},
 	total_cost: function (frm) {
-		cur_frm.set_value("total_cost_per_sqft", frm.doc.total_cost / frm.doc.total_sqft)
+		cur_frm.set_value("total_cost_per_sqft", frm.doc.total_cost / (frm.doc.total_sqft - frm.doc.total_damage_sqft))
 	},
 	from_time: function (frm) {
 		var field = "total_hrs"
@@ -274,7 +274,7 @@ function total_hrs(frm, field, from, to) {
 	})
 }
 function total_cost(frm) {
-	if (frm.doc.total_hrs && frm.doc.docstatus == 0) {
+	if (	frm.doc.docstatus == 0) {
 		cur_frm.set_value('labour_cost', frm.doc.labour_cost_in_workstation * frm.doc.total_hrs * frm.doc.no_of_labour);
 		cur_frm.set_value('total_cost', (frm.doc.additional_cost || 0) + (frm.doc.labour_cost || 0) + (frm.doc.total_operator_wages || 0));
 	}
