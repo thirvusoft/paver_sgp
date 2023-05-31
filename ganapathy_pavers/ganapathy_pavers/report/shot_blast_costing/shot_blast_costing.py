@@ -52,7 +52,7 @@ def get_data(filters):
 						INNER JOIN `tabShot Blast Costing` opr_sbc
 						ON opr_sbi.parent = opr_sbc.name
 						WHERE
-							opr_sbi.docstatus != 2 and
+							opr_sbc.docstatus != 2 and
 							DATE(opr_sbc.to_time) = DATE(sbc.to_time) and
 							opr_sbi.item_name = sbi.item_name
 							{operator_conditions}
