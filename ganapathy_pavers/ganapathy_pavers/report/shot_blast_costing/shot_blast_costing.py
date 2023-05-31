@@ -31,7 +31,7 @@ def get_data(filters):
 			DATE(sbc.to_time) as date,
 			sbi.item_name as item_code,
 			SUM(sbi.bundle_taken) as bundle_taken,
-			SUM(sbi.sqft) as sqft,
+			SUM(sbi.sqft - sbi.damages_in_sqft) as sqft,
 			SUM(sbi.damages_in_nos) as damages_in_nos,
 			SUM(sbi.damages_in_sqft) as damages_in_sqft,
 			SUM(sbi.damages_in_sqft) * 100 / SUM(sbi.sqft) as damage_percent,
