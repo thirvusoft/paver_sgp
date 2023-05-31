@@ -9,14 +9,22 @@ def execute(filters=None):
 
 def get_data(filters):
 	conditions = ""
+	operator_conditions = ""
 	if filters.get("item_code"):
 		conditions += f""" and sbi.item_name = '{filters.get("item_code")}' """
+		operator_conditions += f"""  and opr_sbi.item_name = '{filters.get("item_code")}' """
+
 	if filters.get("material_manufacturing"):
 		conditions += f""" and sbi.material_manufacturing = '{filters.get("material_manufacturing")}' """
+		operator_conditions += f""" and opr_sbi.material_manufacturing = '{filters.get("material_manufacturing")}' """
+
 	if filters.get("from_date"):
 		conditions += f""" and DATE(sbc.to_time) >= '{filters.get("from_date")}' """
+		operator_conditions += f""" and DATE(opr_sbc.to_time) >= '{filters.get("from_date")}' """
+
 	if filters.get("to_date"):
 		conditions += f""" and DATE(sbc.to_time) <= '{filters.get("to_date")}' """
+		operator_conditions += f""" and DATE(opr_sbc.to_time) <= '{filters.get("to_date")}' """
 
 	query = f"""
 		SELECT
@@ -31,13 +39,33 @@ def get_data(filters):
 			SUM(sbc.no_of_labour * (sbi.sqft / sbc.total_sqft)) as no_of_labour,
 			SUM(sbc.total_hrs * (sbi.sqft / sbc.total_sqft)) as total_hrs,
 			SUM(sbc.labour_cost * (sbi.sqft / sbc.total_sqft)) as labour_cost,
+			(
+				SELECT 
+					GROUP_CONCAT(DISTINCT opr.operator_name SEPARATOR ', ') 
+                FROM `tabCW Operator Details` opr
+				WHERE 
+					opr.parenttype = "Shot Blast Costing" and
+					opr.parent in (
+						SELECT 
+							opr_sbc.name
+						FROM `tabShot Blast Items` opr_sbi
+						INNER JOIN `tabShot Blast Costing` opr_sbc
+						ON opr_sbi.parent = opr_sbc.name
+						WHERE
+							opr_sbi.docstatus != 2 and
+							DATE(opr_sbc.to_time) = DATE(sbc.to_time) and
+							opr_sbi.item_name = sbi.item_name
+							{operator_conditions}
+					)
+			) as operator,
+			SUM(sbc.total_operator_wages * (sbi.sqft / sbc.total_sqft)) as operator_salary,
 			SUM(sbc.additional_cost * (sbi.sqft / sbc.total_sqft)) as additional_cost,
 			SUM(sbc.total_cost * (sbi.sqft / sbc.total_sqft)) as total_cost
 		FROM `tabShot Blast Items` sbi
 		INNER JOIN `tabShot Blast Costing` sbc
 		ON sbi.parent = sbc.name
 		WHERE
-			sbi.docstatus != 2
+			sbc.docstatus != 2
 			{conditions}
 		GROUP BY {"DATE(sbc.to_time), sbi.item_name" if filters.get("group_by") == "Date" else "sbi.item_name, DATE(sbc.to_time)"}
 	"""

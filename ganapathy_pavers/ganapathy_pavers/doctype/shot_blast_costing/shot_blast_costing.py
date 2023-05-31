@@ -43,7 +43,8 @@ uom_conv_query = lambda: f"""
 
 class ShotBlastCosting(Document):
     def validate(self):
-        self.total_cost = (self.additional_cost or 0) + (self.labour_cost or 0)
+        self.total_cost = (self.additional_cost or 0) + (self.labour_cost or 0) + (self.total_operator_wages or 0)
+        self.total_cost_per_sqft = (self.total_cost or 0) / (self.total_sqft or 0)
         self.fetch_warehouses()
         self.calculate_total_damage_cost()
     
@@ -375,3 +376,21 @@ def material_manufacturing_query(doctype, txt, searchfield, start, page_len, fil
                 "start": start,
                 "page_len": page_len
             }, as_dict=as_dict)
+
+@frappe.whitelist()
+def get_operators(workstation, division=1):
+    division = int(division)
+    op_table=[]
+    op_list=[]
+ 
+    op_cost= frappe.get_doc("Workstation",workstation)
+    for j in op_cost.ts_operators_table:
+        if(j.ts_operator_name not in op_list):
+            op_list.append(j.ts_operator_name)
+            op_table.append({"employee":j.ts_operator_name,"operator_name":j.ts_operator_full_name,"salary":j.ts_operator_wages, "division_salary":(j.ts_operator_wages/division)})
+        else:
+            for k in op_table:
+                if k['employee'] == j.ts_operator_name:
+                    k['salary'] = j.ts_operator_wages
+                    k["division_salary"] = (j.ts_operator_wages/division)
+    return(op_table)

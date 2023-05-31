@@ -1,7 +1,7 @@
 // Copyright (c) 2023, Thirvusoft and contributors
 // For license information, please see license.txt
 /* eslint-disable */
-let ponnusamy = 0;
+
 var currentDate = moment();
 var prevMonthStart = moment(currentDate).subtract(1, 'month').startOf('month').format();
 var prevMonthEnd = moment(currentDate).subtract(1, 'month').endOf('month').format();

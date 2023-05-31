@@ -87,6 +87,7 @@ frappe.ui.form.on('Shot Blast Costing', {
 		} else {
 			cur_frm.set_value('no_of_labour', 0)
 		}
+		frm.trigger("get_operators");
 	},
 	total_cost: function (frm) {
 		cur_frm.set_value("total_cost_per_sqft", frm.doc.total_cost / frm.doc.total_sqft)
@@ -127,6 +128,41 @@ frappe.ui.form.on('Shot Blast Costing', {
 	},
 	labour_cost: function (frm) {
 		cur_frm.set_value('total_cost', frm.doc.additional_cost + frm.doc.labour_cost)
+	},
+	get_operators: function (frm) {
+		if (frm.doc.workstation) {
+			frappe.call({
+				method: "ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.get_operators",
+				args: {
+					workstation: frm.doc.workstation || '',
+					division: frm.doc.division || 1,
+				},
+				callback: function (r) {
+					frm.set_value("operator_details", r.message);
+					var total_operator_wages = 0;
+					for (let row = 0; row < r.message.length; row++) {
+						total_operator_wages += r.message[row].division_salary;
+					}
+					frm.set_value("total_operator_wages", total_operator_wages);
+				},
+			});
+		} else {
+			frm.set_value("operator_details", []);
+			frm.set_value("total_operator_wages", 0);
+		}
+	},
+	division: function (frm) {
+		let operator_details = frm.doc.operator_details ? frm.doc.operator_details : [],
+			total_operator_wages = 0;
+		for (let row = 0; row < operator_details.length; row++) {
+			let cdt = operator_details[row].doctype,
+				cdn = operator_details[row].name;
+			let data = locals[cdt][cdn];
+			let wages = (data.salary ? data.salary : 0) / (frm.doc.division ? frm.doc.division : 1);
+			frappe.model.set_value(cdt, cdn, "division_salary", wages);
+			total_operator_wages += wages;
+		}
+		frm.set_value("total_operator_wages", total_operator_wages);
 	},
 });
 frappe.ui.form.on('Shot Blast Items', {
@@ -240,7 +276,7 @@ function total_hrs(frm, field, from, to) {
 function total_cost(frm) {
 	if (frm.doc.total_hrs && frm.doc.docstatus == 0) {
 		cur_frm.set_value('labour_cost', frm.doc.labour_cost_in_workstation * frm.doc.total_hrs * frm.doc.no_of_labour);
-		cur_frm.set_value('total_cost', frm.doc.additional_cost + frm.doc.labour_cost);
+		cur_frm.set_value('total_cost', (frm.doc.additional_cost || 0) + (frm.doc.labour_cost || 0) + (frm.doc.total_operator_wages || 0));
 	}
 }
 frappe.ui.form.on('Shot Blast Costing', {
@@ -265,9 +301,9 @@ function make_stock_entry(frm, type) {
 async function total_damage_cost(frm) {
 	await frappe.call({
 		method: "run_doc_method",
-		args: { 
-			'docs': frm.doc, 
-			'method': 'calculate_total_damage_cost' 
+		args: {
+			'docs': frm.doc,
+			'method': 'calculate_total_damage_cost'
 		},
 		callback: function (r) {
 			if (!r.exc) {
