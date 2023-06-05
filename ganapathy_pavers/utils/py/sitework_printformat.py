@@ -411,7 +411,7 @@ def get_retail_cost(doc):
     unrelated_other_cost = 0
     for m in doc.job_worker:
         if m.other_work == 1:
-            if m.related_work:
+            if not m.related_work:
                 unrelated_other_sqft += (m.sqft_allocated or 0) if not m.amount_calc_by_person else 0
                 unrelated_other_cost += m.amount or 0
             else:

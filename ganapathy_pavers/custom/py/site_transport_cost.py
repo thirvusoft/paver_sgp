@@ -67,7 +67,6 @@ class SiteTransportCost:
                     "docstatus": 1,
                     "employee": employee,
                     "date": date,
-                    "select_purpose": "Goods Supply",
                 }, pluck="today_odometer_value")) or 1
 
                 if employee not in driver_salary:
@@ -104,7 +103,6 @@ class SiteTransportCost:
                 total_odometer = sum(frappe.get_all("Vehicle Log", {
                     "docstatus": 1,
                     "license_plate": ['in', op_vehicles],
-                    "select_purpose": "Goods Supply",
                     "date": date,
                 }, pluck="today_odometer_value")) or 1
 
@@ -151,7 +149,6 @@ class SiteTransportCost:
                 total_odometer = sum(frappe.get_all("Vehicle Log", {
                     "license_plate": vehicle,
                     "date": date,
-                    "select_purpose": "Goods Supply"
                 }, pluck="today_odometer_value"))
 
                 if date not in yearl_maintenance:
