@@ -397,6 +397,8 @@ def get_delivery_transport_detail(sitename):
 def get_retail_cost(doc):
     doc=frappe.get_doc("Project",doc)
     rental_cost = 0
+    unrelated_other_sqft=0
+    unrelated_other_per_sqft=0
     add_cost = 0
     for i in doc.additional_cost:
 
@@ -406,9 +408,14 @@ def get_retail_cost(doc):
             add_cost += i.amount or 0
     other_cost = 0
     job_work_cost = 0
+    unrelated_other_cost = 0
     for m in doc.job_worker:
         if m.other_work == 1:
-            other_cost+= m.amount or 0
+            if m.related_work:
+                unrelated_other_sqft += (m.sqft_allocated or 0) if not m.amount_calc_by_person else 0
+                unrelated_other_cost += m.amount or 0
+            else:
+                other_cost+= m.amount or 0
         else:
             job_work_cost += m.amount or 0
     item_cost = []
@@ -423,14 +430,16 @@ def get_retail_cost(doc):
          "amount": cost
         })
     
+    unrelated_other_per_sqft = unrelated_other_cost / (unrelated_other_sqft or 1)
+
     return {
         "additional_cost" : add_cost,
         "rental" : rental_cost,
         "item_cost":item_cost,
         "own_vehicle":doc.transporting_cost,
         "job_work_rate": job_work_cost,
-        "other_rate": other_cost
+        "other_rate": other_cost,
+        "unrelated_other_cost": unrelated_other_cost,
+        "unrelated_other_sqft": unrelated_other_sqft,
+        "unrelated_other_per_sqft": unrelated_other_per_sqft,
     }
-        
-
-           
