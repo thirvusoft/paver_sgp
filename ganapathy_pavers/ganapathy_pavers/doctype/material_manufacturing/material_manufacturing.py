@@ -17,9 +17,17 @@ class MaterialManufacturing(Document):
     def validate(doc):
         doc.calculate_production_details()
         doc.get_bin_items()
+        top_layer, panmix = 0, 0
         for row in doc.items:
             row.amount = (row.rate or 0) * (row.qty or 0)
-            
+            if row.layer_type == "Top Layer":
+                top_layer += (row.amount or 0)
+            elif row.layer_type == "Panmix":
+                panmix += (row.amount or 0)
+        
+        doc.top_layer_cost = top_layer
+        doc.bottom_layer_cost = panmix
+    
     def calculate_production_details(doc):
         doc.total_production_qty = (doc.production_qty or 0)
         doc.total_damaged_qty = (doc.damage_qty or 0) + (doc.rack_shift_damage_qty or 0)
