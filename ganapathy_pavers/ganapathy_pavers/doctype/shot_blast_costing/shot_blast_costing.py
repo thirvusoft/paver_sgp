@@ -54,7 +54,8 @@ class ShotBlastCosting(Document):
         for row in self.items:
             if row.material_manufacturing and row.damages_in_sqft:
                 prod_date = frappe.get_value("Material Manufacturing", row.material_manufacturing, "from_time")
-                row.damage_cost = row.damages_in_sqft * (get_paver_production_rate(item=row.item_name, date=prod_date) or 0)
+                row.per_sqft_rate = get_paver_production_rate(item=row.item_name, date=prod_date) or 0
+                row.damage_cost = row.damages_in_sqft * (row.per_sqft_rate or 0)
                 total_cost += row.damage_cost or 0
         self.total_damage_cost = total_cost
 

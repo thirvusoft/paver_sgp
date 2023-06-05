@@ -15,6 +15,7 @@
   "sqft",
   "damages_in_sqft",
   "damage_cost",
+  "per_sqft_rate",
   "column_break_8",
   "batch",
   "batch_stock"
@@ -106,12 +107,18 @@
    "fieldtype": "Currency",
    "label": "Damage Cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "per_sqft_rate",
+   "fieldtype": "Currency",
+   "label": "Per Sqft Rate",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-05-22 11:50:29.908084",
+ "modified": "2023-06-05 12:48:06.718338",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Items",
