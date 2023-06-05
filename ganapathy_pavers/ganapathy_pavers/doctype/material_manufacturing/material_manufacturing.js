@@ -518,7 +518,7 @@ function std_item(frm) {
 									row.qty = (d.layer_type == 'Top Layer' ? d.qty * (cur_frm.doc.total_no_of_batches ? cur_frm.doc.total_no_of_batches : 0) : d.qty);
 									row.ts_qty = d.ts_qty;
 									row.bom_qty = d.ts_qty;
-									row.average_consumption = d.ts_qty;
+									row.average_consumption = row.qty / (frm.doc.total_no_of_batches || 1);
 									row.no_of_batches = frm.doc.total_no_of_batches
 									row.stock_uom = d.stock_uom;
 									row.from_bom = 1;
