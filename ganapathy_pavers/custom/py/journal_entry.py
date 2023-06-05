@@ -54,8 +54,8 @@ def get_production_details(date=None, from_date=None, to_date=None, machines=[],
         if(machines):
             pm_filt["work_station"] = ["in", machines]
         
-        if item:
-            pm_filt["item_to_manufacture"] = item
+        # if item:
+        #     pm_filt["item_to_manufacture"] = item
 
         res['paver'] = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='total_production_sqft'))
         res['cw'] = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))

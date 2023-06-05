@@ -17,12 +17,13 @@ def execute(filters=None):
 	if filters.get("machine"):
 		filters1["work_station"] = ["in", filters.get("machine", [])]
 	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
+
+	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
+
+	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
+	
 	if item:
 		filters1["item_to_manufacture"]=item
-
-	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
-
-	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
 	paver_list = frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
 	test_data = []
 

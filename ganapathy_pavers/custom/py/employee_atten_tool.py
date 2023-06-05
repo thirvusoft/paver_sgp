@@ -208,11 +208,11 @@ def fill_emp_cancel_detail(self, event):
 def fill_attn_cancel_detail(self, event):
 	emp_tools = []
 	if self.ts_employee_attendance_tool:
-		emp_tools.append({
+		emp_tools.append(frappe._dict({
 				'emp_attendance_tool': self.ts_employee_attendance_tool,
 				'working_area': self.machine,
 				'working_hours': self.working_hours
-			})
+			}))
 	for row in self.working_area_list or emp_tools:
 		if row.emp_attendance_tool and (row.emp_attendance_tool in frappe.get_all('TS Employee Attendance Tool', {'docstatus': ['!=', 2]}, pluck='name')):
 			doc=frappe.get_doc("TS Employee Attendance Tool", row.emp_attendance_tool )
