@@ -262,7 +262,7 @@ frappe.ui.form.on('Sales Order', {
         cur_frm.set_value('total_post', Math.ceil(cur_frm.doc.post + cur_frm.doc.double_post))
     },
     height: function (frm) {
-        cur_frm.set_value('total_slab', Math.ceil(cur_frm.doc.post * (cur_frm.doc.height - 2)))
+        cur_frm.set_value('total_slab', Math.ceil(cur_frm.doc.post * (cur_frm.doc.height)))
     },
     work: function (frm) {
         // if (frm.doc.work == "Supply Only") {

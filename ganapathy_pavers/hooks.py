@@ -145,6 +145,9 @@ doc_events = {
 	"Item": {
 		"validate": [
 			"ganapathy_pavers.custom.py.item.validate_dsm_uom"
+		],
+		"before_validate": [
+			"ganapathy_pavers.utils.event_sync.validate_prime_item",
 		]
 	},
 	"Stock Entry": {

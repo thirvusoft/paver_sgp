@@ -217,6 +217,15 @@ def validate(self,event):
         })
 
 def validate_jw_qty(self):
+    siteName = ""
+    try:
+        siteName = (frappe.local.site).split('.')[0]
+    except:
+        pass
+        
+    if siteName=="sgpprime" or frappe.session.siteName == "sgpprime":
+        return
+
     if(self.type == "Pavers"):
         bundle_uom="Bdl"
         sqf_uom="SQF"
