@@ -258,12 +258,15 @@ doc_events = {
 						"ganapathy_pavers.custom.py.vehicle_log.adblue_stock_entry",
 						"ganapathy_pavers.custom.py.vehicle_log.fastag_expense",
 						"ganapathy_pavers.custom.py.vehicle_log.update_fasttag_exp_to_sw",
+						"ganapathy_pavers.custom.py.vehicle_log.update_delivery_note_created",
 					  ],
 		"on_cancel":[
 						"ganapathy_pavers.custom.py.site_transport_cost.update_transport_cost_of_all_sites",
 						"ganapathy_pavers.custom.py.vehicle_log.onsubmit",
 						"ganapathy_pavers.custom.py.vehicle_log.update_fasttag_exp_to_sw",
-						"ganapathy_pavers.custom.py.vehicle_log.update_transport_cost"],
+						"ganapathy_pavers.custom.py.vehicle_log.update_transport_cost",
+						"ganapathy_pavers.custom.py.vehicle_log.update_delivery_note_created",
+					],
 		"validate": ["ganapathy_pavers.custom.py.vehicle_log.validate",
 					"ganapathy_pavers.custom.py.vehicle_log.validate_distance",
 					"ganapathy_pavers.custom.py.vehicle_log.total_cost"

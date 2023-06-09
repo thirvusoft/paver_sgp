@@ -9,4 +9,10 @@ def execute():
                 frappe.db.set_value("Vehicle Log", j.name, "operator", opr, update_modified=False)
 
 
-# ganapathy_pavers.patches.vehicle_log.execute
+# ganapathy_pavers.patches.vehicle_log.vl_to_dn_created
+
+def vl_to_dn_created():
+    vl=frappe.get_all("Vehicle Log", {"docstatus": 1, "select_purpose": "Goods Supply", "delivery_note": ["is", "set"]}, pluck="delivery_note", group_by="delivery_note")
+    for i in vl:
+        frappe.db.set_value("Delivery Note", i, "vehicle_log_created", 1, update_modified=False)
+    print(len(vl))
