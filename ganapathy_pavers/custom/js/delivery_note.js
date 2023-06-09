@@ -246,6 +246,22 @@ frappe.ui.form.on("Delivery Note", {
 });
 
 frappe.ui.form.on('Delivery Note', "refresh", function (frm) {
+    frm.set_query("driver_name_2", function() {
+        return {
+            filters: {
+                employee_categories: "Driver"
+            }
+        }
+    });
+
+    frm.set_query("operator_", function() {
+        return {
+            filters: {
+                employee_categories: "Operator"
+            }
+        }
+    });
+
     if (!ganapathy_pavers.delivery_note_save_fn) {
         ganapathy_pavers.delivery_note_save_fn = frm.save
         cur_frm.save = function (...args) {
