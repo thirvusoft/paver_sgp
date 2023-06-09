@@ -17,11 +17,11 @@ class SiteTransportCost:
         return {
             "value": (sum(self.operator_salary.values()) or 0) + (sum(self.driver_salary.values()) or 0) + (self.maintenance_cost or 0) + (self.fuel_cost or 0) + (sum(self.vehicle_daily_cost.values()) or 0),
             "description": f"""<div>
-                        <b>Driver Salary:</b> {", ".join([f"<b>{emp}</b>: {self.driver_salary.get(emp)}" for emp in self.driver_salary])} <br>
-                        <b>Operator Salary:</b> {", ".join([f"<b>{opr}</b>: {self.operator_salary.get(opr)}" for opr in self.operator_salary])} <br>
-                        <b>Maintenance Cost:</b> {self.maintenance_cost} <br>
-                        <b>Fuel:</b> {self.fuel_cost} <br>
-                        <b>Vehicle Yearly:</b> {", ".join([f"<b>{str(date)}</b>: {self.vehicle_daily_cost.get(date)}" for date in self.vehicle_daily_cost])}
+                        <b>Driver Salary:</b> {", ".join([f"<b>{emp}</b>: {'%.2f'%(self.driver_salary.get(emp) or 0)}" for emp in self.driver_salary])} <br>
+                        <b>Operator Salary:</b> {", ".join([f"<b>{opr}</b>: {'%.2f'%(self.operator_salary.get(opr) or 0)}" for opr in self.operator_salary])} <br>
+                        <b>Maintenance Cost:</b> {'%.2f'%(self.maintenance_cost or 0)} <br>
+                        <b>Fuel:</b> {'%.2f'%(self.fuel_cost or 0)} <br>
+                        <b>Vehicle Yearly:</b> {", ".join([f"<b>{str(date)}</b>: {'%.2f'%(self.vehicle_daily_cost.get(date) or 0)}" for date in self.vehicle_daily_cost])}
                     </div>"""
         }
 
@@ -67,6 +67,7 @@ class SiteTransportCost:
                     "docstatus": 1,
                     "employee": employee,
                     "date": date,
+                    "select_purpose": ["!=", "Fuel"],
                 }, pluck="today_odometer_value")) or 1
 
                 if employee not in driver_salary:
@@ -104,6 +105,7 @@ class SiteTransportCost:
                     "docstatus": 1,
                     "license_plate": ['in', op_vehicles],
                     "date": date,
+                    "select_purpose": ["!=", "Fuel"],
                 }, pluck="today_odometer_value")) or 1
 
                 if operator not in operator_salary:
@@ -149,6 +151,7 @@ class SiteTransportCost:
                 total_odometer = sum(frappe.get_all("Vehicle Log", {
                     "license_plate": vehicle,
                     "date": date,
+                    "select_purpose": ["!=", "Fuel"],
                 }, pluck="today_odometer_value"))
 
                 if date not in yearl_maintenance:
