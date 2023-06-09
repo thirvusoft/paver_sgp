@@ -241,6 +241,12 @@ def update_delivery_note(self, event=None):
             })
             dn.save("Update")
 
+def update_delivery_note_created(self, event):
+    if event=="on_submit" and self.delivery_note and self.select_purpose=="Goods Supply":
+        frappe.db.set_value("Delivery Note", self.delivery_note, "vehicle_log_created", 1)
+    elif event=="on_cancel" and self.delivery_note and self.select_purpose=="Goods Supply":
+        frappe.db.set_value("Delivery Note", self.delivery_note, "vehicle_log_created", 0)
+
 def supplier_journal_entry(self, event=None):
     if not self.select_purpose == "Fuel" or (self.select_purpose == "Fuel" and self.from_barrel):
         return

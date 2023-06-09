@@ -1,3 +1,6 @@
+frappe.provide("ganapathy_pavers")
+
+
 var date, distance;
 frappe.ui.form.on('Delivery Note Item', {
     ts_qty: function (frm, cdt, cdn) {
@@ -51,9 +54,9 @@ async function bundle_calc(frm, cdt, cdn) {
 
 frappe.ui.form.on('Delivery Note', {
     onload: async function (frm) {
-        frm.set_query('site_work',function(frm){
+        frm.set_query('site_work', function (frm) {
             return {
-                filters:{
+                filters: {
                     'customer': cur_frm.doc.customer,
                     'status': ["not in", ['Completed', 'Billed', 'Cancelled']],
                 }
@@ -147,7 +150,7 @@ frappe.ui.form.on('Delivery Note', {
                 await cur_frm.add_custom_button("Open Vehicle Log", function () {
                     window.open(`/app/vehicle-log/${res[0].name}`)
                 }).removeClass("elipsis").addClass("btn-primary")
-            } else if (frm.doc.transporter=="Own Transporter" && frm.doc.own_vehicle_no && frm.doc.docstatus == 1) {
+            } else if (frm.doc.transporter == "Own Transporter" && frm.doc.own_vehicle_no && frm.doc.docstatus == 1) {
                 cur_frm.add_custom_button("Create Vehicle Log", async function () {
                     date = cur_frm.doc.posting_date
                     distance = cur_frm.doc.distance
@@ -156,20 +159,24 @@ frappe.ui.form.on('Delivery Note', {
                             await frappe.new_doc("Vehicle Log", {
                                 license_plate: frm.doc.own_vehicle_no,
                                 employee: frm.doc.employee,
+                                operator: frm.doc.operator_employee,
                                 date: date,
                                 select_purpose: "Goods Supply",
                                 delivery_note: frm.doc.name,
                             })
                         },
                         () => {
+                            cur_frm.set_value("employee", frm.doc.employee)
+                            cur_frm.set_value("operator", frm.doc.operator_employee)
                             cur_frm.set_value("date", date)
                             if (distance) {
                                 cur_frm.set_value("odometer", cur_frm.doc.last_odometer + distance)
                             }
+                            cur_frm.refresh_fields()
                         }
                     ])
 
-                }).removeClass("elipsis").addClass("btn-primary")
+                }).removeClass("elipsis").addClass("btn-primary");
             }
         })
     }
@@ -236,4 +243,32 @@ frappe.ui.form.on("Delivery Note", {
     validate: function (frm) {
         frm.trigger("taxes_and_charges")
     },
+});
+
+frappe.ui.form.on('Delivery Note', "refresh", function (frm) {
+    if (!ganapathy_pavers.delivery_note_save_fn) {
+        ganapathy_pavers.delivery_note_save_fn = frm.save
+        cur_frm.save = function (...args) {
+            if (frm.doc.transporter == "Own Transporter" && args[0] == "Submit") {
+                if (!cur_dialog) {
+                    frappe.confirm(`
+                        <div>
+                            <div>
+                                Is the provided Vehicle, Driver and Operator details are Correct?
+                            <div>
+                            <div>
+                                Vehicle: ${frm.doc.own_vehicle_no || ""}<br> 
+                                Driver: ${frm.doc.driver_name_2 || ""}<br>
+                                Operator: ${frm.doc.operator_ || ""}<br>
+                            <div>
+                        <div>`,
+                        () => ganapathy_pavers.delivery_note_save_fn.call(frm, ...args),
+                        () => $(args[2]).prop('disabled', false)
+                    )
+                }
+            } else {
+                ganapathy_pavers.delivery_note_save_fn.call(frm, ...args)
+            }
+        }
+    }
 });
