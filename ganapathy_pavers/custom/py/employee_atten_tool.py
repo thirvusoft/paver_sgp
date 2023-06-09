@@ -165,9 +165,9 @@ def update_attendance_to_checkin(self, event):
 			SELECT name
 			FROM `tabEmployee Checkin`
 			WHERE employee='{self.employee}'
-			AND ts_emp_att_tool_name in {f"({emp_tools[0]})" if len(emp_tools) == 1 else tuple(emp_tools)}
+			AND ts_emp_att_tool_name in {f"('{emp_tools[0]}')" if len(emp_tools) == 1 else tuple(emp_tools)}
 		""", as_list=True)
-		
+	
 	emp_checkin_name = [i[0] if isinstance(i, list) else i for i in emp_checkin_name if i]
 
 	for checkin in frappe.get_all('Employee Checkin', {'attendance': self.name, "name": ["not in", emp_checkin_name]}, pluck='name'):
