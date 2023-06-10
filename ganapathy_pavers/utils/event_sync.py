@@ -11,7 +11,7 @@ def resynccall():
     frappe.session.siteName = "sgpprime"
     all = frappe.get_all("Event Sync Log", {
         "status": "Failed", 
-        "ref_doctype": "Sales Invoice", 
+        "ref_doctype": "Payment Entry", 
         "issue_fixed": 0
         }, order_by="creation", pluck="name")
     total = len(all)
@@ -19,17 +19,17 @@ def resynccall():
     print("TOTAL", total)
     for i in all:
         data = frappe.db.get_value("Event Sync Log", i, "data")
-        
+        f=json.loads(data)
+        del f['references']
+        # data = re.sub(r'"so_detail": "[^"]+",', '', data)
+        # data = re.sub(r'"ts_source_doctype_name": "[^"]+",', '', data)
+        # data = re.sub(r'"set_posting_time": 0,', '"set_posting_time": 1,', data)
+        # data = re.sub(r'"ts_purchase_receipt_invoice_no": "[^"]+",', '', data)
+        # data = re.sub(r'"amended_from": "[^"]+",', '', data)
+        # data = re.sub(r'"vehicle_log": "[^"]+",', '', data)
+        # data = re.sub(r'"update_stock": 1,', '"update_stock": 0,', data)
 
-        data = re.sub(r'"so_detail": "[^"]+",', '', data)
-        data = re.sub(r'"dn_detail": "[^"]+",', '', data)
-        data = re.sub(r'"sales_order": "[^"]+",', '', data)
-        data = re.sub(r'"delivery_note": "[^"]+",', '', data)
-        data = re.sub(r'"batch_no": "[^"]+",', '', data)
-        data = re.sub(r'"update_stock": 1,', '"update_stock": 0,', data)
-
-        frappe.db.set_value("Event Sync Log", i, "data", data, update_modified=False)
-
+        frappe.db.set_value("Event Sync Log", i, "data", json.dumps(f, indent=4, sort_keys=True, default=str), update_modified=False)
         frappe.response.docs = []
         getdoc("Event Sync Log", i)
         d=json.dumps(frappe.response.docs[0].__dict__, indent=4, sort_keys=True, default=str)

@@ -3,6 +3,9 @@ var prop_name;
 
 frappe.ui.form.on('Sales Order', {
     onload: function (frm) {
+        cur_frm.fields_dict.customer_name.df.hidden = 0
+        cur_frm.fields_dict.customer_name.refresh()
+
         if (cur_frm.doc.docstatus == 1) {
             cur_frm.add_custom_button('Update Customer Details', function () {
                 update_customer()

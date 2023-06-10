@@ -61,8 +61,8 @@
   {
    "hidden": 0,
    "is_query_report": 1,
-   "label": "Diesel Consumption Summary",
-   "link_to": "Diesel Consumption Summary",
+   "label": "Fuel Consumption Summary",
+   "link_to": "Fuel Consumption Summary",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -77,7 +77,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-05-04 15:28:36.304810",
+ "modified": "2023-06-10 16:28:24.383760",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Vehicle Maintenance",

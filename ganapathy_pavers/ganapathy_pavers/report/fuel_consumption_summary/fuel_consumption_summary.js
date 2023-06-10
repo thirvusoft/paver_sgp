@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Diesel Consumption Summary"] = {
+frappe.query_reports["Fuel Consumption Summary"] = {
 	"filters": [
 		{
 			"fieldname": "from_date",

@@ -14,11 +14,11 @@
  "modified": "2023-05-11 12:45:57.093476",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "Diesel Consumption Summary",
+ "name": "Fuel Consumption Summary",
  "owner": "Administrator",
  "prepared_report": 0,
  "ref_doctype": "Vehicle Log",
- "report_name": "Diesel Consumption Summary",
+ "report_name": "Fuel Consumption Summary",
  "report_type": "Script Report",
  "roles": [
   {
