@@ -316,6 +316,7 @@ frappe.ui.form.on('Material Manufacturing', {
 			if (data.layer_type == "Top Layer") {
 				frappe.model.set_value(cdt, cdn, 'qty', (data.ts_qty ? data.ts_qty : 0) * (frm.doc.total_no_of_batches ? frm.doc.total_no_of_batches : 0))
 				frappe.model.set_value(cdt, cdn, 'no_of_batches', (frm.doc.total_no_of_batches ? frm.doc.total_no_of_batches : 0))
+				frappe.model.set_value(cdt, cdn, 'average_consumption', (data.qty) / (data.no_of_batches ? data.no_of_batches : 1))
 			}
 		}
 		refresh_field("items")
@@ -326,6 +327,7 @@ frappe.ui.form.on('Material Manufacturing', {
 			let data = locals[cdt][cdn]
 			if (data.layer_type == "Panmix") {
 				frappe.model.set_value(cdt, cdn, 'no_of_batches', (frm.doc.bottom_layer_batches ? frm.doc.bottom_layer_batches : 0))
+				frappe.model.set_value(cdt, cdn, 'average_consumption', (data.qty) / (data.no_of_batches ? data.no_of_batches : 1))
 			}
 		}
 		refresh_field("items")
@@ -551,7 +553,13 @@ frappe.ui.form.on('BOM Item', {
 		// frappe.model.set_value(cdt,cdn,"item_tax_template",r.message)
 	},
 	qty: function (frm, cdt, cdn) {
+		let data = locals[cdt][cdn];
 		total_amount(frm, cdt, cdn)
+		frappe.model.set_value(cdt, cdn, 'average_consumption', (data.qty || 0) / (data.no_of_batches ? data.no_of_batches : 1))
+	},
+	no_of_batches: function(frm, cdt, cdn) {
+		let data = locals[cdt][cdn];
+		frappe.model.set_value(cdt, cdn, 'average_consumption', (data.qty || 0) / (data.no_of_batches ? data.no_of_batches : 1))
 	},
 	item_code: function (frm, cdt, cdn) {
 		var d = locals[cdt][cdn];

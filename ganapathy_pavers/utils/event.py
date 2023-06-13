@@ -1,38 +1,53 @@
-import frappe, json
+import frappe, json, copy
 from frappe.desk.form.load import getdoc
 from frappe.event_streaming.doctype.event_producer.event_producer import resync
-from frappe.model import default_fields
 import re
+from ganapathy_pavers.utils.event_sync.sales_invoice import si_validate
+
+
+default_fields = (
+	'doctype',
+	'name',
+	'owner',
+	'creation',
+	'modified',
+	'modified_by',
+	'parent',
+	'parentfield',
+	'parenttype',
+	'docstatus'
+)
 
 # from ganapathy_pavers.utils.event_sync import resynccall
 # from ganapathy_pavers.utils.event_sync import checkitems
 
 def resynccall():
     frappe.session.siteName = "sgpprime"
-    all = frappe.get_all("Event Sync Log", {
-        "status": "Failed", 
-        "ref_doctype": "Payment Entry", 
-        "issue_fixed": 0
-        }, order_by="creation", pluck="name")
+    all = frappe.db.get_all("Event Sync Log", 
+        filters={
+            # "status": "Failed", 
+            "ref_doctype": "Sales Invoice",
+            "docname": ["in", ["SGP-23-24-090", "ESI-23-24-067"]], 
+            # "issue_fixed": 0
+        }, 
+        order_by="creation", 
+        # pluck="name",
+        fields = ["name", "docname", "update_type"]
+        )
+
     total = len(all)
     success, failed = 0, 0
     print("TOTAL", total)
     for i in all:
-        data = frappe.db.get_value("Event Sync Log", i, "data")
-        f=json.loads(data)
-        del f['references']
-        # data = re.sub(r'"so_detail": "[^"]+",', '', data)
-        # data = re.sub(r'"ts_source_doctype_name": "[^"]+",', '', data)
-        # data = re.sub(r'"set_posting_time": 0,', '"set_posting_time": 1,', data)
-        # data = re.sub(r'"ts_purchase_receipt_invoice_no": "[^"]+",', '', data)
-        # data = re.sub(r'"amended_from": "[^"]+",', '', data)
-        # data = re.sub(r'"vehicle_log": "[^"]+",', '', data)
-        # data = re.sub(r'"update_stock": 1,', '"update_stock": 0,', data)
-
-        frappe.db.set_value("Event Sync Log", i, "data", json.dumps(f, indent=4, sort_keys=True, default=str), update_modified=False)
+        # print(i)
+        # continue
         frappe.response.docs = []
         getdoc("Event Sync Log", i)
-        d=json.dumps(frappe.response.docs[0].__dict__, indent=4, sort_keys=True, default=str)
+        doc = frappe.response.docs[0]
+        if doc.update_type == "Create":
+            si_validate(doc, "")
+            doc.save()
+        d=json.dumps(doc.__dict__, indent=4, sort_keys=True, default=str)
         res = resync(d)
         print(res)
         if res == "Failed":
@@ -77,7 +92,7 @@ def checkitems():
 def checkuom(item):
     itemsuoms = {}
     for row in item.uoms:
-        row = row.__dict__
+        row = copy.deepcopy(row.__dict__)
         for fieldname in default_fields:
             if fieldname in row:
                 del row[fieldname]
@@ -112,7 +127,7 @@ def checkitemdefaults(item):
     itemsdefs={}
     for row in item.item_defaults:
         _row = row
-        row = row.__dict__
+        row = copy.deepcopy(row.__dict__)
         for fieldname in default_fields:
             if fieldname in row:
                 del row[fieldname]
@@ -131,13 +146,13 @@ def checktaxes(item):
     taxes = {}
     for row in item.taxes:
         _row = row
-        row = row.__dict__
+        row = copy.deepcopy(row.__dict__)
         for fieldname in default_fields:
             if fieldname in row:
                 del row[fieldname]
         taxes[row.get("idx")] = row
         tax[json.dumps(row, sort_keys=True, default=str)] = (tax.get(json.dumps(row, sort_keys=True, default=str)) or 0) + 1
-    
+
     item.update({
         "taxes": list(taxes.values())
     })
@@ -146,7 +161,7 @@ def checkItemAttribute(item):
     itemattr = {}
     for row in item.attributes:
         _row = row
-        row = row.__dict__
+        row = copy.deepcopy(row.__dict__)
         for fieldname in default_fields:
             if fieldname in row:
                 del row[fieldname]
@@ -170,4 +185,9 @@ def validate_prime_item(self, event=None):
         checkItemAttribute(self)
 
         
-        
+def create_gl_entries():
+    d=frappe.get_all("Sales Invoice", {"docstatus": 1}, pluck="name")
+    for i in d:
+        if not frappe.get_all("GL Entry", {"voucher_no": i, "voucher_type": "Sales Invoice"}):
+            t=frappe.get_doc("Sales Invoice", i)
+            t.make_gl_entries()

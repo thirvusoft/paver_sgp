@@ -142,12 +142,17 @@ jenv = {
 }
 
 doc_events = {
+	"Event Sync Log": {
+		"validate": [
+			"ganapathy_pavers.utils.event_sync.event_sync.validate"
+		]
+	},
 	"Item": {
 		"validate": [
 			"ganapathy_pavers.custom.py.item.validate_dsm_uom"
 		],
 		"before_validate": [
-			"ganapathy_pavers.utils.event_sync.validate_prime_item",
+			"ganapathy_pavers.utils.event.validate_prime_item",
 		]
 	},
 	"Stock Entry": {

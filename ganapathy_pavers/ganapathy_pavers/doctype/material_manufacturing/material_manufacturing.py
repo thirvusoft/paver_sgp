@@ -60,7 +60,7 @@ class MaterialManufacturing(Document):
                 bin.total_qty+=row.get(frappe.scrub(bin.bin), 0)
                 if not bin.average_qty:
                     bin.average_qty=0
-                bin.average_qty+=(row.get(frappe.scrub(bin.bin), 0)/len(doc.raw_material_consumption))
+                bin.average_qty+=(row.get(frappe.scrub(bin.bin), 0)/(doc.bottom_layer_batches or 1))
         
         if len(total_raw_material) == 0:
             doc.total_no_of_raw_material = 0
