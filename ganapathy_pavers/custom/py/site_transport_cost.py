@@ -156,8 +156,20 @@ class SiteTransportCost:
 
                 if date not in yearl_maintenance:
                     yearl_maintenance[date] = 0
-                main_cost = frappe.db.get_value("Vehicle", vehicle, "yearly_maintenance_cost")            
-                cost = ((main_cost or 0)/312) * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / total_odometer
+
+                main_cost = frappe.db.get_all("Vehicle Yearly Maintenance", {
+                    "parenttype": "Vehicle",
+                    "parent": vehicle,
+                    "from_date": ["<=", date],
+                    "to_date": [">=", date]
+                }, ["amount", "no_of_days"])
+
+                if main_cost:
+                    main_cost = (main_cost[0].amount or 0)/(main_cost[0].no_of_days or 1)
+                else:
+                    main_cost = 0
+
+                cost = main_cost * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / total_odometer
                 yearl_maintenance[date] += (cost or 0)
 
         return yearl_maintenance

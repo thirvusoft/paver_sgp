@@ -30,7 +30,7 @@ frappe.ui.form.on("Vehicle", {
             };
         });
     },
-    odometer_depends_on: function (frm) { 
+    odometer_depends_on: function (frm) {
         if (frm.doc.odometer_depends_on == "Hours") {
             frm.fields_dict.last_odometer.set_label("Last Hours");
             frm.fields_dict.fuel_odometer.set_label("Last Hours  (Fuel or Service)");
@@ -67,4 +67,26 @@ frappe.ui.form.on('Vehicle', {
             }
         });
     },
+});
+
+frappe.ui.form.on("Vehicle Yearly Maintenance", {
+    calculate_no_of_days: function (frm, cdt, cdn) {
+        let data = locals[cdt][cdn];
+        if (data.from_date && data.to_date) {
+            let weekends = 0;
+            let to_date = new Date(data.to_date);
+            let from_date = new Date(data.from_date);
+
+            while (from_date <= to_date) {
+                if (from_date.getDay() === 0) {
+                    weekends++;
+                }
+                from_date.setDate(from_date.getDate() + 1);
+            }
+            let no_of_days = 1 + frappe.datetime.get_day_diff(data.to_date, data.from_date) - weekends
+            frappe.model.set_value(cdt, cdn, 'no_of_days', no_of_days)
+        } else {
+            frappe.model.set_value(cdt, cdn, 'no_of_days', 0)
+        }
+    }
 });

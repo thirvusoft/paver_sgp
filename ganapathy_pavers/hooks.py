@@ -298,6 +298,7 @@ doc_events = {
   	},
 	"Vehicle":{
         "validate":[
+					"ganapathy_pavers.custom.py.vehicle.validate_vehicle_maintenance_dates"
 					],
 		"on_update": [
 					"ganapathy_pavers.ganapathy_pavers.doctype.maintenance_type.maintenance_type.update_select_purpose",

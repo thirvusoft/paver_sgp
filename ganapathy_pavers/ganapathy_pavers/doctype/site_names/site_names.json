@@ -12,10 +12,10 @@
  "fields": [
   {
    "fieldname": "site_work",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Site Name",
-   "options": "Project"
+   "reqd": 1
   },
   {
    "fieldname": "remarks",
@@ -27,7 +27,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-05-02 15:58:08.013985",
+ "modified": "2023-06-14 12:44:11.784233",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Site Names",
