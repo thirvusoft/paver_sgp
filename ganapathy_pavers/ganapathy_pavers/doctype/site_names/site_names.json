@@ -14,7 +14,8 @@
    "fieldname": "site_work",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Site Name"
+   "label": "Site Name",
+   "reqd": 1
   },
   {
    "fieldname": "remarks",
@@ -26,7 +27,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-06-15 17:20:01.784613",
+ "modified": "2023-06-16 17:20:01.784613",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Site Names",

@@ -3,7 +3,7 @@ frappe.ui.form.on('Salary Slip',{
     refresh: function(frm, cdt, cdn) {
         if (frm.is_new() && frm.doc.employee) {
         frappe.db.get_doc('Employee', frm.doc.employee).then((doc) => {
-            frm.set_value("billed_salary_balance", doc.salary_balance)
+            frm.set_value("billed_salary_balance", doc.salary_balance>0?doc.salary_balance:0)
         });
     }
     },

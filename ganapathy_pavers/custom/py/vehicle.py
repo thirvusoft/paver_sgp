@@ -1,5 +1,5 @@
 import frappe
-from frappe.utils import add_months, add_days, nowdate,get_first_day,get_last_day
+from frappe.utils import add_months, add_days, nowdate, get_first_day, get_last_day, getdate
 
 def notification(remainder_type, owner, license_plate, maintenance_item, doctype):
     emailid = frappe.get_single("Vehicle Settings").email_id_for_notification
@@ -31,6 +31,21 @@ def vehicle_maintenance_notification():
             if(doc.day_before and str(doc.to_date) == add_days(nowdate(), 1)):
                 notification("Day Before", frappe.session.user, doc.parent, doc.maintenance,'Vehicle')
 
+
+def validate_vehicle_maintenance_dates(self, event=None):
+    def is_date_between(date, start_date, end_date):
+        return start_date <= date <= end_date
+
+    for row in self.vehicle_yearly_maintenance[::-1]:
+        if (row.from_date and row.to_date):
+            if (getdate(row.from_date) > getdate(row.to_date)):
+                frappe.throw(f"""In <b>Vehicle Yearly Maintenance</b>, From date cannot be greater than To date in <b>row {row.idx}</b>""")
+            for orderrow in self.vehicle_yearly_maintenance:
+                if row.idx != orderrow.idx:
+                    if is_date_between(getdate(orderrow.from_date), getdate(row.from_date), getdate(row.to_date)):
+                        frappe.throw(f"""In <b>Vehicle Yearly Maintenance</b>, From Date {orderrow.from_date} in <b>row {orderrow.idx}</b> gets conflict with <b>row {row.idx}</b> [{row.from_date} - {row.to_date}]""")
+                    if is_date_between(getdate(orderrow.to_date), getdate(row.from_date), getdate(row.to_date)):
+                        frappe.throw(f"""In <b>Vehicle Yearly Maintenance</b>, to Date {orderrow.to_date} in <b>row {orderrow.idx}</b> gets conflict with <b>row {row.idx}</b> [{row.from_date} - {row.to_date}]""")
 
 @frappe.whitelist()
 def get_vehicle_expenses(date):

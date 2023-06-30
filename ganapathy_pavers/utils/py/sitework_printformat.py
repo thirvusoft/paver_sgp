@@ -183,7 +183,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
             child.item_code, 
             child.uom
         """, as_dict=True)
-    # frappe.errprint(res)
+
     f_res = {}
 
     for row in res:
