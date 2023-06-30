@@ -44,9 +44,7 @@ frappe.ui.form.on('Salary Slip',{
         else if(frm.doc.designation=='Contractor'){
             frm.trigger('employee_count');    
         }
-        var date = frm.doc.end_date;
-        var arr = date.split('-');
-        frm.set_value('days',arr[2]) 
+        
     },
     total_unpaid_amount: function(frm) {
         let unpaid_amount = (frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance
