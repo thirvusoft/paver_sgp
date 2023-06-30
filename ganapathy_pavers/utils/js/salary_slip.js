@@ -38,6 +38,7 @@ frappe.ui.form.on('Salary Slip',{
                     cur_frm.set_value("total_paid_amount",paid_amount);
                     cur_frm.set_value("total_amount",total_amount);
                     cur_frm.set_value("total_unpaid_amount",(frm.doc.total_amount-frm.doc.total_paid_amount)+frm.doc.salary_balance);
+                    frm.trigger("__days_calc");
                 }
         })
         }
@@ -135,7 +136,7 @@ frappe.ui.form.on('Salary Slip',{
         }
     },
     days: function (frm) {
-        frm.trigger("__days_calc");
+        // frm.trigger("__days_calc");
     },
     total_time_of_food_taken:function(frm){
         var emp = frm.doc.employee
