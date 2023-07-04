@@ -43,6 +43,19 @@ uom_conv_query = lambda: f"""
 
 class ShotBlastCosting(Document):
     def validate(self):
+        self.total_damage_sqft = 0
+        self.total_sqft = 0
+        self.total_pieces = 0
+        self.total_bundle = 0
+
+        for row in self.items:
+            self.total_damage_sqft += (row.damages_in_sqft or 0)
+            self.total_sqft += (row.sqft or 0)
+            self.total_pieces += (row.taken_pieces or 0)
+            self.total_bundle += (row.bundle_taken or 0)
+
+        self.avg_damage_sqft = (self.total_damage_sqft or 0) / (len(self.items) or 1)
+
         self.total_cost = (self.additional_cost or 0) + (self.labour_cost or 0) + (self.total_operator_wages or 0)
         self.total_cost_per_sqft = (self.total_cost or 0) / (((self.total_sqft or 0) - (self.total_damage_sqft or 0)) or 1)
         self.fetch_warehouses()

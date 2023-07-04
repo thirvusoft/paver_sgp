@@ -49,7 +49,7 @@ frappe.ui.form.on("Stock Entry", {
             let bdl = await ganapathy_pavers.uom_conversion(row.item_code, row.uom, row.qty, 'Bdl', 0);
             let pieces = await ganapathy_pavers.uom_conversion(row.item_code, 'Bdl', (bdl || 0)%1, 'Nos', 0);
             frappe.model.set_value(row.doctype, row.name, 'ts_qty', parseInt(bdl) || 0);
-            frappe.model.set_value(row.doctype, row.name, 'pieces', pieces || 0);
+            frappe.model.set_value(row.doctype, row.name, 'pieces', roundNumber(pieces || 0), 2);
 
         })
     }
