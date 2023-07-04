@@ -470,6 +470,6 @@ def get_site_sales_order_item_prices(site):
 							where 
 							   so.docstatus = 1 and
 							   so.site_work = '{site}' and
-							   soi.item_group = 'Compound Wall'
+							   soi.item_group = 'Compound Walls'
 							""", as_dict=True),
 	}
