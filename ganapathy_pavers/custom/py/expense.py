@@ -856,7 +856,7 @@ def get_vehicle_salary(account, from_date, to_date, vehicle = None, machine = []
                         _vl.docstatus = 1 and
                         _vl.{employee_field} = vl.{employee_field} and
                         _vl.date = vl.date and
-                        _vl.select_purpose in ("Raw Material", "Goods Supply", "Material Shifting", "Site Visit")
+                        _vl.select_purpose in ("Raw Material", "Goods Supply", "Material Shifting", "Site Visit", "Internal Material Transfer")
                 )*ifnull((
                     select drv.salary_per_day
                     from `tabDriver` drv

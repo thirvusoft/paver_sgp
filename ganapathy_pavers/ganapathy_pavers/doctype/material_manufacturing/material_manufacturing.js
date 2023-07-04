@@ -13,16 +13,18 @@ frappe.ui.form.on('Material Manufacturing', {
 			default_value("default_manufacture_operation", "operation")
 			default_value("default_rack_shift_workstation", "workstation")
 			default_value("default_manufacture_workstation", "work_station")
-			default_value("default_manufacture_source_warehouse", "source_warehouse")
-			default_value("default_manufacture_target_warehouse", "target_warehouse")
-			default_value("default_rack_shift_source_warehouse", "rack_shift_source_warehouse")
-			default_value("default_rack_shift_target_warehouse", "rack_shift_target_warehouse")
-			default_value("default_curing_source_warehouse", "curing_source_warehouse")
-			default_value("default_curing_target_warehouse", "curing_target_warehouse")
 			default_value("setting_oil", "setting_oil_item_name")
 			frm.trigger("get_bin_items")
 		}
 		set_css(frm);
+	},
+	fetch_warehouse_from_workstation: function (frm) {
+		value_from_workstation("default_manufacture_source_warehouse", "source_warehouse")
+		value_from_workstation("default_manufacture_target_warehouse", "target_warehouse")
+		value_from_workstation("default_rack_shift_source_warehouse", "rack_shift_source_warehouse")
+		value_from_workstation("default_rack_shift_target_warehouse", "rack_shift_target_warehouse")
+		value_from_workstation("default_curing_source_warehouse", "curing_source_warehouse")
+		value_from_workstation("default_curing_target_warehouse", "curing_target_warehouse")
 	},
 	get_bin_items: async function (frm) {
 		frm.clear_table("bin_items");
@@ -126,12 +128,12 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	production_qty: async function (frm) {
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty)
-		let res = await ganapathy_pavers.uom_converstion(frm.doc.item_to_manufacture, "Nos", frm.doc.total_completed_qty, "SQF")
+		let res = await ganapathy_pavers.uom_conversion(frm.doc.item_to_manufacture, "Nos", frm.doc.total_completed_qty, "SQF")
 		cur_frm.set_value('production_sqft', res)
 	},
 	damage_qty: async function (frm) {
 		cur_frm.set_value('total_completed_qty', frm.doc.production_qty - frm.doc.damage_qty)
-		let res = await ganapathy_pavers.uom_converstion(frm.doc.item_to_manufacture, "Nos", frm.doc.total_completed_qty, "SQF")
+		let res = await ganapathy_pavers.uom_conversion(frm.doc.item_to_manufacture, "Nos", frm.doc.total_completed_qty, "SQF")
 		cur_frm.set_value('production_sqft', res)
 	},
 	curing_damaged_qty: function (frm) {
@@ -200,8 +202,8 @@ frappe.ui.form.on('Material Manufacturing', {
 		frappe.db.get_single_value("USB Setting", "default_rack_shift_uom").then(value => {
 			uom_bundle = value
 		})
-		
-		let res = await ganapathy_pavers.uom_converstion(frm.doc.item_to_manufacture, "Nos", (frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty), "Bdl")
+
+		let res = await ganapathy_pavers.uom_conversion(frm.doc.item_to_manufacture, "Nos", (frm.doc.total_no_of_produced_qty - frm.doc.rack_shift_damage_qty), "Bdl")
 		cur_frm.set_value('total_no_of_bundle', res)
 	},
 	total_no_of_bundle: function (frm) {
@@ -360,6 +362,7 @@ frappe.ui.form.on('Material Manufacturing', {
 		else {
 			cur_frm.set_value('no_of_labours', 0)
 		}
+		frm.trigger('fetch_warehouse_from_workstation')
 	},
 	operator_cost_rack_shift: function (frm) {
 		cur_frm.set_value('operators_cost_in_rack_shift', (frm.doc.operator_cost_rack_shift / ((frm.doc.no_of_item_in_process > 1) ? (frm.doc.total_working_hrs ? frm.doc.total_working_hrs : 1) : 1) * frm.doc.total_hours_rack))
@@ -433,7 +436,7 @@ function add_total_raw_material(frm) {
 		cur_frm.set_value('total_manufacturing_expense', frm.doc.labour_cost_manufacture + frm.doc.operators_cost_in_manufacture);
 		cur_frm.set_value('total_expense', frm.doc.additional_cost + frm.doc.total_manufacturing_expense + frm.doc.total_raw_material);
 	}
-	
+
 	cur_frm.set_value('strapping_cost', frm.doc.strapping_cost_per_sqft * frm.doc.production_sqft);
 	cur_frm.set_value('total_expense_per_sqft', (frm.doc.total_expense) / frm.doc.production_sqft);
 	cur_frm.set_value('rack_shifting_total_expense1_per_sqft', (frm.doc.rack_shifting_total_expense1) / frm.doc.production_sqft);
@@ -547,6 +550,17 @@ function default_value(usb_field, set_field) {
 	})
 	cur_frm.refresh_field(set_field);
 }
+
+function value_from_workstation(usb_field, set_field) {
+	if (cur_frm.doc.work_station) {
+		frappe.db.get_value("Workstation", cur_frm.doc.work_station, usb_field).then(value => {
+			cur_frm.set_value(set_field, value['message'][usb_field])
+		})
+	}
+
+	cur_frm.refresh_field(set_field);
+}
+
 frappe.ui.form.on('BOM Item', {
 	rate: function (frm, cdt, cdn) {
 		total_amount(frm, cdt, cdn)
@@ -557,7 +571,7 @@ frappe.ui.form.on('BOM Item', {
 		total_amount(frm, cdt, cdn)
 		frappe.model.set_value(cdt, cdn, 'average_consumption', (data.qty || 0) / (data.no_of_batches ? data.no_of_batches : 1))
 	},
-	no_of_batches: function(frm, cdt, cdn) {
+	no_of_batches: function (frm, cdt, cdn) {
 		let data = locals[cdt][cdn];
 		frappe.model.set_value(cdt, cdn, 'average_consumption', (data.qty || 0) / (data.no_of_batches ? data.no_of_batches : 1))
 	},
