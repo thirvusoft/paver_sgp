@@ -26,6 +26,12 @@ def item_details_fetching_compoundwall(item_code):
         area_bundle= doc.bundle_per_sqr_ft
         return area_bundle,item_price
 
+@frappe.whitelist()
+def calc_site_cost(sitename):
+    doc = frappe.get_doc("Project", sitename)
+    before_save(doc)
+    doc.save()
+
 def before_save(doc, action=None):
     additionalcost_total= 0
     item_details_total = 0
@@ -51,7 +57,7 @@ def before_save(doc, action=None):
         raw_material_total = raw_material_total+(i.amount or 0)
     doc.total_amount_of_raw_material=raw_material_total
 
-    sales_invoice_amount = sum(frappe.get_all("Sales Invoice", {"docstatus": 1, "site_work": doc.name}, pluck="total"))
+    sales_invoice_amount = sum(frappe.get_all("Sales Invoice", {"docstatus": 1, "site_work": doc.name}, pluck="net_total"))
 
     doc.total_expense_amount=sales_invoice_amount or 0
 

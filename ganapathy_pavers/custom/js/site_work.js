@@ -86,6 +86,21 @@ frappe.ui.form.on("Project",{
 				frappe.show_alert({message: "Please Save this Form", indicator: "red"})
 			}
 		}, "Update")
+
+		await frm.add_custom_button("Site Cost", function() {
+			frappe.call({
+				method: "ganapathy_pavers.custom.py.site_work.calc_site_cost",
+				args: {
+					sitename: frm.doc.name
+				},
+				freeze: true,
+				freeze_message: "Updating",
+				callback(r) {
+					frm.reload_doc()
+				}
+			})
+		}, "Update");
+
 		await frm.add_custom_button("Transport Cost", function() {
 			frappe.call({
 				method: "ganapathy_pavers.custom.py.site_transport_cost.update_transport_cost",
