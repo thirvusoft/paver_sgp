@@ -403,6 +403,7 @@ doctype_js = {
 				"Quotation": "/custom/js/quotation.js",
 				"Payroll Entry": "/utils/js/payroll_entry.js",
 				"Employee Advance": "/utils/js/employee_advance.js",
+				"Stock Entry": "/custom/js/stock_entry.js"
 			 }
 # Scheduled Tasks
 # ---------------

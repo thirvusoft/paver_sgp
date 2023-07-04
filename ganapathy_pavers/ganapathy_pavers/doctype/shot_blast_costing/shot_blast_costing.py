@@ -51,7 +51,7 @@ class ShotBlastCosting(Document):
     @frappe.whitelist()
     def calculate_total_damage_cost(self):
         total_cost=0
-        for row in self.items:
+        for row in self.get('items') or []:
             if row.material_manufacturing and row.damages_in_sqft:
                 prod_date = frappe.get_value("Material Manufacturing", row.material_manufacturing, "from_time")
                 row.per_sqft_rate = get_paver_production_rate(item=row.item_name, date=prod_date) or 0
@@ -60,17 +60,17 @@ class ShotBlastCosting(Document):
         self.total_damage_cost = total_cost
 
     def fetch_warehouses(self):
-        if not self.warehouse:
-            curing_t = frappe.db.get_single_value("USB Setting", "default_curing_target_warehouse")
-            self.warehouse = curing_t
-
-        if not self.source_warehouse:
-            curing_s = frappe.db.get_single_value("USB Setting", "default_curing_target_warehouse_for_setting")
-            self.source_warehouse = curing_s
-
         if not self.workstation:
             wrk = frappe.db.get_single_value("USB Setting", "default_shot_blast_workstation")
             self.workstation = wrk
+
+        if not self.warehouse:
+            curing_t = frappe.db.get_value("Workstation", self.workstation, "default_curing_target_warehouse")
+            self.warehouse = curing_t
+
+        if not self.source_warehouse:
+            curing_s = frappe.db.get_value("Workstation", self.workstation, "default_curing_target_warehouse_for_setting")
+            self.source_warehouse = curing_s
 
     def before_submit(doc):
         material = frappe.get_all("Stock Entry",filters={"shot_blast":doc.get("name")},pluck="name")
@@ -141,9 +141,15 @@ def make_stock_entry(doc):
     if len(valid) >= 1:
         frappe.throw("Already Stock Entry("+valid[0]+") Created")
 
+    if not doc.get("from_time"):
+        frappe.throw("Please Enter From Time")
+
+    if not doc.get("to_time"):
+        frappe.throw("Please Enter To Time")
+
     _datetime = datetime.datetime.strptime(doc.get("to_time"), '%Y-%m-%d %H:%M:%S')
 
-    default_scrap_warehouse = frappe.db.get_singles_value("USB Setting", "scrap_warehouse")
+    default_scrap_warehouse = frappe.db.get_value("Workstation", doc.get('worstation'), "scrap_warehouse")
     expenses_included_in_valuation = frappe.get_cached_value("Company", doc.get("company"), "expenses_included_in_valuation")
     
     stock_entry = frappe.new_doc("Stock Entry")

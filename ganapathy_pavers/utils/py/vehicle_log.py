@@ -11,7 +11,7 @@ def batch_custom_fields():
                 fieldtype="Select",
                 label="Purpose",
                 insert_after="today_odometer_value",
-                options="\nAdblue\nFuel\nGoods Supply\nMaterial Shifting\nOther Work\nRaw Material\nService\nSite Visit"
+                options="\nAdblue\nFuel\nGoods Supply\nInternal Material Transfer\nMaterial Shifting\nOther Work\nRaw Material\nService\nSite Visit"
             ),
             dict(
                 fieldname="sales_invoice",

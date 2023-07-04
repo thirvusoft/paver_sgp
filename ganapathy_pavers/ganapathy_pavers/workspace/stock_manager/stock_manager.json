@@ -83,9 +83,18 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Internal Material Transfer",
+   "link_to": "Internal Material Transfer",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2023-05-16 12:01:16.964335",
+ "modified": "2023-07-04 13:58:19.968742",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "STOCK MANAGER",

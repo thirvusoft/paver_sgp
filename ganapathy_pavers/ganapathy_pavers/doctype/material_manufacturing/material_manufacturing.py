@@ -209,7 +209,7 @@ def make_stock_entry(doc,type1):
 
    if doc.get("total_completed_qty") == 0 or doc.get("cement_item") == '' or doc.get("ggbs_item") == '' or doc.get("total_expense") == 0:
            frappe.throw("Please Enter the Production Qty and From Time - To Time in Manufacture Section and Save This Form")
-   default_scrap_warehouse = frappe.db.get_singles_value("USB Setting", "scrap_warehouse")
+   default_scrap_warehouse = frappe.db.get_value("Workstation", doc.get('work_station'), "scrap_warehouse")
    expenses_included_in_valuation = frappe.get_cached_value("Company", doc.get("company"), "expenses_included_in_valuation")
    stock_entry = frappe.new_doc("Stock Entry")
    stock_entry.company = doc.get("company")

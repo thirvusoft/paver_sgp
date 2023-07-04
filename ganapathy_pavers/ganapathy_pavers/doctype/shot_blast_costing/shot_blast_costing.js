@@ -57,18 +57,24 @@ frappe.ui.form.on('Shot Blast Costing', {
 	},
 	setup: function (frm) {
 		if (cur_frm.is_new() == 1) {
-			frappe.db.get_single_value("USB Setting", "default_curing_target_warehouse").then(value => {
-				cur_frm.set_value("warehouse", value)
-			})
-			cur_frm.refresh_field("warehouse");
-			frappe.db.get_single_value("USB Setting", "default_curing_target_warehouse_for_setting").then(value => {
-				cur_frm.set_value("source_warehouse", value)
-			})
-			cur_frm.refresh_field("source_warehouse");
 			frappe.db.get_single_value("USB Setting", "default_shot_blast_workstation").then(value => {
 				cur_frm.set_value("workstation", value)
 			})
 			cur_frm.refresh_field("workstation");
+			frm.trigger('fetch_warehouse_from_workstation');
+		}
+	},
+	fetch_warehouse_from_workstation: function (frm) {
+		if (frm.doc.workstation) {
+			frappe.db.get_value("Workstation", frm.doc.workstation, "default_curing_target_warehouse").then(value => {
+				cur_frm.set_value("warehouse", value['message']['default_curing_target_warehouse'])
+			})
+			cur_frm.refresh_field("warehouse");
+
+			frappe.db.get_value("Workstation", frm.doc.workstation, "default_curing_target_warehouse_for_setting").then(value => {
+				cur_frm.set_value("source_warehouse", value['message']['default_curing_target_warehouse_for_setting'])
+			})
+			cur_frm.refresh_field("source_warehouse");
 		}
 	},
 	validate: function (frm) {
@@ -80,6 +86,7 @@ frappe.ui.form.on('Shot Blast Costing', {
 		total_cost(frm)
 	},
 	workstation: function (frm) {
+		frm.trigger('fetch_warehouse_from_workstation');
 		if (cur_frm.doc.workstation) {
 			frappe.db.get_value('Workstation', cur_frm.doc.workstation, 'no_of_labours').then(value => {
 				cur_frm.set_value('no_of_labour', value.message.no_of_labours)
@@ -179,7 +186,7 @@ frappe.ui.form.on('Shot Blast Items', {
 	damages_in_nos: async function (frm, cdt, cdn) {
 		total_damage_cost(frm)
 		var row = locals[cdt][cdn]
-		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Nos', row.damages_in_nos, 'SQF')
+		let sqft = await ganapathy_pavers.uom_conversion(row.item_name, 'Nos', row.damages_in_nos, 'SQF')
 		frappe.model.set_value(cdt, cdn, "damages_in_sqft", sqft)
 	},
 	bundle_taken: async function (frm, cdt, cdn) {
@@ -188,8 +195,8 @@ frappe.ui.form.on('Shot Blast Items', {
 			frappe.model.set_value(cdt, cdn, "bundle_taken", 0)
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
-		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
-		let sqft_pieces = await ganapathy_pavers.uom_converstion(row.item_name, 'Nos', row.taken_pieces, 'SQF')
+		let sqft = await ganapathy_pavers.uom_conversion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
+		let sqft_pieces = await ganapathy_pavers.uom_conversion(row.item_name, 'Nos', row.taken_pieces, 'SQF')
 		frappe.model.set_value(cdt, cdn, "sqft", (sqft || 0) + (sqft_pieces || 0))
 	},
 	taken_pieces: async function (frm, cdt, cdn) {
@@ -198,8 +205,8 @@ frappe.ui.form.on('Shot Blast Items', {
 			frappe.model.set_value(cdt, cdn, "bundle_taken", 0)
 			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
 		}
-		let sqft = await ganapathy_pavers.uom_converstion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
-		let sqft_pieces = await ganapathy_pavers.uom_converstion(row.item_name, 'Nos', row.taken_pieces, 'SQF')
+		let sqft = await ganapathy_pavers.uom_conversion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
+		let sqft_pieces = await ganapathy_pavers.uom_conversion(row.item_name, 'Nos', row.taken_pieces, 'SQF')
 		frappe.model.set_value(cdt, cdn, "sqft", (sqft || 0) + (sqft_pieces || 0))
 	},
 	sqft: function (frm, cdt, cdn) {
@@ -247,7 +254,7 @@ function total(frm) {
 	var total_bundle = 0
 	var total_pieces = 0
 	var total_sqft = 0
-	for (var i = 0; i < frm.doc.items.length; i++) {
+	for (var i = 0; i < (frm.doc.items || []).length; i++) {
 		total_bundle += frm.doc.items[i].bundle_taken || 0
 		total_sqft += frm.doc.items[i].sqft || 0
 		total_pieces += frm.doc.items[i].taken_pieces || 0
@@ -274,7 +281,7 @@ function total_hrs(frm, field, from, to) {
 	})
 }
 function total_cost(frm) {
-	if (	frm.doc.docstatus == 0) {
+	if (frm.doc.docstatus == 0) {
 		cur_frm.set_value('labour_cost', frm.doc.labour_cost_in_workstation * frm.doc.total_hrs * frm.doc.no_of_labour);
 		cur_frm.set_value('total_cost', (frm.doc.additional_cost || 0) + (frm.doc.labour_cost || 0) + (frm.doc.total_operator_wages || 0));
 	}
