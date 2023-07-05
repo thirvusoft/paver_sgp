@@ -1,0 +1,59 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-07-05 12:21:17.609312",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "table_head",
+  "row_head",
+  "amount",
+  "is_total_row",
+  "data"
+ ],
+ "fields": [
+  {
+   "fieldname": "table_head",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Table Head"
+  },
+  {
+   "fieldname": "row_head",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Row Head"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_total_row",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Total Row"
+  },
+  {
+   "fieldname": "data",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Data"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-07-05 13:18:15.779161",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Transport Cost Splitup",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
