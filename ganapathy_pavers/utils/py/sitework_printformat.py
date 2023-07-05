@@ -58,6 +58,11 @@ def site_work(doc):
 	for i in list(exp.values()):
 		if "transport" in i["description"].lower():
 			without_transport_cost -= i["amount"]
+		
+		if 'fastag' in i["description"].lower():
+			doc.total -= i['amount'] or 0
+			without_transport_cost -= i["amount"]
+			doc.transporting_cost += i['amount'] or 0
 
 	delivered_items=(items.keys())
 	dn_items=frappe.get_all("Delivery Note Item", {"parenttype": "Delivery Note", "parent": ["in", dn], "item_code": ["in", delivered_items]}, ["creation", "item_code", "warehouse"])
@@ -81,11 +86,17 @@ def site_work(doc):
 
 	total_job_worker_cost = sum([(i.amount or 0) for i in doc.job_worker if not i.other_work])
 	total_other_worker_cost = sum([(i.amount or 0) for i in doc.job_worker if i.other_work])
+	# frappe.errprint(doc.transporting_cost)
+	# frappe.errprint(doc.total)
+	# frappe.errprint(without_transport_cost)
+	# frappe.errprint(sqf)
+	# frappe.errprint((doc.transporting_cost + (doc.total - without_transport_cost)) / sqf)
 	return {
 			'items':items,
 			'nos':round(nos,2),
 			'sqf':round(sqf,2), 
 			'expense': list(exp.values()), 
+			'own_vehicle_cost': doc.transporting_cost,
 			'transporting_cost': (doc.transporting_cost + (doc.total - without_transport_cost)) / sqf if sqf else 0,
 			'supply_transporting_cost': (doc.transporting_cost + (doc.total - without_transport_cost)) / supply_sqf if supply_sqf else 0,
 			'total_job_worker_cost': total_job_worker_cost / sqf if sqf else 0,
@@ -404,11 +415,14 @@ def get_retail_cost(doc):
 
 		if "transport" in i.description.lower():
 			rental_cost += i.amount or 0
+		elif 'fastag' in i.description.lower():
+			doc.transporting_cost += i.amount or 0
 		else:
 			add_cost += i.amount or 0
 	other_cost = 0
-	job_work_cost = 0
+	job_work_cost = {}
 	unrelated_other_cost = 0
+	jw_amt = 0
 	for m in doc.job_worker:
 		if m.other_work == 1:
 			if not m.related_work:
@@ -417,9 +431,16 @@ def get_retail_cost(doc):
 			else:
 				other_cost+= m.amount or 0
 		else:
-			job_work_cost += m.amount or 0
+			if doc.type == "Pavers":
+				if m.item not in job_work_cost:
+					job_work_cost[m.item] = 0
+				job_work_cost[m.item] += m.amount or 0
+			jw_amt += m.amount or 0
+
 	item_cost = []
 	for item in doc.delivery_detail:
+		if doc.type != "Pavers":
+			job_work_cost[item.item] = jw_amt
 		date = item.creation
 		bin_ = get_item_price_list_rate(item = item.item, date = date)
 		cost=(bin_ or 0)* (((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)))
@@ -473,3 +494,30 @@ def get_site_sales_order_item_prices(site):
 							   soi.item_group = 'Compound Walls'
 							""", as_dict=True),
 	}
+
+def get_site_supply_and_return_trip_details(sitename):
+	supply = lambda is_return = 0: frappe.db.sql(f"""
+			select 
+				sum(dni.qty) as qty,
+				dni.uom
+			from `tabDelivery Note Item` dni
+			inner join `tabDelivery Note` dn
+			where dn.name = dni.parent and
+				dn.docstatus = 1 and
+				dn.site_work = '{sitename}' and
+				dni.item_group in ('Pavers', 'Compound Walls') and
+				dn.is_return = {is_return}
+			group by dni.uom
+			""", as_dict=True)
+	
+	return {
+		'supply': {
+			'no_of_trips': frappe.db.count('Delivery Note', filters={'docstatus': 1, 'is_return': 0, 'site_work': sitename}),
+			'qty': ", ".join([f"""{round(i.qty, 2)} {i.uom}""" for i in supply(0)])
+		},
+		'return': {
+			'no_of_trips': frappe.db.count('Delivery Note', filters={'docstatus': 1, 'is_return': 1, 'site_work': sitename}),
+			'qty': ", ".join([f"""{round(i.qty, 2)} {i.uom}""" for i in supply(1)])
+		}
+	}
+
