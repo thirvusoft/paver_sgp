@@ -1,6 +1,7 @@
 # ganapathy_pavers.custom.py.site_transport_cost.update_transport_cost
 
 import frappe
+from frappe.utils import formatdate
 
 class SiteTransportCost:
     def __init__(self, site: str) -> float:
@@ -17,12 +18,60 @@ class SiteTransportCost:
         return {
             "value": (sum(self.operator_salary.values()) or 0) + (sum(self.driver_salary.values()) or 0) + (self.maintenance_cost or 0) + (self.fuel_cost or 0) + (sum(self.vehicle_daily_cost.values()) or 0),
             "description": f"""<div>
-                        <b>Driver Salary:</b> {", ".join([f"<b>{emp}</b>: {'%.2f'%(self.driver_salary.get(emp) or 0)}" for emp in self.driver_salary])} <br>
-                        <b>Operator Salary:</b> {", ".join([f"<b>{opr}</b>: {'%.2f'%(self.operator_salary.get(opr) or 0)}" for opr in self.operator_salary])} <br>
+                        <b>Driver Salary:</b> {", ".join([f"<b>{emp or '-'}</b>: {'%.2f'%(self.driver_salary.get(emp) or 0)}" for emp in self.driver_salary])} <br>
+                        <b>Operator Salary:</b> {", ".join([f"<b>{opr or '-'}</b>: {'%.2f'%(self.operator_salary.get(opr) or 0)}" for opr in self.operator_salary])} <br>
                         <b>Maintenance Cost:</b> {'%.2f'%(self.maintenance_cost or 0)} <br>
                         <b>Fuel:</b> {'%.2f'%(self.fuel_cost or 0)} <br>
-                        <b>Vehicle Yearly:</b> {", ".join([f"<b>{str(date)}</b>: {'%.2f'%(self.vehicle_daily_cost.get(date) or 0)}" for date in self.vehicle_daily_cost])}
-                    </div>"""
+                        <b>Vehicle Yearly:</b> {", ".join([f"<b>{formatdate(date)}</b>: {'%.2f'%(self.vehicle_daily_cost.get(date) or 0)}" for date in self.vehicle_daily_cost])}
+                    </div>""",
+            "splitup": [
+                *[
+                    {
+                        'table_head': 'Driver Salary',
+                        'row_head': emp,
+                        'amount': self.driver_salary.get(emp),
+                    }
+                    for emp in self.driver_salary
+                ],
+                {
+                    'table_head': 'Driver Salary',
+                    'row_head': "Total",
+                    'amount': sum(self.driver_salary.values()),
+                    'is_total_row': 1
+                },
+
+                *[
+                    {
+                        'table_head': 'Operator Salary',
+                        'row_head': opr,
+                        'amount': self.operator_salary.get(opr),
+                    }
+                    for opr in self.operator_salary
+                ],
+                {
+                    'table_head': 'Operator Salary',
+                    'row_head': "Total",
+                    'amount': sum(self.operator_salary.values()),
+                    'is_total_row': 1
+                },
+                {'table_head': 'Maintenance', 'row_head': 'Maintenance Cost', 'amount': self.maintenance_cost or 0},
+                {'table_head': 'Fuel', 'row_head': 'Fuel Cost', 'amount': self.fuel_cost or 0},
+                *sorted([
+                    {
+                        'table_head': 'Vehicle Yearly',
+                        'row_head': formatdate(date),
+                        'data': date,
+                        'amount': self.vehicle_daily_cost.get(date),
+                    }
+                    for date in self.vehicle_daily_cost
+                ], key = lambda x: ((x.get('table_head') or ''), (x.get('data') or ''), (x.get('amount') or ''),)),
+                {
+                    'table_head': 'Vehicle Yearly',
+                    'row_head': "Total",
+                    'amount': sum(self.vehicle_daily_cost.values()),
+                    'is_total_row': 1
+                },
+            ]
         }
 
 
@@ -201,6 +250,14 @@ def update_transport_cost(sitename):
     trans_cost = cost.get_transport_cost()
     frappe.db.set_value("Project", sitename, "transporting_cost", trans_cost.get("value", 0) or 0, update_modified=False)
     frappe.db.set_value("Project", sitename, "transport_cost_details", trans_cost.get("description", "") or "", update_modified=False)
+
+    site = frappe.get_doc("Project", sitename)
+    site.update({
+        "transport_cost_splitup": trans_cost.get("splitup", "") or []
+    })
+    
+    site.flags.ignore_validate = True
+    site.save()
 
 def update_transport_cost_of_all_sites(self, event = None):
     if self.delivery_note:
