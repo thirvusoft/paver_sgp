@@ -24,6 +24,9 @@ frappe.query_reports["Vehicle Summary"] = {
 		}
 	],
 	formatter: function(value, row, column, data, default_formatter) {
+		if (data.column_row == 1) {
+			return `<b>${__({'SQFT': 'Unit', 'SQFT Cost': 'Unit Cost'}[column.label] || column.label || '')}</b>`;
+		}
 		if (column.fieldname == "vehicle" && data.reference) {
 			value = $(`<span ondblclick=\'ganapathy_pavers.show_reference(\"${data.vehicle}\", ${JSON.stringify(data.reference)}, 0)\'>${value}</span>`);
 			let $value = $(value);

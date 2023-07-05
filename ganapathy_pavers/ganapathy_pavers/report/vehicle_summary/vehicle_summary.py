@@ -65,7 +65,12 @@ def get_columns(filters):
 			"fieldname": "reference",
 			"fieldtype": "Data",
 			"hidden": 1
-		}
+		},
+		{
+			"fieldname": "column_row",
+			"fieldtype": "Check",
+			"hidden": 1
+		},
 	]
 	return columns
 
@@ -137,7 +142,8 @@ def get_data(filters):
 					from `tabVehicle` vehicle
 					where
 						vehicle.name=_vl.license_plate and
-						vehicle.expense_type='Vehicle'
+						vehicle.expense_type='Vehicle' and
+						vehicle.not_in_vehicle_summary = 0
 				) > 0 and
 				_vl.docstatus=1
 				{conditions.replace("vl.", '_vl.')}
@@ -188,7 +194,7 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 	rm = []
 	data = []
 	paver_exp, paver_sqf, paver_sqf_cost = 0, 0, 0
-	cw_exp, cw_sqf, cw_sqf_cost = 0, 0, 0
+	cw_exp, cw_sqf, cw_sqf_cost, rm_unit_cost = 0, 0, 0, 0
 	inward_freight, inward_exp, inward_sqf, inward_profit_loss = 0, 0, 0, 0
 	for row in vehicle_details:
 		exp = (vehicle_exp.get(row.get("vehicle")) or 0) / (((row.delivered_paver or 0) + (row.delivered_cw or 0) + (row.inward or 0)) or 1)
@@ -224,11 +230,14 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 			inward_exp += (exp * (row.inward or 0)) or 0
 			inward_freight += freight or 0
 			inward_sqf += row.inward or 0
+
+			rm_unit_cost += ((exp * (row.inward or 0)) or 0) / (row.inward or 1) or 0
 			rm.append({
 				"vehicle": row.vehicle,
 				"freight": freight,
 				"expense": exp * (row.inward or 0),
 				"sqft": row.inward,
+				"sqft_cost": ((exp * (row.inward or 0)) or 0) / (row.inward or 1),
 				"profit_loss": freight - (exp * (row.inward or 0) or 0),
 				"mileage": row.mileage
 			})
@@ -303,6 +312,9 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 	if rm:
 		data.append({})
 		data.append({
+			'column_row': 1
+		})
+		data.append({
 			"vehicle": "INWARD",
 			"bold": 1
 		})
@@ -312,7 +324,14 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 			"freight": inward_freight,
 			"expense": inward_exp,
 			"sqft": inward_sqf,
+			"sqft_cost": rm_unit_cost,
 			"profit_loss": inward_profit_loss,
+			"bold": 1
+		})
+		data.append({
+			"vehicle": "AVERAGE",
+			"sqft": inward_exp / (inward_sqf or 1),
+			"sqft_cost": (rm_unit_cost) / len(rm),
 			"bold": 1
 		})
 	return data
