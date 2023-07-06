@@ -197,29 +197,31 @@ class SiteTransportCost:
 
         for date in date_vehicle_wise_logs:
             for vehicle in date_vehicle_wise_logs.get(date, {}) or {}:
-                total_odometer = sum(frappe.get_all("Vehicle Log", {
-                    "license_plate": vehicle,
-                    "date": date,
-                    "select_purpose": ["!=", "Fuel"],
-                }, pluck="today_odometer_value"))
+                for vl in date_vehicle_wise_logs.get(date, {}).get(vehicle):
+                    total_odometer = sum(frappe.get_all("Vehicle Log", {
+                        "license_plate": vehicle,
+                        "date": date,
+                        "select_purpose": ["!=", "Fuel"],
+                        "docstatus": 1
+                    }, pluck="today_odometer_value"))
 
-                if date not in yearl_maintenance:
-                    yearl_maintenance[date] = 0
+                    if date not in yearl_maintenance:
+                        yearl_maintenance[date] = 0
 
-                main_cost = frappe.db.get_all("Vehicle Yearly Maintenance", {
-                    "parenttype": "Vehicle",
-                    "parent": vehicle,
-                    "from_date": ["<=", date],
-                    "to_date": [">=", date]
-                }, ["amount", "no_of_days"])
+                    main_cost = frappe.db.get_all("Vehicle Yearly Maintenance", {
+                        "parenttype": "Vehicle",
+                        "parent": vehicle,
+                        "from_date": ["<=", date],
+                        "to_date": [">=", date]
+                    }, ["amount", "no_of_days"])
 
-                if main_cost:
-                    main_cost = (main_cost[0].amount or 0)/(main_cost[0].no_of_days or 1)
-                else:
-                    main_cost = 0
+                    if main_cost:
+                        main_cost = (main_cost[0].amount or 0)/(main_cost[0].no_of_days or 1)
+                    else:
+                        main_cost = 0
 
-                cost = main_cost * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / total_odometer
-                yearl_maintenance[date] += (cost or 0)
+                    cost = main_cost * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / total_odometer
+                    yearl_maintenance[date] += (cost or 0)
 
         return yearl_maintenance
 

@@ -86,11 +86,7 @@ def site_work(doc):
 
 	total_job_worker_cost = sum([(i.amount or 0) for i in doc.job_worker if not i.other_work])
 	total_other_worker_cost = sum([(i.amount or 0) for i in doc.job_worker if i.other_work])
-	# frappe.errprint(doc.transporting_cost)
-	# frappe.errprint(doc.total)
-	# frappe.errprint(without_transport_cost)
-	# frappe.errprint(sqf)
-	# frappe.errprint((doc.transporting_cost + (doc.total - without_transport_cost)) / sqf)
+	
 	return {
 			'items':items,
 			'nos':round(nos,2),
@@ -423,6 +419,7 @@ def get_retail_cost(doc):
 	job_work_cost = {}
 	unrelated_other_cost = 0
 	jw_amt = 0
+	jw_rate = []
 	for m in doc.job_worker:
 		if m.other_work == 1:
 			if not m.related_work:
@@ -433,14 +430,16 @@ def get_retail_cost(doc):
 		else:
 			if doc.type == "Pavers":
 				if m.item not in job_work_cost:
-					job_work_cost[m.item] = 0
-				job_work_cost[m.item] += m.amount or 0
+					job_work_cost[m.item] = {'amount': 0, 'rate': []}
+				job_work_cost[m.item]['amount'] += m.amount or 0
+				job_work_cost[m.item]['rate'].append(m.rate or 0)
 			jw_amt += m.amount or 0
+			jw_rate.append(m.rate or 0)
 
 	item_cost = []
 	for item in doc.delivery_detail:
 		if doc.type != "Pavers":
-			job_work_cost[item.item] = jw_amt
+			job_work_cost[item.item] =  {'amount': jw_amt, 'rate': jw_rate}
 		date = item.creation
 		bin_ = get_item_price_list_rate(item = item.item, date = date)
 		cost=(bin_ or 0)* (((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)))
@@ -450,6 +449,10 @@ def get_retail_cost(doc):
 		 "rate" : bin_,
 		 "amount": cost
 		})
+	
+	for i in job_work_cost:
+		if (isinstance(job_work_cost[i].get('rate'), list)):
+			job_work_cost[i]['rate'] = sum(job_work_cost[i]['rate'])/len(job_work_cost[i]['rate'])
 	
 	unrelated_other_per_sqft = unrelated_other_cost / (unrelated_other_sqft or 1)
 
