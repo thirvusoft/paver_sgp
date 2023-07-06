@@ -8,20 +8,23 @@ class SiteTransportCost:
         self.site = site
         
     def get_transport_cost(self):
+        doc = frappe.get_doc('Project', self.site)
         self.vehicle_logs = self.get_vehicle_logs()
         self.driver_salary = self.get_vehicle_log_driver_cost()
         self.operator_salary = self.get_vehicle_log_operator_cost()
         self.get_fuel_maintenance_cost()
+        self.fastag_charges = sum([(row.amount or 0) for row in doc.additional_cost if 'fastag' in (row.description or '').lower()])
         self.vehicle_daily_cost = self.get_yearly_maintenance_cost()
 
 
         return {
-            "value": (sum(self.operator_salary.values()) or 0) + (sum(self.driver_salary.values()) or 0) + (self.maintenance_cost or 0) + (self.fuel_cost or 0) + (sum(self.vehicle_daily_cost.values()) or 0),
+            "value": (sum(self.operator_salary.values()) or 0) + (sum(self.driver_salary.values()) or 0) + (self.maintenance_cost or 0) + (self.fastag_charges or 0) + (self.fuel_cost or 0) + (sum(self.vehicle_daily_cost.values()) or 0),
             "description": f"""<div>
                         <b>Driver Salary:</b> {", ".join([f"<b>{emp or '-'}</b>: {'%.2f'%(self.driver_salary.get(emp) or 0)}" for emp in self.driver_salary])} <br>
                         <b>Operator Salary:</b> {", ".join([f"<b>{opr or '-'}</b>: {'%.2f'%(self.operator_salary.get(opr) or 0)}" for opr in self.operator_salary])} <br>
                         <b>Maintenance Cost:</b> {'%.2f'%(self.maintenance_cost or 0)} <br>
                         <b>Fuel:</b> {'%.2f'%(self.fuel_cost or 0)} <br>
+                        <b>Fastag: </b> {'%.2f'%(self.fastag_charges or 0)} <br>
                         <b>Vehicle Yearly:</b> {", ".join([f"<b>{formatdate(date)}</b>: {'%.2f'%(self.vehicle_daily_cost.get(date) or 0)}" for date in self.vehicle_daily_cost])}
                     </div>""",
             "splitup": [
@@ -56,6 +59,7 @@ class SiteTransportCost:
                 },
                 {'table_head': 'Maintenance', 'row_head': 'Maintenance Cost', 'amount': self.maintenance_cost or 0},
                 {'table_head': 'Fuel', 'row_head': 'Fuel Cost', 'amount': self.fuel_cost or 0},
+                {'table_head': 'Fastag', 'row_head': 'Fastag Charge', 'amount': self.fastag_charges or 0},
                 *sorted([
                     {
                         'table_head': 'Vehicle Yearly',

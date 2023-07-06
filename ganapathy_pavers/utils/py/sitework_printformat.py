@@ -62,7 +62,7 @@ def site_work(doc):
 		if 'fastag' in i["description"].lower():
 			doc.total -= i['amount'] or 0
 			without_transport_cost -= i["amount"]
-			doc.transporting_cost += i['amount'] or 0
+			# doc.transporting_cost += i['amount'] or 0
 
 	delivered_items=(items.keys())
 	dn_items=frappe.get_all("Delivery Note Item", {"parenttype": "Delivery Note", "parent": ["in", dn], "item_code": ["in", delivered_items]}, ["creation", "item_code", "warehouse"])
@@ -412,7 +412,7 @@ def get_retail_cost(doc):
 		if "transport" in i.description.lower():
 			rental_cost += i.amount or 0
 		elif 'fastag' in i.description.lower():
-			doc.transporting_cost += i.amount or 0
+			pass
 		else:
 			add_cost += i.amount or 0
 	other_cost = 0
@@ -524,3 +524,12 @@ def get_site_supply_and_return_trip_details(sitename):
 		}
 	}
 
+def get_item_wise_so_rate(sitename):
+	doc=frappe.get_doc('Project', sitename)
+	res = {}
+	for i in doc.item_details:
+		res[i.item] = i.rate
+	for i in doc.item_details_compound_wall:
+		res[i.item] = i.rate
+	
+	return res
