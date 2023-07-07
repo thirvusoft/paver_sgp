@@ -94,7 +94,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-07-07 11:24:29.648966",
+ "modified": "2023-07-07 12:24:42.682256",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "STOCK MANAGER",
@@ -137,6 +137,18 @@
    "doc_view": "Tree",
    "label": "Warehouse",
    "link_to": "Warehouse",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Item Size",
+   "link_to": "Item Size",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Item Size Rate",
+   "link_to": "Item Size Rate",
    "type": "DocType"
   },
   {
