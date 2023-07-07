@@ -352,7 +352,7 @@ def size_details(items, _type):
 		if row['short_name'] and 'mm' not in row['short_name'].lower():
 			continue
 		shortname=row['short_name'].lower()
-		size=shortname.split('mm')[0][::-1]
+		size=shortname.split('mm')[0][::-1].strip()
 		for i in range(len(size)):
 			if not size[i].isnumeric():
 				size=size[:i]

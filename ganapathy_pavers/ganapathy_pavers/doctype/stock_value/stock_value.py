@@ -193,6 +193,8 @@ def group_item_sizes(res):
 				'rate': row.get('rate') or 0,
 				'amount': (row.get('qty') or 0) * (row.get('rate') or 0),
 			}
+		else:
+			paver_res[key or '']['qty'] += row.get('qty') or 0
 	
 	for row in cw:
 		key = row.get('item_size') or row.get('name')
@@ -206,6 +208,8 @@ def group_item_sizes(res):
 				'rate': row.get('rate') or 0,
 				'amount': (row.get('qty') or 0) * (row.get('rate') or 0),
 			}
+		else:
+			cw_res[key or '']['qty'] += row.get('qty') or 0
 	
 	for row in raw_material:
 		key = row.get('item_size') or row.get('name')
@@ -218,6 +222,8 @@ def group_item_sizes(res):
 				'rate': row.get('rate') or 0,
 				'amount': (row.get('qty') or 0) * (row.get('rate') or 0),
 			}
+		else:
+			raw_material_res[key or '']['qty'] += row.get('qty') or 0
 
 	res = frappe._dict({
 		'paver_stock': list(paver_res.values()),
