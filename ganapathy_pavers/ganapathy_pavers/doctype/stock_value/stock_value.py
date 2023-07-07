@@ -56,9 +56,14 @@ def get_items(item_group='', cw_type = '', date='', paver_cw_warehouse=[], rm_wa
 	if isinstance(rm_warehouse, str):
 		rm_warehouse = json.loads(rm_warehouse)
 	
-	item_filters = " item.disabled = 0 and item.has_variants = 0 "
+	item_filters = " item.is_stock_item = 1 and item.disabled = 0 and item.has_variants = 0 "
 	if ignore_empty_item_size:
-		item_filters += " and IFNULL(item.item_size, '') != '' "
+		item_filters += """ and 
+		CASE 
+			WHEN item.item_group = "Pavers" THEN IFNULL(item.item_size, '') != ''
+			ELSE 1=1
+		END
+		"""
 	if item_group:
 		item_filters += f" and item.item_group = '{item_group}' "
 	
@@ -96,7 +101,7 @@ def get_items(item_group='', cw_type = '', date='', paver_cw_warehouse=[], rm_wa
 										iva.parent = item.name and
 										iva.attribute = "Colour"
 									LIMIT 1
-		       					) = "GREY"
+		       					) = "Grey"
 									THEN "Grey"
 		    					WHEN (
 		       						SELECT
