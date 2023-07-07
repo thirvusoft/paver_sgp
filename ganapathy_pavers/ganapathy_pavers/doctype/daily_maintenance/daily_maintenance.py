@@ -8,16 +8,16 @@ from frappe.model.document import Document
 from frappe.utils.data import nowdate, nowtime
 from ganapathy_pavers import uom_conversion
 
-def get_stock_qty(item_code, warehouse, date, time):
+def get_stock_qty(item_code, warehouse, date, time=None, uom_conv = True):
 	qty = 0
 	for i in warehouse:
 		qty += get_previous_sle({
 			'item_code': item_code,
-			'warehouse': i,#f""" warehouse in {tuple(warehouse)}""" if len(warehouse)>1 else f""" warehouse = '{warehouse[0]}'""",
+			'warehouse': i,
 			'posting_date': date,
 			'posting_time': time
 		}).get('qty_after_transaction', 0) or 0
-	return dsm_uom_conversion(item_code, qty)
+	return dsm_uom_conversion(item_code, qty) if uom_conv else qty
 
 def dsm_uom_conversion(item, qty, uom=None):
 	to_uom=frappe.db.get_value("Item", item, "dsm_uom")
@@ -352,7 +352,7 @@ def size_details(items, _type):
 		if row['short_name'] and 'mm' not in row['short_name'].lower():
 			continue
 		shortname=row['short_name'].lower()
-		size=shortname.split('mm')[0][::-1]
+		size=shortname.split('mm')[0][::-1].strip()
 		for i in range(len(size)):
 			if not size[i].isnumeric():
 				size=size[:i]

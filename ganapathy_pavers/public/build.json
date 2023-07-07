@@ -1,5 +1,6 @@
 {
     "js/ganapathy_pavers.min.js": [
+        "public/js/ganapathy_pavers.js",
         "public/js/employee_formatter.js",
         "public/js/production_report_item_filter.js",
         "public/js/uom_converstion.js",

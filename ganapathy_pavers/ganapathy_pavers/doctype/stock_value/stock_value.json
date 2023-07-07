@@ -1,0 +1,232 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SV.-.{date}.-.###",
+ "creation": "2023-07-06 17:03:56.289305",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "column_break_2",
+  "get_items",
+  "filters_section",
+  "item_group",
+  "warehouse_paver_cw",
+  "column_break_3",
+  "ignore_empty_item_size",
+  "cw_type",
+  "warehouse_rm",
+  "section_break_10",
+  "paver_stock",
+  "paver_stock_qty",
+  "paver_stock_value",
+  "section_break_12",
+  "cw_stock",
+  "compound_wall_stock_qty",
+  "compound_wall_stock_value",
+  "section_break_14",
+  "raw_material_stock",
+  "raw_material_stock_qty",
+  "raw_material_stock_value",
+  "section_break_16",
+  "column_break_17",
+  "total_stock_qty",
+  "total_stock_value",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "get_items",
+   "fieldtype": "Button",
+   "label": "Get Items"
+  },
+  {
+   "fieldname": "filters_section",
+   "fieldtype": "Section Break",
+   "label": "Filters"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "depends_on": "eval: !['Raw Material'].includes(doc.item_group)",
+   "fieldname": "warehouse_paver_cw",
+   "fieldtype": "Table",
+   "label": "Warehouse for Pavers and Compound Walls",
+   "options": "DSM Warehouse"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.item_group == 'Compound Walls'",
+   "fieldname": "cw_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "CW Type",
+   "options": "\nSlab\nPost\nFencing Post\nLego Block"
+  },
+  {
+   "depends_on": "eval: !['Pavers', 'Compound Walls'].includes(doc.item_group)",
+   "fieldname": "warehouse_rm",
+   "fieldtype": "Table",
+   "label": "Warehouse for Raw Materials",
+   "options": "DSM Warehouse"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "paver_stock",
+   "fieldtype": "Table",
+   "label": "Paver Stock",
+   "options": "Stock Value Item Detail"
+  },
+  {
+   "fieldname": "paver_stock_value",
+   "fieldtype": "Currency",
+   "label": "Paver Stock Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "cw_stock",
+   "fieldtype": "Table",
+   "label": "CW Stock",
+   "options": "Stock Value Item Detail"
+  },
+  {
+   "fieldname": "compound_wall_stock_value",
+   "fieldtype": "Currency",
+   "label": "Compound Wall Stock Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "raw_material_stock",
+   "fieldtype": "Table",
+   "label": "Raw Material Stock",
+   "options": "Stock Value Item Detail"
+  },
+  {
+   "fieldname": "raw_material_stock_value",
+   "fieldtype": "Currency",
+   "label": "Raw Material Stock Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_stock_value",
+   "fieldtype": "Currency",
+   "label": "Total Stock Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Stock Value",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Stock Value",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "ignore_empty_item_size",
+   "fieldtype": "Check",
+   "label": "Ignore Item with no Item Size"
+  },
+  {
+   "fieldname": "paver_stock_qty",
+   "fieldtype": "Float",
+   "label": "Paver Stock Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "compound_wall_stock_qty",
+   "fieldtype": "Float",
+   "label": "Compound Wall Stock Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "raw_material_stock_qty",
+   "fieldtype": "Float",
+   "label": "Raw Material Stock Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_stock_qty",
+   "fieldtype": "Float",
+   "label": "Total Stock Qty",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2023-07-07 11:04:20.659338",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Stock Value",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
