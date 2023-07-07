@@ -3,6 +3,7 @@
 
 frappe.ui.form.on('Stock Value', {
 	refresh: async function (frm) {
+		document.querySelector(`button[data-fieldtype="Button"][data-fieldname="get_items"]`).classList.add('btn-primary')
 		if (frm.is_new()) {
 			let DSM_DEF = await frappe.db.get_doc("DSM Defaults");
 
@@ -34,7 +35,7 @@ frappe.ui.form.on('Stock Value', {
 		await frappe.call({
 			method: "ganapathy_pavers.ganapathy_pavers.doctype.stock_value.stock_value.get_items",
 			freeze: true,
-			freeze: 'Fetching Items',
+			freeze_message: ganapathy_pavers.loading_svg || 'Fetching Items',
 			args: {
 				item_group: frm.doc.item_group,
 				cw_type: frm.doc.cw_type,
