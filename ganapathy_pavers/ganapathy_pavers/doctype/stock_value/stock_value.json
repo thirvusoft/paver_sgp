@@ -1,14 +1,17 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "SV.-.{date}.-.###",
+ "autoname": "SV-.{unit}.-.{date}.-.###",
  "creation": "2023-07-06 17:03:56.289305",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "unit",
   "date",
+  "time",
   "column_break_2",
+  "get_warehouses",
   "get_items",
   "filters_section",
   "item_group",
@@ -19,20 +22,52 @@
   "warehouse_rm",
   "section_break_10",
   "paver_stock",
+  "section_break_14",
   "paver_stock_qty",
+  "paver_stock_nos",
+  "paver_stock_sqft",
+  "paver_stock_bundle",
   "paver_stock_value",
+  "column_break_20",
+  "normal_paver_stock_qty",
+  "normal_paver_stock_nos",
+  "normal_paver_stock_sqft",
+  "normal_paver_stock_bundle",
+  "normal_paver_stock_value",
+  "column_break_26",
+  "shot_blast_paver_stock_qty",
+  "shot_blast_paver_stock_nos",
+  "shot_blast_paver_stock_sqft",
+  "shot_blast_paver_stock_bundle",
+  "shot_blast_paver_stock_value",
   "section_break_12",
+  "kerb_stone_stock",
+  "kerb_stone_stock_qty",
+  "kerb_stone_stock_nos",
+  "kerb_stone_stock_sqft",
+  "kerb_stone_stock_bundle",
+  "kerb_stone_stock_value",
+  "section_break_21",
   "cw_stock",
   "compound_wall_stock_qty",
+  "compound_wall_stock_nos",
+  "compound_wall_stock_sqft",
+  "compound_wall_stock_bundle",
   "compound_wall_stock_value",
-  "section_break_14",
+  "section_break_46",
   "raw_material_stock",
   "raw_material_stock_qty",
+  "raw_material_stock_nos",
+  "raw_material_stock_sqft",
+  "raw_material_stock_bundle",
   "raw_material_stock_value",
   "section_break_16",
-  "column_break_17",
   "total_stock_qty",
   "total_stock_value",
+  "column_break_17",
+  "total_stock_nos",
+  "total_stock_sqft",
+  "total_stock_bundle",
   "amended_from"
  ],
  "fields": [
@@ -84,7 +119,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "CW Type",
-   "options": "\nSlab\nPost\nFencing Post\nLego Block"
+   "options": "\nSlab\nPost\nCorner Post\nFencing Post\nU Drain\nLego Block"
   },
   {
    "depends_on": "eval: !['Pavers', 'Compound Walls'].includes(doc.item_group)",
@@ -101,12 +136,13 @@
    "fieldname": "paver_stock",
    "fieldtype": "Table",
    "label": "Paver Stock",
-   "options": "Stock Value Item Detail"
+   "options": "Stock Value Paver Detail"
   },
   {
    "fieldname": "paver_stock_value",
    "fieldtype": "Currency",
    "label": "Paver Stock Value",
+   "precision": "2",
    "read_only": 1
   },
   {
@@ -117,12 +153,13 @@
    "fieldname": "cw_stock",
    "fieldtype": "Table",
    "label": "CW Stock",
-   "options": "Stock Value Item Detail"
+   "options": "Stock Value CW Detail"
   },
   {
    "fieldname": "compound_wall_stock_value",
    "fieldtype": "Currency",
    "label": "Compound Wall Stock Value",
+   "precision": "2",
    "read_only": 1
   },
   {
@@ -133,12 +170,13 @@
    "fieldname": "raw_material_stock",
    "fieldtype": "Table",
    "label": "Raw Material Stock",
-   "options": "Stock Value Item Detail"
+   "options": "Stock Value Raw Material Detail"
   },
   {
    "fieldname": "raw_material_stock_value",
    "fieldtype": "Currency",
    "label": "Raw Material Stock Value",
+   "precision": "2",
    "read_only": 1
   },
   {
@@ -153,6 +191,7 @@
    "fieldname": "total_stock_value",
    "fieldtype": "Currency",
    "label": "Total Stock Value",
+   "precision": "2",
    "read_only": 1
   },
   {
@@ -193,12 +232,237 @@
    "fieldtype": "Float",
    "label": "Total Stock Qty",
    "read_only": 1
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Time",
+   "label": "Time",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval: doc.paver_stock_nos",
+   "fieldname": "paver_stock_nos",
+   "fieldtype": "Float",
+   "label": "Paver Stock Nos",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.paver_stock_sqft",
+   "fieldname": "paver_stock_sqft",
+   "fieldtype": "Float",
+   "label": "Paver Stock Sqft",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.paver_stock_bundle",
+   "fieldname": "paver_stock_bundle",
+   "fieldtype": "Float",
+   "label": "Paver Stock Bundle",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.raw_material_stock_nos",
+   "fieldname": "raw_material_stock_nos",
+   "fieldtype": "Float",
+   "label": "Raw Material Stock Nos",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.raw_material_stock_sqft",
+   "fieldname": "raw_material_stock_sqft",
+   "fieldtype": "Float",
+   "label": "Raw Material Stock Sqft",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.raw_material_stock_bundle",
+   "fieldname": "raw_material_stock_bundle",
+   "fieldtype": "Float",
+   "label": "Raw Material Stock Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_stock_nos",
+   "fieldtype": "Float",
+   "label": "Total Stock Nos",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_stock_sqft",
+   "fieldtype": "Float",
+   "label": "Total Stock Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_stock_bundle",
+   "fieldtype": "Float",
+   "label": "Total Stock Bundle",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.compound_wall_stock_nos",
+   "fieldname": "compound_wall_stock_nos",
+   "fieldtype": "Float",
+   "label": "Compound Wall Stock Nos",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.compound_wall_stock_sqft",
+   "fieldname": "compound_wall_stock_sqft",
+   "fieldtype": "Float",
+   "label": "Compound Wall Stock Sqft",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.compound_wall_stock_bundle",
+   "fieldname": "compound_wall_stock_bundle",
+   "fieldtype": "Float",
+   "label": "Compound Wall Stock Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "kerb_stone_stock",
+   "fieldtype": "Table",
+   "label": "Kerb Stone Stock",
+   "options": "Stock Value Kerb Stone Detail"
+  },
+  {
+   "fieldname": "section_break_21",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "kerb_stone_stock_qty",
+   "fieldtype": "Float",
+   "label": "Kerb Stone Stock Qty",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.kerb_stone_stock_nos",
+   "fieldname": "kerb_stone_stock_nos",
+   "fieldtype": "Float",
+   "label": "Kerb Stone Stock Nos",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.kerb_stone_stock_sqft",
+   "fieldname": "kerb_stone_stock_sqft",
+   "fieldtype": "Float",
+   "label": "Kerb Stone Stock Sqft",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.kerb_stone_stock_bundle",
+   "fieldname": "kerb_stone_stock_bundle",
+   "fieldtype": "Float",
+   "label": "Kerb Stone Stock Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "kerb_stone_stock_value",
+   "fieldtype": "Currency",
+   "label": "Kerb Stone Stock Value",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "normal_paver_stock_qty",
+   "fieldtype": "Float",
+   "label": "Normal Paver Stock Qty",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.normal_paver_stock_nos",
+   "fieldname": "normal_paver_stock_nos",
+   "fieldtype": "Float",
+   "label": "Normal Paver Stock Nos",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.normal_paver_stock_sqft",
+   "fieldname": "normal_paver_stock_sqft",
+   "fieldtype": "Float",
+   "label": "Normal Paver Stock Sqft",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.normal_paver_stock_bundle",
+   "fieldname": "normal_paver_stock_bundle",
+   "fieldtype": "Float",
+   "label": "Normal Paver Stock Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "normal_paver_stock_value",
+   "fieldtype": "Currency",
+   "label": "Normal Paver Stock Value",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_26",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shot_blast_paver_stock_qty",
+   "fieldtype": "Float",
+   "label": "Shot Blast Paver Stock Qty",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.shot_blast_paver_stock_nos",
+   "fieldname": "shot_blast_paver_stock_nos",
+   "fieldtype": "Float",
+   "label": "Shot Blast Paver Stock Nos",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.shot_blast_paver_stock_sqft",
+   "fieldname": "shot_blast_paver_stock_sqft",
+   "fieldtype": "Float",
+   "label": "Shot Blast Paver Stock Sqft",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.shot_blast_paver_stock_bundle",
+   "fieldname": "shot_blast_paver_stock_bundle",
+   "fieldtype": "Float",
+   "label": "Shot Blast Paver Stock Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "shot_blast_paver_stock_value",
+   "fieldtype": "Currency",
+   "label": "Shot Blast Paver Stock Value",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_46",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "unit",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Unit / Location",
+   "options": "Location",
+   "reqd": 1
+  },
+  {
+   "fieldname": "get_warehouses",
+   "fieldtype": "Button",
+   "label": "Get Warehouses"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-07 13:40:06.979307",
+ "modified": "2023-07-10 18:17:57.344228",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Stock Value",
