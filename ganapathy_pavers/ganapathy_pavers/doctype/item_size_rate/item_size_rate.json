@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "item_size",
+  "uom",
   "item_group",
   "column_break_2",
   "valid_from",
@@ -80,11 +81,19 @@
    "fieldtype": "Select",
    "label": "Post Type",
    "options": "\nPost\nCorner Post\nFencing Post\nU Drain Post"
+  },
+  {
+   "fieldname": "uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "UOM",
+   "options": "UOM",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-07 13:47:42.548579",
+ "modified": "2023-07-07 16:01:35.473461",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Item Size Rate",

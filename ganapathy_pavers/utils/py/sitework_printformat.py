@@ -452,7 +452,7 @@ def get_retail_cost(doc):
 	
 	for i in job_work_cost:
 		if (isinstance(job_work_cost[i].get('rate'), list)):
-			job_work_cost[i]['rate'] = sum(job_work_cost[i]['rate'])/len(job_work_cost[i]['rate'])
+			job_work_cost[i]['rate'] = sum(job_work_cost[i]['rate'])/(len(job_work_cost[i]['rate']) or 1)
 	
 	unrelated_other_per_sqft = unrelated_other_cost / (unrelated_other_sqft or 1)
 
