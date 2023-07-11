@@ -94,7 +94,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-07-07 12:24:42.682256",
+ "modified": "2023-07-11 09:59:10.987667",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "STOCK MANAGER",
@@ -155,6 +155,12 @@
    "doc_view": "List",
    "label": "Stock Value",
    "link_to": "Stock Value",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Stock Defaults",
+   "link_to": "Stock Defaults",
    "type": "DocType"
   }
  ]

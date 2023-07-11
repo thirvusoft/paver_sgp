@@ -93,13 +93,16 @@ class StockValue(Document):
 		
 		self.total_stock_qty = self.paver_stock_qty + self.kerb_stone_stock_qty + self.compound_wall_stock_qty + self.raw_material_stock_qty
 		self.total_stock_value = self.paver_stock_value + self.kerb_stone_stock_value + self.compound_wall_stock_value + self.raw_material_stock_value
+		self.total_stock_nos = self.paver_stock_nos + self.kerb_stone_stock_nos + self.compound_wall_stock_nos + self.raw_material_stock_nos
+		self.total_stock_sqft = self.paver_stock_sqft + self.kerb_stone_stock_sqft + self.compound_wall_stock_sqft + self.raw_material_stock_sqft
+		self.total_stock_bundle = self.paver_stock_bundle + self.kerb_stone_stock_bundle + self.compound_wall_stock_bundle + self.raw_material_stock_bundle
 
 @frappe.whitelist()
 def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', paver_cw_warehouse=[], rm_warehouse=[], ignore_empty_item_size=False):
 	default_price_list = frappe.db.get_value("Stock Defaults", unit, 'price_list')
 	
-	if frappe.db.get_all('Stock Defaults', {'unit': unit}):
-		frappe.throw(f"""Please create <a href="/app/stock-defaults/"><b>Stock Defaults</b></a> """)
+	if not frappe.db.get_all('Stock Defaults', {'unit': unit}):
+		frappe.throw(f"""Please create <a href="/app/stock-defaults/"><b>Stock Defaults</b></a> for <b>{unit}</b>""")
 
 	def get_default_price_list():
 		return default_price_list or frappe.throw(f"""Please Enter <b>Price List</b> in <a href='/app/stock-defaults/{unit}'><b>Stock Defaults: {unit}</b></a>""")
@@ -613,5 +616,8 @@ def group_item_sizes(res):
 	
 	res.total_stock_qty = res.paver_stock_qty + res.kerb_stone_stock_qty + res.compound_wall_stock_qty + res.raw_material_stock_qty
 	res.total_stock_value = res.paver_stock_value + res.kerb_stone_stock_value + res.compound_wall_stock_value + res.raw_material_stock_value
+	res.total_stock_nos = res.paver_stock_nos + res.kerb_stone_stock_nos + res.compound_wall_stock_nos + res.raw_material_stock_nos
+	res.total_stock_sqft = res.paver_stock_sqft + res.kerb_stone_stock_sqft + res.compound_wall_stock_sqft + res.raw_material_stock_sqft
+	res.total_stock_bundle = res.paver_stock_bundle + res.kerb_stone_stock_bundle + res.compound_wall_stock_bundle + res.raw_material_stock_bundle
 	
 	return res
