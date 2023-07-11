@@ -92,7 +92,6 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Post Type",
-   "mandatory_depends_on": "eval: doc.item_group == \"Compound Walls\"",
    "options": "\nPost\nCorner Post\nFencing Post"
   },
   {
@@ -110,7 +109,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-10 11:24:34.655837",
+ "modified": "2023-07-11 12:54:42.179260",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Item Size Rate",
