@@ -92,11 +92,12 @@ def execute(filters=None):
             matched_item=""
 
     
-    columns = get_columns()
+    columns = get_columns(filters)
     data.sort(key = lambda x: ((x[0], x[1]) if(group_by == "Date") else ((x[5], x[0]) if(group_by == 'Item Wise') else (x[2], x[0]))))
     matched_item=""
     if group_by!="Customer Wise":
         for i in range (0,len(data)-1,1):
+            
             if data[i][1] == data[i+1][1]:
                 matched_item = data[i][1]
                 data[i+1][0]=None
@@ -117,24 +118,120 @@ def execute(filters=None):
     final_data = (group_total(filters, data) or []) if(data) else []
     return columns, final_data
  
-def get_columns():
+def get_columns(filters={}):
     columns = [
-        _("Date") + ":Date:100",
-        _("Document Name") + ":Link/Delivery Note:100",
-        _("Customer Name") + ":Link/Customer:200",
-        _("Sales Type") + ":Data:100",
-        _("Site Name") + ":Link/Project:160",
-        _("Item Name") + ":Link/Item:350",
-        _("Warehouse") + ":Link/Warehouse:160",
-        _("Vehicle") + ":Link/Vehicle:160",
-        _("Bundle") + ":Data:80",
-        _("Qty") + ":Data:80",
-        _("SQF") + ":Data:80",
-        _("UOM") + ":Link/UOM:100",
-        _("Pieces") + ":Data:80",
-        _("Rate") + ":Data:100",
-        _("Amount") + ":Data:160",
-        _("Grand Total") + ":Data:160"
+        {
+			"label": ("Date"),
+			"fieldtype": "Date",
+			"fieldname": "date",
+			"width": 100,
+            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Date") or (filters.get("summary") == 1 and filters.get("group_by") == "Item Wise") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise"),
+		},
+        {
+			"label": ("Document Name"),
+			"fieldtype": "Link",
+			"fieldname": "document_name",
+            "options":"Delivery Note",
+			"width": 100,
+            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Item Wise") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise")
+		},
+        {
+			"label": ("Customer Name"),
+			"fieldtype": "Link",
+			"fieldname": "customer_name",
+            "options":"Customer",
+			"width": 200,
+            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Date") or (filters.get("summary") == 1 and filters.get("group_by") == "Item Wise")
+		},
+        {
+			"label": ("Sales Type"),
+			"fieldtype": "Data",
+			"fieldname": "sales_type",
+			"width": 100,
+            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Date") or (filters.get("summary") == 1 and filters.get("group_by") == "Item Wise") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise")
+		},
+        {
+			"label": ("Site Name"),
+			"fieldtype": "Link",
+			"fieldname": "site_name",
+            "options":"Project",
+			"width": 160,
+            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Date") or (filters.get("summary") == 1 and filters.get("group_by") == "Item Wise") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise")
+		},
+        {
+			"label": ("Item Name"),
+			"fieldtype": "Link",
+			"fieldname": "item_name",
+            "options":"Item",
+			"width": 350,
+            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Date") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise")
+		},
+        {
+			"label": ("Warehouse"),
+			"fieldtype": "Link",
+			"fieldname": "warehouse",
+            "options":"Warehouse",
+			"width": 160,
+            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Date") or (filters.get("summary") == 1 and filters.get("group_by") == "Item Wise") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise")
+		},
+        {
+			"label": ("Vehicle"),
+			"fieldtype": "Link",
+			"fieldname": "vehicle",
+            "options":"Vehicle",
+			"width": 160,
+            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Date") or (filters.get("summary") == 1 and filters.get("group_by") == "Item Wise") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise")
+		},
+        {
+			"label": ("Bundle"),
+			"fieldtype": "Data",
+			"fieldname": "bundle",
+			"width": 80
+		},
+        {
+			"label": ("Qty"),
+			"fieldtype": "Data",
+			"fieldname": "qty",
+			"width": 80
+		},
+        {
+			"label": ("SQF"),
+			"fieldtype": "Data",
+			"fieldname": "sqf",
+			"width": 80
+		},
+        {
+			"label": ("UOM"),
+			"fieldtype": "Link",
+            "options": "UOM",
+			"fieldname": "uom",
+			"width": 100,
+            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Date") or (filters.get("summary") == 1 and filters.get("group_by") == "Item Wise") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise")
+		},
+        {
+			"label": ("Pieces"),
+			"fieldtype": "Data",
+			"fieldname": "pieces",
+			"width": 80
+		},
+        {
+			"label": ("Rate"),
+			"fieldtype": "Data",
+			"fieldname": "rate",
+			"width": 100
+		},
+        {
+			"label": ("Amount"),
+			"fieldtype": "Data",
+			"fieldname": "amount",
+			"width": 160
+		},
+       {
+			"label": ("Grand Total"),
+			"fieldtype": "Data",
+			"fieldname": "grand_total",
+			"width": 160
+		},
         ]
     
     return columns
@@ -142,17 +239,17 @@ def get_columns():
 
 
 def group_total(filters = {}, data = []):
-    if(not filters.get("group_total")):
+    if(not filters.get("group_total") and (not filters.get("summary"))  ):
         return data
     else:
-        if(filters.get("group_by") == "Date"):
+        if(filters.get("group_by") == "Date" and filters.get("group_total") ==1):
             ret_list = []
             total = [0] * 16
             data.append([None]*16)
             for row in range(len(data)):
                 if(data[row][0] and row!=0 or row == len(data)-1):
                     total[3] = "Group Total"
-                    ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else '' for i in total])
+                    ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else [] for i in total])
                     ret_list.append([None] * 16)
                     ret_list.append(data[row])
                     total = [0] * 16
@@ -161,8 +258,21 @@ def group_total(filters = {}, data = []):
                     ret_list.append(data[row])
                     total = add_list(total, data[row])
             return ret_list
-
-        elif(filters.get("group_by") == "Customer Wise"):
+        elif(filters.get("group_by") == "Date" and filters.get("summary") ==1):
+            ret_list = []
+            total = [0] * 16
+            data.append([None]*16)
+            for row in range(len(data)):
+                if(data[row][0] and row!=0 or row == len(data)-1):
+                    total[1] = (data[row][1])
+                    ret_list.append([("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
+                    total = [0] * 16
+                    total = add_list(total, data[row])
+                else:
+                    total = add_list(total, data[row])
+            return ret_list
+        
+        elif(filters.get("group_by") == "Customer Wise" and filters.get("group_total") ==1):
             ret_list = []
             total = [0] * 16
             data.append([None]*16)
@@ -178,7 +288,32 @@ def group_total(filters = {}, data = []):
                     ret_list.append(data[row])
                     total = add_list(total, data[row])
             return ret_list
-
+        elif(filters.get("group_by") == "Customer Wise" and filters.get("summary") ==1):
+            ret_list = []
+            total = [0] * 16
+            data.append([None]*16)
+            for row in range(len(data)):
+                if(row!=0  and data[row][2]!=data[row-1][2]):
+                    total[2] = data[row-1][2]
+                    ret_list.append([("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
+                    total = [0] * 16
+                    total = add_list(total, data[row])
+                else:
+                    total = add_list(total, data[row])
+            return ret_list
+        elif(filters.get("group_by") == "Item Wise" and filters.get("summary") ==1):
+            ret_list = []
+            total = [0] * 16
+            data.append([None]*16)
+            for row in range(len(data)):
+                if(row!=0  and data[row][5]!=data[row-1][5]):
+                    total[5] = data[row-1][5]
+                    ret_list.append([("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
+                    total = [0] * 16
+                    total = add_list(total, data[row])
+                else:
+                    total = add_list(total, data[row])
+            return ret_list
         else:
             ret_list = []
             total = [0] * 16
@@ -195,7 +330,7 @@ def group_total(filters = {}, data = []):
                     ret_list.append(data[row])
                     total = add_list(total, data[row])
             return ret_list
-    
+                
 def add_list(a, b):
     ret_list1 = []
     for i in range(len(a)):
