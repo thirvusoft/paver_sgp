@@ -1,11 +1,14 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-11-24 12:59:30.734881",
+ "autoname": "field:unit",
+ "creation": "2023-07-10 16:52:46.519259",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "unit",
+  "section_break_2",
   "stock_value_report_section",
   "price_list",
   "raw_material_warehouses_section",
@@ -32,9 +35,51 @@
  ],
  "fields": [
   {
+   "fieldname": "unit",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Unit / Location",
+   "options": "Location",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "stock_value_report_section",
+   "fieldtype": "Section Break",
+   "label": "Stock Value Report"
+  },
+  {
+   "description": "If Item has not Item Size, then the rate will be fetch form this Price List.",
+   "fieldname": "price_list",
+   "fieldtype": "Link",
+   "label": "Price List",
+   "options": "Price List"
+  },
+  {
    "fieldname": "raw_material_warehouses_section",
    "fieldtype": "Section Break",
    "label": "Raw Material Warehouses"
+  },
+  {
+   "fieldname": "raw_material_details",
+   "fieldtype": "Table",
+   "label": "Raw Material Details",
+   "options": "DSM Raw Material Details"
+  },
+  {
+   "fieldname": "section_break_3",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "m12",
+   "fieldtype": "Heading",
+   "label": "Machine 1&2"
   },
   {
    "fieldname": "m12top",
@@ -58,11 +103,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "m12",
-   "fieldtype": "Heading",
-   "label": "Machine 1&2"
-  },
-  {
    "fieldname": "column_break_6",
    "fieldtype": "Column Break"
   },
@@ -70,6 +110,13 @@
    "fieldname": "m3",
    "fieldtype": "Heading",
    "label": "Machine 3"
+  },
+  {
+   "fieldname": "m3wh",
+   "fieldtype": "Link",
+   "label": "Machine3 Warehouse",
+   "options": "Warehouse",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_11",
@@ -81,26 +128,9 @@
    "label": "Compound Wall"
   },
   {
-   "fieldname": "section_break_15",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "items",
-   "fieldtype": "Table",
-   "label": "Raw Material Items to show in DSM",
-   "options": "DSM Items"
-  },
-  {
    "fieldname": "cw_wh",
    "fieldtype": "Link",
    "label": "Compound Wall Warehouse",
-   "options": "Warehouse",
-   "read_only": 1
-  },
-  {
-   "fieldname": "m3wh",
-   "fieldtype": "Link",
-   "label": "Machine3 Warehouse",
    "options": "Warehouse",
    "read_only": 1
   },
@@ -125,15 +155,14 @@
    "options": "DSM Warehouse"
   },
   {
-   "fieldname": "raw_material_details",
-   "fieldtype": "Table",
-   "label": "Raw Material Details",
-   "options": "DSM Raw Material Details"
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break"
   },
   {
-   "fieldname": "section_break_3",
-   "fieldtype": "Section Break",
-   "hidden": 1
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Raw Material Items to show in DSM",
+   "options": "DSM Items"
   },
   {
    "fieldname": "alternative_colours_section",
@@ -145,27 +174,14 @@
    "fieldtype": "Table",
    "label": "DSM Alternative Colours",
    "options": "DSM Alternative Colours"
-  },
-  {
-   "fieldname": "stock_value_report_section",
-   "fieldtype": "Section Break",
-   "label": "Stock Value Report"
-  },
-  {
-   "description": "If Item has not Item Size, then the rate will be fetch form this Price List.",
-   "fieldname": "price_list",
-   "fieldtype": "Link",
-   "label": "Price List",
-   "options": "Price List"
   }
  ],
  "index_web_pages_for_search": 1,
- "issingle": 1,
  "links": [],
- "modified": "2023-07-07 15:13:51.780405",
+ "modified": "2023-07-10 18:16:22.335694",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "DSM Defaults",
+ "name": "Stock Defaults",
  "owner": "Administrator",
  "permissions": [
   {
@@ -180,5 +196,7 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC"
+ "sort_order": "DESC",
+ "track_changes": 1,
+ "track_views": 1
 }

@@ -17,6 +17,7 @@
   "finish",
   "colour",
   "post_type",
+  "column_break_11",
   "rate"
  ],
  "fields": [
@@ -58,29 +59,41 @@
   {
    "fieldname": "item_group",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Item Group",
-   "options": "Item Group"
+   "options": "Item Group",
+   "reqd": 1
   },
   {
    "depends_on": "eval: doc.item_group == \"Pavers\"",
    "fieldname": "finish",
    "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Finish",
+   "mandatory_depends_on": "eval: doc.item_group == \"Pavers\"",
    "options": "\nNormal\nShot Blast"
   },
   {
    "depends_on": "eval: doc.item_group == \"Pavers\"",
    "fieldname": "colour",
    "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Colour",
+   "mandatory_depends_on": "eval: doc.item_group == \"Pavers\"",
    "options": "\nColour\nGrey"
   },
   {
    "depends_on": "eval: doc.item_group == \"Compound Walls\"",
    "fieldname": "post_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Post Type",
-   "options": "\nPost\nCorner Post\nFencing Post\nU Drain Post"
+   "mandatory_depends_on": "eval: doc.item_group == \"Compound Walls\"",
+   "options": "\nPost\nCorner Post\nFencing Post"
   },
   {
    "fieldname": "uom",
@@ -89,11 +102,15 @@
    "label": "UOM",
    "options": "UOM",
    "reqd": 1
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-07 16:01:35.473461",
+ "modified": "2023-07-10 11:24:34.655837",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Item Size Rate",

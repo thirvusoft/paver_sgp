@@ -8,7 +8,7 @@ from frappe.model.document import Document
 from frappe.utils.data import nowdate, nowtime
 from ganapathy_pavers import uom_conversion
 
-def get_stock_qty(item_code, warehouse, date, time=None, uom_conv = True):
+def get_stock_qty(item_code, warehouse, date, time=None, to_uom = None, uom_conv = True):
 	qty = 0
 	for i in warehouse:
 		qty += get_previous_sle({
@@ -17,6 +17,10 @@ def get_stock_qty(item_code, warehouse, date, time=None, uom_conv = True):
 			'posting_date': date,
 			'posting_time': time
 		}).get('qty_after_transaction', 0) or 0
+	
+	if to_uom:
+		return uom_conversion(item=item_code, from_uom=None, from_qty=qty, to_uom=to_uom)
+
 	return dsm_uom_conversion(item_code, qty) if uom_conv else qty
 
 def dsm_uom_conversion(item, qty, uom=None):

@@ -7,6 +7,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "unit",
   "date",
   "production_date",
   "time",
@@ -275,12 +276,23 @@
    "fieldname": "production_date",
    "fieldtype": "Date",
    "label": "Production Date"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "unit",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Unit / Location",
+   "options": "Location",
+   "read_only_depends_on": "eval: doc.docstatus == 1 && doc.unit && !doc.__unsaved",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-04-28 16:18:04.095658",
+ "modified": "2023-07-10 18:35:58.748896",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Daily Maintenance",
