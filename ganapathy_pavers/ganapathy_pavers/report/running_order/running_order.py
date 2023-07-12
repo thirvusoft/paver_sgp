@@ -58,8 +58,8 @@ def execute(filters=None):
 		working_status += f"""  and (SELECT sum(ds1.delivered_stock_qty + ds1.returned_stock_qty)  FROM `tabDelivery Status` as ds1 WHERE ds1.parent=sw.name)>0 AND sw.total_layed_sqft>0"""
 
 	laying_query = f"""
-		(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter}) as total_laying,
-		(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter}) as bundle_laying,
+		(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name AND (CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = pav_cw.item END) {jw_filter}) as total_laying,
+		(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name AND (CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = pav_cw.item END) {jw_filter}) as bundle_laying,
 	"""
 
 	date=from_date
@@ -74,49 +74,46 @@ def execute(filters=None):
 	
 	if date:
 		laying_query = f"""
-			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date < '{date}') as total_laying,
-			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date < '{date}') as bundle_laying,
-			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND {date_filter}) as total_laying_date,
-			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND {date_filter}) as bundle_laying_date,
+			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date < '{date}' AND (CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = pav_cw.item END)) as total_laying,
+			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND jw.start_date < '{date}' AND (CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = pav_cw.item END)) as bundle_laying,
+			(SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND {date_filter} AND (CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = pav_cw.item END)) as total_laying_date,
+			(SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=sw.name {jw_filter} AND {date_filter} AND (CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = pav_cw.item END)) as bundle_laying_date,
 		"""
 
-	for sw in sw_list:		
+	for sw in sw_list:
 		site_data=frappe.db.sql(f"""
 			SELECT 
 				sw.name as site_name,
-				(
-				SELECT 
-					GROUP_CONCAT(
-					IF(
-						pav_cw.parent='{sw.name}'
-						, pav_cw.item
-						, NULL
-					) 
-					SEPARATOR ', '
-					) 
-				FROM `{table_name}` pav_cw
-				WHERE pav_cw.work != "Supply Only"
-				) as design,
-				(SELECT sum(ps.{field_name}) FROM `{table_name}` as ps WHERE ps.parent='{sw.name}' AND ps.work != "Supply Only") as po_qty,
-				(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as total_delivery,
-				(SELECT sum(ds.delivered_bundle + ds.returned_bundle) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}') as bundle_delivery,
+				sw.type as site_type,
+				pav_cw.item as design,
+				sum(pav_cw.{field_name}) as po_qty,
+				(SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}' AND ds.item = pav_cw.item) as total_delivery,
+				(SELECT sum(ds.delivered_bundle + ds.returned_bundle) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}' AND ds.item = pav_cw.item) as bundle_delivery,
 				{laying_query}
 				(
-					IFNULL((SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}'), 0)
-					- IFNULL((SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}), 0)
+					IFNULL((SELECT sum(ds.delivered_stock_qty + ds.returned_stock_qty) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}' AND CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE ds.item = pav_cw.item END), 0)
+					- IFNULL((SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' AND CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = pav_cw.item END AND jw.other_work=0), 0)
 				) as site_stock,
 				(
-					IFNULL((SELECT sum(ds.delivered_bundle + ds.returned_bundle) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}'), 0)
-					- IFNULL((SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' {jw_filter}), 0)
+					IFNULL((SELECT sum(ds.delivered_bundle + ds.returned_bundle) FROM `tabDelivery Status` as ds WHERE ds.parent='{sw.name}' AND CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE ds.item = pav_cw.item END), 0)
+					- IFNULL((SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent='{sw.name}' AND CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = pav_cw.item END AND jw.other_work=0), 0)
 				) as bundle_site_stock,
 				null as raw_material_fixed,
 				null as raw_material_delivered
 			FROM `tabProject` as sw
-			WHERE sw.name='{sw.name}'
-			{supply_only_filter}
-			{working_status}
+			INNER JOIN `{table_name}` pav_cw
+			ON sw.name = pav_cw.parent AND pav_cw.parenttype = 'Project'
+			WHERE 
+				sw.name='{sw.name}' and
+				pav_cw.work != "Supply Only"
+				{supply_only_filter}
+				{working_status}
+			GROUP BY
+				pav_cw.item
 		""", as_dict=1)
 
+		site_data += get_delivery_detail(sw.name, site_data, laying_query)
+		
 		raw_material=frappe.db.sql(f"""
 			SELECT 
 				rw.item as raw_material
@@ -127,21 +124,70 @@ def execute(filters=None):
 			AND rw.customer_scope = {filters.get("customer_scope", 0)} 
 			AND rw.rate_inclusive = {filters.get("rate_inclusive", 0)}
 		""", as_dict=1)
+
 		if not raw_material and (filters.get("customer_scope", 0) or filters.get("rate_inclusive", 0)):
 			continue
 
-		if raw_material and site_data:
+		if raw_material:
+			if not site_data:
+				site_data = [{'site_name': sw.name}]
 			for rm_idx in range(0, len(raw_material), 1):
-				if rm_idx==0:
-					site_data[0].update(raw_material[0])
+				if (rm_idx+1) <= len(site_data):
+					site_data[rm_idx].update(raw_material[rm_idx])
 				else:
 					site_data.append(raw_material[rm_idx])
+
 		if site_data:
-			data += site_data or []
+			for row_idx in range(len(site_data)):
+				if (row_idx!=0):
+					site_data[row_idx]['site_name'] = None
+					if (site_data[row_idx].get('site_type') == 'Compound Wall'):
+						for field in [ 'total_laying', 'total_laying_date', 'bundle_laying', 'bundle_laying_date']:
+							site_data[row_idx][field] = None
+
+			data += (site_data or []) + [{}]
 
 	columns=get_columns(filters)
 	return columns,data
 	
+def get_delivery_detail(site_work, site_data, laying_query):
+	"""
+		If a item is not in site work like no sales order or supply only sales order
+		and also have deliveries, then this will return the delivery and laying details
+	"""
+	site_data_items = [row.design for row in site_data if row.design]
+	ds_filters = ''
+
+	if site_data_items:
+		ds_filters += f""" and ds.item not in ({", ".join(f"'{item}'" for item in site_data_items)}) """
+		
+	add_items = frappe.db.sql(f"""
+		SELECT
+			ds.parent as site_name,
+			sw.type as site_type,
+			ds.item as design,
+			(ds.delivered_stock_qty + ds.returned_stock_qty) as total_delivery,
+			(ds.delivered_bundle + ds.returned_bundle) as bundle_delivery,
+			{laying_query.replace('pav_cw.item', 'ds.item')}
+			(
+				IFNULL((ds.delivered_stock_qty + ds.returned_stock_qty), 0)
+				- IFNULL((SELECT sum(jw.sqft_allocated) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=ds.parent AND CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = ds.item END AND jw.other_work=0), 0)
+			) as site_stock,
+			(
+				IFNULL((ds.delivered_bundle + ds.returned_bundle), 0)
+				- IFNULL((SELECT sum(jw.completed_bundle) FROM `tabTS Job Worker Details` as jw WHERE jw.parent=ds.parent AND CASE WHEN sw.type='Compound Wall' THEN 1=1 ELSE jw.item = ds.item END AND jw.other_work=0), 0)
+			) as bundle_site_stock,
+			null as raw_material_fixed,
+			null as raw_material_delivered
+		FROM `tabProject` sw
+		inner join `tabDelivery Status` ds on ds.parent = sw.name and ds.parenttype = 'Project' 
+		WHERE
+			sw.name = '{site_work}'
+			{ds_filters}
+	""", as_dict=True)
+
+	return add_items
+
 
 def get_columns(filters):
 
@@ -206,6 +252,8 @@ def get_columns(filters):
 			"label": f"""Bndl Laying @ {frappe.utils.formatdate(filters.get("from_date", ""))} { f''' to {frappe.utils.formatdate(filters.get("to_date", ""))}''' if filters.get("to_date") else ""}""",
 			"fieldtype": "Float",
 			"fieldname": "bundle_laying_date",
+			"hidden": not (filters.get("from_date") or filters.get("to_date")),
+			"hidden": not filters.get("date"),
 			"hidden": not (filters.get("from_date") or filters.get("to_date")),
 			"width": 100
 		},
