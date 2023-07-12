@@ -34,7 +34,7 @@ def get_production_details(date=None, from_date=None, to_date=None, machines=[],
         cw_filt = {'docstatus':['!=', 2], 'type': ['in', ['Post', 'Slab']]}
         lg_filt ={'docstatus':['!=', 2], 'type': 'Lego Block'}
         fp_filt ={'docstatus':['!=', 2], 'type': 'Fencing Post'}
-        pm_filt = {'docstatus':['!=', 2]}
+        pm_filt = {'docstatus':['!=', 2], "is_sample": 0}
         if(from_date):
             pm_filt['from_time'] = ['>=', add_days(from_date,1)]
             cw_filt['molding_date'] = ['>=', from_date]

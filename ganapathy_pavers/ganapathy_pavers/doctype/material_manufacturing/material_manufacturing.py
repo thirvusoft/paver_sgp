@@ -250,7 +250,7 @@ def make_stock_entry(doc,type1):
        frappe.msgprint("New Stock Entry Created "+stock_entry.name)
    elif doc.get("stock_entry_rack_shift")=="Repack" and type1 == "create_rack_shiftingstock_entry":
        if doc.get("total_rack_shift_expense") == 0:
-           frappe.throw("Please Enter From Time - To Time in Rack Shifting Section and Save This Form as Rack Shifting expense is empty")
+           frappe.throw("Rack Shift Expense cannot be Empty")
        valid = frappe.get_all("Stock Entry",filters={"usb":doc.get("name"),"stock_entry_type":"Repack","docstatus":["!=",2]},pluck="name")
        stock_entry.set_posting_time = 1
        stock_entry.posting_date = frappe.utils.formatdate(doc.get("to_time_rack"), "yyyy-MM-dd")

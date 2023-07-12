@@ -93,6 +93,7 @@ def get_data(filters):
     data={}
     paver_filters={
         'from_time':['between',[filters.get('from_date'),filters.get('to_date')]],
+        'is_sample': 0
     }
     if filters.get("machine"):
         paver_filters["work_station"]=["in", filters.get("machine")]
@@ -148,8 +149,8 @@ def get_production_cost(filters, item):
     query=f"""
         SELECT 
             (
-                SELECT AVG((lomm.operators_cost_in_manufacture+lomm.operators_cost_in_rack_shift))/AVG(lomm.total_production_sqft) + 
-                AVG((lomm.labour_cost_manufacture+lomm.labour_cost_in_rack_shift+lomm.labour_expense))/AVG(lomm.total_production_sqft)
+                SELECT AVG((lomm.operators_cost_in_manufacture+lomm.operators_cost_in_rack_shift))/AVG(CASE WHEN lomm.is_sample=0 THEN lomm.total_production_sqft ELSE 0 END) + 
+                AVG((lomm.labour_cost_manufacture+lomm.labour_cost_in_rack_shift+lomm.labour_expense))/AVG(CASE WHEN lomm.is_sample=0 THEN lomm.total_production_sqft ELSE 0 END)
                 FROM `tabMaterial Manufacturing` as lomm
                 {conditions.replace("mm.", "lomm.").replace(F"AND lomm.item_to_manufacture='{item}'", " ")}
             ) as labour_operator_cost,
@@ -161,7 +162,7 @@ def get_production_cost(filters, item):
                         from `tabMaterial Manufacturing` mmm
                         {conditions.replace("mm.", "mmm.") + " AND mmm.item_to_manufacture=mm.item_to_manufacture"}
                     )
-                )/SUM(mm.total_production_sqft)
+                )/SUM(CASE WHEN mm.is_sample=0 THEN mm.total_production_sqft ELSE 0 END)
             ) as prod_cost,
         AVG(mm.strapping_cost_per_sqft) as strapping,
         AVG(mm.shot_blast_per_sqft) as shot_blasting

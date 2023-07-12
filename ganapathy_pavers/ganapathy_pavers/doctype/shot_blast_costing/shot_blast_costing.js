@@ -10,6 +10,7 @@ frappe.ui.form.on('Shot Blast Costing', {
 				args["item_to_manufacture"] = data.item_name
 			}
 			args["is_shot_blasting"] = 1
+			args["is_sample"] = 0
 			args["docstatus"] = ["!=", 2]
 			args["shot_blasted_bundle"] = [">", 0]
 			if (frm.doc.to_time) {
@@ -32,12 +33,13 @@ frappe.ui.form.on('Shot Blast Costing', {
 			return {
 				query: "ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.batch_query",
 				filters: {
-					material_manufacturing: row.material_manufacturing
+					material_manufacturing: row.material_manufacturing,
+					is_sample: 0
 				}
 			}
 		})
 		var mm_items = [];
-		await frappe.db.get_list('Material Manufacturing', { filters: { is_shot_blasting: 1, docstatus: 0 }, fields: ['item_to_manufacture'], limit: 0 }).then((value) => {
+		await frappe.db.get_list('Material Manufacturing', { filters: { is_shot_blasting: 1, docstatus: 0, is_sample: 0 }, fields: ['item_to_manufacture'], limit: 0 }).then((value) => {
 			for (let i = 0; i < value.length; i++) {
 				if (!(mm_items.includes(value[i].item_to_manufacture))) {
 					mm_items.push(value[i].item_to_manufacture)

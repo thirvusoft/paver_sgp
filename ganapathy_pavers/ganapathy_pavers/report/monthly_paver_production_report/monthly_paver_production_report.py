@@ -39,7 +39,7 @@ def execute(filters=None):
 		bom_item = frappe.db.sql(""" 
 								select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent {0} group by item_code """.format(condition),as_list=1)
 		production_qty = frappe.db.sql(""" 
-								select sum(total_production_sqft) as production_sqft,
+								select sum(CASE WHEN is_sample = 0 THEN total_production_sqft ELSE 0 END) as production_sqft,
 								item_to_manufacture as item_to_manufacture,
 								avg(item_price) as item_price,
 								sum(rack_shifting_total_expense1) as rack_shifting_total_expense1,
@@ -65,7 +65,7 @@ def execute(filters=None):
 		test_data.append({
 			"material":"-",
 			"qty":f"""<b>Item:</b> {production_qty[0]['item_to_manufacture']}"""   if filters.get("item") else "",
-			"sqft":f"<b>SQFT :</b> {production_qty[0]['production_sqft']:,.3f}",
+			"sqft":f"<b>SQFT :</b> {(production_qty[0]['production_sqft'] or 0):,.3f}",
 			"uom":f"<b>Production Cost per SQFT :</b> ₹{production_qty[0]['item_price']:,.3f}",
 		})
 		test_data.append({})
@@ -77,7 +77,7 @@ def execute(filters=None):
 			test_data.append({
 				"material":item[0],
 				"qty":float(item[1]),
-				"sqft":f"{item[1] / production_qty[0]['production_sqft']:,.3f}",
+				"sqft":f"{item[1] / (production_qty[0]['production_sqft'] or 1):,.3f}",
 				"uom":item[2],
 				**{
 					frappe.scrub(uom): (rm_uoms_total.update({uom: (rm_uoms_total.get(uom) or [])+[uom_conversion(item=item[0], from_uom=item[2], from_qty=item[1], to_uom=uom, throw_err=False)]})) 
@@ -87,9 +87,9 @@ def execute(filters=None):
 				},
 				"rate":f'₹{item[3]:,.2f}',
 				"amount":f'₹{item[4]:,.2f}',
-				"cost_per_sqft":f"₹{item[4] / production_qty[0]['production_sqft']:,.3f}",
+				"cost_per_sqft":f"₹{item[4] / (production_qty[0]['production_sqft'] or 1):,.3f}",
 			})
-			total_cost_per_sqft += item[4] / production_qty[0]['production_sqft']
+			total_cost_per_sqft += item[4] / (production_qty[0]['production_sqft'] or 1)
 
 		test_data.append({
 			**{frappe.scrub(uom):sum(rm_uoms_total.get(uom) or []) for uom in rm_uoms_total},
