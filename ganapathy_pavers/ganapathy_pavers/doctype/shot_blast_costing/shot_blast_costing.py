@@ -65,10 +65,10 @@ class ShotBlastCosting(Document):
     def calculate_total_damage_cost(self):
         total_cost=0
         for row in self.get('items') or []:
-            if row.material_manufacturing and row.damages_in_sqft:
+            if row.material_manufacturing:
                 prod_date = frappe.get_value("Material Manufacturing", row.material_manufacturing, "from_time")
-                row.per_sqft_rate = get_paver_production_rate(item=row.item_name, date=prod_date) or 0
-                row.damage_cost = row.damages_in_sqft * (row.per_sqft_rate or 0)
+                row.per_sqft_rate = get_paver_production_rate(item=row.item_name, date=prod_date, include_sample_rate=1) or 0
+                row.damage_cost = (row.damages_in_sqft or 0) * (row.per_sqft_rate or 0)
                 total_cost += row.damage_cost or 0
         self.total_damage_cost = total_cost
 
@@ -77,13 +77,17 @@ class ShotBlastCosting(Document):
             wrk = frappe.db.get_single_value("USB Setting", "default_shot_blast_workstation")
             self.workstation = wrk
 
-        if not self.warehouse:
-            curing_t = frappe.db.get_value("Workstation", self.workstation, "default_curing_target_warehouse")
-            self.warehouse = curing_t
+        source_warehouse = frappe.db.get_value('Workstation', self.workstation, 'default_curing_target_warehouse_for_setting')
 
-        if not self.source_warehouse:
-            curing_s = frappe.db.get_value("Workstation", self.workstation, "default_curing_target_warehouse_for_setting")
-            self.source_warehouse = curing_s
+        target_warehouse = frappe.db.get_value('Workstation', self.workstation, 'default_curing_target_warehouse')
+        sample_target_warehouse = frappe.db.get_value('Workstation', self.workstation, 'default_sample_finished_target_warehouse')
+        for row in self.items:
+            row.source_warehouse = source_warehouse
+            if frappe.db.get_value('Material Manufacturing', row.material_manufacturing, 'is_sample'):
+                row.target_warehouse = sample_target_warehouse
+            else:
+                row.target_warehouse = target_warehouse
+
 
     def before_submit(doc):
         material = frappe.get_all("Stock Entry",filters={"shot_blast":doc.get("name")},pluck="name")
@@ -177,14 +181,14 @@ def make_stock_entry(doc):
     stock_entry.stock_entry_type = "Repack"
     for i in doc.get("items"):
         stock_entry.append('items', dict(
-            s_warehouse = doc.get("source_warehouse"), 
+            s_warehouse = i.get("source_warehouse"), 
             item_code = i["item_name"],
             qty = i["sqft"]-i["damages_in_sqft"], 
             uom = frappe.db.get_value("Item", i["item_name"], "stock_uom"),
             batch_no = i["batch"]
         ))
         stock_entry.append('items', dict(
-            t_warehouse = doc.get("warehouse"), 
+            t_warehouse = i.get("target_warehouse"), 
             item_code = i["item_name"],
             qty = i["sqft"]-i["damages_in_sqft"], 
             uom = frappe.db.get_value("Item", i["item_name"], "stock_uom"),
@@ -192,8 +196,8 @@ def make_stock_entry(doc):
 
         check_batch_stock_avalability(
             i["batch"], 
-            doc.get("source_warehouse"), 
-            doc.get("warehouse"),
+            i.get("source_warehouse"), 
+            i.get("target_warehouse"),
             _datetime.date(),
             _datetime.time(),
             i["sqft"]
@@ -201,7 +205,7 @@ def make_stock_entry(doc):
         
         if i["damages_in_nos"] > 0:
             stock_entry.append('items', dict(
-                s_warehouse = doc.get("source_warehouse"),t_warehouse = default_scrap_warehouse, item_code = i["item_name"]	,qty = i["damages_in_nos"], uom = default_nos, is_process_loss = 1,batch_no = i["batch"]
+                s_warehouse = i.get("source_warehouse"),t_warehouse = default_scrap_warehouse, item_code = i["item_name"]	,qty = i["damages_in_nos"], uom = default_nos, is_process_loss = 1,batch_no = i["batch"]
                 ))
     stock_entry.append('additional_costs', dict(
             expense_account	 = expenses_included_in_valuation, amount = doc.get("total_cost"),description = "In Shot Blast, Cost of Labour and Additional"

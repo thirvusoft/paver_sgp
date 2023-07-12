@@ -215,7 +215,7 @@ def get_item_price_list_rate(item, date):
 	item_price=get_item_price(args=args, item_code=item)
 	return item_price[0][1] if len(item_price) and len(item_price[0])>1 else 0
 
-def get_paver_production_rate(item, date=None):
+def get_paver_production_rate(item, date=None, include_sample_rate=False):
 	def get_paver_production_date(filters, item):
 		if frappe.get_all("Material Manufacturing", {
 			"item_to_manufacture": item,
@@ -257,7 +257,7 @@ def get_paver_production_rate(item, date=None):
 	}
 	filters = get_paver_production_date(filters, item)
 
-	return sum(get_production_cost(filters, item))
+	return sum(get_production_cost(filters, item, include_sample_rate=include_sample_rate))
 
 def get_cw_production_rate(_type=[], date=None):
 	def get_cw_production_date(_type, filters):
