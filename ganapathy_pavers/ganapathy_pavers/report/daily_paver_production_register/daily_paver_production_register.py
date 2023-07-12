@@ -62,7 +62,10 @@ def get_columns(filters):
 
 def get_data(filters):
     data=[]
-    _filters={'from_time':['between',[filters.get('from_date'),filters.get('to_date')]]}
+    _filters={
+            'from_time': ['between',[filters.get('from_date'),filters.get('to_date')]],
+            'is_sample': 0
+        }
     if filters.get('item'):
         _filters["item_to_manufacture"]=filters.get('item')
     if filters.get('machine'):

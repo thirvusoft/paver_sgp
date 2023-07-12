@@ -75,6 +75,7 @@ def site_work(doc):
 		
 		if [item["item_code"], get_first_day(item["creation"])] not in paver_prod_details:
 			prod_cost=get_item_price_list_rate(item["item_code"], item["creation"])
+			frappe.errprint(f""" {item["item_code"]}  {item["creation"]}  {prod_cost} """ )
 			paver_prod_details.append([item["item_code"], get_first_day(item["creation"])])
 			if prod_cost:
 				production_rate[item['item_code']].append(prod_cost)
@@ -214,11 +215,12 @@ def get_item_price_list_rate(item, date):
 	item_price=get_item_price(args=args, item_code=item)
 	return item_price[0][1] if len(item_price) and len(item_price[0])>1 else 0
 
-def get_paver_production_rate(item, date=None):
+def get_paver_production_rate(item, date=None, include_sample_rate=False):
 	def get_paver_production_date(filters, item):
 		if frappe.get_all("Material Manufacturing", {
 			"item_to_manufacture": item,
 			"docstatus": ["!=", 2],
+			"is_sample": 0,
 			"from_time": ["between", [filters.get('from_date'), filters.get('to_date')]]
 			}):
 			return filters
@@ -226,6 +228,7 @@ def get_paver_production_rate(item, date=None):
 		date = frappe.get_all("Material Manufacturing",{
 			"item_to_manufacture": item,
 			"docstatus": ["!=", 2],
+			"is_sample": 0,
 			"from_time": ["<=", filters.get('to_date'),]
 			}, order_by="from_time desc", pluck="from_time", limit=1)
 
@@ -233,6 +236,7 @@ def get_paver_production_rate(item, date=None):
 			date = frappe.get_all("Material Manufacturing",{
 			"item_to_manufacture": item,
 			"docstatus": ["!=", 2],
+			"is_sample": 0,
 			}, order_by="from_time desc", pluck="from_time", limit=1)
 		
 		if not date:
@@ -253,7 +257,7 @@ def get_paver_production_rate(item, date=None):
 	}
 	filters = get_paver_production_date(filters, item)
 
-	return sum(get_production_cost(filters, item))
+	return sum(get_production_cost(filters, item, include_sample_rate=include_sample_rate))
 
 def get_cw_production_rate(_type=[], date=None):
 	def get_cw_production_date(_type, filters):

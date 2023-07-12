@@ -117,7 +117,7 @@
    "hidden": 0,
    "is_query_report": 1,
    "label": "Running Order Report",
-   "link_to": "Running Order Report",
+   "link_to": "Running Order",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -140,7 +140,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-02-16 18:48:53.413083",
+ "modified": "2023-07-12 12:29:45.693252",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Sales Cycle",

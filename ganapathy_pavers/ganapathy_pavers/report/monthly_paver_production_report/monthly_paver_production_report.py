@@ -5,10 +5,12 @@
 import frappe
 import json
 from frappe import _
+from ganapathy_pavers import uom_conversion
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
 from ganapathy_pavers.custom.py.expense import  expense_tree
 
 def execute(filters=None):
+	rm_uoms = frappe.db.get_all("Item Group UOM", {'parenttype': 'Item Group', 'parent': 'Raw Material'}, pluck='uom')
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 	item=filters.get("item")
@@ -37,7 +39,7 @@ def execute(filters=None):
 		bom_item = frappe.db.sql(""" 
 								select item_code,sum(qty),uom,avg(rate),sum(amount) from `tabBOM Item` where parent {0} group by item_code """.format(condition),as_list=1)
 		production_qty = frappe.db.sql(""" 
-								select sum(total_production_sqft) as production_sqft,
+								select sum(CASE WHEN is_sample = 0 THEN total_production_sqft ELSE 0 END) as production_sqft,
 								item_to_manufacture as item_to_manufacture,
 								avg(item_price) as item_price,
 								sum(rack_shifting_total_expense1) as rack_shifting_total_expense1,
@@ -63,24 +65,34 @@ def execute(filters=None):
 		test_data.append({
 			"material":"-",
 			"qty":f"""<b>Item:</b> {production_qty[0]['item_to_manufacture']}"""   if filters.get("item") else "",
-			"sqft":f"<b>SQFT :</b> {production_qty[0]['production_sqft']:,.3f}",
+			"sqft":f"<b>SQFT :</b> {(production_qty[0]['production_sqft'] or 0):,.3f}",
 			"uom":f"<b>Production Cost per SQFT :</b> ₹{production_qty[0]['item_price']:,.3f}",
 		})
 		test_data.append({})
 		total_cost_per_sqft = 0
+
+		rm_uoms_total = {}
+
 		for item in bom_item:
 			test_data.append({
 				"material":item[0],
 				"qty":float(item[1]),
-				"sqft":f"{item[1] / production_qty[0]['production_sqft']:,.3f}",
+				"sqft":f"{item[1] / (production_qty[0]['production_sqft'] or 1):,.3f}",
 				"uom":item[2],
+				**{
+					frappe.scrub(uom): (rm_uoms_total.update({uom: (rm_uoms_total.get(uom) or [])+[uom_conversion(item=item[0], from_uom=item[2], from_qty=item[1], to_uom=uom, throw_err=False)]})) 
+					or
+					rm_uoms_total[uom][-1]  # uom updated in list to calculate total
+					for uom in rm_uoms
+				},
 				"rate":f'₹{item[3]:,.2f}',
 				"amount":f'₹{item[4]:,.2f}',
-				"cost_per_sqft":f"₹{item[4] / production_qty[0]['production_sqft']:,.3f}",
+				"cost_per_sqft":f"₹{item[4] / (production_qty[0]['production_sqft'] or 1):,.3f}",
 			})
-			total_cost_per_sqft += item[4] / production_qty[0]['production_sqft']
+			total_cost_per_sqft += item[4] / (production_qty[0]['production_sqft'] or 1)
 
 		test_data.append({
+			**{frappe.scrub(uom):sum(rm_uoms_total.get(uom) or []) for uom in rm_uoms_total},
 			"rate":"<b>Production Cost</b>",
 			"amount":f"<b>₹{production_qty[0]['total_raw_material']:,.2f}</b>",
 			"cost_per_sqft":f"<b>₹{total_cost_per_sqft:,.3f}</b>"
@@ -158,15 +170,16 @@ def execute(filters=None):
 				})
 				if data and len(data)>0:
 					data[0]["uom"] = f"<b>Production Cost per SQFT :</b> ₹{((production_cost_per_sqft or 0)+(total_sqf or 0)):,.3f}"
-	columns = get_columns()
+	columns = get_columns(rm_uoms)
 	return columns, data
 
-def get_columns():
+def get_columns(rm_uoms=[]):
 	columns = [
 		_("Material") + ":Link/Item:150",
 		_("QTY") + ":Data:200",
 		_("Sqft") + ":Data:200",
 		_("UOM") + ":Link/UOM:250",
+		*[_(uom) + ":Float:100" for uom in rm_uoms],
 		_("Rate") + ":Data:200",
 		_("Amount") + ":Data:150",
 		_("Cost Per SQFT") + ":Data:100",

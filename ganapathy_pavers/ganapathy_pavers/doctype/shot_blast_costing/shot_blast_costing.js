@@ -32,7 +32,7 @@ frappe.ui.form.on('Shot Blast Costing', {
 			return {
 				query: "ganapathy_pavers.ganapathy_pavers.doctype.shot_blast_costing.shot_blast_costing.batch_query",
 				filters: {
-					material_manufacturing: row.material_manufacturing
+					material_manufacturing: row.material_manufacturing,
 				}
 			}
 		})
@@ -64,17 +64,28 @@ frappe.ui.form.on('Shot Blast Costing', {
 			frm.trigger('fetch_warehouse_from_workstation');
 		}
 	},
-	fetch_warehouse_from_workstation: function (frm) {
+	fetch_warehouse_from_workstation: async function (frm) {
 		if (frm.doc.workstation) {
-			frappe.db.get_value("Workstation", frm.doc.workstation, "default_curing_target_warehouse").then(value => {
-				cur_frm.set_value("warehouse", value['message']['default_curing_target_warehouse'])
-			})
-			cur_frm.refresh_field("warehouse");
+			let source_warehouse = await frappe.db.get_value("Workstation", frm.doc.workstation, "default_curing_target_warehouse_for_setting")
 
-			frappe.db.get_value("Workstation", frm.doc.workstation, "default_curing_target_warehouse_for_setting").then(value => {
-				cur_frm.set_value("source_warehouse", value['message']['default_curing_target_warehouse_for_setting'])
-			})
-			cur_frm.refresh_field("source_warehouse");
+			let sample_target_warehouse = await frappe.db.get_value("Workstation", frm.doc.workstation, "default_sample_finished_target_warehouse")
+			let target_warehouse = await frappe.db.get_value("Workstation", frm.doc.workstation, "default_curing_target_warehouse")
+
+			frm.doc.items?.forEach(async (row) => {
+				let is_sample = (await frappe.db.get_value("Material Manufacturing", row.material_manufacturing, 'is_sample'));
+				if (is_sample['message']['is_sample']) {
+					frappe.model.set_value(row.doctype, row.name, 'target_warehouse', sample_target_warehouse['message']['default_sample_finished_target_warehouse'])
+				} else {
+					frappe.model.set_value(row.doctype, row.name, 'target_warehouse', target_warehouse['message']['default_curing_target_warehouse'])
+				}
+			});
+
+
+			(frm.doc.items || []).forEach(row => {
+				frappe.model.set_value(row.doctype, row.name, 'source_warehouse', source_warehouse['message']['default_curing_target_warehouse_for_setting'])
+			});
+
+			cur_frm.refresh_field("items");
 		}
 	},
 	validate: function (frm) {
@@ -173,7 +184,7 @@ frappe.ui.form.on('Shot Blast Costing', {
 	},
 });
 frappe.ui.form.on('Shot Blast Items', {
-	material_manufacturing: function (frm, cdt, cdn) {
+	material_manufacturing: async function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
 		if (!row.material_manufacturing) {
 			return
@@ -182,6 +193,7 @@ frappe.ui.form.on('Shot Blast Items', {
 			frappe.model.set_value(cdt, cdn, "item_name", r.item_to_manufacture)
 			frappe.model.set_value(cdt, cdn, "batch", r.batch_no_curing)
 		});
+		await frm.trigger('fetch_warehouse_from_workstation');
 	},
 	damages_in_nos: async function (frm, cdt, cdn) {
 		total_damage_cost(frm)

@@ -24,7 +24,11 @@ frappe.ui.form.on('Material Manufacturing', {
 		value_from_workstation("default_rack_shift_source_warehouse", "rack_shift_source_warehouse")
 		value_from_workstation("default_rack_shift_target_warehouse", "rack_shift_target_warehouse")
 		value_from_workstation("default_curing_source_warehouse", "curing_source_warehouse")
-		value_from_workstation("default_curing_target_warehouse", "curing_target_warehouse")
+		if (frm.doc.is_sample) {
+			value_from_workstation("default_sample_finished_target_warehouse", "curing_target_warehouse")
+		} else {
+			value_from_workstation("default_curing_target_warehouse", "curing_target_warehouse")
+		}
 	},
 	get_bin_items: async function (frm) {
 		frm.clear_table("bin_items");
@@ -72,6 +76,13 @@ frappe.ui.form.on('Material Manufacturing', {
 		else {
 			frm.set_value("shot_blast_per_sqft", 0)
 			default_value("default_curing_target_warehouse", "curing_target_warehouse")
+		}
+	},
+	is_sample: function (frm) {
+		if (frm.doc.is_sample) {
+			value_from_workstation("default_sample_finished_target_warehouse", "curing_target_warehouse")
+		} else {
+			value_from_workstation("default_curing_target_warehouse", "curing_target_warehouse")
 		}
 	},
 	from_time: function (frm) {

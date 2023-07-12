@@ -30,7 +30,7 @@ def get_columns():
 
 def get_data(filters= {}):
 	final_data = []
-	pm_filt = {'docstatus':['!=', 2]}
+	pm_filt = {'docstatus':['!=', 2], 'is_sample': 0}
 	cw_filt = {'docstatus':['!=', 2]}
 	dl_filt = {'docstatus':1}
 	if(filters.get('from_date')):

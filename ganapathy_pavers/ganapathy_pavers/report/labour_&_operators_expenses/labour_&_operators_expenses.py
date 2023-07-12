@@ -5,7 +5,7 @@ def execute(filters=None):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 	machine=filters.get("machine", [])
-	pm_filt = "where docstatus!=2"
+	pm_filt = "where docstatus!=2 and is_sample=0 "
 	sbc_filt= "where docstatus!=2"
 	cw_filt = "where docstatus!=2 and IFNULL(type, '')!='' "
 
