@@ -334,8 +334,11 @@ def group_total(filters = {}, data = []):
 def add_list(a, b):
     ret_list1 = []
     for i in range(len(a)):
-        if((isinstance(a[i], int) or isinstance(a[i], float)) and (isinstance(b[i], int) or isinstance(b[i], float))):
-            ret_list1.append(a[i] + b[i])
+        if(isinstance(a[i], (int, float)) or isinstance(b[i], (int, float))):
+            ret_list1.append(
+                (a[i] if isinstance(a[i], (int, float)) else 0) + 
+                (b[i] if isinstance(b[i], (int, float)) else 0)
+            )
         else:
             ret_list1.append(None)
     return ret_list1
