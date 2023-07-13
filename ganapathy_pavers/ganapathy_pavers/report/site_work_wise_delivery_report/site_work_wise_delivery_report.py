@@ -125,7 +125,7 @@ def get_columns(filters={}):
 			"fieldtype": "Date",
 			"fieldname": "date",
 			"width": 100,
-            "hidden":(filters.get("summary") == 1 and filters.get("group_by") == "Date") or (filters.get("summary") == 1 and filters.get("group_by") == "Item Wise") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise"),
+            "hidden": (filters.get("summary") == 1 and filters.get("group_by") == "Item Wise") or (filters.get("summary") == 1 and filters.get("group_by") == "Customer Wise"),
 		},
         {
 			"label": ("Document Name"),
@@ -249,7 +249,7 @@ def group_total(filters = {}, data = []):
             for row in range(len(data)):
                 if(data[row][0] and row!=0 or row == len(data)-1):
                     total[3] = "Group Total"
-                    ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else [] for i in total])
+                    ret_list.append([frappe.bold(("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i))) if(i!=None) else '' for i in total])
                     ret_list.append([None] * 16)
                     ret_list.append(data[row])
                     total = [0] * 16
