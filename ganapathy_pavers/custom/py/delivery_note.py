@@ -196,6 +196,26 @@ def validate(doc,action):
             doc.value_pieces = True
         if d.ts_qty:
             doc.value_bundle = True
+    
+    if doc.transporter == "Own Transporter" and doc.own_vehicle_no:
+        vehicle_capacity_uoms = frappe.get_all("Weight and UOM", {'parent': doc.own_vehicle_no, 'parenttype': 'Vehicle'}, pluck='uom', group_by='uom')
+        filled_uoms=[]
+        for row in doc.vehicle_capacity:
+            if row.uom in vehicle_capacity_uoms:
+                filled_uoms.append(row.uom)
+                row.actual_weight = frappe.get_value("Weight and UOM", {'parent': doc.own_vehicle_no, 'parenttype': 'Vehicle', 'uom': row.uom}, 'weight') or 0
+                row.difference = (row.weight or 0) - (row.actual_weight or 0)
+        
+        for i in vehicle_capacity_uoms:
+            if i not in filled_uoms:
+                actual_weight = frappe.get_value("Weight and UOM", {'parent': doc.own_vehicle_no, 'parenttype': 'Vehicle', 'uom': i}, 'weight') or 0
+                doc.append('vehicle_capacity', {
+                    'uom': i,
+                    'actual_weight': actual_weight or 0,
+                    'weight': 0,
+                    'difference': -1 * (actual_weight or 0),
+                })
+
      
 def sales_order_required(self,event):
     """check in manage account if sales order required or not"""
