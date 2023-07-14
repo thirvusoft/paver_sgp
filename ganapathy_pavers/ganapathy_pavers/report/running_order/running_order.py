@@ -117,12 +117,13 @@ def execute(filters=None):
 		raw_material=frappe.db.sql(f"""
 			SELECT 
 				rw.item as raw_material
-				, rw.qty as raw_material_fixed
-				, (rw.delivered_quantity + rw.returned_quantity) as raw_material_delivered 
+				, SUM(rw.qty) as raw_material_fixed
+				, SUM((rw.delivered_quantity + rw.returned_quantity)) as raw_material_delivered 
 			FROM `tabRaw Materials` as rw 
 			WHERE rw.parent='{sw.name}'
 			AND rw.customer_scope = {filters.get("customer_scope", 0)} 
 			AND rw.rate_inclusive = {filters.get("rate_inclusive", 0)}
+			GROUP BY rw.item
 		""", as_dict=1)
 
 		if not raw_material and (filters.get("customer_scope", 0) or filters.get("rate_inclusive", 0)):
@@ -138,11 +139,20 @@ def execute(filters=None):
 					site_data.append(raw_material[rm_idx])
 
 		if site_data:
+			if from_date or to_date:
+				has_laying = False
+				for row in site_data:
+					if row.get('total_laying_date'):
+						has_laying = True
+						break
+
+				if not has_laying:
+					continue
 			for row_idx in range(len(site_data)):
 				if (row_idx!=0):
 					site_data[row_idx]['site_name'] = None
 					if (site_data[row_idx].get('site_type') == 'Compound Wall'):
-						for field in [ 'total_laying', 'total_laying_date', 'bundle_laying', 'bundle_laying_date']:
+						for field in [ 'total_laying', 'total_laying_date', 'bundle_laying', 'bundle_laying_date', 'site_stock', 'bundle_site_stock']:
 							site_data[row_idx][field] = None
 
 			data += (site_data or []) + [{}]
@@ -246,22 +256,22 @@ def get_columns(filters):
 			"label": ("Bndl Laying"),
 			"fieldtype": "Float",
 			"fieldname": "bundle_laying",
-			"width": 100
+			"width": 100,
+			"hidden": filters.get('type') != 'Pavers',
 		},
 		{
 			"label": f"""Bndl Laying @ {frappe.utils.formatdate(filters.get("from_date", ""))} { f''' to {frappe.utils.formatdate(filters.get("to_date", ""))}''' if filters.get("to_date") else ""}""",
 			"fieldtype": "Float",
 			"fieldname": "bundle_laying_date",
-			"hidden": not (filters.get("from_date") or filters.get("to_date")),
-			"hidden": not filters.get("date"),
-			"hidden": not (filters.get("from_date") or filters.get("to_date")),
-			"width": 100
+			"hidden": filters.get('type') != 'Pavers' or not (filters.get("from_date") or filters.get("to_date")),
+			"width": 100,
 		},
 		{
 		    "label": ("Bndl Stock @Site"),
 		    "fieldtype": "Float",
 		    "fieldname": "bundle_site_stock",
-		    "width": 100
+		    "width": 100,
+		    "hidden": filters.get('type') != 'Pavers',
 		},
 		{
 			"label": ("Raw Material"),
