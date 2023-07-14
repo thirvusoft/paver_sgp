@@ -124,8 +124,7 @@ def execute(filters=None):
 			data += test_data
 		total_sqf=0
 		total_amt=0
-		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []), item=filters.get("item"))
-		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
+		
 		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []), item=filters.get("item"))
 		if prod_details.get('paver'):
 			labour_exp = {

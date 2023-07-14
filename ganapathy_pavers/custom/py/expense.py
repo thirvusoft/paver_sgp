@@ -107,6 +107,13 @@ def expense_tree(
             prod_details=""
     if not machine:
         machine=[]
+    
+    _machine = []
+    gl_fields = [r.fieldname for r in frappe.get_meta('GL Entry').fields]
+    for mach in machine:
+        if frappe.scrub(mach) in gl_fields:
+            _machine.append(mach)
+    machine = _machine
     if not parent:
         parent=frappe.db.get_all("Account", {"root_type": "Expense", "parent_account":["is", "not set"], "is_group": 1, "company": company}, pluck="name")
         if parent:

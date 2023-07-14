@@ -203,20 +203,20 @@ frappe.ui.form.on('Shot Blast Items', {
 	},
 	bundle_taken: async function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
-		if (row.bundle_taken > (row.bdl || 0)) {
-			frappe.model.set_value(cdt, cdn, "bundle_taken", 0)
-			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
-		}
+		// if (row.bundle_taken > (row.bdl || 0)) {
+		// 	frappe.model.set_value(cdt, cdn, "bundle_taken", 0)
+		// 	frappe.throw("Taken Bundle is Greater Than Produced Bundle")
+		// }
 		let sqft = await ganapathy_pavers.uom_conversion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
 		let sqft_pieces = await ganapathy_pavers.uom_conversion(row.item_name, 'Nos', row.taken_pieces, 'SQF')
 		frappe.model.set_value(cdt, cdn, "sqft", (sqft || 0) + (sqft_pieces || 0))
 	},
 	taken_pieces: async function (frm, cdt, cdn) {
 		var row = locals[cdt][cdn]
-		if (row.bundle_taken > (row.bdl || 0)) {
-			frappe.model.set_value(cdt, cdn, "bundle_taken", 0)
-			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
-		}
+		// if (row.bundle_taken > (row.bdl || 0)) {
+		// 	frappe.model.set_value(cdt, cdn, "bundle_taken", 0)
+		// 	frappe.throw("Taken Bundle is Greater Than Produced Bundle")
+		// }
 		let sqft = await ganapathy_pavers.uom_conversion(row.item_name, 'Bdl', row.bundle_taken, 'SQF')
 		let sqft_pieces = await ganapathy_pavers.uom_conversion(row.item_name, 'Nos', row.taken_pieces, 'SQF')
 		frappe.model.set_value(cdt, cdn, "sqft", (sqft || 0) + (sqft_pieces || 0))
@@ -271,10 +271,10 @@ function total(frm) {
 		total_sqft += frm.doc.items[i].sqft || 0
 		total_pieces += frm.doc.items[i].taken_pieces || 0
 
-		if (frm.doc.items[i].bundle_taken > frm.doc.items[i].bdl) {
-			frappe.model.set_value(frm.doc.items[i].doctype, frm.doc.items[i].name, "bundle_taken", 0)
-			frappe.throw("Taken Bundle is Greater Than Produced Bundle")
-		}
+		// if (frm.doc.items[i].bundle_taken > frm.doc.items[i].bdl) {
+		// 	frappe.model.set_value(frm.doc.items[i].doctype, frm.doc.items[i].name, "bundle_taken", 0)
+		// 	frappe.throw("Taken Bundle is Greater Than Produced Bundle")
+		// }
 	}
 	cur_frm.set_value("total_bundle", total_bundle)
 	cur_frm.set_value("total_sqft", total_sqft)

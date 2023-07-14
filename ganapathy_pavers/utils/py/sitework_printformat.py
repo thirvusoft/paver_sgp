@@ -1,9 +1,11 @@
 import copy
+from ganapathy_pavers.custom.py.journal_entry import get_production_details
 from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost
 import frappe
 from frappe.utils import nowdate, get_first_day, get_last_day
 from ganapathy_pavers import uom_conversion
 from erpnext.stock.get_item_details import get_item_price
+from ganapathy_pavers.custom.py.expense import total_expense
 
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -75,7 +77,6 @@ def site_work(doc):
 		
 		if [item["item_code"], get_first_day(item["creation"])] not in paver_prod_details:
 			prod_cost=get_item_price_list_rate(item["item_code"], item["creation"])
-			frappe.errprint(f""" {item["item_code"]}  {item["creation"]}  {prod_cost} """ )
 			paver_prod_details.append([item["item_code"], get_first_day(item["creation"])])
 			if prod_cost:
 				production_rate[item['item_code']].append(prod_cost)
@@ -215,7 +216,7 @@ def get_item_price_list_rate(item, date):
 	item_price=get_item_price(args=args, item_code=item)
 	return item_price[0][1] if len(item_price) and len(item_price[0])>1 else 0
 
-def get_paver_production_rate(item, date=None, include_sample_rate=False):
+def get_paver_production_rate(item, date=None, machine=[], include_sample_rate=False, include_expense = False):
 	def get_paver_production_date(filters, item):
 		if frappe.get_all("Material Manufacturing", {
 			"item_to_manufacture": item,
@@ -253,11 +254,23 @@ def get_paver_production_rate(item, date=None, include_sample_rate=False):
 	filters = {
 		"from_date": get_first_day(date).strftime(DATE_FORMAT),
 		"to_date": get_last_day(date).strftime(DATE_FORMAT),
-		"machine": []
+		"machine": machine
 	}
 	filters = get_paver_production_date(filters, item)
+	
+	expense_rate = 0
+	if include_expense:
+		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=machine, item=filters.get("item"))
+		expense_rate = total_expense(
+                    from_date=filters.get('from_date'),
+                    to_date=filters.get('to_date'),
+                    prod_details="Paver",
+                    expense_type="Manufacturing",
+                    machine = machine,
+                ) 
+		expense_rate /= (prod_details.get('paver') or 1)
 
-	return sum(get_production_cost(filters, item, include_sample_rate=include_sample_rate))
+	return expense_rate+sum(get_production_cost(filters, item, include_sample_rate=include_sample_rate))
 
 def get_cw_production_rate(_type=[], date=None):
 	def get_cw_production_date(_type, filters):

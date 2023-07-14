@@ -67,7 +67,12 @@ class ShotBlastCosting(Document):
         for row in self.get('items') or []:
             if row.material_manufacturing:
                 prod_date = frappe.get_value("Material Manufacturing", row.material_manufacturing, "from_time")
-                row.per_sqft_rate = get_paver_production_rate(item=row.item_name, date=prod_date, include_sample_rate=1) or 0
+                machine = []
+                workstation = frappe.db.get_value("Material Manufacturing", row.material_manufacturing, "work_station")
+                location = frappe.get_value('Workstation', workstation, 'location')
+                if location:
+                    _machine = frappe.get_all('Workstation', {'location': location}, pluck='name')
+                row.per_sqft_rate = get_paver_production_rate(item=row.item_name, date=prod_date, machine=machine, include_sample_rate=1, include_expense=False) or 0
                 row.damage_cost = (row.damages_in_sqft or 0) * (row.per_sqft_rate or 0)
                 total_cost += row.damage_cost or 0
         self.total_damage_cost = total_cost
@@ -81,12 +86,12 @@ class ShotBlastCosting(Document):
 
         target_warehouse = frappe.db.get_value('Workstation', self.workstation, 'default_curing_target_warehouse')
         sample_target_warehouse = frappe.db.get_value('Workstation', self.workstation, 'default_sample_finished_target_warehouse')
-        for row in self.items:
-            row.source_warehouse = source_warehouse
-            if frappe.db.get_value('Material Manufacturing', row.material_manufacturing, 'is_sample'):
-                row.target_warehouse = sample_target_warehouse
-            else:
-                row.target_warehouse = target_warehouse
+        # for row in self.items:
+        #     row.source_warehouse = source_warehouse
+        #     if frappe.db.get_value('Material Manufacturing', row.material_manufacturing, 'is_sample'):
+        #         row.target_warehouse = sample_target_warehouse
+        #     else:
+        #         row.target_warehouse = target_warehouse
 
 
     def before_submit(doc):
