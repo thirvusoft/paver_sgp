@@ -50,6 +50,8 @@ def group_dn_items(name):
                     WHERE
                         dni.parenttype = 'Delivery Note' and
                         dni.parent = '{name}'
-                    GROUP BY dni.item_code
+                    GROUP BY 
+                        dni.item_code,
+                        dni.rate
                 """, as_dict=True)
     return items
