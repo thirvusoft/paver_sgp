@@ -1,6 +1,5 @@
 import frappe
-
-
+import ganapathy_pavers
 
 def update_qty_sitework(self,event):
     if(self.doctype=='Sales Invoice' and self.update_stock==0):
@@ -182,8 +181,17 @@ def update_customer(self,event):
                 frappe.db.set(doc, "customer", cus)
 
 def validate(doc,action):
-    
     for d in doc.items:
+        if d.so_detail:
+            d.unacc = frappe.db.get_value('Sales Order Item', d.so_detail, 'unacc')
+        
+        if d.item_group in ['Pavers', 'Compound Walls']:
+            bdl = ganapathy_pavers.uom_conversion(d.item_code, d.uom, d.qty, 'Bdl', 0)
+            pieces = ganapathy_pavers.uom_conversion(d.item_code, 'Bdl', (bdl or 0)%1, 'Nos', 0);
+            d.ts_qty = int(bdl) or 0
+            d.pieces = pieces or 0
+
+
         if d.pieces:
             doc.value_pieces = True
         if d.ts_qty:
