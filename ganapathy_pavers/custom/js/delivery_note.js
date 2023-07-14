@@ -202,13 +202,21 @@ frappe.ui.form.on("Delivery Note Item", {
 });
 
 frappe.ui.form.on("Delivery Note", {
-    validate: function (frm) {
-        (cur_frm.doc.items || []).forEach(row => {
-            if (row.unacc) {
-                frappe.model.set_value(row.doctype, row.name, 'item_tax_template', null);
+    validate: async function (frm) {
+        (cur_frm.doc.items || []).forEach(async row => {
+            let so_unacc=0;
+            if (row.so_detail) {
+                so_unacc = (await frappe.db.get_value('Sales Order', [['Sales Order Item', 'name', '=', row.so_detail]], '`tabSales Order Item`.unacc')).message.unacc
+            }
+            if (so_unacc) {
+                await frappe.model.set_value(row.doctype, row.name, 'unacc', 1);
+                await frappe.model.set_value(row.doctype, row.name, 'item_tax_template', null);
+            } else {
+                await frappe.model.set_value(row.doctype, row.name, 'unacc', 0);
             }
         })
         refresh_field("items");
+        frm.trigger("taxes_and_charges");
     },
     taxes_and_charges: function (frm) {
         if (frm.doc.branch) {
@@ -238,9 +246,6 @@ frappe.ui.form.on("Delivery Note", {
         frm.trigger("taxes_and_charges")
     },
     branch: function (frm) {
-        frm.trigger("taxes_and_charges")
-    },
-    validate: function (frm) {
         frm.trigger("taxes_and_charges")
     },
 });
