@@ -1,0 +1,21 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Production Ratio",
+   "width": "Full"
+  }
+ ],
+ "creation": "2023-07-17 13:00:49.822416",
+ "dashboard_name": "Manufacturing Dashboard",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2023-07-17 13:04:42.389398",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Manufacturing Dashboard",
+ "owner": "Administrator"
+}
