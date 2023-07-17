@@ -157,6 +157,9 @@ doc_events = {
 		],
 		"before_validate": [
 			"ganapathy_pavers.utils.event.validate_prime_item",
+		],
+		"on_update": [
+			"ganapathy_pavers.custom.py.item.update_paver_type_in_prod"
 		]
 	},
 	"Stock Entry": {

@@ -28,6 +28,15 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"fieldtype": "Link",
 			"width": "100",
 			"options": "Item",
+			on_change: async () => {
+				if (frappe.query_report.get_filter_value('item')) {
+					let d=await frappe.db.get_value("Item", frappe.query_report.get_filter_value('item'), 'paver_type')
+					frappe.query_report.set_filter_value('paver_type', d.message.paver_type)
+				} else {
+					frappe.query_report.set_filter_value('paver_type', '')
+				}
+				frappe.query_report.refresh()
+			}
 		},
 		{
 			"fieldname": "paver_type",
@@ -44,7 +53,7 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			default: [],
 			on_change: on_change,
 			get_data: async function (txt) {
-				let ws = (await frappe.db.get_list("Material Manufacturing", { fields: ["work_station"], limit: 0}))
+				let ws = (await frappe.db.get_list("Material Manufacturing", { fields: ["work_station"], limit: 0 }))
 				let machines = []
 				ws.forEach(data => {
 					if (!machines.includes(data.work_station)) {
@@ -93,6 +102,6 @@ async function on_change() {
 		frappe.query_report.get_filter("to_date").get_value(),
 		frappe.query_report.get_filter("machine").get_value(),
 		frappe.query_report.get_filter("item")
-		)
+	)
 	frappe.query_report.refresh()
 }
