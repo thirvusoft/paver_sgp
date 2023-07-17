@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Production Ratio"] = {
+frappe.query_reports["Paver Material Consumption"] = {
 	filters: [
 		{
 			fieldname: "from_date",

@@ -1,7 +1,7 @@
 {
  "add_total_row": 0,
  "columns": [],
- "creation": "2023-07-17 13:02:13.713840",
+ "creation": "2023-07-17 15:32:18.496574",
  "disable_prepared_report": 0,
  "disabled": 0,
  "docstatus": 0,
@@ -10,15 +10,14 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "SGP Header 1",
- "modified": "2023-07-17 13:10:22.743759",
+ "modified": "2023-07-17 15:32:18.496574",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
- "name": "Production Ratio",
+ "name": "Unit Wise Production Details",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "",
  "ref_doctype": "Material Manufacturing",
- "report_name": "Production Ratio",
+ "report_name": "Unit Wise Production Details",
  "report_type": "Script Report",
  "roles": [
   {

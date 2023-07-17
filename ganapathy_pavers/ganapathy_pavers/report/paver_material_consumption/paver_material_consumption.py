@@ -5,7 +5,14 @@ import frappe
 
 def execute(filters=None):
 	columns, data = get_columns(filters), get_data(filters)
-	return columns, data
+	chart_data = {
+		"data": {
+			"labels": [(i.get('item') or '') for i in data],
+			"datasets": [{"values": [(i.get('qty') or 0) for i in data]}],
+		},
+		"type": "pie",
+	}
+	return columns, data, None, chart_data
 
 def get_data(filters):
 	return frappe.db.sql(f"""
@@ -49,7 +56,7 @@ def get_data(filters):
 					END
 				GROUP BY
 					bom.item_code
-	""")
+	""", as_dict=True)
 
 def get_columns(filters):
 	return [

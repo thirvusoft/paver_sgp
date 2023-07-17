@@ -2,11 +2,23 @@
  "cards": [],
  "charts": [
   {
-   "chart": "Production Ratio",
-   "width": "Full"
+   "chart": "Paver Production Ratio",
+   "width": "Half"
   },
   {
-   "chart": "Material Consumption",
+   "chart": "CW Production Ratio",
+   "width": "Half"
+  },
+  {
+   "chart": "Paver Material Consumption",
+   "width": "Half"
+  },
+  {
+   "chart": "CW Material Consumption",
+   "width": "Half"
+  },
+  {
+   "chart": "Unit Wise Production Details",
    "width": "Full"
   }
  ],
@@ -17,7 +29,7 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2023-07-17 15:26:59.996939",
+ "modified": "2023-07-17 17:56:03.263868",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Manufacturing Dashboard",
