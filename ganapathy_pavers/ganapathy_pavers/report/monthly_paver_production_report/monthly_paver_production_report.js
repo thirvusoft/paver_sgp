@@ -30,6 +30,13 @@ frappe.query_reports["Monthly Paver Production Report"] = {
 			"options": "Item",
 		},
 		{
+			"fieldname": "paver_type",
+			"label": __("Paver Type"),
+			"fieldtype": "Link",
+			"options": "Paver Type",
+			"width": "100",
+		},
+		{
 			"fieldname": "machine",
 			"label": __("Machine"),
 			"fieldtype": "MultiSelectList",

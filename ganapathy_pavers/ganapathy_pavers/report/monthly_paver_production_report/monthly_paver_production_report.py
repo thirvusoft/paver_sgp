@@ -16,17 +16,16 @@ def execute(filters=None):
 	item=filters.get("item")
 	data = []
 	filters1={'from_time':["between",[from_date,to_date]] }
+	if filters.get("paver_type"):
+		filters1["paver_type"] = filters.get("paver_type")
 	if filters.get("machine"):
 		filters1["work_station"] = ["in", filters.get("machine", [])]
-	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
 
-	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
+	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1, pluck="name")
 
-	lo_paver_list=frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
-	
 	if item:
 		filters1["item_to_manufacture"]=item
-	paver_list = frappe.db.get_list("Material Manufacturing", filters1,pluck="name")
+	paver_list = frappe.db.get_list("Material Manufacturing", filters1, pluck="name")
 	test_data = []
 
 	if paver_list:
@@ -125,7 +124,7 @@ def execute(filters=None):
 		total_sqf=0
 		total_amt=0
 		
-		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []), item=filters.get("item"))
+		prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []), item=filters.get("item"), paver_type = filters.get('paver_type'))
 		if prod_details.get('paver'):
 			labour_exp = {
 				"value": "Labour & Operator",

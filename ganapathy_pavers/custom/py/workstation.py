@@ -3,7 +3,7 @@ import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.model.utils.rename_field import rename_field
          
-wrk_dt = ["Journal Entry Account", "Stock Entry Detail", "GL Entry", "Purchase Invoice","Production Expense Table"]
+wrk_doctypes = ["Journal Entry Account", "Stock Entry Detail", "GL Entry", "Purchase Invoice","Production Expense Table"]
 
 def total_no_salary(doc,action):
     if doc.ts_operators_table:
@@ -21,7 +21,7 @@ def operator_salary(operator):
     salary = sum(frappe.get_all("Salary Structure Assignment", filters={'employee':operator, 'docstatus': 1}, pluck='base')) / 26
     return salary
 
-def make_custom_field(self, event=None):
+def make_custom_field(self, event=None, oldname=None, wrk_dt=wrk_doctypes, insert_after="workstation"):
     if self.used_in_expense_splitup:
         for doctype in wrk_dt:
             meta=frappe.get_meta(doctype)
@@ -31,33 +31,40 @@ def make_custom_field(self, event=None):
                     create=False
                     continue
             if create:
+                if oldname:
+                    ia = frappe.get_value("Custom Field", {
+                        'dt': doctype,
+                        'fieldname': frappe.scrub(oldname)
+                    }, 'insert_after')
+                    if ia:
+                        insert_after=ia
                 custom_fields={
                     doctype: [
                             dict(
                                 fieldname=frappe.scrub(self.name),
                                 label=f"{self.name}",
                                 fieldtype="Check",
-                                insert_after="workstation",
+                                insert_after=insert_after,
                                 depends_on="""eval:doc.expense_type=="Manufacturing" """,
                             ),]
                     }
                 create_custom_fields(custom_fields)
     else:
-        remove_custom_field(self)
+        remove_custom_field(self, wrk_dt=wrk_dt)
 
-def rename_custom_field(self, event, oldname, newname, merge):
+def rename_custom_field_workstation(self, event, oldname, newname, merge, wrk_dt=wrk_doctypes, insert_after="workstation"):
     if oldname == newname:
         return
-    make_custom_field(self)
+    make_custom_field(self, oldname=oldname, insert_after=insert_after, wrk_dt=wrk_dt)
     for doctype in wrk_dt:
         rename_field(doctype, frappe.scrub(oldname), frappe.scrub(newname))
     if merge:
-        copy_custom_field_values(self, oldname, newname)
+        copy_custom_field_values(self, oldname, newname, wrk_dt=wrk_dt)
     _self = copy.deepcopy(self)
     _self.name = oldname
-    remove_custom_field(_self, event)
+    remove_custom_field(_self, event, wrk_dt=wrk_dt)
 
-def copy_custom_field_values(self, oldname, newname):
+def copy_custom_field_values(self, oldname, newname, wrk_dt=wrk_doctypes):
     for doctype in wrk_dt:
         frappe.db.sql(f"""
             update `tab{doctype}` 
@@ -73,14 +80,14 @@ def copy_custom_field_values(self, oldname, newname):
         """)
     pass
 
-def remove_custom_field(self, event=None):
+def remove_custom_field(self, event=None, wrk_dt=wrk_doctypes):
     #check field exists
     if not [row for row in frappe.get_meta("GL Entry").fields if row.fieldname==frappe.scrub(self.name)]:
         for i in frappe.get_all("Custom Field", {"dt": ["in", wrk_dt],"fieldname": frappe.scrub(self.name)}, pluck = "name"):
             frappe.delete_doc("Custom Field", i)
         return 
     
-    #if field exists
+    # if field exists
     gl_links = frappe.get_all("GL Entry", filters = {frappe.scrub(self.name): 1}, fields = ["voucher_type", "voucher_no"], group_by="voucher_no, voucher_type")
 
     if gl_links and not event == "after_rename":
@@ -92,7 +99,9 @@ def remove_custom_field(self, event=None):
 
         frappe.throw(messgae)
     
-    for i in frappe.get_all("Custom Field", {"dt": ["in", wrk_dt],"fieldname": frappe.scrub(self.name)}, pluck = "name"):
-        frappe.delete_doc("Custom Field", i)
+    for i in frappe.get_all("Custom Field", filters={"dt": ["in", wrk_dt],"fieldname": frappe.scrub(self.name)}, fields =[ "name", "insert_after", "dt"]):
+        for t in frappe.get_all('Custom Field', filters={'dt': i['dt'], 'insert_after': frappe.scrub(self.name)}, pluck='name'):
+            frappe.db.set_value("Custom Field", t, 'insert_after', i['insert_after'])
+        frappe.delete_doc("Custom Field", i['name'])
     
 

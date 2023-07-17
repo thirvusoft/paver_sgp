@@ -16,7 +16,7 @@ def journal_entry(self, event):
             break
 
 @frappe.whitelist()
-def get_production_details(date=None, from_date=None, to_date=None, machines=[], item=None):
+def get_production_details(date=None, from_date=None, to_date=None, machines=[], item=None, paver_type=None):
     if not machines:
         machines = []
     res={'month': '', 'paver': 0, 'cw': 0, 'lego': 0, 'fp': 0}
@@ -54,8 +54,8 @@ def get_production_details(date=None, from_date=None, to_date=None, machines=[],
         if(machines):
             pm_filt["work_station"] = ["in", machines]
         
-        # if item:
-        #     pm_filt["item_to_manufacture"] = item
+        if paver_type:
+            pm_filt["paver_type"] = paver_type
 
         res['paver'] = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='total_production_sqft'))
         res['cw'] = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))
