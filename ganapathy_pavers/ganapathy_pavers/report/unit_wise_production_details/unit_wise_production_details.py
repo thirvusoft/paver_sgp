@@ -41,7 +41,7 @@ def get_data(filters):
 				) UNION ALL
 				(
 					SELECT
-						IFNULL((SELECT wrk.location FROM `tabWorkstation` wrk WHERE wrk.name = IFNULL(cw_item.workstation, '') limit 1), '') as unit,
+						IFNULL((SELECT wrk.location FROM `tabWorkstation` wrk WHERE wrk.name = IFNULL(cw_item.workstation, '') limit 1), '-') as unit,
 						sum(cw_item.production_sqft) as qty
 					FROM `tabCW Manufacturing` cw
 					INNER JOIN `tabCW Items` cw_item ON
@@ -59,7 +59,7 @@ def get_data(filters):
 							ELSE 1=1
 						END
 					GROUP BY
-						IFNULL((SELECT wrk.location FROM `tabWorkstation` wrk WHERE wrk.name = IFNULL(cw_item.workstation, '') limit 1), '')
+						IFNULL((SELECT wrk.location FROM `tabWorkstation` wrk WHERE wrk.name = IFNULL(cw_item.workstation, '') limit 1), '-')
 				)
 			) res
 			GROUP BY res.unit
