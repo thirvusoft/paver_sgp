@@ -1,0 +1,33 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Vehicle Usage Based on KM",
+   "width": "Full"
+  },
+  {
+   "chart": "Vehicle Wise Expense",
+   "width": "Full"
+  },
+  {
+   "chart": "Vehicle Wise Fuel Consumption",
+   "width": "Full"
+  },
+  {
+   "chart": "Vehicle Wise Delivery",
+   "width": "Full"
+  }
+ ],
+ "creation": "2023-07-18 13:12:47.973129",
+ "dashboard_name": "Vehicle Dashboard",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2023-07-18 16:14:05.329581",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Vehicle Dashboard",
+ "owner": "Administrator"
+}
