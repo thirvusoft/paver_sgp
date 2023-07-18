@@ -1,0 +1,25 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Item-wise Annual Purchase",
+   "width": "Full"
+  },
+  {
+   "chart": "Supplier wise Analytics",
+   "width": "Full"
+  }
+ ],
+ "creation": "2023-07-18 17:38:13.630439",
+ "dashboard_name": "Purchase",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2023-07-18 17:44:02.067264",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Purchase",
+ "owner": "Administrator"
+}
