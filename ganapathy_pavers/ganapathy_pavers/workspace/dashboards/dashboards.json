@@ -8,12 +8,13 @@
  "doctype": "Workspace",
  "extends_another_page": 0,
  "hide_custom": 1,
+ "icon": "dashboard",
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
  "label": "Dashboards",
  "links": [],
- "modified": "2023-07-17 18:11:14.710350",
+ "modified": "2023-07-18 13:09:18.452321",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Dashboards",
@@ -25,6 +26,12 @@
    "doc_view": "",
    "label": "Manufacturing Dashboard",
    "link_to": "Manufacturing Dashboard",
+   "type": "Dashboard"
+  },
+  {
+   "doc_view": "",
+   "label": "Delivery Dashboard",
+   "link_to": "Delivery Dashboard",
    "type": "Dashboard"
   }
  ],
