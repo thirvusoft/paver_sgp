@@ -1,0 +1,39 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2023-07-17 18:34:05.312351",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "SGP Header 1",
+ "modified": "2023-07-17 18:34:05.312351",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Unit Wise Delivery",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Location",
+ "report_name": "Unit Wise Delivery",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Stock User"
+  },
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Sales User"
+  },
+  {
+   "role": "Sales Manager"
+  }
+ ]
+}

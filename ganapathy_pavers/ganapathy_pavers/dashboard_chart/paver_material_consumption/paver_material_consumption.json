@@ -11,7 +11,7 @@
  "idx": 0,
  "is_public": 0,
  "is_standard": 1,
- "modified": "2023-07-17 16:45:26.415253",
+ "modified": "2023-07-18 11:02:00.632974",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Paver Material Consumption",
@@ -22,7 +22,7 @@
  "timeseries": 0,
  "timespan": "Last Year",
  "type": "Pie",
- "use_report_chart": 0,
+ "use_report_chart": 1,
  "x_field": "item",
  "y_axis": [
   {

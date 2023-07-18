@@ -10,7 +10,7 @@
  "idx": 0,
  "is_public": 0,
  "is_standard": 1,
- "modified": "2023-07-17 16:46:12.046560",
+ "modified": "2023-07-18 11:01:44.837109",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Material Consumption",
@@ -21,7 +21,7 @@
  "timeseries": 0,
  "timespan": "Last Year",
  "type": "Pie",
- "use_report_chart": 0,
+ "use_report_chart": 1,
  "x_field": "item",
  "y_axis": [
   {
