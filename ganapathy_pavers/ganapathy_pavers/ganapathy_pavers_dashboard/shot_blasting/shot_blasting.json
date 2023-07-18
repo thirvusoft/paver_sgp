@@ -1,0 +1,21 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Shot Blasting",
+   "width": "Full"
+  }
+ ],
+ "creation": "2023-07-18 16:22:55.954316",
+ "dashboard_name": "Shot Blasting",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2023-07-18 16:36:02.002534",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Shot Blasting",
+ "owner": "Administrator"
+}
