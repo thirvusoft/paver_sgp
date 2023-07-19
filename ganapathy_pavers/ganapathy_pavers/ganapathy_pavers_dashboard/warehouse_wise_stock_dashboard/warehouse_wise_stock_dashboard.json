@@ -1,0 +1,25 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Warehouse wise stock",
+   "width": "Full"
+  },
+  {
+   "chart": "Stock Ageing",
+   "width": "Full"
+  }
+ ],
+ "creation": "2023-07-19 17:48:15.276128",
+ "dashboard_name": "Warehouse wise stock Dashboard",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 1,
+ "is_standard": 1,
+ "modified": "2023-07-19 17:59:02.502827",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Warehouse wise stock Dashboard",
+ "owner": "Administrator"
+}
