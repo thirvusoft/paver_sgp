@@ -27,3 +27,10 @@ def emp_hrs(diff_hrs, employee):
             frappe.set_value(doc.doctype, doc.name, "ot_hours",  day_ot)
             frappe.set_value(doc.doctype, doc.name, "one_day_hours",  '8.0')
             frappe.set_value(doc.doctype, doc.name, "full_day_working",  '1')
+
+def update_salary_slip(self, event=None):
+    for ss in frappe.get_all("Salary Slip", {'employee': self.name, 'department': ['!=', self.department]}):
+        frappe.db.set_value("Salary Slip", ss.name, 'department', self.department, update_modified=False)
+    
+    for ss in frappe.get_all("Salary Slip", {'employee': self.name, 'designation': ['!=', self.designation]}):
+        frappe.db.set_value("Salary Slip", ss.name, 'designation', self.designation, update_modified=False)
