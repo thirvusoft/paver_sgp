@@ -24,10 +24,15 @@ def get_data(filters):
 	locations = frappe.get_all("Location", {"warehouse": ["is", "set"]}, ["warehouse", "name"])
 	warehouse = {}
 
-	get_child_warehouses = lambda warehouse: [
-		w.name if not w.is_group else get_child_warehouses(w.name)
-		for w in frappe.get_all("Warehouse", {"parent_warehouse": warehouse}, ['name', 'is_group'])
-	]
+	def get_child_warehouses(warehouse):
+		res = []
+		for w in frappe.get_all("Warehouse", {"parent_warehouse": warehouse}, ['name', 'is_group']):
+			if not w.is_group:
+				res.append(w.name)
+			else:
+				res += get_child_warehouses(w.name)
+		
+		return res
 
 	for unit_warehouse in locations:
 		warehouse[unit_warehouse.name] = get_child_warehouses(unit_warehouse.warehouse)

@@ -14,7 +14,7 @@
  "is_standard": 1,
  "label": "Dashboards",
  "links": [],
- "modified": "2023-07-18 16:17:25.131478",
+ "modified": "2023-07-19 15:59:50.537739",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Dashboards",
@@ -38,6 +38,12 @@
    "doc_view": "",
    "label": "Vehicle Dashboard",
    "link_to": "Vehicle Dashboard",
+   "type": "Dashboard"
+  },
+  {
+   "doc_view": "",
+   "label": "SiteWork",
+   "link_to": "SiteWork",
    "type": "Dashboard"
   }
  ],

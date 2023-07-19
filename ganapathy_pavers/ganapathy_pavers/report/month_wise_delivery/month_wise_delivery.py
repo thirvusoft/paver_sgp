@@ -73,7 +73,12 @@ def get_data(filters):
 					THEN dn.is_return = 1
 				ELSE dn.is_return = 0
 			END
-		GROUP BY MONTHNAME(dn.posting_date)
+		GROUP BY CONCAT(
+		      	MONTHNAME(dn.posting_date),
+				' ',
+		      	YEAR(dn.posting_date)
+		      )
+		ORDER BY YEAR(dn.posting_date), MONTH(dn.posting_date)
 	""", as_dict=True)
 
 def get_columns(filters):
