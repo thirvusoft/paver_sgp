@@ -1,0 +1,33 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Outgoing Bills (Sales Invoice)",
+   "width": "Full"
+  },
+  {
+   "chart": "Item-wise Annual Sales",
+   "width": "Full"
+  },
+  {
+   "chart": "Customer Wise Sales Analytics",
+   "width": "Full"
+  },
+  {
+   "chart": "Territory Based Sales",
+   "width": "Full"
+  }
+ ],
+ "creation": "2023-07-18 17:03:57.602233",
+ "dashboard_name": "Sales Invoice",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2023-07-18 17:30:28.599816",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Sales Invoice",
+ "owner": "Administrator"
+}

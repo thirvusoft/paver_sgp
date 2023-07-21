@@ -1,0 +1,25 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Supplier wise Analytics",
+   "width": "Full"
+  },
+  {
+   "chart": "Item Wise Purchase",
+   "width": "Half"
+  }
+ ],
+ "creation": "2023-07-18 17:38:13.630439",
+ "dashboard_name": "Purchase",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2023-07-18 18:18:02.390485",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Purchase",
+ "owner": "Administrator"
+}
