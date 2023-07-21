@@ -1,0 +1,32 @@
+{
+ "chart_name": "Warehouse wise stock",
+ "chart_type": "Report",
+ "creation": "2023-07-19 17:47:34.519095",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "dynamic_filters_json": "{}",
+ "filters_json": "{\"company\":\"SRI GANAPATHY FLY ASH BRICKS\",\"from_date\":\"2023-06-19\",\"to_date\":\"2023-07-19\"}",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2023-07-19 17:48:24.659815",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Warehouse wise stock",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "Warehouse Wise Stock Report",
+ "roles": [],
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 0,
+ "x_field": "warehouse",
+ "y_axis": [
+  {
+   "y_field": "bal_qty"
+  }
+ ]
+}
