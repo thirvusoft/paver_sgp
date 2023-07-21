@@ -143,6 +143,8 @@
   "shot_blast_per_sqft",
   "section_break_98",
   "item_price",
+  "column_break_137",
+  "item_price_without_labour",
   "section_break_137",
   "total_production_qty",
   "column_break_139",
@@ -706,7 +708,8 @@
    "fieldname": "item_price",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Item Price"
+   "label": "Item Price",
+   "read_only": 1
   },
   {
    "fieldname": "strapping_cost_per_sqft",
@@ -1001,12 +1004,23 @@
    "fieldtype": "Float",
    "label": "Total Production Sqft",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_137",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_price_without_labour",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Item Price (Without Labour Cost)",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-29 11:06:57.019062",
+ "modified": "2023-07-20 10:03:24.270893",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

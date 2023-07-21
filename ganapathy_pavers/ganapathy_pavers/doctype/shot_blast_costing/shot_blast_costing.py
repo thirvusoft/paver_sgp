@@ -221,7 +221,7 @@ def make_stock_entry(doc):
     frappe.msgprint("New Stock Entry Created "+stock_entry.name)
 
 @frappe.whitelist()
-def uom_conversion(mm, batch=None, date=None, warehouse=None):
+def uom_conversion(mm=None, batch=None, date=None, warehouse=None):
     res = {
         "bundle": 0,
         "stock": 0
@@ -245,7 +245,7 @@ def uom_conversion(mm, batch=None, date=None, warehouse=None):
         batch_qty = frappe.db.sql(batch_qty_query)
         res['stock'] = batch_qty[0][0] if batch_qty and batch_qty[0] and batch_qty[0][0] else 0
 
-    batch_qty = frappe.get_value('Material Manufacturing', mm, 'shot_blasted_bundle')
+    batch_qty = frappe.get_value('Material Manufacturing', mm, 'shot_blasted_bundle') if mm else 0
     res["bundle"] = batch_qty
     return res
 

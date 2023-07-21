@@ -224,7 +224,7 @@ class SiteTransportCost:
                     else:
                         main_cost = 0
 
-                    cost = main_cost * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / total_odometer
+                    cost = main_cost * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / (total_odometer or 1)
                     yearl_maintenance[date] += (cost or 0)
 
         return yearl_maintenance

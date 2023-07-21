@@ -329,7 +329,6 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		rate = ()
 		if item.get('item_size'):
 			filters = {}
-			filters['item_group'] = item.get('item_group')
 
 			if item.get('item_group') == 'Kerb Stone':
 				filters['finish'] = item.get('finish')

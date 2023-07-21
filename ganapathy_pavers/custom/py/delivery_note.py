@@ -185,11 +185,11 @@ def validate(doc,action):
         if d.so_detail:
             d.unacc = frappe.db.get_value('Sales Order Item', d.so_detail, 'unacc')
         
-        if d.item_group in ['Pavers', 'Compound Walls']:
-            bdl = ganapathy_pavers.uom_conversion(d.item_code, d.uom, d.qty, 'Bdl', 0)
-            pieces = ganapathy_pavers.uom_conversion(d.item_code, 'Bdl', (bdl or 0)%1, 'Nos', 0);
-            d.ts_qty = int(bdl) or 0
-            d.pieces = pieces or 0
+        # if d.item_group in ['Pavers', 'Compound Walls']:
+        #     bdl = ganapathy_pavers.uom_conversion(d.item_code, d.uom, d.qty, 'Bdl', 0)
+        #     pieces = ganapathy_pavers.uom_conversion(d.item_code, 'Bdl', (bdl or 0)%1, 'Nos', 0)
+        #     d.ts_qty = int(bdl) or 0
+        #     d.pieces = pieces or 0
 
 
         if d.pieces:

@@ -112,6 +112,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
 	query=f"""
 		SELECT 
 			dni.item_code,
+			dn.posting_date as date,
 			SUM(dni.qty) as qty,
 			dni.uom,
 			AVG(rate) as rate,
@@ -172,7 +173,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
 		GROUP BY dni.item_code, dni.uom
 	"""
 	res = frappe.db.sql(query, as_dict=True)
-	
+	frappe.log_error(title='res', message=res)
 	res+=frappe.db.sql(f""" 
 		select
 			child.item_code,
@@ -192,7 +193,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
 			child.item_code, 
 			child.uom
 		""", as_dict=True)
-
+	frappe.log_error(title='res', message=res)
 	f_res = {}
 
 	for row in res:

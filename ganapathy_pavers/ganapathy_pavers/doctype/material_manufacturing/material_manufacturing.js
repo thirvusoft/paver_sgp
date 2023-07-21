@@ -71,11 +71,11 @@ frappe.ui.form.on('Material Manufacturing', {
 	is_shot_blasting: function (frm) {
 		if (frm.doc.is_shot_blasting == 1) {
 			default_value("shot_blast_per_sqft", "shot_blast_per_sqft")
-			default_value("default_curing_target_warehouse_for_setting", "curing_target_warehouse")
+			value_from_workstation("default_curing_target_warehouse_for_setting", "curing_target_warehouse")
 		}
 		else {
 			frm.set_value("shot_blast_per_sqft", 0)
-			default_value("default_curing_target_warehouse", "curing_target_warehouse")
+			value_from_workstation("default_curing_target_warehouse", "curing_target_warehouse")
 		}
 	},
 	is_sample: function (frm) {

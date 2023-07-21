@@ -27,7 +27,11 @@ class MaterialManufacturing(Document):
         
         doc.top_layer_cost = top_layer
         doc.bottom_layer_cost = panmix
+        doc.calculate_item_price()
     
+    def calculate_item_price(doc):
+        doc.item_price_without_labour = ((doc.bottom_layer_cost or 0) / (doc.total_production_sqft or 1))+((doc.top_layer_cost or 0) / (doc.total_production_sqft or 1))+(doc.strapping_cost_per_sqft or 0)+(doc.shot_blast_per_sqft or 0)
+
     def calculate_production_details(doc):
         doc.total_production_qty = (doc.production_qty or 0)
         doc.total_damaged_qty = (doc.damage_qty or 0) + (doc.rack_shift_damage_qty or 0)
