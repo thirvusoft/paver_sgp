@@ -14,7 +14,7 @@
  "is_standard": 1,
  "label": "Dashboards",
  "links": [],
- "modified": "2023-07-18 19:07:06.232741",
+ "modified": "2023-07-19 17:59:50.537739",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Dashboards",
@@ -44,6 +44,12 @@
    "doc_view": "",
    "label": "Sales Dashboard",
    "link_to": "Sales Invoice",
+   "type": "Dashboard"
+  },
+  {
+   "doc_view": "",
+   "label": "SiteWork",
+   "link_to": "SiteWork",
    "type": "Dashboard"
   }
  ],

@@ -146,6 +146,11 @@ jenv = {
 }
 
 doc_events = {
+	"Employee": {
+		"on_update": [
+			"ganapathy_pavers.custom.py.employee.update_salary_slip"
+		]
+	},
 	"Event Sync Log": {
 		"validate": [
 			"ganapathy_pavers.utils.event_sync.event_sync.validate"

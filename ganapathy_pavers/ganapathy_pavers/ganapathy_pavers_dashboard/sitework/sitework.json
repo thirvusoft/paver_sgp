@@ -1,0 +1,37 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Completed Site Analysis",
+   "width": "Full"
+  },
+  {
+   "chart": "Site Wise Profitability",
+   "width": "Full"
+  },
+  {
+   "chart": "Long Term Sites",
+   "width": "Full"
+  },
+  {
+   "chart": "Laying Details",
+   "width": "Full"
+  },
+  {
+   "chart": "Site Work - Excess and Remaining Delivery",
+   "width": "Full"
+  }
+ ],
+ "creation": "2023-07-19 12:19:36.071270",
+ "dashboard_name": "SiteWork",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2023-07-19 18:38:09.934649",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "SiteWork",
+ "owner": "Administrator"
+}
