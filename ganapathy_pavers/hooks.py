@@ -29,7 +29,7 @@ app_include_js = "/assets/js/ganapathy_pavers.min.js"
 # webform_include_css = {"doctype": "public/css/doctype.css"}
 
 # include js in page
-# page_js = {"page" : "public/js/file.js"}
+page_js = {"dashboard-view" : "custom/js/dashboard_view.js"}
 
 # include js in doctype views
 
@@ -146,6 +146,11 @@ jenv = {
 }
 
 doc_events = {
+	"Employee": {
+		"on_update": [
+			"ganapathy_pavers.custom.py.employee.update_salary_slip"
+		]
+	},
 	"Event Sync Log": {
 		"validate": [
 			"ganapathy_pavers.utils.event_sync.event_sync.validate"
@@ -157,6 +162,9 @@ doc_events = {
 		],
 		"before_validate": [
 			"ganapathy_pavers.utils.event.validate_prime_item",
+		],
+		"on_update": [
+			"ganapathy_pavers.custom.py.item.update_paver_type_in_prod"
 		]
 	},
 	"Stock Entry": {
@@ -314,7 +322,7 @@ doc_events = {
 	"Workstation":{
 		"validate": "ganapathy_pavers.custom.py.workstation.total_no_salary",
 		"on_update": "ganapathy_pavers.custom.py.workstation.make_custom_field",
-		"after_rename": "ganapathy_pavers.custom.py.workstation.rename_custom_field",
+		"after_rename": "ganapathy_pavers.custom.py.workstation.rename_custom_field_workstation",
 		"on_trash": "ganapathy_pavers.custom.py.workstation.remove_custom_field",
 	},
 	"Purchase Receipt":{

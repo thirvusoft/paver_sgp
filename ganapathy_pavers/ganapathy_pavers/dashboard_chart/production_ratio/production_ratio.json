@@ -1,0 +1,31 @@
+{
+ "chart_name": "Production Ratio",
+ "chart_type": "Report",
+ "creation": "2023-07-17 13:04:30.949089",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "dynamic_filters_json": "{}",
+ "filters_json": "{\"from_date\":\"2023-07-01\",\"to_date\":\"2023-07-31\",\"machine\":[]}",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2023-07-17 13:28:45.337449",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Production Ratio",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "Production Ratio",
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 0,
+ "x_field": "item",
+ "y_axis": [
+  {
+   "y_field": "qty"
+  }
+ ]
+}

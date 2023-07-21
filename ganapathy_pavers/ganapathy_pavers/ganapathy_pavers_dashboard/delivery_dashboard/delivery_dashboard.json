@@ -1,0 +1,29 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Unit Wise Delivery",
+   "width": "Full"
+  },
+  {
+   "chart": "Month Wise Delivery",
+   "width": "Full"
+  },
+  {
+   "chart": "Site Wise Delivery",
+   "width": "Full"
+  }
+ ],
+ "creation": "2023-07-17 18:12:32.517481",
+ "dashboard_name": "Delivery Dashboard",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2023-07-18 12:53:50.491147",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Delivery Dashboard",
+ "owner": "Administrator"
+}

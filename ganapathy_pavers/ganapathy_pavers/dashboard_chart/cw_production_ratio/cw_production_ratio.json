@@ -1,0 +1,32 @@
+{
+ "chart_name": "CW Production Ratio",
+ "chart_type": "Report",
+ "creation": "2023-07-17 16:13:42.389789",
+ "custom_options": "{\"x_field\": \"item\", \"chart_type\": \"Bar\", \"y_axis_fields\": [{\"idx\": 1, \"__islocal\": true, \"name\": \"row 1\", \"y_field\": \"qty\", \"color\": \"#EC864B\"}], \"y_fields\": [\"qty\"], \"colors\": [\"#EC864B\"]}",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "filters_json": "{\"from_date\":\"2023-07-01\",\"to_date\":\"2023-07-31\"}",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 0,
+ "is_standard": 1,
+ "modified": "2023-07-18 11:02:00.774094",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "CW Production Ratio",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "CW Production Ratio",
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 1,
+ "x_field": "item",
+ "y_axis": [
+  {
+   "color": "#EC864B",
+   "y_field": "qty"
+  }
+ ]
+}

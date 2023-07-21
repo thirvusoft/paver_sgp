@@ -3,6 +3,7 @@
  
 import frappe
 from frappe import _
+from frappe.utils import flt
  
 def execute(filters=None):
     from_date = filters.get("from_date")
@@ -239,6 +240,7 @@ def get_columns(filters={}):
 
 
 def group_total(filters = {}, data = []):
+    
     if(not filters.get("group_total") and (not filters.get("summary"))  ):
         return data
     else:
@@ -265,9 +267,10 @@ def group_total(filters = {}, data = []):
             for row in range(len(data)):
                 if(data[row][0] and row!=0 or row == len(data)-1):
                     total[1] = (data[row][1])
-                    ret_list.append([("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
+                    ret_list.append([(flt(i,2) if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
                     total = [0] * 16
                     total = add_list(total, data[row])
+                    
                 else:
                     total = add_list(total, data[row])
             return ret_list
@@ -284,6 +287,7 @@ def group_total(filters = {}, data = []):
                     ret_list.append(data[row])
                     total = [0] * 16
                     total = add_list(total, data[row])
+                    
                 else:
                     ret_list.append(data[row])
                     total = add_list(total, data[row])
@@ -295,11 +299,12 @@ def group_total(filters = {}, data = []):
             for row in range(len(data)):
                 if(row!=0  and data[row][2]!=data[row-1][2]):
                     total[2] = data[row-1][2]
-                    ret_list.append([("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
+                    ret_list.append([(flt(i,2) if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
                     total = [0] * 16
                     total = add_list(total, data[row])
                 else:
                     total = add_list(total, data[row])
+            
             return ret_list
         elif(filters.get("group_by") == "Item Wise" and filters.get("summary") ==1):
             ret_list = []
@@ -308,11 +313,14 @@ def group_total(filters = {}, data = []):
             for row in range(len(data)):
                 if(row!=0  and data[row][5]!=data[row-1][5]):
                     total[5] = data[row-1][5]
-                    ret_list.append([("%.2f"%i if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
+                    ret_list.append([(flt(i,2) if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
                     total = [0] * 16
                     total = add_list(total, data[row])
+                    
                 else:
+                
                     total = add_list(total, data[row])
+            
             return ret_list
         else:
             ret_list = []
@@ -329,7 +337,9 @@ def group_total(filters = {}, data = []):
                 else:
                     ret_list.append(data[row])
                     total = add_list(total, data[row])
+            
             return ret_list
+    
                 
 def add_list(a, b):
     ret_list1 = []
@@ -339,6 +349,7 @@ def add_list(a, b):
                 (a[i] if isinstance(a[i], (int, float)) else 0) + 
                 (b[i] if isinstance(b[i], (int, float)) else 0)
             )
+    
         else:
             ret_list1.append(None)
     return ret_list1

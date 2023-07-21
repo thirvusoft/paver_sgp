@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "item_to_manufacture",
+  "paver_type",
   "per_rack",
   "per_plate",
   "is_shot_blasting",
@@ -295,6 +296,7 @@
   {
    "fieldname": "work_station",
    "fieldtype": "Link",
+   "in_standard_filter": 1,
    "label": "Workstation",
    "options": "Workstation",
    "reqd": 1
@@ -639,6 +641,7 @@
    "default": "0",
    "fieldname": "is_shot_blasting",
    "fieldtype": "Check",
+   "in_standard_filter": 1,
    "label": "Is Shot Blasting Item"
   },
   {
@@ -958,6 +961,7 @@
    "default": "0",
    "fieldname": "is_sample",
    "fieldtype": "Check",
+   "in_standard_filter": 1,
    "label": "Is Sample"
   },
   {
@@ -1015,12 +1019,21 @@
    "in_list_view": 1,
    "label": "Item Price (Without Labour Cost)",
    "read_only": 1
+  },
+  {
+   "fetch_from": "item_to_manufacture.paver_type",
+   "fieldname": "paver_type",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Paver Type",
+   "options": "Paver Type",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-20 10:03:24.270893",
+ "modified": "2023-07-21 10:03:24.270893",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

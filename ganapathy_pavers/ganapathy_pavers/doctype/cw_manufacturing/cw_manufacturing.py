@@ -483,7 +483,7 @@ def add_item(doc, batches = 1):
                 if(cw_type):
                     type1.append(cw_type)
         if(len(list(set(type1))) != 1):
-            frappe.throw('Please enter either Post or Slab.')
+            frappe.throw('Please enter Single Compound Wall Type Items.')
         else:
             type1 = type1[0]
         for k in doc:

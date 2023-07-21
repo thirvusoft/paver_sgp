@@ -1,4 +1,6 @@
 import frappe
+import sys
+
 from ganapathy_pavers.utils.py.site_work import batch_customization
 
 def execute():
@@ -33,3 +35,18 @@ def other_work():
         self.total_completed_bundle=total_comp_bundle
         self.completed=(completed_area/total_area)*100 if total_area else 0
         self.db_update()
+    
+def update_excess_remaining_qty():
+    sites = frappe.get_all("Project")
+    n = 0
+    for i in sites:
+        n+=1
+        sys.stdout.write(f"\r{n}/{len(sites)} Updating Sites")
+        sys.stdout.flush()
+        doc=frappe.get_doc("Project", i.name)
+        doc.excess_or_remaining_qty = (doc.get('measurement_sqft') or 0) - sum([(row.get('delivered_stock_qty') or 0)+(row.get('returned_stock_qty') or 0) for row in (doc.get('delivery_detail') or [])])
+        doc.db_update()
+    sys.stdout.write(f"\r\n")
+    sys.stdout.flush()
+
+# ganapathy_pavers.patches.sitework_patch.update_excess_remaining_qty

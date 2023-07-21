@@ -131,6 +131,8 @@ def before_save(doc, action=None):
 
     doc.actual_site_cost_calculation=(item_cost or 0)+(doc.total or 0)+(doc.total_job_worker_cost or 0)+ (rm_cost or 0) + (doc.transporting_cost or 0)
     doc.site_profit_amount=(doc.total_expense_amount or 0) - (doc.actual_site_cost_calculation or 0)
+    
+    doc.excess_or_remaining_qty = (doc.get('measurement_sqft') or 0) - sum([(row.get('delivered_stock_qty') or 0)+(row.get('returned_stock_qty') or 0) for row in (doc.get('delivery_detail') or [])])
     return doc
 
 @frappe.whitelist()
