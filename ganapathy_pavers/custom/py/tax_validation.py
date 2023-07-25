@@ -10,7 +10,7 @@ def dn_tax_validation(self, event=None):
     for row in self.items:
         if row.unacc:
             row.item_tax_template=''
-            row.item_tax_rate=''
+            row.item_tax_rate='{}'
 
 def tax_validation(self, event=None):
     """

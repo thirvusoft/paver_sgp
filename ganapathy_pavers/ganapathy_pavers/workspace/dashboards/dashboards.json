@@ -14,7 +14,7 @@
  "is_standard": 1,
  "label": "Dashboards",
  "links": [],
- "modified": "2023-07-21 10:37:39.116278",
+ "modified": "2023-07-21 13:15:52.329334",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Dashboards",
@@ -26,6 +26,24 @@
    "doc_view": "",
    "label": "Manufacturing Dashboard",
    "link_to": "Manufacturing Dashboard",
+   "type": "Dashboard"
+  },
+  {
+   "doc_view": "",
+   "label": "Shot Blasting",
+   "link_to": "Shot Blasting",
+   "type": "Dashboard"
+  },
+  {
+   "doc_view": "",
+   "label": "SiteWork",
+   "link_to": "SiteWork",
+   "type": "Dashboard"
+  },
+  {
+   "doc_view": "",
+   "label": "Sales Dashboard",
+   "link_to": "Sales Invoice",
    "type": "Dashboard"
   },
   {
@@ -42,18 +60,6 @@
   },
   {
    "doc_view": "",
-   "label": "Sales Dashboard",
-   "link_to": "Sales Invoice",
-   "type": "Dashboard"
-  },
-  {
-   "doc_view": "",
-   "label": "SiteWork",
-   "link_to": "SiteWork",
-   "type": "Dashboard"
-  },
-  {
-   "doc_view": "",
    "label": "Stock Dashboard",
    "link_to": "Warehouse wise stock Dashboard",
    "type": "Dashboard"
@@ -62,6 +68,12 @@
    "doc_view": "",
    "label": "Purchase Dashboard",
    "link_to": "Purchase",
+   "type": "Dashboard"
+  },
+  {
+   "doc_view": "",
+   "label": "HR",
+   "link_to": "HR",
    "type": "Dashboard"
   }
  ],

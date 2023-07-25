@@ -219,7 +219,7 @@ def validate(doc,action):
      
 def sales_order_required(self,event):
     """check in manage account if sales order required or not"""
-    if frappe.db.get_value("Selling Settings", None, "sales_order_required") == "Yes":
+    if frappe.db.get_value("Selling Settings", None, "sales_order_required") == "Yes" and not self.is_sample_delivery:
         for d in self.get("items"):
             if not d.against_sales_order:
                 frappe.throw(("Sales Order required for Item {0}").format(d.item_code))

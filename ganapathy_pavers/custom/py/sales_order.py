@@ -399,3 +399,15 @@ def update_multicustomer(customers_name, sales_order):
 	frappe.delete_doc('Property Setter', doc.name)
 	frappe.delete_doc('Property Setter', doc1.name)
 	frappe.delete_doc('Property Setter', doc2.name)
+
+def check_branch(doc, event):
+    if (doc.branch):
+        value = frappe.db.get_value("Branch", doc.branch, "is_accounting")
+        if (not value):
+            for row in doc.items:
+                frappe.db.set_value(row.doctype, row.name, 'unacc', 1)
+                frappe.db.set_value(row.doctype, row.name, 'item_tax_template', '')
+        else:
+            for row in doc.items:
+                frappe.db.set_value(row.doctype, row.name, 'unacc', 0)
+        

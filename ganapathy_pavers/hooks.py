@@ -230,8 +230,11 @@ doc_events = {
 			"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
 			"ganapathy_pavers.custom.py.tax_validation.tax_validation"
 			],
-		"on_update_after_submit": ["ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
-									"ganapathy_pavers.custom.py.sales_order.update_site"]
+		"on_update_after_submit": [
+					"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
+					"ganapathy_pavers.custom.py.sales_order.update_site",
+					"ganapathy_pavers.custom.py.sales_order.check_branch"
+				]
 	},
 	"Job Card":{
 		"on_submit":"afterganapathy_pavers.ganapathy_pavers.utils.py.jobcard.workstation"
