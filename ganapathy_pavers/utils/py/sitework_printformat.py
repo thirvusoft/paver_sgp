@@ -117,52 +117,105 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
 			dni.uom,
 			AVG(rate) as rate,
 			SUM(dni.amount) as amount,
-			ROUND(
-				ifnull((
-					SELECT sle.incoming_rate
-					FROM `tabStock Ledger Entry` sle
-					WHERE
-						sle.is_cancelled=0 and
-						sle.voucher_type = 'Purchase Invoice' and
-						sle.item_code = dni.item_code and
-						sle.posting_date  <= dn.posting_date and
-						sle.is_cancelled = 0 and
-						sle.project='{site_work}'
-					order by posting_date desc
-					limit 1
-				), ifnull(
-							((
-							select 
-								avg(rm.rate)
-							from `tabRaw Materials` rm
-							where 
-								rm.item= dni.item_code and
-								rm.parenttype="Project" and
-								rm.parent='{site_work}'
-							) /
+			CASE
+				WHEN IFNULL((
+						select 
+							rm.is_supplied_rate
+						from `tabRaw Materials` rm
+						where 
+							rm.item= dni.item_code and
+							rm.parenttype="Project" and
+							rm.parent='{site_work}' and
+							rm.is_supplied_rate = 1
+						limit 1
+						), 0) = 1
+					THEN IFNULL((
+						select 
+							rm.rate /
 							ifnull((
 								SELECT
 									uom.conversion_factor
 								FROM `tabUOM Conversion Detail` uom
 								WHERE
 									uom.parenttype='Item' and
-									uom.parent=dni.item_code and
-									uom.uom=dni.uom
+									uom.parent=rm.item and
+									uom.uom=rm.uom
 								limit 1
 								), 0)
-						))) *
-				ifnull((
-					SELECT
-						uom.conversion_factor
-					FROM `tabUOM Conversion Detail` uom
-					WHERE
-						uom.parenttype='Item' and
-						uom.parent=dni.item_code and
-						uom.uom=dni.uom
-					limit 1
-				)    
-				, 0)
-			, 2) as valuation_rate
+						from `tabRaw Materials` rm
+						where 
+							rm.item= dni.item_code and
+							rm.parenttype="Project" and
+							rm.parent='{site_work}' and
+							rm.is_supplied_rate = 1
+						limit 1
+						), 0)*
+						ifnull((
+							SELECT
+								uom.conversion_factor
+							FROM `tabUOM Conversion Detail` uom
+							WHERE
+								uom.parenttype='Item' and
+								uom.parent=dni.item_code and
+								uom.uom=dni.uom
+							limit 1
+						)    
+						, 0)
+				ELSE ROUND(
+					ifnull((
+						SELECT sle.incoming_rate + (sle.incoming_rate /100 * IFNULL(
+							(
+								SELECT
+									sle_pi.taxes_and_charges_added * 100 / sle_pi.total
+								FROM `tabPurchase Invoice` sle_pi
+								WHERE
+									sle_pi.name = sle.voucher_no
+								LIMIT 1
+							), 0))
+						FROM `tabStock Ledger Entry` sle
+						WHERE
+							sle.is_cancelled=0 and
+							sle.voucher_type = 'Purchase Invoice' and
+							sle.item_code = dni.item_code and
+							sle.posting_date  <= dn.posting_date and
+							sle.is_cancelled = 0 and
+							sle.project='{site_work}'
+						order by posting_date desc
+						limit 1
+					), ifnull(
+								((
+								select 
+									avg(rm.rate) /
+									ifnull((
+										SELECT
+											uom.conversion_factor
+										FROM `tabUOM Conversion Detail` uom
+										WHERE
+											uom.parenttype='Item' and
+											uom.parent=rm.item and
+											uom.uom=rm.uom
+										limit 1
+										), 0)
+								from `tabRaw Materials` rm
+								where 
+									rm.item= dni.item_code and
+									rm.parenttype="Project" and
+									rm.parent='{site_work}'
+								)
+							))) *
+					ifnull((
+						SELECT
+							uom.conversion_factor
+						FROM `tabUOM Conversion Detail` uom
+						WHERE
+							uom.parenttype='Item' and
+							uom.parent=dni.item_code and
+							uom.uom=dni.uom
+						limit 1
+					)    
+					, 0)
+				, 2) 
+			END as valuation_rate
 		FROM `tabDelivery Note Item` dni
 		LEFT OUTER JOIN `tabDelivery Note` dn
 		ON dn.name=dni.parent AND dni.parenttype="Delivery Note"
