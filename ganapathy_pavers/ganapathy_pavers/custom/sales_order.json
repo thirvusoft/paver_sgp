@@ -41,7 +41,7 @@
    "name": "Sales Order-type",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "\nPavers\nCompound Wall",
+   "options": "\nPavers\nCompound Wall\nInternal",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
