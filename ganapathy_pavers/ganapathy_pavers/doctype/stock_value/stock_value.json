@@ -48,6 +48,13 @@
   "kerb_stone_stock_bundle",
   "kerb_stone_stock_value",
   "section_break_21",
+  "grass_paver_stock",
+  "grass_paver_stock_qty",
+  "grass_paver_stock_nos",
+  "grass_paver_stock_sqft",
+  "grass_paver_stock_bundle",
+  "grass_paver_stock_value",
+  "section_break_48",
   "cw_stock",
   "compound_wall_stock_qty",
   "compound_wall_stock_nos",
@@ -457,12 +464,52 @@
    "fieldname": "get_warehouses",
    "fieldtype": "Button",
    "label": "Get Warehouses"
+  },
+  {
+   "fieldname": "grass_paver_stock",
+   "fieldtype": "Table",
+   "label": "Grass Paver Stock",
+   "options": "Stock Value Grass Paver Detail"
+  },
+  {
+   "fieldname": "grass_paver_stock_qty",
+   "fieldtype": "Float",
+   "label": "Grass Paver Stock Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "grass_paver_stock_nos",
+   "fieldtype": "Float",
+   "label": "Grass Paver Stock Nos",
+   "read_only": 1
+  },
+  {
+   "fieldname": "grass_paver_stock_sqft",
+   "fieldtype": "Float",
+   "label": "Grass Paver Stock Sqft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "grass_paver_stock_bundle",
+   "fieldtype": "Float",
+   "label": "Grass Paver Stock Bundle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "grass_paver_stock_value",
+   "fieldtype": "Currency",
+   "label": "Grass Paver Stock Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_48",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-11 12:04:18.252821",
+ "modified": "2023-07-27 10:52:48.754415",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Stock Value",

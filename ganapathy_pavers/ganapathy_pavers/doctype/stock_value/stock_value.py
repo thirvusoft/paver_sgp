@@ -14,6 +14,7 @@ class StockValue(Document):
 		self.normal_paver_stock_value = 0
 		self.shot_blast_paver_stock_value = 0
 		self.kerb_stone_stock_value = 0
+		self.grass_paver_stock_value = 0
 		self.compound_wall_stock_value = 0
 		self.raw_material_stock_value = 0
 
@@ -21,6 +22,7 @@ class StockValue(Document):
 		self.normal_paver_stock_qty = 0
 		self.shot_blast_paver_stock_qty = 0
 		self.kerb_stone_stock_qty = 0
+		self.grass_paver_stock_qty = 0
 		self.compound_wall_stock_qty = 0
 		self.raw_material_stock_qty = 0
 
@@ -28,6 +30,7 @@ class StockValue(Document):
 		self.normal_paver_stock_nos = 0
 		self.shot_blast_paver_stock_nos = 0
 		self.kerb_stone_stock_nos = 0
+		self.grass_paver_stock_nos = 0
 		self.compound_wall_stock_nos = 0
 		self.raw_material_stock_nos = 0
 
@@ -35,6 +38,7 @@ class StockValue(Document):
 		self.normal_paver_stock_sqft = 0
 		self.shot_blast_paver_stock_sqft = 0
 		self.kerb_stone_stock_sqft = 0
+		self.grass_paver_stock_sqft = 0
 		self.compound_wall_stock_sqft = 0
 		self.raw_material_stock_sqft = 0
 
@@ -42,6 +46,7 @@ class StockValue(Document):
 		self.normal_paver_stock_bundle = 0
 		self.shot_blast_paver_stock_bundle = 0
 		self.kerb_stone_stock_bundle = 0
+		self.grass_paver_stock_bundle = 0
 		self.compound_wall_stock_bundle = 0
 		self.raw_material_stock_bundle = 0
 
@@ -75,6 +80,14 @@ class StockValue(Document):
 			self.kerb_stone_stock_sqft += row.sqft or 0
 			self.kerb_stone_stock_bundle += row.bundle or 0
 		
+		for row in self.grass_paver_stock:
+			row.amount = (row.qty or 0) * (row.rate or 0)
+			self.grass_paver_stock_value += row.amount or 0
+			self.grass_paver_stock_qty += row.qty or 0
+			self.grass_paver_stock_nos += row.nos or 0
+			self.grass_paver_stock_sqft += row.sqft or 0
+			self.grass_paver_stock_bundle += row.bundle or 0
+		
 		for row in self.cw_stock:
 			row.amount = (row.qty or 0) * (row.rate or 0)
 			self.compound_wall_stock_value += row.amount or 0
@@ -91,21 +104,22 @@ class StockValue(Document):
 			self.raw_material_stock_sqft += row.sqft or 0
 			self.raw_material_stock_bundle += row.bundle or 0
 		
-		self.total_stock_qty = self.paver_stock_qty + self.kerb_stone_stock_qty + self.compound_wall_stock_qty + self.raw_material_stock_qty
-		self.total_stock_value = self.paver_stock_value + self.kerb_stone_stock_value + self.compound_wall_stock_value + self.raw_material_stock_value
-		self.total_stock_nos = self.paver_stock_nos + self.kerb_stone_stock_nos + self.compound_wall_stock_nos + self.raw_material_stock_nos
-		self.total_stock_sqft = self.paver_stock_sqft + self.kerb_stone_stock_sqft + self.compound_wall_stock_sqft + self.raw_material_stock_sqft
-		self.total_stock_bundle = self.paver_stock_bundle + self.kerb_stone_stock_bundle + self.compound_wall_stock_bundle + self.raw_material_stock_bundle
+		self.total_stock_qty = self.paver_stock_qty + self.kerb_stone_stock_qty + self.grass_paver_stock_qty + self.compound_wall_stock_qty + self.raw_material_stock_qty
+		self.total_stock_value = self.paver_stock_value + self.kerb_stone_stock_value + self.grass_paver_stock_value + self.compound_wall_stock_value + self.raw_material_stock_value
+		self.total_stock_nos = self.paver_stock_nos + self.kerb_stone_stock_nos + self.grass_paver_stock_nos + self.compound_wall_stock_nos + self.raw_material_stock_nos
+		self.total_stock_sqft = self.paver_stock_sqft + self.kerb_stone_stock_sqft + self.grass_paver_stock_sqft + self.compound_wall_stock_sqft + self.raw_material_stock_sqft
+		self.total_stock_bundle = self.paver_stock_bundle + self.kerb_stone_stock_bundle + self.grass_paver_stock_bundle + self.compound_wall_stock_bundle + self.raw_material_stock_bundle
 
 @frappe.whitelist()
 def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', paver_cw_warehouse=[], rm_warehouse=[], ignore_empty_item_size=False):
-	default_price_list = frappe.db.get_value("Stock Defaults", unit, 'price_list')
-	
 	if not frappe.db.get_all('Stock Defaults', {'unit': unit}):
 		frappe.throw(f"""Please create <a href="/app/stock-defaults/"><b>Stock Defaults</b></a> for <b>{unit}</b>""")
 
+	stock_default = frappe.db.get_value("Stock Defaults", {'unit': unit}, "name")
+	default_price_list = frappe.db.get_value("Stock Defaults", stock_default, 'price_list')
+
 	def get_default_price_list():
-		return default_price_list or frappe.throw(f"""Please Enter <b>Price List</b> in <a href='/app/stock-defaults/{unit}'><b>Stock Defaults: {unit}</b></a>""")
+		return default_price_list or frappe.throw(f"""Please Enter <b>Price List</b> in <a href='/app/stock-defaults/{stock_default}'><b>Stock Defaults: {stock_default}</b></a>""")
 
 	try:
 		if isinstance(ignore_empty_item_size, str):
@@ -121,6 +135,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		'cw_stock': [],
 		'raw_material_stock': [],
 		'kerb_stone_stock': [],
+		'grass_paver_stock': [],
 	}
 	if isinstance(paver_cw_warehouse, str):
 		paver_cw_warehouse = json.loads(paver_cw_warehouse)
@@ -150,7 +165,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 					FROM `tabDSM Items` dsm_rm
 					WHERE
 						dsm_rm.parenttype = 'Stock Defaults' and
-						dsm_rm.parent = '{unit}'
+						dsm_rm.parent = '{stock_default}'
 				)
 			ELSE 1=1
 		END
@@ -161,8 +176,10 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		    name,
 			item.item_size,
 			CASE
-		    	WHEN item.name like '%kerb%stone%' 
+		    	WHEN item.name like '%kerb%stone%' or ifnull(item.item_size, '') like '%kerb%stone%'
 		    		THEN 'Kerb Stone'
+		    	WHEN item.name like '%grass%paver%' or ifnull(item.item_size, '') like '%grass%paver%'
+		    		THEN 'Grass Paver'
 		       	ELSE item.item_group
 		    END as item_group,
 			item.compound_wall_type,
@@ -275,6 +292,8 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 			res["raw_material_stock"].append(item)
 		elif item.get('item_group') == 'Kerb Stone':
 			res['kerb_stone_stock'].append(item)
+		elif item.get('item_group') == 'Grass Paver':
+			res['grass_paver_stock'].append(item)
 
 	for item in res['paver_stock']:
 		item['qty'] = get_stock_qty(
@@ -331,6 +350,42 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 			filters = {}
 
 			if item.get('item_group') == 'Kerb Stone':
+				filters['finish'] = item.get('finish')
+				filters['colour'] = item.get('colour')
+			elif item.get('item_group') == 'Compound Walls' and item.get('compound_wall_type') in ['Post', 'Corner Post', 'Fencing Post']:
+				filters['post_type'] = item.get('compound_wall_type')
+
+			rate = get_item_size_price(item_size=item.get('item_size'), item_code=item.get('name'), posting_date=date, to_uom=item.get('uom'), filters=filters)
+		else:
+			rate = get_item_price(args={
+					'batch_no': '',
+					'posting_date': date, 
+					'price_list': get_default_price_list()
+				}, 
+				item_code=item.get('name'), 
+				to_uom = item.get('uom'))
+			
+		if rate and rate[0] and len(rate[0])>1:
+			item['rate'] = rate[0][1]
+	
+	for item in res['grass_paver_stock']:
+		item['qty'] = get_stock_qty(
+			item_code=item.get('name'),
+			warehouse=paver_cw_warehouse,
+			date=nowdate(),
+			time = time,
+			to_uom=item.get('uom'),
+			uom_conv=False
+		)
+		item['nos'] = uom_conversion(item=item.get('name'), from_uom=item.get('uom'), from_qty=item.get("qty"), to_uom="Nos", throw_err=False)
+		item['sqft'] = uom_conversion(item=item.get('name'), from_uom=item.get('uom'), from_qty=item.get("qty"), to_uom="SQF", throw_err=False)
+		item['bundle'] = uom_conversion(item=item.get('name'), from_uom=item.get('uom'), from_qty=item.get("qty"), to_uom="Bdl", throw_err=False)
+		
+		rate = ()
+		if item.get('item_size'):
+			filters = {}
+
+			if item.get('item_group') == 'Grass Paver':
 				filters['finish'] = item.get('finish')
 				filters['colour'] = item.get('colour')
 			elif item.get('item_group') == 'Compound Walls' and item.get('compound_wall_type') in ['Post', 'Corner Post', 'Fencing Post']:
@@ -423,19 +478,21 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		if rate and rate[0] and len(rate[0])>1:
 			item['rate'] = rate[0][1]
 
-	return group_item_sizes(res)
+	return group_item_sizes(res=res, stock_default=stock_default)
 	
 
-def group_item_sizes(res):
+def group_item_sizes(res, stock_default):
 	paver = res['paver_stock']
 	kerb_stone = res['kerb_stone_stock']
+	grass_paver = res['grass_paver_stock']
 	cw = res['cw_stock']
 	raw_material = res['raw_material_stock']
 
 	paver_res = {}
 	kerb_stone_res = {}
-	cw_res =  {}
-	raw_material_res ={}
+	grass_paver_res = {}
+	cw_res = {}
+	raw_material_res = {}
 
 	for row in paver:
 		key = f"""{row.get('item_size') or row.get('name')}--------{row.get('colour_type') or ""}---------{row.get('uom')}--------------{row.get('rate')}"""
@@ -483,6 +540,29 @@ def group_item_sizes(res):
 			kerb_stone_res[key or '']['sqft'] += row.get('sqft') or 0
 			kerb_stone_res[key or '']['bundle'] += row.get('bundle') or 0
 	
+	for row in grass_paver:
+		key = f"""{row.get('item_size') or row.get('name')}--------{row.get('colour_type') or ""}---------{row.get('uom')}--------------{row.get('rate')}"""
+		if key not in grass_paver_res:
+			grass_paver_res[key or ''] = {
+				'size': row.get('item_size') or '',
+				'type': row.get('colour_type'),
+				'finish': row.get('finish'),
+				'colour': row.get('colour'),
+				'item_code': (row.get('name') or '') if not row.get('item_size') else '',
+				'qty': row.get('qty') or 0,
+				'nos': row.get('nos') or 0,
+				'sqft': row.get('sqft') or 0,
+				'bundle': row.get('bundle') or 0,
+				'uom': row.get('uom') or '',
+				'rate': row.get('rate') or 0,
+				'amount': (row.get('qty') or 0) * (row.get('rate') or 0),
+			}
+		else:
+			grass_paver_res[key or '']['qty'] += row.get('qty') or 0
+			grass_paver_res[key or '']['nos'] += row.get('nos') or 0
+			grass_paver_res[key or '']['sqft'] += row.get('sqft') or 0
+			grass_paver_res[key or '']['bundle'] += row.get('bundle') or 0
+	
 	for row in cw:
 		key = f"{row.get('item_size') or row.get('name')}---------{row.get('uom')}--------------{row.get('rate')}"
 		if key not in cw_res:
@@ -527,6 +607,7 @@ def group_item_sizes(res):
 	res = frappe._dict({
 		'paver_stock': sorted(list(paver_res.values()), key=lambda x: x.get('finish') or ''),
 		'kerb_stone_stock': sorted(list(kerb_stone_res.values()), key=lambda x: x.get('finish') or ''),
+		'grass_paver_stock': sorted(list(grass_paver_res.values()), key=lambda x: x.get('finish') or ''),
 		'cw_stock': list(cw_res.values()),
 		'raw_material_stock': list(raw_material_res.values())
 	})
@@ -535,6 +616,7 @@ def group_item_sizes(res):
 	res.normal_paver_stock_value = 0
 	res.shot_blast_paver_stock_value = 0
 	res.kerb_stone_stock_value = 0
+	res.grass_paver_stock_value = 0
 	res.compound_wall_stock_value = 0
 	res.raw_material_stock_value = 0
 
@@ -542,6 +624,7 @@ def group_item_sizes(res):
 	res.normal_paver_stock_qty = 0
 	res.shot_blast_paver_stock_qty = 0
 	res.kerb_stone_stock_qty = 0
+	res.grass_paver_stock_qty = 0
 	res.compound_wall_stock_qty = 0
 	res.raw_material_stock_qty = 0
 
@@ -549,6 +632,7 @@ def group_item_sizes(res):
 	res.normal_paver_stock_nos = 0
 	res.shot_blast_paver_stock_nos = 0
 	res.kerb_stone_stock_nos = 0
+	res.grass_paver_stock_nos = 0
 	res.compound_wall_stock_nos = 0
 	res.raw_material_stock_nos = 0
 
@@ -556,6 +640,7 @@ def group_item_sizes(res):
 	res.normal_paver_stock_sqft = 0
 	res.shot_blast_paver_stock_sqft = 0
 	res.kerb_stone_stock_sqft = 0
+	res.grass_paver_stock_sqft = 0
 	res.compound_wall_stock_sqft = 0
 	res.raw_material_stock_sqft = 0
 
@@ -563,6 +648,7 @@ def group_item_sizes(res):
 	res.normal_paver_stock_bundle = 0
 	res.shot_blast_paver_stock_bundle = 0
 	res.kerb_stone_stock_bundle = 0
+	res.grass_paver_stock_bundle = 0
 	res.compound_wall_stock_bundle = 0
 	res.raw_material_stock_bundle = 0
 
@@ -597,6 +683,14 @@ def group_item_sizes(res):
 		res.kerb_stone_stock_sqft += row.get('sqft') or 0
 		res.kerb_stone_stock_bundle += row.get('bundle') or 0
 	
+	for row in res.grass_paver_stock:
+		row['amount'] = (row.get('qty') or 0) * (row.get('rate') or 0)
+		res.grass_paver_stock_value += row.get('amount') or 0
+		res.grass_paver_stock_qty += row.get('qty') or 0
+		res.grass_paver_stock_nos += row.get('nos') or 0
+		res.grass_paver_stock_sqft += row.get('sqft') or 0
+		res.grass_paver_stock_bundle += row.get('bundle') or 0
+	
 	for row in res.cw_stock:
 		row['amount'] = (row.get('qty') or 0) * (row.get('rate') or 0)
 		res.compound_wall_stock_value += row.get('amount') or 0
@@ -613,10 +707,35 @@ def group_item_sizes(res):
 		res.raw_material_stock_sqft += row.get('sqft') or 0
 		res.raw_material_stock_bundle += row.get('bundle') or 0
 	
-	res.total_stock_qty = res.paver_stock_qty + res.kerb_stone_stock_qty + res.compound_wall_stock_qty + res.raw_material_stock_qty
-	res.total_stock_value = res.paver_stock_value + res.kerb_stone_stock_value + res.compound_wall_stock_value + res.raw_material_stock_value
-	res.total_stock_nos = res.paver_stock_nos + res.kerb_stone_stock_nos + res.compound_wall_stock_nos + res.raw_material_stock_nos
-	res.total_stock_sqft = res.paver_stock_sqft + res.kerb_stone_stock_sqft + res.compound_wall_stock_sqft + res.raw_material_stock_sqft
-	res.total_stock_bundle = res.paver_stock_bundle + res.kerb_stone_stock_bundle + res.compound_wall_stock_bundle + res.raw_material_stock_bundle
+	res.total_stock_qty = res.paver_stock_qty + res.kerb_stone_stock_qty + res.grass_paver_stock_qty + res.compound_wall_stock_qty + res.raw_material_stock_qty
+	res.total_stock_value = res.paver_stock_value + res.kerb_stone_stock_value + res.grass_paver_stock_value + res.compound_wall_stock_value + res.raw_material_stock_value
+	res.total_stock_nos = res.paver_stock_nos + res.kerb_stone_stock_nos + res.grass_paver_stock_nos + res.compound_wall_stock_nos + res.raw_material_stock_nos
+	res.total_stock_sqft = res.paver_stock_sqft + res.kerb_stone_stock_sqft + res.grass_paver_stock_sqft + res.compound_wall_stock_sqft + res.raw_material_stock_sqft
+	res.total_stock_bundle = res.paver_stock_bundle + res.kerb_stone_stock_bundle + res.grass_paver_stock_bundle + res.compound_wall_stock_bundle + res.raw_material_stock_bundle
 	
+	if stock_default and res.get('raw_material_stock'):
+		def get_item_order(item, default): 
+			res = frappe.get_all("DSM Items", {
+				'item_code': item,
+				'parenttype': 'Stock Defaults',
+				'parent': frappe.get_value("Stock Defaults", stock_default, "name")
+			}, 'idx')
+
+			if res:
+				res = res[0].idx
+			else:
+				res = frappe.get_value("DSM Items", {
+					'item_code': ["like", item],
+					'parenttype': 'Stock Defaults',
+					'parent': frappe.get_value("Stock Defaults", stock_default, "name")
+				}, 'idx')
+
+			if not isinstance(res, int):
+				res = 0
+
+			return res or default or 0
+
+		default=len(res['raw_material_stock']) + 1
+		res['raw_material_stock'].sort(key = lambda row: (get_item_order(item=row.get("item_code") or row.get("size") or "", default=default) or 0))
+
 	return res

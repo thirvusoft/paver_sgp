@@ -115,7 +115,7 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
 			dn.posting_date as date,
 			SUM(dni.qty) as qty,
 			dni.uom,
-			AVG(rate) as rate,
+			AVG(dni.rate) as rate,
 			SUM(dni.amount) as amount,
 			CASE
 				WHEN IFNULL((
