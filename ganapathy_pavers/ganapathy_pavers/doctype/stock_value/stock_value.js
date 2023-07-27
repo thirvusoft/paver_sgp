@@ -27,19 +27,25 @@ frappe.ui.form.on('Stock Value', {
 			frm.set_value("time", frappe.datetime.now_time());
 		}
 	},
+	unit: async function (frm) {
+		if (frm.doc.unit) {
+			let ac = await frappe.db.get_value("Stock Defaults", frm.doc.unit, "administrative_cost");
+			frm.set_value("administrative_cost", ac.message.administrative_cost || 0);			
+		}
+	},
 	get_warehouses: async function (frm) {
 		if (!frm.doc.unit) {
 			frm.scroll_to_field('unit');
-			frappe.show_alert({message: 'Please enter Unit', indicator: 'red'});
+			frappe.show_alert({ message: 'Please enter Unit', indicator: 'red' });
 			return
 		}
 		frm.set_value("warehouse_paver_cw", []);
 		frm.set_value("warehouse_rm", []);
 
-		let STOCK_DEF_LIST = await frappe.db.get_list('Stock Defaults', {filters:{'unit': frm.doc.unit}});
+		let STOCK_DEF_LIST = await frappe.db.get_list('Stock Defaults', { filters: { 'unit': frm.doc.unit } });
 
 		if (!STOCK_DEF_LIST.length) {
-			frappe.throw({message: `Please create <a href='/app/stock-defaults/'><b>Stock Defaults</b></a> for ${frm.doc.unit}`, indicator: 'red'})
+			frappe.throw({ message: `Please create <a href='/app/stock-defaults/'><b>Stock Defaults</b></a> for ${frm.doc.unit}`, indicator: 'red' })
 		}
 
 		let STOCK_DEF = await frappe.db.get_doc("Stock Defaults", frm.doc.unit);
@@ -83,7 +89,7 @@ frappe.ui.form.on('Stock Value', {
 			}
 		});
 		if (!frm.doc.unit) {
-			frappe.throw({message: 'Please enter Unit'})
+			frappe.throw({ message: 'Please enter Unit' })
 		}
 		await frappe.call({
 			method: "ganapathy_pavers.ganapathy_pavers.doctype.stock_value.stock_value.get_items",
@@ -91,6 +97,7 @@ frappe.ui.form.on('Stock Value', {
 			freeze_message: ganapathy_pavers.loading_svg || 'Fetching Items',
 			args: {
 				unit: frm.doc.unit,
+				administrative_cost: frm.doc.administrative_cost || 0,
 				item_group: frm.doc.item_group,
 				cw_type: frm.doc.cw_type,
 				date: frm.doc.date,

@@ -11,6 +11,8 @@
   "section_break_2",
   "stock_value_report_section",
   "price_list",
+  "column_break_5",
+  "administrative_cost",
   "raw_material_warehouses_section",
   "raw_material_details",
   "section_break_3",
@@ -174,11 +176,20 @@
    "fieldtype": "Table",
    "label": "DSM Alternative Colours",
    "options": "DSM Alternative Colours"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "administrative_cost",
+   "fieldtype": "Currency",
+   "label": "Administrative Cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-10 18:16:22.335694",
+ "modified": "2023-07-27 12:47:01.100782",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Stock Defaults",

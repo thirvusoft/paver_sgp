@@ -11,6 +11,7 @@
   "date",
   "time",
   "column_break_2",
+  "administrative_cost",
   "get_warehouses",
   "get_items",
   "filters_section",
@@ -28,18 +29,21 @@
   "paver_stock_sqft",
   "paver_stock_bundle",
   "paver_stock_value",
+  "paver_stock_value_administrative",
   "column_break_20",
   "normal_paver_stock_qty",
   "normal_paver_stock_nos",
   "normal_paver_stock_sqft",
   "normal_paver_stock_bundle",
   "normal_paver_stock_value",
+  "normal_paver_stock_value_administrative",
   "column_break_26",
   "shot_blast_paver_stock_qty",
   "shot_blast_paver_stock_nos",
   "shot_blast_paver_stock_sqft",
   "shot_blast_paver_stock_bundle",
   "shot_blast_paver_stock_value",
+  "shot_blast_paver_stock_value_administrative",
   "section_break_12",
   "kerb_stone_stock",
   "kerb_stone_stock_qty",
@@ -47,6 +51,7 @@
   "kerb_stone_stock_sqft",
   "kerb_stone_stock_bundle",
   "kerb_stone_stock_value",
+  "kerb_stone_stock_value_administrative",
   "section_break_21",
   "grass_paver_stock",
   "grass_paver_stock_qty",
@@ -54,6 +59,7 @@
   "grass_paver_stock_sqft",
   "grass_paver_stock_bundle",
   "grass_paver_stock_value",
+  "grass_paver_stock_value_administrative",
   "section_break_48",
   "cw_stock",
   "compound_wall_stock_qty",
@@ -61,6 +67,7 @@
   "compound_wall_stock_sqft",
   "compound_wall_stock_bundle",
   "compound_wall_stock_value",
+  "compound_wall_stock_value_administrative",
   "section_break_46",
   "raw_material_stock",
   "raw_material_stock_qty",
@@ -68,9 +75,12 @@
   "raw_material_stock_sqft",
   "raw_material_stock_bundle",
   "raw_material_stock_value",
+  "raw_material_stock_value_administrative",
   "section_break_16",
   "total_stock_qty",
   "total_stock_value",
+  "total_stock_value_administrative",
+  "total_stock_value_with_administrative",
   "column_break_17",
   "total_stock_nos",
   "total_stock_sqft",
@@ -504,12 +514,71 @@
   {
    "fieldname": "section_break_48",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "administrative_cost",
+   "fieldtype": "Currency",
+   "label": "Administrative Cost"
+  },
+  {
+   "fieldname": "paver_stock_value_administrative",
+   "fieldtype": "Currency",
+   "label": "Paver Stock Value Administrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "normal_paver_stock_value_administrative",
+   "fieldtype": "Currency",
+   "label": "Normal Paver Stock Value Administrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "shot_blast_paver_stock_value_administrative",
+   "fieldtype": "Currency",
+   "label": "Shot Blast Paver Stock Value Administrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "kerb_stone_stock_value_administrative",
+   "fieldtype": "Currency",
+   "label": "Kerb Stone Stock Value Administrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "grass_paver_stock_value_administrative",
+   "fieldtype": "Currency",
+   "label": "Grass Paver Stock Value Administrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "compound_wall_stock_value_administrative",
+   "fieldtype": "Currency",
+   "label": "Compound Wall Stock Value Administrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "raw_material_stock_value_administrative",
+   "fieldtype": "Currency",
+   "label": "Raw Material Stock Value Administrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_stock_value_administrative",
+   "fieldtype": "Currency",
+   "label": "Total Stock Value Administrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_stock_value_with_administrative",
+   "fieldtype": "Currency",
+   "label": "Total Stock Value With Administrative Cost",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-27 10:52:48.754415",
+ "modified": "2023-07-27 15:30:40.582946",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Stock Value",

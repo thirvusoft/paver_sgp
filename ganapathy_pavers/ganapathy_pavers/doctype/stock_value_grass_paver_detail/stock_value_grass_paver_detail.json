@@ -19,7 +19,8 @@
   "bundle",
   "section_break_10",
   "rate",
-  "amount"
+  "amount",
+  "administrative_cost"
  ],
  "fields": [
   {
@@ -102,18 +103,25 @@
    "precision": "2"
   },
   {
-   "columns": 2,
+   "columns": 1,
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount",
    "precision": "2"
+  },
+  {
+   "columns": 1,
+   "fieldname": "administrative_cost",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Administrative Cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-07-27 10:49:54.398056",
+ "modified": "2023-07-27 16:04:32.843937",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Stock Value Grass Paver Detail",
