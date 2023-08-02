@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "columns": [],
  "creation": "2023-07-17 15:32:18.496574",
  "disable_prepared_report": 0,
@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "SGP Header 1",
- "modified": "2023-07-17 15:32:18.496574",
+ "modified": "2023-08-01 10:55:56.897551",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Unit Wise Production Details",

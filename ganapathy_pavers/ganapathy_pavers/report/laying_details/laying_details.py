@@ -21,6 +21,9 @@ def get_data(filters):
 		'Item': 'jw.item',
 		'Site': 'sw.name'
 	}
+	if not filters.get('group_by'):
+		filters["group_by"] = 'Job Worker'
+		
 	return frappe.db.sql(f"""
 			SELECT
 		      	IFNULL({fieldname.get(filters.get('group_by'))}, '-') as name,
