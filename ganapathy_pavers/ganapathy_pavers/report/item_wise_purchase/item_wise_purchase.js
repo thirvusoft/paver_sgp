@@ -26,12 +26,22 @@ frappe.query_reports["Item Wise Purchase"] = {
 			fieldname: "warehouse",
 			label: __("Warehouse"),
 			fieldtype: "MultiSelectList",
-			get_data: function() {
+			get_data: function () {
+				let filters = [
+					['Purchase Invoice Item', 'warehouse', 'is', 'set'],
+					['Purchase Invoice', 'update_stock', '=', 1]
+				];
+				if (frappe.query_report.get_filter_value("from_date")) {
+					filters.push(['Purchase Invoice', 'posting_date', '>=', frappe.query_report.get_filter_value("from_date")]);
+				}
+				if (frappe.query_report.get_filter_value("to_date")) {
+					filters.push(['Purchase Invoice', 'posting_date', '<=', frappe.query_report.get_filter_value("to_date")]);
+				}
+				if (frappe.query_report.get_filter_value("supplier")) {
+					filters.push(['Purchase Invoice', 'supplier', '=', frappe.query_report.get_filter_value("supplier")]);
+				}
 				return frappe.db.get_list("Purchase Invoice", {
-					filters: [
-						['Purchase Invoice Item', 'warehouse', 'is', 'set'],
-						['Purchase Invoice', 'update_stock', '=', 1]
-					],
+					filters: filters,
 					fields: [
 						'`tabPurchase Invoice Item`.warehouse as value',
 						'`tabPurchase Invoice Item`.warehouse as description'
@@ -45,7 +55,7 @@ frappe.query_reports["Item Wise Purchase"] = {
 			fieldname: "item_group",
 			label: __("Item Group"),
 			fieldtype: "MultiSelectList",
-			get_data: function() {
+			get_data: function () {
 				return frappe.db.get_list("Purchase Invoice", {
 					filters: [
 						['Purchase Invoice Item', 'item_group', 'is', 'set'],

@@ -21,7 +21,38 @@ def get_data(filters):
 	return frappe.db.sql(f"""
 			SELECT
 				pii.item_code as item,
-				sum(pii.stock_qty) as qty,
+				sum(pii.stock_qty) * (
+					IFNULL((
+						SELECT
+							uom.conversion_factor
+						FROM `tabUOM Conversion Detail` uom
+						WHERE
+							uom.parenttype='Item' and
+							uom.parent=pii.item_code and
+							uom.uom=pii.stock_uom
+						LIMIT 1
+					)    
+					, 0)
+					/
+					IFNULL((
+						SELECT
+							uom.conversion_factor
+						FROM `tabUOM Conversion Detail` uom
+						WHERE
+							uom.parenttype='Item' and
+							uom.parent=pii.item_code and
+							uom.uom = (
+								SELECT
+		      						IFNULL(item.dsm_uom, item.stock_uom)
+		      					FROM `tabItem` item
+		      					WHERE
+		      						item.name = pii.item_code
+		      					LIMIT 1
+							)
+						LIMIT 1
+					)    
+					, 0)
+				) as qty,
 				sum(pii.amount) as amount
 		    FROM `tabPurchase Invoice` pi
 		    INNER JOIN `tabPurchase Invoice Item` pii

@@ -65,6 +65,18 @@ def get_data(filters):
 				ELSE 1=1
 			END AND
 			CASE
+				WHEN IFNULL(dni.so_detail, '') != '' AND IFNULL('{len(filters.get('work') or [])}', 0) != 0
+					THEN (
+						SELECT
+							COUNT(soi.name)
+						FROM `tabSales Order Item` soi
+						WHERE
+							soi.name = dni.so_detail AND
+							IFNULL(soi.work, '') in ({', '.join(f"'{i or ''}'" for i in (filters.get('work') or ['', '']))})
+					) = 1
+				ELSE 1=1
+			END AND
+			CASE
 				WHEN IFNULL({filters.get('is_return') or 0}, 0) = 1
 					THEN dn.is_return = 1
 				ELSE dn.is_return = 0

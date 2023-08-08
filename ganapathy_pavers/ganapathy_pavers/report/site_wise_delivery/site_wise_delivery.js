@@ -33,6 +33,18 @@ frappe.query_reports["Site Wise Delivery"] = {
 			options: 'Project',
 		},
 		{
+			fieldname: "work",
+			label: __("Work"),
+			fieldtype: "MultiSelectList",
+			get_data: async function (txt) {
+				let work = (await frappe.db.get_list("Sales Order", {
+					// filters: [["Sales Order Item", "work", "!=", ""]],
+					fields: ["`tabSales Order Item`.work as value", "`tabSales Order Item`.work as description"],
+					group_by: "`tabSales Order Item`.work", limit: 0 }))
+				return work
+			}
+		},
+		{
 			fieldname: "is_return",
 			label: __("Is Return"),
 			fieldtype: "Check",
