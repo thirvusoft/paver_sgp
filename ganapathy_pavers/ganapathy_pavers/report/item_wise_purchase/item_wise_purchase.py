@@ -28,6 +28,7 @@ def get_data(filters):
 		    ON pii.parent = pi.name AND pii.parenttype = "Purchase Invoice"
 		    WHERE
 		      	pi.update_stock = 1 AND
+				pi.docstatus = 1 AND
 		      	CASE
 		      		WHEN IFNULL('{filters.get('supplier') or ""}', '') != ''
 				    	THEN pi.supplier = "{filters.get('supplier')}"

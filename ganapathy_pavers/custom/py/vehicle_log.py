@@ -166,7 +166,7 @@ def validate_distance(self, event):
     self.today_odometer_value=(self.odometer or 0)-((self.fuel_odometer_value or 0) if self.select_purpose in ["Fuel", "Service"] else (self.last_odometer or 0))
 
 def total_cost(self, event):
-    if(self.fuel_qty and self.price):
+    if(self.fuel_qty and self.price and not self.total_fuel):
         self.total_fuel=self.fuel_qty * self.price
     
     self.total_expence=0

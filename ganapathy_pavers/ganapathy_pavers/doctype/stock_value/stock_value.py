@@ -334,7 +334,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		item['qty'] = get_stock_qty(
 			item_code=item.get('name'),
 			warehouse=paver_cw_warehouse,
-			date=nowdate(),
+			date=date,
 			time = time,
 			to_uom=item.get('uom'),
 			uom_conv=False
@@ -371,7 +371,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		item['qty'] = get_stock_qty(
 			item_code=item.get('name'),
 			warehouse=paver_cw_warehouse,
-			date=nowdate(),
+			date=date,
 			time = time,
 			to_uom=item.get('uom'),
 			uom_conv=False
@@ -407,7 +407,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		item['qty'] = get_stock_qty(
 			item_code=item.get('name'),
 			warehouse=paver_cw_warehouse,
-			date=nowdate(),
+			date=date,
 			time = time,
 			to_uom=item.get('uom'),
 			uom_conv=False
@@ -443,7 +443,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		item['qty'] = get_stock_qty(
 			item_code=item.get('name'),
 			warehouse=paver_cw_warehouse,
-			date=nowdate(),
+			date=date,
 			time = time,
 			to_uom=item.get('uom'),
 			uom_conv=False
@@ -480,7 +480,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		item['qty'] = get_stock_qty(
 			item_code=item.get('name'),
 			warehouse=rm_warehouse,
-			date=nowdate(),
+			date=date,
 			time = time,
 			to_uom=item.get('uom'),
 			uom_conv=False

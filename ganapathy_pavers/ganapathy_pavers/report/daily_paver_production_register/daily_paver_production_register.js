@@ -38,8 +38,17 @@ frappe.query_reports["Daily Paver Production Register"] = {
 			"width": "80",
 			default: [],
 			on_change: on_change,
-			get_data: function(txt) {
-				return frappe.db.get_link_options('Workstation', txt);
+			get_data: async function (txt) {
+				let ws = (await frappe.db.get_list("Material Manufacturing", { fields: ["work_station"], limit: 0 }))
+				let machines = []
+				ws.forEach(data => {
+					if (!machines.includes(data.work_station)) {
+						machines.push(data.work_station)
+					}
+				});
+				return frappe.db.get_link_options('Workstation', txt, {
+					name: ["in", machines]
+				});
 			}
 		}
 
