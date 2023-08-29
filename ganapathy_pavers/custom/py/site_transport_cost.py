@@ -95,6 +95,7 @@ class SiteTransportCost:
             "mileage",
             "last_odometer", 
             "delivery_note", 
+            "site_work"
         ])
         return vehicle_logs
 
@@ -127,8 +128,13 @@ class SiteTransportCost:
                 if employee not in driver_salary:
                     driver_salary[employee] = 0
 
-                               
-                salary = (per_day_salary or 0) * len((driver_trips_on_date.get(employee, {}) or {}).get(date, []) or []) * odometer / total_odometer
+                length_vls = (driver_trips_on_date.get(employee, {}) or {}).get(date, []) or []
+                vl_count = []
+                for i in length_vls:
+                    if i.get('site_work') not in vl_count:
+                        vl_count.append(i.get('site_work'))
+                
+                salary = (per_day_salary or 0) * len(vl_count) * odometer / total_odometer
                 driver_salary[employee] += (salary or 0)
 
         return driver_salary
@@ -164,8 +170,13 @@ class SiteTransportCost:
                 if operator not in operator_salary:
                     operator_salary[operator] = 0
 
-                               
-                salary = (per_day_salary or 0) * len((operator_trips_on_date.get(operator, {}) or {}).get(date, []) or []) * odometer / total_odometer
+                length_vls = (operator_trips_on_date.get(operator, {}) or {}).get(date, []) or []
+                vl_count = []
+                for i in length_vls:
+                    if i.get('site_work') not in vl_count:
+                        vl_count.append(i.get('site_work'))
+
+                salary = (per_day_salary or 0) * len(vl_count) * odometer / total_odometer
                 operator_salary[operator] += (salary or 0)
 
         return operator_salary
@@ -224,7 +235,13 @@ class SiteTransportCost:
                     else:
                         main_cost = 0
 
-                    cost = main_cost * len((date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, {}) or {}) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / (total_odometer or 1)
+                length_vls = (date_vehicle_wise_logs.get(date, {}) or {}).get(vehicle, []) or []
+                vl_count = []
+                for i in length_vls:
+                    if i.get('site_work') not in vl_count:
+                        vl_count.append(i.get('site_work'))
+
+                    cost = main_cost * len(vl_count) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / (total_odometer or 1)
                     yearl_maintenance[date] += (cost or 0)
 
         return yearl_maintenance
