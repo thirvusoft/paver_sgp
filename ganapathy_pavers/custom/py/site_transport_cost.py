@@ -89,7 +89,8 @@ class SiteTransportCost:
             "name", 
             "license_plate", 
             "date", 
-            "employee", 
+            "employee",
+            "operator",
             "odometer", 
             "mileage",
             "last_odometer", 
@@ -136,7 +137,7 @@ class SiteTransportCost:
         operator_trips_on_date={}
 
         for vl in self.vehicle_logs:
-            operator = frappe.db.get_value("Vehicle", vl.get("license_plate"), "operator")
+            operator = vl.get("operator")
             if operator not in operator_trips_on_date:
                 operator_trips_on_date[operator] = {}
 
@@ -148,7 +149,7 @@ class SiteTransportCost:
         operator_salary = {}
 
         for operator in operator_trips_on_date:
-            per_day_salary = frappe.db.get_value("Driver", operator, "salary_per_day") or 0
+            per_day_salary = frappe.db.get_value("Driver", {'employee': operator}, "salary_per_day") or 0
             for date in operator_trips_on_date.get(operator, {}) or {}:
                 vls = (operator_trips_on_date.get(operator, {}) or {}).get(date, []) or []
                 odometer = sum([(i.get("odometer") or 0) - (i.get("last_odometer") or 0) for i in vls])
