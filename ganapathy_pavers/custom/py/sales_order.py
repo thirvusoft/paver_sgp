@@ -1,6 +1,7 @@
 import frappe
 import json
 from frappe.utils.csvutils import getlink
+from ganapathy_pavers import uom_conversion
 
 @frappe.whitelist()
 def get_item_value(doctype):
@@ -411,3 +412,13 @@ def check_branch(doc, event):
             for row in doc.items:
                 frappe.db.set_value(row.doctype, row.name, 'unacc', 0)
         
+def update_qty_and_required_unit(doc, event=None):
+    for row in doc.items:
+        row.db_set("ts_required_area_qty", uom_conversion(item = row.item_code, from_uom=row.uom, from_qty=row.qty, to_uom="SQF"))
+
+def patch():
+    for row in frappe.db.get_all("Sales Order Item", {"item_group": ["in", ["Pavers", "Compound Walls"]]}, ['name', 'item_code', 'qty', 'uom']):
+        qty = uom_conversion(item = row.item_code, from_uom=row.uom, from_qty=row.qty, to_uom="SQF", throw_err=False)
+        frappe.db.set_value("Sales Order Item", row.name, 'ts_required_area_qty', qty)
+
+# from ganapathy_pavers.custom.py.sales_order import patch

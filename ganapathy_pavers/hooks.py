@@ -228,12 +228,14 @@ doc_events = {
 		"on_cancel":"ganapathy_pavers.custom.py.sales_order.remove_project_fields",
 		"validate":[
 			"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
-			"ganapathy_pavers.custom.py.tax_validation.tax_validation"
+			"ganapathy_pavers.custom.py.tax_validation.tax_validation",
+			"ganapathy_pavers.custom.py.sales_order.update_qty_and_required_unit"
 			],
 		"on_update_after_submit": [
 					"ganapathy_pavers.custom.py.sales_order.item_table_pa_cw",
 					"ganapathy_pavers.custom.py.sales_order.update_site",
-					"ganapathy_pavers.custom.py.sales_order.check_branch"
+					"ganapathy_pavers.custom.py.sales_order.check_branch",
+					"ganapathy_pavers.custom.py.sales_order.update_qty_and_required_unit"
 				]
 	},
 	"Job Card":{
