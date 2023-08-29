@@ -154,10 +154,9 @@ class SiteTransportCost:
                 vls = (operator_trips_on_date.get(operator, {}) or {}).get(date, []) or []
                 odometer = sum([(i.get("odometer") or 0) - (i.get("last_odometer") or 0) for i in vls])
 
-                op_vehicles = frappe.get_all("Vehicle", {"operator": operator}, pluck='name')
                 total_odometer = sum(frappe.get_all("Vehicle Log", {
                     "docstatus": 1,
-                    "license_plate": ['in', op_vehicles],
+                    "operator": operator,
                     "date": date,
                     "select_purpose": ["!=", "Fuel"],
                 }, pluck="today_odometer_value")) or 1
