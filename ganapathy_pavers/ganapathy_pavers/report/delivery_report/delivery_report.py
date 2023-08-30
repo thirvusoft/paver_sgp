@@ -37,7 +37,10 @@ class PartyLedgerSummaryReport(object):
 		for row in data:
 			if self.filters.get("sw_status") and row.get("project"):
 				try:
-					if (frappe.get_value("Project", row.get("project"), "status") not in self.filters.get("sw_status")):
+					if 'Stock Pending at Site' in self.filters.get('sw_status') and frappe.get_value("Project", row.get("project"), "status") == 'Stock Pending at Site':
+						row['out_delivery_amount'] = frappe.get_value("Project", row.get("project"), "stock_value")
+						final_data.append(row)
+					elif (frappe.get_value("Project", row.get("project"), "status") not in self.filters.get("sw_status")):
 						final_data.append(row)
 				except:
 					pass
