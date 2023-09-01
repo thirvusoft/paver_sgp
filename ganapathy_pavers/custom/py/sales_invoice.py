@@ -1,7 +1,6 @@
 import frappe
 import json
-from erpnext.controllers.taxes_and_totals import get_itemised_tax
-from erpnext.controllers.taxes_and_totals import get_itemised_taxable_amount
+
 def update_customer(self,event):
     cus=self.customer
     for row in self.items:
@@ -26,3 +25,7 @@ def get_einvoice_no(name="", irn=""):
         return
     res=json.loads(erl[0])
     return res.get("result", {}).get("EwbNo")
+
+def update_sales_type(doc, event=None):
+    for gl in frappe.get_all("GL Entry", {"voucher_type": doc.doctype, "voucher_no": doc.name}):
+        frappe.db.set_value("GL Entry", gl.name, "type", doc.type)

@@ -177,8 +177,11 @@ doc_events = {
 		
 	},
 	"Payment Entry":{
-                      "on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary"
-          },
+    	"on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary",
+		"on_update_after_submit": [
+			"ganapathy_pavers.custom.py.sales_invoice.update_sales_type"
+		]
+    },
 	"Salary Slip":{
         		"on_submit":[
 					"ganapathy_pavers.utils.py.salary_slip.employee_advance",
@@ -311,7 +314,9 @@ doc_events = {
 					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
 					],
-		
+		"on_update_after_submit": [
+			"ganapathy_pavers.custom.py.sales_invoice.update_sales_type"
+		]		
   	},
 	"Vehicle":{
         "validate":[
@@ -354,6 +359,9 @@ doc_events = {
 		"on_cancel": [
 			"ganapathy_pavers.custom.py.journal_entry.site_work_additional_cost"
 		],
+		"on_update_after_submit": [
+			"ganapathy_pavers.custom.py.sales_invoice.update_sales_type"
+		]
 	},
 	"Attendance": {
 		"on_trash":"ganapathy_pavers.custom.py.employee_checkin.unlink_logs",
