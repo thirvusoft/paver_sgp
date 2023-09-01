@@ -264,15 +264,24 @@ def group_total(filters = {}, data = []):
             ret_list = []
             total = [0] * 16
             data.append([None]*16)
+            count = 0
             for row in range(len(data)):
                 if(data[row][0] and row!=0 or row == len(data)-1):
                     total[1] = (data[row][1])
+
+                    if isinstance(total[13], (int, float)):
+                        total[13] = flt(total[13], 2) / count
+
                     ret_list.append([(flt(i,2) if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
+                    count = 0
                     total = [0] * 16
                     total = add_list(total, data[row])
                     
                 else:
                     total = add_list(total, data[row])
+                
+                count+=1
+                
             return ret_list
         
         elif(filters.get("group_by") == "Customer Wise" and filters.get("group_total") ==1):
@@ -296,30 +305,46 @@ def group_total(filters = {}, data = []):
             ret_list = []
             total = [0] * 16
             data.append([None]*16)
+            count = 0
             for row in range(len(data)):
                 if(row!=0  and data[row][2]!=data[row-1][2]):
                     total[2] = data[row-1][2]
+
+                    if isinstance(total[13], (int, float)):
+                        total[13] = flt(total[13], 2) / count
+
                     ret_list.append([(flt(i,2) if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
+                    count = 0
                     total = [0] * 16
                     total = add_list(total, data[row])
                 else:
                     total = add_list(total, data[row])
+                
+                count+=1
             
             return ret_list
         elif(filters.get("group_by") == "Item Wise" and filters.get("summary") ==1):
             ret_list = []
             total = [0] * 16
             data.append([None]*16)
+            count = 0
             for row in range(len(data)):
                 if(row!=0  and data[row][5]!=data[row-1][5]):
                     total[5] = data[row-1][5]
+                    
+                    if isinstance(total[13], (int, float)):
+                        total[13] = flt(total[13], 2) / count
+
                     ret_list.append([(flt(i,2) if (isinstance(i, int) or isinstance(i, float)) else str(i)) if(i!=None) else '' for i in total])
+                    count = 0
                     total = [0] * 16
                     total = add_list(total, data[row])
                     
                 else:
                 
                     total = add_list(total, data[row])
+
+                count+=1
             
             return ret_list
         else:
