@@ -257,15 +257,15 @@ class PartyLedgerSummaryReport(object):
 			dn_filters["project"] = self.filters.get("project")
 		if self.filters.get("company"):
 			dn_filters["company"] = self.filters.get("company")
-		customer_list=frappe.get_all("Delivery Note", dn_filters, ["customer", "project", "type"])
+		customer_list=frappe.get_all("Delivery Note", dn_filters, ["customer", "customer_name", "project", "type"])
 		for i in customer_list:
 			run=1
 			for j in data:
-				if (j.get("party_name")==i.get("customer") and j.get("project")==i.get("project") and j.get("type")==i.get("type")):
+				if (j.get("party")==i.get("customer") and j.get("project")==i.get("project") and j.get("type")==i.get("type")):
 					run=0
 					continue
 			if run:
-				data.append(frappe._dict({'party': i.get("customer"), 'party_name': i.get("customer"), 'party_name': i.get("customer"), 'project': i.get("project"), 'type': i.get("type")}))
+				data.append(frappe._dict({'party': i.get("customer"), 'party_name': i.get("customer_name"), 'project': i.get("project"), 'type': i.get("type")}))
 		for customer in data:
 			filters={'customer': customer.get("party"), 'docstatus':1}
 			filters['project'] = (customer.get('project') or '')
