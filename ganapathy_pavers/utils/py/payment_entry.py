@@ -19,3 +19,6 @@ def payment_entry_property_setter():
     make_property_setter("Payment Entry", "branch", "reqd",1, "Check")
     make_property_setter("Payment Entry", "mode_of_payment", "reqd",1, "Check")
     make_property_setter("Payment Entry", "type", "reqd",1, "Check")
+
+def site_to_project(doc, event=None):
+    doc.project = doc.site_work

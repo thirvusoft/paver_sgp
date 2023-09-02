@@ -177,6 +177,7 @@ doc_events = {
 		
 	},
 	"Payment Entry":{
+		"validate": "ganapathy_pavers.utils.py.payment_entry.site_to_project",
     	"on_submit":"ganapathy_pavers.utils.py.payment_entry.create_additional_salary",
 		"on_update_after_submit": [
 			"ganapathy_pavers.custom.py.sales_invoice.update_sales_type"

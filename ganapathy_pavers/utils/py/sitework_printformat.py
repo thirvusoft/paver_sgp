@@ -596,11 +596,10 @@ def get_site_supply_and_return_trip_details(sitename):
 	}
 
 def get_item_wise_so_rate(sitename):
-	doc=frappe.get_doc('Project', sitename)
 	res = {}
-	for i in doc.item_details:
-		res[i.item] = i.rate
-	for i in doc.item_details_compound_wall:
-		res[i.item] = i.rate
+	sales_orders = frappe.db.get_all("Sales Order", {"docstatus": 1, "project": sitename})
+	for so in sales_orders:
+		for row in frappe.get_all("Sales Order Item", {"parenttype": "Sales Order", "parent": so.name}, ["item_code", "rate"]):
+			res[row.item_code] = row.rate
 	
 	return res

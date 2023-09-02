@@ -85,6 +85,11 @@ frappe.query_reports["Delivery Report"] = {
 			}
 		},
 		{
+			"fieldname":"stock_pending_value",
+			"label": __("Fetch stock value for stock pending site"),
+			"fieldtype": "Check",
+		},
+		{
 			"fieldname":"type",
 			"label": __("Type"),
 			"fieldtype": "Select",

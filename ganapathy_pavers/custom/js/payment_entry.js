@@ -15,7 +15,9 @@ frappe.ui.form.on("Payment Entry",{
                 }
             }
         })
-     cur_frm.set_value('project', cur_frm.doc.site_work)
+        if(frm.is_new()) {
+            cur_frm.set_value('project', cur_frm.doc.site_work)
+        }
     },
     sales_taxes_and_charges_template: function(frm) {
         if(frm.doc.branch) {
