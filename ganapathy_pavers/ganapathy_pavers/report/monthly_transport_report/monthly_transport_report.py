@@ -37,6 +37,9 @@ def execute(filters=None):
 	end_km = 0
 	pavers_km = 0
 	cw_km = 0
+	others_km = 0
+	last = 0
+	diff_km = 0
 	
 	if not doc:
 		return columns, data
@@ -51,6 +54,8 @@ def execute(filters=None):
 				pavers_km += i['today_odometer_value']
 			elif dn_type == "Compound Wall":
 				cw_km += i['today_odometer_value']
+			else:
+				others_km += i['today_odometer_value']
 
 		elif i.sales_invoice:
 			si_type = frappe.get_value(
@@ -59,6 +64,15 @@ def execute(filters=None):
 				pavers_km += i['today_odometer_value']
 			elif si_type == "Compound Wall":
 				cw_km += i['today_odometer_value']
+			else:
+				others_km += i['today_odometer_value']
+		else:
+			others_km += i['today_odometer_value']
+		
+
+		if last:
+			diff_km += (i["last_odometer"]-last)
+		last = i['odometer']
 
 	data.append({
 		"item":f"Starting KM :{start_km}",
@@ -68,7 +82,13 @@ def execute(filters=None):
 
 	data.append({
 		"item":f"Paver KM :{pavers_km}",
-		"1":f"CW KM :{cw_km}",
+		"qty":f"CW KM :{cw_km}",
+		**({
+			"1": f"Others KM: {others_km}"
+		} if others_km else {}),
+		**({
+			"2": f"Missed KM: {diff_km}",
+		} if diff_km else {}),
 		"3":"Total Sqrft :"
 	})
 	data.append({
