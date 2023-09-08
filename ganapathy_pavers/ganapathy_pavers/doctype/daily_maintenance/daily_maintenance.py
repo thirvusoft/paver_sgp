@@ -189,7 +189,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	
 
 	#compound_wall_items
-	compound_item=frappe.db.get_all("Item", filters={'disabled': 0, 'item_group':"Compound Walls","compound_wall_type":["!=", "Post"],'item_name':['like',"%FEET%"]},pluck='name',order_by='name')
+	compound_item=frappe.db.get_all("Item", filters={'disabled': 0, 'item_group':"Compound Walls","compound_wall_type":["!=", "Slab"],'item_name':['like',"%FEET%"]},pluck='name',order_by='name')
 	post_item={}
 	if compound_item:
 		# for i in compound_item:
