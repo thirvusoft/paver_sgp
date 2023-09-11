@@ -128,19 +128,19 @@ def execute(filters=None):
 		"1": "<b>Per Unit</b>",
 	})
 
-	expense_details = frappe.db.sql(""" select child.maintenance as maintenance, sum(child.expense) as expense from `tabVehicle Log` as parent left outer join `tabMaintenance Details` as child on child.parent = parent.name where child.maintenance is not null and parent.date between '{0}' and '{1}' and parent.license_plate = '{2}' group by child.maintenance """.format(from_date,to_date,vehicle_no), as_dict= True)
+	# expense_details = frappe.db.sql(""" select child.maintenance as maintenance, sum(child.expense) as expense from `tabVehicle Log` as parent left outer join `tabMaintenance Details` as child on child.parent = parent.name where child.maintenance is not null and parent.date between '{0}' and '{1}' and parent.license_plate = '{2}' group by child.maintenance """.format(from_date,to_date,vehicle_no), as_dict= True)
 
-	total_amount = 0
+	# total_amount = 0
 
-	for j in expense_details:
-		if total_unit:
-			total_amount += round(j['expense'],2)
-			continue
-			data.append({
-				"item": j['maintenance'],
-				"qty": round(j['expense'],2),
-				"1": round(j['expense']/total_unit,3),
-			})
+	# for j in expense_details:
+	# 	if total_unit:
+	# 		total_amount += round(j['expense'],2)
+	# 		continue
+	# 		data.append({
+	# 			"item": j['maintenance'],
+	# 			"qty": round(j['expense'],2),
+	# 			"1": round(j['expense']/total_unit,3),
+	# 		})
 	expense_details = get_expense_data(total_unit or 1, filters) or []
 	total_amount=sum([i['qty'] for i in expense_details]) or 0
 	total_per_unit=sum([i['1'] for i in expense_details])
@@ -150,13 +150,13 @@ def execute(filters=None):
 
 	data.append({
 		"item": "<b>Total Amount</b>",
-		"qty": f"<b>{total_amount}</b>",
+		"qty": f"<b>{round(total_amount, 2)}</b>",
 		"1": f"{total_per_unit}",
 	})
 
 	data.append({
 		"item": "<b>Difference</b>",
-		"qty": f"<b>{(invoice_grand_total or 0)-(total_amount or 0)}</b>",
+		"qty": f"<b>{round(((invoice_grand_total or 0)-(total_amount or 0)), 2)}</b>",
 	})
 
 	return columns, data
@@ -165,6 +165,24 @@ def get_expense_data(total_purchase_unit, filters):
 	exp=frappe.get_single("Expense Accounts")
 	if not exp.vehicle_expense:
 		return []
+	
+	inward_km, delivered_km = frappe.db.sql(f"""
+		select
+			sum(case when ifnull(vl.purchase_invoice, '') != ''
+				then ifnull(vl.today_odometer_value, 0)
+				else 0
+			end) as inward_km,
+			sum(case when ifnull(vl.delivery_note, '') != ''
+				then ifnull(vl.today_odometer_value, 0)
+				else 0
+			end) as delivered_km
+		from `tabVehicle Log` vl
+		where
+			vl.license_plate = "{filters.get("vehicle_no")}" and
+			vl.docstatus = 1 and
+			vl.date between "{filters.get('from_date')}" and "{filters.get('to_date')}"
+	""")[0] or (0, 0)
+	
 	if filters.get("new_method"):
 		exp_tree=expense_tree(
 							from_date=filters.get('from_date'),
@@ -177,11 +195,12 @@ def get_expense_data(total_purchase_unit, filters):
 	res=[]
 	for i in exp_tree:
 		if i.get("expandable"):
-			child=get_expense_from_child(total_purchase_unit, i['child_nodes'])
+			child=get_expense_from_child(total_purchase_unit, i['child_nodes'], inward_km, delivered_km)
 			if child:
 				res+=child
 		else:
 			if i["balance"]:
+				i["balance"] *= inward_km / ((inward_km + delivered_km) or 1)
 				res.append({
 					"item": i['value'],
 					"qty": i["balance"],
@@ -190,10 +209,11 @@ def get_expense_data(total_purchase_unit, filters):
 				})	
 	return res
 
-def get_expense_from_child(total_purchase_unit, account):
+def get_expense_from_child(total_purchase_unit, account, inward_km, delivered_km):
 	res=[]
 	for i in account:
 		if i["balance"]:
+			i["balance"] *= inward_km / ((inward_km + delivered_km) or 1)
 			res.append({
 				"item": i['value'],
 				"qty": i["balance"],
@@ -201,7 +221,7 @@ def get_expense_from_child(total_purchase_unit, account):
 				"reference_data": json.dumps(i.get("references")) if i.get("references") else ""
 			})
 		if i['child_nodes']:
-			res1=(get_expense_from_child(total_purchase_unit, i['child_nodes']))
+			res1=(get_expense_from_child(total_purchase_unit, i['child_nodes'], inward_km, delivered_km))
 			res+=res1
 	return res
 

@@ -131,7 +131,27 @@ def get_data(filters):
 			sum(case when ifnull(vl.purchase_invoice, '') != ''
 				then ifnull(({delivery_query(item_group="Raw Material", uom="Unit", parent="Purchase Invoice", child="Purchase Invoice Item", vl_field="purchase_invoice")}), 0)
 				else 0
-			end) as inward
+			end) as inward,
+			sum(case when ifnull(vl.delivery_note, '') != ''
+				then case 
+						when (select dn.type from `tabDelivery Note` dn where dn.name = vl.delivery_note limit 1) = "Pavers"
+							then ifnull(vl.today_odometer_value, 0)
+						else 0
+					end
+				else 0
+			end) as delivered_paver_km,
+			sum(case when ifnull(vl.delivery_note, '') != ''
+				then case 
+						when (select dn.type from `tabDelivery Note` dn where dn.name = vl.delivery_note limit 1) != "Pavers"
+							then ifnull(vl.today_odometer_value, 0)
+						else 0
+					end
+				else 0
+			end) as delivered_cw_km,
+			sum(case when ifnull(vl.purchase_invoice, '') != ''
+				then ifnull(vl.today_odometer_value, 0)
+				else 0
+			end) as inward_km
 		from  (
 			SELECT *
 			FROM `tabVehicle Log` _vl 
@@ -197,28 +217,28 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 	cw_exp, cw_sqf, cw_sqf_cost, rm_unit_cost = 0, 0, 0, 0
 	inward_freight, inward_exp, inward_sqf, inward_profit_loss = 0, 0, 0, 0
 	for row in vehicle_details:
-		exp = (vehicle_exp.get(row.get("vehicle")) or 0) / (((row.delivered_paver or 0) + (row.delivered_cw or 0) + (row.inward or 0)) or 1)
+		exp = (vehicle_exp.get(row.get("vehicle")) or 0) / (((row.delivered_paver_km or 0) + (row.delivered_cw_km or 0) + (row.inward_km or 0)) or 1)
 		if (row.delivered_paver):
-			paver_exp += ((exp * (row.delivered_paver or 0)) or 0)
+			paver_exp += (row_paver_exp:=(exp * ((row.delivered_paver_km or 0) + (row.delivered_cw_km or 0)) * (row.delivered_paver or 0) / (((row.delivered_paver or 0) + (row.delivered_cw or 0)) or 1)) or 0)
 			paver_sqf += (row.delivered_paver or 0)
-			paver_sqf_cost += ((exp * (row.delivered_paver or 0) or 0) / (row.delivered_paver or 1) or 0)
+			paver_sqf_cost += (row_paver_sqft_cost:=((row_paver_exp or 0) / (row.delivered_paver or 1) or 0))
 			paver.append({
 				"vehicle": row.vehicle,
-				"expense": exp * (row.delivered_paver or 0),
+				"expense": row_paver_exp,
 				"sqft": row.delivered_paver,
-				"sqft_cost": (exp * (row.delivered_paver or 0) or 0) / (row.delivered_paver or 1),
+				"sqft_cost": row_paver_sqft_cost,
 				"mileage": row.mileage
 			})
 		
 		if (row.delivered_cw):
-			cw_exp += ((exp * (row.delivered_cw or 0)) or 0)
+			cw_exp += (row_cw_exp:=(exp * ((row.delivered_paver_km or 0) + (row.delivered_cw_km or 0)) * (row.delivered_cw or 0) / (((row.delivered_paver or 0) + (row.delivered_cw or 0)) or 1)) or 0)
 			cw_sqf += (row.delivered_cw or 0)
-			cw_sqf_cost += ((exp * (row.delivered_cw or 0) or 0) / (row.delivered_cw or 1) or 0)
+			cw_sqf_cost += (row_cw_sqft_cost:=((row_cw_exp or 0) / (row.delivered_cw or 1) or 0))
 			cw.append({
 				"vehicle": row.vehicle,
-				"expense": exp * (row.delivered_cw or 0),
+				"expense": row_cw_exp,
 				"sqft": row.delivered_cw,
-				"sqft_cost": (exp * (row.delivered_cw or 0) or 0) / (row.delivered_cw or 1),
+				"sqft_cost": row_cw_sqft_cost,
 				"mileage": row.mileage
 			})
 
@@ -226,19 +246,19 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 		freight = sum(frappe.get_list("Purchase Invoice",{"name":["in",pi_doc], 'purpose': ["!=", "Service"]}, pluck='ts_total_amount'))
 		
 		if (row.inward):
-			inward_profit_loss += ((freight - (exp * (row.inward or 0) or 0)) or 0)
-			inward_exp += (exp * (row.inward or 0)) or 0
+			inward_exp += (row_inward_exp:=(exp * (row.inward_km or 0) or 0))
+			inward_profit_loss += ((freight - (row_inward_exp or 0)) or 0)
 			inward_freight += freight or 0
 			inward_sqf += row.inward or 0
 
-			rm_unit_cost += ((exp * (row.inward or 0)) or 0) / (row.inward or 1) or 0
+			rm_unit_cost += (row_inward_exp or 0) / (row.inward or 1)
 			rm.append({
 				"vehicle": row.vehicle,
 				"freight": freight,
-				"expense": exp * (row.inward or 0),
+				"expense": row_inward_exp,
 				"sqft": row.inward,
-				"sqft_cost": ((exp * (row.inward or 0)) or 0) / (row.inward or 1),
-				"profit_loss": freight - (exp * (row.inward or 0) or 0),
+				"sqft_cost": (row_inward_exp or 0) / (row.inward or 1),
+				"profit_loss": freight - (row_inward_exp or 0),
 				"mileage": row.mileage
 			})
 
