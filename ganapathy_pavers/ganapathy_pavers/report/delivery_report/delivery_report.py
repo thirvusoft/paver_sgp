@@ -253,6 +253,13 @@ class PartyLedgerSummaryReport(object):
 				dn_filters["posting_date"] = ["between", [self.filters.from_date, self.filters.to_date]]
 		if self.filters.get("party"):
 			dn_filters["customer"] = self.filters.get("party")
+		else:
+			customers = tuple(frappe.get_all("Customer", {"dont_show_in_delivery_report": 1}, pluck="name"))
+			if len(customers) == 1:
+				dn_filters["customer"] = ["!=", customers[0]]
+			elif len(customers) > 1:
+				dn_filters["customer"] = ["not in", customers]
+
 		if self.filters.get("project"):
 			dn_filters["project"] = self.filters.get("project")
 		if self.filters.get("company"):
@@ -341,6 +348,12 @@ class PartyLedgerSummaryReport(object):
 
 		if self.filters.get("party"):
 			conditions.append("party=%(party)s")
+		else:
+			customers = tuple(frappe.get_all("Customer", {"dont_show_in_delivery_report": 1}, pluck="name"))
+			if len(customers) == 1:
+				conditions.append("party != '{0}'".format(customers[0]))
+			elif len(customers) > 1:
+				conditions.append(f"party not in {customers}")
 
 		if self.filters.party_type == "Customer":
 			if self.filters.get("customer_group"):
