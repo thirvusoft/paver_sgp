@@ -251,10 +251,10 @@ doc_events = {
 					"ganapathy_pavers.custom.py.delivery_note.update_qty_sitework",
 					"ganapathy_pavers.custom.py.delivery_note.update_return_qty_sitework",
 					],
-		# "on_cancel":[
-		# 			"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
-		# 			"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
-		# 			 ],
+		"on_cancel":[
+					"ganapathy_pavers.custom.py.delivery_note.reduce_qty_sitework",
+					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
+					 ],
 		"validate":[
 			"ganapathy_pavers.custom.py.delivery_note.validate",
 			"ganapathy_pavers.custom.py.tax_validation.dn_tax_validation",
