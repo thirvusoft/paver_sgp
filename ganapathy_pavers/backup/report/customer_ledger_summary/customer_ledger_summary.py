@@ -135,7 +135,7 @@ class PartyLedgerSummaryReport(object):
 			if gle.posting_date < self.filters.from_date or gle.is_opening == "Yes":
 				self.party_data[gle.party].opening_balance += amount
 			else:
-				if amount > 0:
+				if amount > 0 and ((not (gle.voucher_type == 'Journal Entry' and gle.is_opening == 'No')) if self.filters.party_type == "Customer" else True):
 					self.party_data[gle.party].invoiced_amount += amount
 				elif gle.voucher_no in self.return_invoices:
 					self.party_data[gle.party].return_amount -= amount
@@ -190,7 +190,18 @@ class PartyLedgerSummaryReport(object):
 		self.gl_entries = frappe.db.sql(("""
 			select
 				gle.posting_date, gle.party, gle.voucher_type, gle.voucher_no, gle.against_voucher_type,
-				gle.against_voucher, gle.debit, gle.credit, gle.is_opening {join_field}
+				gle.against_voucher, 
+				(
+					case when ifnull(gle.debit, 0) != 0 and gle.voucher_type = 'Journal Entry' and gle.is_opening = 'No' and gle.party_type = "Customer"
+							then 0
+						else gle.debit
+					end
+				) as debit,
+				case when ifnull(gle.debit, 0) != 0 and gle.voucher_type = 'Journal Entry' and gle.is_opening = 'No' and gle.party_type = "Customer"
+						then -1 * gle.debit
+					else gle.credit
+				end as credit, 
+				gle.is_opening {join_field}
 			from `tabGL Entry` gle
 			{join}
 			where
