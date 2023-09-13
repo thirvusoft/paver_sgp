@@ -462,9 +462,16 @@ def get_operators(doc, item_count=1):
 
 @frappe.whitelist()
 def get_working_hrs(attendance_date, machine):
-    attn = frappe.get_all("Attendance", { "attendance_date": attendance_date, "machine": machine, "docstatus": 1},
-                     pluck="working_hours")
-    attn = [float(att) if(att) else 0 for att in attn]
+    
+    attn = frappe.get_all("Attendance", 
+        [
+            ["Attendance", "attendance_date", "=", attendance_date],
+            ["Working Area List", "working_area", "=", machine],
+            ["Attendance", "docstatus", '=', 1]
+        ],
+        ["`tabWorking Area List`.working_hours"])
+    
+    attn = [float(att.working_hours) if(att.working_hours) else 0 for att in attn]
     return {'hours':sum(attn), 'labours': len(attn)}
 
 

@@ -413,6 +413,7 @@ def check_branch(doc, event):
                 frappe.db.set_value(row.doctype, row.name, 'unacc', 0)
         
 def update_qty_and_required_unit(doc, event=None):
+    doc.order_type = "Sales"
     for row in doc.items:
         row.db_set("ts_required_area_qty", uom_conversion(item = row.item_code, from_uom=row.uom, from_qty=row.qty, to_uom="SQF"))
 
