@@ -35,12 +35,14 @@ class PartyLedgerSummaryReport(object):
 		data = self.get_data()
 		final_data=[]
 		for row in data:
+			if self.filters.get('stock_pending_value') and frappe.get_value("Project", row.get("project"), "status") == 'Stock Pending at Site':
+				row['outstanding_amount'] = frappe.get_value("Project", row.get("project"), "stock_value")
+				row["out_delivery_amount"] = 0
+				row["paid_amount"] = 0
+
 			if self.filters.get("sw_status") and row.get("project"):
 				try:
-					if self.filters.get('stock_pending_value') and frappe.get_value("Project", row.get("project"), "status") == 'Stock Pending at Site':
-						row['out_delivery_amount'] = frappe.get_value("Project", row.get("project"), "stock_value")
-						final_data.append(row)
-					elif (frappe.get_value("Project", row.get("project"), "status") not in self.filters.get("sw_status")):
+					if (frappe.get_value("Project", row.get("project"), "status") not in self.filters.get("sw_status")):
 						final_data.append(row)
 				except:
 					pass
@@ -176,7 +178,7 @@ class PartyLedgerSummaryReport(object):
 	def outstanding_amount(self):
 		gl=frappe.get_last_doc("GL Entry")
 		gl=gl.voucher_no
-		invoice=frappe.get_all("Delivery Note", filters={'name':gl}, fields=['rounded_total'], pluck='rounded_total')
+		invoice=frappe.get_all("Delivery Note", filters={'name':gl, "is_not_billable": 0}, fields=['rounded_total'], pluck='rounded_total')
 		return self.get_data(invoice)
 	 
 
@@ -248,7 +250,7 @@ class PartyLedgerSummaryReport(object):
 
 	def get_outstand_based_on_delivery_note(self,data):
 		out=[]
-		dn_filters={"docstatus": 1}
+		dn_filters={"docstatus": 1, "is_not_billable": 0}
 		if self.filters.from_date and self.filters.to_date:
 				dn_filters["posting_date"] = ["between", [self.filters.from_date, self.filters.to_date]]
 		if self.filters.get("party"):
@@ -274,7 +276,7 @@ class PartyLedgerSummaryReport(object):
 			if run:
 				data.append(frappe._dict({'party': i.get("customer"), 'party_name': i.get("customer_name"), 'project': i.get("project"), 'type': i.get("type")}))
 		for customer in data:
-			filters={'customer': customer.get("party"), 'docstatus':1}
+			filters={'customer': customer.get("party"), 'docstatus':1, "is_not_billable": 0}
 			filters['project'] = (customer.get('project') or '')
 			filters['type'] = (customer.get('type') or '')
 			filters["posting_date"] = ["between", [self.filters.from_date, self.filters.to_date]]
