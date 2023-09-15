@@ -68,7 +68,7 @@ frappe.query_reports["Delivery Report"] = {
 		},
 		{
 			"fieldname":"sw_status",
-			"label": __("Site Work Status to don't fetch"),
+			"label": __("Site Work Status to don't show"),
 			"fieldtype": "MultiSelectList",
 			"options": "\nOpen\nCompleted\nTo Bill\nBilled\nCancelled\nStock Pending at Site\nRework",
 			"default": "Billed",
@@ -88,6 +88,7 @@ frappe.query_reports["Delivery Report"] = {
 			"fieldname":"stock_pending_value",
 			"label": __("Fetch stock value for stock pending site"),
 			"fieldtype": "Check",
+			"print_hide": 1
 		},
 		{
 			"fieldname":"type",
@@ -145,18 +146,21 @@ frappe.query_reports["Delivery Report"] = {
 			"label": __("Don't Fetch Records with no Site"),
 			"fieldtype": "Check",
 			"default": 1,
+			"print_hide": 1
 		},
 		{
 			"fieldname":"show_invoice_amount",
 			"label": __("Show Invoice Amount"),
 			"fieldtype": "Check",
-			"default": 0
+			"default": 0,
+			"print_hide": 1
 		},
 		{
 			"fieldname":"invoiced_delivery",
 			"label": __("Don't Show Invoiced Deliveries and their Paid Amount"),
 			"fieldtype": "Check",
-			"default": 1
+			"default": 1,
+			"print_hide": 1
 		}
 	]
 };

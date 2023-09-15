@@ -97,7 +97,8 @@ frappe.query_reports["Customer Ledger Summary"] = {
 			"fieldname":"closing_balance_zero",
 			"label": __("Don't show zero closing balance"),
 			"fieldtype": "Check",
-			"default": 1
+			"default": 1,
+			"print_hide": 1
 		},
 		{
 			"fieldname":"closing_balance_opt",
