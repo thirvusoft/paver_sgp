@@ -111,6 +111,12 @@ frappe.query_reports["Customer Ledger Summary"] = {
 			"label": __("Type"),
 			"fieldtype": "Select",
 			"options": "\nPavers\nCompound Wall\nInternal\nOthers\n--Nothing--"
-		}
+		},
+		{
+			"fieldname": "sales_type_order_and_group",
+			"print_hide": 1,
+			"label": __("Group and Order by Sales Type"),
+			"fieldtype": "Check",
+		},
 	]
 };
