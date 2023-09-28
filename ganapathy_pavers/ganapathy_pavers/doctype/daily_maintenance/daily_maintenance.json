@@ -19,6 +19,11 @@
   "labour_absent",
   "operator_present",
   "operator_absent",
+  "column_break_13",
+  "labour_present_night",
+  "labour_absent_night",
+  "operator_present_night",
+  "operator_absent_night",
   "section_break_9",
   "warehouse",
   "column_break_11",
@@ -75,22 +80,22 @@
   {
    "fieldname": "labour_present",
    "fieldtype": "Int",
-   "label": "Labour Present"
+   "label": "Labour Present Day"
   },
   {
    "fieldname": "labour_absent",
    "fieldtype": "Int",
-   "label": "Labour Absent"
+   "label": "Labour Absent Day"
   },
   {
    "fieldname": "operator_present",
    "fieldtype": "Int",
-   "label": "Operator Present"
+   "label": "Operator Present Day"
   },
   {
    "fieldname": "operator_absent",
    "fieldtype": "Int",
-   "label": "Operator Absent"
+   "label": "Operator Absent Day"
   },
   {
    "fieldname": "section_break_9",
@@ -287,12 +292,36 @@
    "options": "Location",
    "read_only_depends_on": "eval: doc.docstatus == 1 && doc.unit && !doc.__unsaved",
    "reqd": 1
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "labour_present_night",
+   "fieldtype": "Int",
+   "label": "Labour Present Night"
+  },
+  {
+   "fieldname": "labour_absent_night",
+   "fieldtype": "Int",
+   "label": "Labour Absent Night"
+  },
+  {
+   "fieldname": "operator_present_night",
+   "fieldtype": "Int",
+   "label": "Operator Present Night"
+  },
+  {
+   "fieldname": "operator_absent_night",
+   "fieldtype": "Int",
+   "label": "Operator Absent Night"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-10 18:35:58.748896",
+ "modified": "2023-09-26 10:54:31.643263",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Daily Maintenance",
