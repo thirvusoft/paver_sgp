@@ -8,7 +8,7 @@ def property_setter():
         'field_name' : 'type',
         'property': 'options',
         'property_type' : 'Select',
-        'value' : 'Compound Wall\nPavers'
+        'value' : '\nCompound Wall\nPavers'
         
     })
     doc.save()
