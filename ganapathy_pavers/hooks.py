@@ -114,7 +114,8 @@ override_doctype_class = {
 	"Stock Entry" : "ganapathy_pavers.custom.py.stock_entry.Tsstockentry",
 	"Vehicle Log" : "ganapathy_pavers.custom.py.vehicle_overwrite.odometer",
 	"Journal Entry": "ganapathy_pavers.custom.py.journal_entry_override._JournalEntry",
-	"Purchase Invoice": "ganapathy_pavers.custom.py.purchase_invoice_expense._PurchaseInvoice"
+	"Purchase Invoice": "ganapathy_pavers.custom.py.purchase_invoice_expense._PurchaseInvoice",
+	"Lead":"ganapathy_pavers.custom.py.lead.lead_status"
 }
 
 # Document Events
