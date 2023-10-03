@@ -417,7 +417,7 @@ doctype_js = {
 				"Employee Attendance Tool":"/custom/js/employee_atten_tool.js",
 				"Employee":"/custom/js/employee.js",
 				"Delivery Note":"/custom/js/delivery_note.js",
-				# "Sales Invoice": "/custom/js/sales_invoice.js",
+				"Sales Invoice": "/custom/js/sales_invoice.js",
 				# "Journal Entry": "/custom/js/journal_entry.js",
 				"Vehicle Log":[
 								"/custom/js/vehicle_log.js", 
