@@ -2,7 +2,6 @@ import frappe
 from erpnext.crm.doctype.lead.lead import Lead
 
 class lead_status(Lead):
-    frappe.errprint("dsfsdgdf")
     def validate(self):
         self.set_lead_name()
         self.set_title()
