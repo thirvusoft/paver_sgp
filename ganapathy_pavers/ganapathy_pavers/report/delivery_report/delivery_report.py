@@ -296,7 +296,7 @@ class PartyLedgerSummaryReport(object):
 					sales_invoice=list(set(sales_invoice))
 					if sales_invoice:
 						paid_amount=frappe.db.sql("""
-							SELECT SUM(grand_total - outstanding_amount) 
+							SELECT SUM(rounded_total - outstanding_amount) 
 							FROM `tabSales Invoice`
 							WHERE name {0}
 						""".format(f"='{sales_invoice[0]}'" if len(sales_invoice)==1 else f" in {tuple(sales_invoice)}"), as_list=1)

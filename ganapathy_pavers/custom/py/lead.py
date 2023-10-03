@@ -1,4 +1,16 @@
 import frappe
+from erpnext.crm.doctype.lead.lead import Lead
+
+class lead_status(Lead):
+    def validate(self):
+        self.set_lead_name()
+        self.set_title()
+        if self.status not in ["Converted","Completed"]:
+            self.set_status()
+        self.check_email_id_is_unique()
+        self.validate_email_id()
+        self.validate_contact_date()
+        self.set_prev()
 
 def new_status():
     doc=frappe.new_doc('Property Setter')
