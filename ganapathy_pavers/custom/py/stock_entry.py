@@ -41,6 +41,40 @@ def update_asset(self, event):
             doc.flags.ignore_mandatory=True
             doc.flags.ignore_permission=True
             doc.save('Update')
+    if event=="on_cancel":
+        sites = frappe.get_all("Project", filters = [
+            ["Additional Costs", "stock_entry", "=", self.name]
+            ], pluck="name")
+        if sites:
+            for site in sites:
+                sw_doc=frappe.get_doc("Project", site)
+                add_costs=[]
+                for row in sw_doc.additional_cost:
+                    if row.stock_entry != self.name:
+                        add_costs.append(row)
+                sw_doc.update({
+                    "additional_cost": add_costs 
+                })
+                sw_doc.save()
+        
+        return
+            
+    if self.internal_fuel_consumption and self.site_work:
+        sw_doc=frappe.get_doc("Project",self.site_work)
+        total_qty=0
+        for i in self.items:
+            total_qty += i.qty
+
+
+        sw_doc.append("additional_cost", {
+            "description": self.internal_fuel_consumption,
+            "qty": total_qty,
+            "nos":total_qty,
+            "amount": self.total_outgoing_value,
+            "stock_entry":self.name
+            
+        })
+        sw_doc.save()
 
 class _StockController(StockController):
     def make_gl_entries(self, gl_entries=None, from_repost=False):

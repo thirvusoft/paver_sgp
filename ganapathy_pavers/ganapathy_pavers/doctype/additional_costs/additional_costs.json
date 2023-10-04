@@ -24,6 +24,7 @@
   "section_break_14",
   "journal_entry",
   "purchase_invoice",
+  "stock_entry",
   "qty",
   "rate",
   "item_tax_template",
@@ -180,12 +181,17 @@
    "fieldtype": "Date",
    "label": "Date",
    "mandatory_depends_on": "eval:doc.description==\"Site Advance\" && doc.amount>0"
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Data",
+   "label": "Stock Entry"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-03-31 18:02:48.654595",
+ "modified": "2023-10-04 12:49:14.172109",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Additional Costs",
