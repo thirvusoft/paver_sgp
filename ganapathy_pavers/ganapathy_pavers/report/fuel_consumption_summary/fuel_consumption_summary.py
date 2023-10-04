@@ -15,6 +15,7 @@ def execute(filters=None):
 def get_purchase_fuel_data(filters):
     query = f"""
     select
+        fip.item_code,
         fip.fuel_type as license_plate,
         sum(poi.stock_qty) as fuel_qty,
         sum(poi.amount) as total_fuel
@@ -22,9 +23,11 @@ def get_purchase_fuel_data(filters):
     inner join `tabPurchase Invoice` po on po.name=poi.parent and poi.parenttype="Purchase Invoice"
     inner join `tabFuel Item Map` fip on fip.item_code=poi.item_code and fip.parenttype="Vehicle Settings"
     where
+        !IFNULL(fip.fuel_type='{filters.get("fuel_type")}') and 
         po.docstatus=1 and
         po.update_stock=1 and
         po.posting_date between '{filters.get("from_date")}' and '{filters.get("to_date")}'
+       
     group by poi.item_code
     """
     data = frappe.db.sql(query, as_dict=True)
