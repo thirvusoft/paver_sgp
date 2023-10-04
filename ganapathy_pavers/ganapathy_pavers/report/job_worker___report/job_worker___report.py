@@ -422,7 +422,7 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
         res=frappe.db.sql(query)[0][0]
         return {"amount": res}
     planned_deduction=0
-    planned_deduction=frappe.db.sql(f"""
+    planned_deduction=(frappe.db.sql(f"""
         SELECT 
             SUM(dp.amount)
         FROM `tabDeduction Planning` dp
@@ -433,7 +433,7 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
             AND ea.employee='{employee}'
             AND dp.date between '{from_date}' and '{to_date}'
             AND ea.repay_unclaimed_amount_from_salary=1
-    """)[0][0]
+    """)[0][0] or 0) + (get_undeducted_planned_advances(employee, from_date, to_date) or 0)
     debit_note = frappe.db.sql(f"""
                 select
                     sum(jea.debit) as amount,
@@ -464,17 +464,47 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
     if debit_note and debit_note[0] and debit_note[0].get("amount"):
         debit = debit_note[0].get("amount")
         remarks = debit_note[0].get("remarks")
+    return {"amount": round(((planned_deduction or 0) + (debit or 0)), 2) or 0, "remarks": remarks}
 
-    return {"amount": round(((planned_deduction or 0) + (debit or 0)), 2) or 0, "remarks": remarks}#get_undeducted_advances(employee, from_date, to_date)
-
-def get_undeducted_advances(employee, from_date, to_date):
+def get_undeducted_planned_advances(employee, from_date, to_date):
     res= frappe.db.sql(f"""
-        SELECT SUM(ads.amount - ifnull(ads.salary_slip_amount, 0))
-        FROM `tabAdditional Salary` ads
-        WHERE ads.docstatus=1 
-        AND ads.employee="{employee}"
-        AND ads.payroll_date <= '{to_date}'
+        SELECT
+            ROUND(SUM(ded_pl.amount - IFNULL(
+                (
+                    SELECT
+                        SUM(ssr.amount)
+                    FROM `tabSalary Slip Reference` ssr
+                    WHERE
+                        ssr.parenttype = 'Additional Salary' AND
+                        IFNULL((
+                            SELECT
+                                COUNT(*)
+                            FROM `tabSalary Slip` sal_slip
+                            WHERE
+                                ded_pl.date BETWEEN sal_slip.start_date and sal_slip.end_date and
+                                sal_slip.name = ssr.salary_slip
+                        ), 0) > 0 AND
+                        IFNULL((
+                            SELECT
+                                COUNT(*)
+                            FROM `tabAdditional Salary` a_sal
+                            WHERE
+                                a_sal.name = ssr.parent and
+                                a_sal.ref_doctype = 'Employee Advance' AND 
+                                a_sal.ref_docname = ded_pl.parent
+                        ), 0) > 0
+                )
+            , 0)), 2)
+        FROM `tabDeduction Planning` ded_pl
+        INNER JOIN `tabEmployee Advance` e_adv
+        ON ded_pl.parent = e_adv.name AND ded_pl.parenttype = 'Employee Advance'
+        WHERE
+            ded_pl.date < '{from_date}' AND
+            e_adv.employee = '{employee}' AND
+            e_adv.docstatus = 1 AND
+            e_adv.repay_unclaimed_amount_from_salary = 1
     """)[0][0]
+    frappe.errprint(f"{employee} - {res}") if res else 0
     return round((res or 0), 2)
 
 def get_employees_to_add(filters, employees):
@@ -506,7 +536,7 @@ def get_employees_to_add(filters, employees):
 
     rem = frappe.get_all("Employee", emp_filters, pluck='name')
     return [[emp]+ [None for i in range(11)] for emp in rem if (
-        get_undeducted_advances(emp, filters.get("from_date"), filters.get("to_date")) or
+        get_undeducted_planned_advances(emp, filters.get("from_date"), filters.get("to_date")) or
         get_employee_salary_balance(emp, filters.get("from_date"), filters.get("to_date")).get("amount") or
         get_employee_salary_slip_amount(emp, filters.get("from_date"), filters.get("to_date"))
     )]

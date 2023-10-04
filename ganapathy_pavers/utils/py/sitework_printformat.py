@@ -186,16 +186,41 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
 								((
 								select 
 									avg(rm.rate) /
-									ifnull((
-										SELECT
-											uom.conversion_factor
-										FROM `tabUOM Conversion Detail` uom
-										WHERE
-											uom.parenttype='Item' and
-											uom.parent=rm.item and
-											uom.uom=rm.uom
-										limit 1
-										), 0)
+									ifnull(
+										ifnull(
+											(
+												SELECT
+													pi_item.conversion_factor
+												FROM `tabPurchase Invoice Item` pi_item
+												WHERE 
+													pi_item.name = (
+															SELECT 
+																sle.voucher_detail_no 
+															FROM `tabStock Ledger Entry` sle 
+															WHERE
+																sle.is_cancelled=0 and
+																sle.voucher_type = 'Purchase Invoice' and
+																sle.item_code = dni.item_code and
+																sle.posting_date  <= dn.posting_date and
+																sle.is_cancelled = 0 and
+																sle.project='{site_work}'
+															order by posting_date desc
+															limit 1
+														) and
+													pi_item.uom = rm.uom
+											),
+											(
+												SELECT
+													uom.conversion_factor
+												FROM `tabUOM Conversion Detail` uom
+												WHERE
+													uom.parenttype='Item' and
+													uom.parent=rm.item and
+													uom.uom=rm.uom
+												limit 1
+											)
+										), 0
+									)
 								from `tabRaw Materials` rm
 								where 
 									rm.item= dni.item_code and
@@ -203,17 +228,41 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
 									rm.parent='{site_work}'
 								)
 							))) *
-					ifnull((
-						SELECT
-							uom.conversion_factor
-						FROM `tabUOM Conversion Detail` uom
-						WHERE
-							uom.parenttype='Item' and
-							uom.parent=dni.item_code and
-							uom.uom=dni.uom
-						limit 1
-					)    
-					, 0)
+					ifnull(
+						ifnull(
+							(
+								SELECT
+									pi_item.conversion_factor
+								FROM `tabPurchase Invoice Item` pi_item
+								WHERE 
+									pi_item.name = (
+											SELECT 
+												sle.voucher_detail_no 
+											FROM `tabStock Ledger Entry` sle 
+											WHERE
+												sle.is_cancelled=0 and
+												sle.voucher_type = 'Purchase Invoice' and
+												sle.item_code = dni.item_code and
+												sle.posting_date  <= dn.posting_date and
+												sle.is_cancelled = 0 and
+												sle.project='{site_work}'
+											order by posting_date desc
+											limit 1
+										) and
+									pi_item.uom = dni.uom
+							),
+							(
+								SELECT
+									uom.conversion_factor
+								FROM `tabUOM Conversion Detail` uom
+								WHERE
+									uom.parenttype='Item' and
+									uom.parent=dni.item_code and
+									uom.uom=dni.uom
+								limit 1
+							)
+						), 0
+					)
 				, 2) 
 			END as valuation_rate
 		FROM `tabDelivery Note Item` dni

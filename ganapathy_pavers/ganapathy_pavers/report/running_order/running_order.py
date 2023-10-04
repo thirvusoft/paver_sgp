@@ -112,7 +112,7 @@ def execute(filters=None):
 				pav_cw.item
 		""", as_dict=1)
 
-		site_data += get_delivery_detail(sw.name, site_data, laying_query)
+		site_data += get_delivery_detail(sw.name, site_data, laying_query, supply_only_filter, working_status)
 		
 		raw_material=frappe.db.sql(f"""
 			SELECT 
@@ -160,7 +160,7 @@ def execute(filters=None):
 	columns=get_columns(filters)
 	return columns,data
 	
-def get_delivery_detail(site_work, site_data, laying_query):
+def get_delivery_detail(site_work, site_data, laying_query, supply_only_filter, working_status):
 	"""
 		If a item is not in site work like no sales order or supply only sales order
 		and also have deliveries, then this will return the delivery and laying details
@@ -194,6 +194,8 @@ def get_delivery_detail(site_work, site_data, laying_query):
 		WHERE
 			sw.name = '{site_work}'
 			{ds_filters}
+			{supply_only_filter}
+			{working_status}
 	""", as_dict=True)
 
 	return add_items
