@@ -65,7 +65,6 @@ def update_asset(self, event):
         for i in self.items:
             total_qty += i.qty
 
-
         sw_doc.append("additional_cost", {
             "description": self.internal_fuel_consumption,
             "qty": total_qty,
@@ -354,6 +353,8 @@ class Tsstockentry(StockEntry, _StockController):
 
 
 def basic_rate_validation(doc,event):
+    if doc.site_work:
+        doc.project=doc.site_work
     if(doc.usb or doc.cw_usb or doc.shot_blast or doc.shot_blast_costing):
         for item in doc.items:
             admin_exp = frappe.db.get_value("Item", item.item_code, "administrative_cost") or 0
