@@ -68,7 +68,7 @@ frappe.query_reports["Delivery Report"] = {
 		},
 		{
 			"fieldname":"sw_status",
-			"label": __("Site Work Status to don't show"),
+			"label": __("Site Work Status"),
 			"fieldtype": "MultiSelectList",
 			"options": "\nOpen\nCompleted\nTo Bill\nBilled\nCancelled\nStock Pending at Site\nRework",
 			"default": "Billed",
