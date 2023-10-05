@@ -415,7 +415,8 @@ def check_branch(doc, event):
 def update_qty_and_required_unit(doc, event=None):
     doc.order_type = "Sales"
     for row in doc.items:
-        row.db_set("ts_required_area_qty", uom_conversion(item = row.item_code, from_uom=row.uom, from_qty=row.qty, to_uom="SQF"))
+        if row.item_group in ['Pavers', 'Compound Walls']:
+            row.db_set("ts_required_area_qty", uom_conversion(item = row.item_code, from_uom=row.uom, from_qty=row.qty, to_uom="SQF"))
 
 def patch():
     for row in frappe.db.get_all("Sales Order Item", {"item_group": ["in", ["Pavers", "Compound Walls"]]}, ['name', 'item_code', 'qty', 'uom']):

@@ -96,7 +96,7 @@ class SiteTransportCost:
             "last_odometer", 
             "delivery_note", 
             "site_work"
-        ])
+        ]) if delivery_notes else []
         return vehicle_logs
 
     def get_vehicle_log_driver_cost(self):
@@ -123,7 +123,7 @@ class SiteTransportCost:
                     "employee": employee,
                     "date": date,
                     "select_purpose": ["!=", "Fuel"],
-                }, pluck="today_odometer_value")) or 1
+                }, pluck="today_odometer_value"))
 
                 if employee not in driver_salary:
                     driver_salary[employee] = 0
@@ -134,7 +134,7 @@ class SiteTransportCost:
                     if i.get('site_work') not in vl_count:
                         vl_count.append(i.get('site_work'))
                 
-                salary = (per_day_salary or 0) * len(vl_count) * odometer / total_odometer
+                salary = ((per_day_salary or 0) * len(vl_count) * odometer / total_odometer) if total_odometer else 0
                 driver_salary[employee] += (salary or 0)
 
         return driver_salary
@@ -165,7 +165,7 @@ class SiteTransportCost:
                     "operator": operator,
                     "date": date,
                     "select_purpose": ["!=", "Fuel"],
-                }, pluck="today_odometer_value")) or 1
+                }, pluck="today_odometer_value"))
 
                 if operator not in operator_salary:
                     operator_salary[operator] = 0
@@ -176,7 +176,7 @@ class SiteTransportCost:
                     if i.get('site_work') not in vl_count:
                         vl_count.append(i.get('site_work'))
 
-                salary = (per_day_salary or 0) * len(vl_count) * odometer / total_odometer
+                salary = ((per_day_salary or 0) * len(vl_count) * odometer / total_odometer) if total_odometer else 0
                 operator_salary[operator] += (salary or 0)
 
         return operator_salary
@@ -190,7 +190,7 @@ class SiteTransportCost:
             maint_rate = frappe.db.get_value("Vehicle", vl.get("license_plate"), "maintenance_per_km") or 0
             maintenance_cost += ((maint_rate or 0) * (distance or 0)) or 0
             mileage = vl.get("mileage")
-            cost = ((distance*rate/(mileage or 1)) or 0)
+            cost = ((distance*rate/(mileage or 1)) or 0) if mileage else 0
 
             fuel_cost += cost or 0
 
@@ -231,7 +231,7 @@ class SiteTransportCost:
                     }, ["amount", "no_of_days"])
 
                     if main_cost:
-                        main_cost = (main_cost[0].amount or 0)/(main_cost[0].no_of_days or 1)
+                        main_cost = ((main_cost[0].amount or 0)/(main_cost[0].no_of_days)) if main_cost[0].no_of_days else 0
                     else:
                         main_cost = 0
 
@@ -241,7 +241,7 @@ class SiteTransportCost:
                     if i.get('site_work') not in vl_count:
                         vl_count.append(i.get('site_work'))
 
-                    cost = main_cost * len(vl_count) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / (total_odometer or 1)
+                    cost = (main_cost * len(vl_count) * ((vl.get("odometer") or 0) - (vl.get("last_odometer") or 0)) / (total_odometer or 1)) if total_odometer else 0
                     yearl_maintenance[date] += (cost or 0)
 
         return yearl_maintenance
