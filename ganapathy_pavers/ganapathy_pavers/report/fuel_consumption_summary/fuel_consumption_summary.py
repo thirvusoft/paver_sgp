@@ -23,7 +23,11 @@ def get_purchase_fuel_data(filters):
     inner join `tabPurchase Invoice` po on po.name=poi.parent and poi.parenttype="Purchase Invoice"
     inner join `tabFuel Item Map` fip on fip.item_code=poi.item_code and fip.parenttype="Vehicle Settings"
     where
-        !IFNULL(fip.fuel_type='{filters.get("fuel_type")}') and 
+        case 
+            when IFNULL('{filters.get("fuel_type") or ""}', "")!="" 
+                then fip.fuel_type='{filters.get("fuel_type")}' 
+            else 1=1 
+        end and
         po.docstatus=1 and
         po.update_stock=1 and
         po.posting_date between '{filters.get("from_date")}' and '{filters.get("to_date")}'
@@ -128,7 +132,7 @@ def get_stock_entry_data(filters):
     ON se.name = sed.parent
     WHERE
         se.docstatus = 1 and
-        !IFNULL(se.internal_fuel_consumption) and
+        IFNULL(se.internal_fuel_consumption, "")!="" and
         se.stock_entry_type = "Material Issue" 
         {conditions}
     GROUP BY se.internal_fuel_consumption, sed.item_code

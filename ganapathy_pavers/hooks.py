@@ -169,8 +169,10 @@ doc_events = {
 		]
 	},
 	"Stock Entry": {
-		"on_submit": "ganapathy_pavers.custom.py.stock_entry.update_asset",
-		"on_cancel": "ganapathy_pavers.custom.py.stock_entry.update_asset",
+		"on_submit": ["ganapathy_pavers.custom.py.stock_entry.update_asset",
+					"ganapathy_pavers.custom.py.stock_entry.add_additional_cost"],
+		"on_cancel": ["ganapathy_pavers.custom.py.stock_entry.update_asset",
+					"ganapathy_pavers.custom.py.stock_entry.remove_additional_cost"],
         "validate" : [
     			"ganapathy_pavers.custom.py.stock_entry.basic_rate_validation",
 				"ganapathy_pavers.custom.py.stock_entry.expense_account",
