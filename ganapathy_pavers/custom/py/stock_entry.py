@@ -42,6 +42,8 @@ def update_asset(self, event):
             doc.flags.ignore_permission=True
             doc.save('Update')
 
+            
+
 class _StockController(StockController):
     def make_gl_entries(self, gl_entries=None, from_repost=False):
         if self.docstatus == 2:
@@ -320,6 +322,8 @@ class Tsstockentry(StockEntry, _StockController):
 
 
 def basic_rate_validation(doc,event):
+    if doc.site_work:
+        doc.project=doc.site_work
     if(doc.usb or doc.cw_usb or doc.shot_blast or doc.shot_blast_costing):
         for item in doc.items:
             admin_exp = frappe.db.get_value("Item", item.item_code, "administrative_cost") or 0
@@ -361,3 +365,39 @@ def make_gl_entries(gl_map, cancel=False, adv_adj=False, merge_entries=True, upd
 				frappe.throw(_("Incorrect number of General Ledger Entries found. You might have selected a wrong Account in the transaction."))
 		else:
 			make_reverse_gl_entries(gl_map, adv_adj=adv_adj, update_outstanding=update_outstanding)
+
+
+def remove_additional_cost(self,event):
+    sites = frappe.get_all("Project", filters = [
+        ["Additional Costs", "stock_entry", "=", self.name]
+        ], pluck="name")
+    if sites:
+        for site in sites:
+            sw_doc=frappe.get_doc("Project", site)
+            add_costs=[]
+            for row in sw_doc.additional_cost:
+                if row.stock_entry != self.name:
+                    add_costs.append(row)
+            sw_doc.update({
+                "additional_cost": add_costs 
+            })
+            sw_doc.save()
+    
+    return
+
+def add_additional_cost(self,event):
+    if self.internal_fuel_consumption and self.site_work:
+        sw_doc=frappe.get_doc("Project",self.site_work)
+        total_qty=0
+        for i in self.items:
+            total_qty += i.qty
+
+        sw_doc.append("additional_cost", {
+            "description": self.internal_fuel_consumption,
+            "qty": total_qty,
+            "nos":total_qty,
+            "amount": self.total_outgoing_value,
+            "stock_entry":self.name
+            
+        })
+        sw_doc.save()

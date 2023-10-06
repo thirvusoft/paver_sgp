@@ -49,3 +49,27 @@ def vehicle_fuel():
             frappe.db.set_value("GL Entry", i, "machine3_night", sum([1 for wrk in vl.workstations if frappe.scrub(wrk.workstation)=="machine3_night"]), update_modified=False)
             frappe.db.set_value("GL Entry", i, "machine3_day", sum([1 for wrk in vl.workstations if frappe.scrub(wrk.workstation)=="machine3_day"]), update_modified=False)
 
+
+def site_work_additional_cost():
+    stock_entry = frappe.get_all("Stock Entry", {"internal_fuel_consumption":["is","set"],"site_work":["is","set"],"docstatus":1}, pluck="name")
+    print(len(stock_entry))
+    if stock_entry:
+        for i in stock_entry:
+            se_doc=frappe.get_doc("Stock Entry", i)
+            if se_doc:
+                sw_doc=frappe.get_doc("Project",se_doc.site_work)
+                total_qty=0
+                for j in se_doc.items:
+                    total_qty += j.qty
+
+
+                sw_doc.append("additional_cost", {
+                    "description": se_doc.internal_fuel_consumption,
+                    "qty": total_qty,
+                    "nos":total_qty,
+                    "amount": se_doc.total_outgoing_value,
+                    "stock_entry":se_doc.name
+                    
+                })
+        
+                sw_doc.save()
