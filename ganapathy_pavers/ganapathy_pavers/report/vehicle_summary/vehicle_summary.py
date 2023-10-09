@@ -96,16 +96,20 @@ def get_data(filters):
 							uom.uom=child.stock_uom
 					)
                 	, 0)/
-					ifnull((
-						SELECT
-							uom.conversion_factor
-						FROM `tabUOM Conversion Detail` uom
-						WHERE
-							uom.parenttype='Item' and
-							uom.parent=child.item_code and
-							uom.uom='{uom}'
-					)    
-					, 0)
+					ifnull(
+						case when child.uom = '{uom}' then child.conversion_factor end,
+						ifnull(
+							(
+								SELECT
+									uom.conversion_factor
+								FROM `tabUOM Conversion Detail` uom
+								WHERE
+									uom.parenttype='Item' and
+									uom.parent=child.item_code and
+									uom.uom='{uom}'
+							)
+						, 0)
+					)
 				) as qty
 		from `tab{child}` child
 		inner join `tab{parent}` parent

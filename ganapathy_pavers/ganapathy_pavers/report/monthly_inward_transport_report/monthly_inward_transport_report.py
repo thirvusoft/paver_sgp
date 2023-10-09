@@ -80,7 +80,20 @@ def execute(filters=None):
 		"1": "<b>Total Unit</b>",
 	})
 
-	pi_item=frappe.get_all("Purchase Invoice Item",{"parent":['in',pi_doc], "docstatus": 1},['item_code','count(item_code) as count','sum(stock_qty) as stock_qty','stock_uom'],group_by='item_code')
+	pi_item=frappe.get_all("Purchase Invoice Item",
+						{
+							"parent": ['in', pi_doc], 
+							"docstatus": 1
+						},
+						[
+							'item_code', 
+							'count(item_code) as count', 
+							'sum(stock_qty) as stock_qty',
+							'uom',
+							'conversion_factor',
+							'stock_uom'
+						],
+						group_by='item_code, conversion_factor, uom')
 	
 	from collections import Counter
 	purchase_uom = Counter()
@@ -90,19 +103,19 @@ def execute(filters=None):
 	for d in pi_item:
 		purchase_count[d['item_code']] += d['count']
 		purchase_uom[d['item_code']] = d['stock_uom']
-		purchase_qty[d['item_code']] += d['stock_qty']
+		purchase_qty[d['item_code']] += round(((d['stock_qty']/d['conversion_factor']) if (d['conversion_factor'] and d['uom'] == "Unit") else uom_conversion(d['item_code'], d['stock_uom'], d['stock_qty'], "Unit", False)), 2)
 
  
 	total_load =0
 	total_unit= 0
 	for j in purchase_count:
 		total_load += purchase_count[j]
-		total_unit += (round(uom_conversion(j, purchase_uom[j], purchase_qty[j], "Unit", False), 2))
+		total_unit += purchase_qty[j]
 		
 		data.append({
 			"item": j,
 			"qty": purchase_count[j],
-			"1": round(uom_conversion(j, purchase_uom[j], purchase_qty[j], "Unit", False), 2),
+			"1": purchase_qty[j],
 		})
 
 	data.append({
