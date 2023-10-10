@@ -270,25 +270,27 @@ def get_transport_vehicle_details(vehicle_details, vehicle_exp, filters):
 	rental_exp_details = get_rental_vehicle_expense(filters=filters)
 	rental_exp_reference = rental_exp_details.get("reference") or []
 
+	add_delivery_reference(rental_sqft, rental_exp_reference)
+
 	paver_exp += rental_exp_details.get("PAVER")
-	paver_sqf += rental_sqft["PAVER"]
-	paver_sqf_cost += (rental_exp_details.get("PAVER") or 0) / (rental_sqft["PAVER"] or 1)
+	paver_sqf += rental_sqft["PAVER"]['sqf']
+	paver_sqf_cost += (rental_exp_details.get("PAVER") or 0) / (rental_sqft["PAVER"]['sqf'] or 1)
 	paver.append({
 		"vehicle": 'RENTAL',
 		"expense": (rental_exp_details.get('PAVER') or 0),
-		"sqft": rental_sqft['PAVER'],
-		"sqft_cost": ( rental_exp_details.get('PAVER') or 0) / (rental_sqft['PAVER'] or 1),
+		"sqft": rental_sqft['PAVER']['sqf'],
+		"sqft_cost": ( rental_exp_details.get('PAVER') or 0) / (rental_sqft['PAVER']['sqf'] or 1),
 		"reference": json.dumps(rental_exp_reference.get("PAVER") or [])
 	})
 
 	cw_exp += rental_exp_details.get("COMPOUND WALL")
-	cw_sqf += rental_sqft["COMPOUND WALL"]
-	cw_sqf_cost += (rental_exp_details.get("COMPOUND WALL") or 0) / (rental_sqft["COMPOUND WALL"] or 1)
+	cw_sqf += rental_sqft["COMPOUND WALL"]['sqf']
+	cw_sqf_cost += (rental_exp_details.get("COMPOUND WALL") or 0) / (rental_sqft["COMPOUND WALL"]['sqf'] or 1)
 	cw.append({
 		"vehicle": 'RENTAL',
 		"expense": (rental_exp_details.get('COMPOUND WALL') or 0),
-		"sqft": rental_sqft['COMPOUND WALL'],
-		"sqft_cost":  (rental_exp_details.get('COMPOUND WALL')  or 0) / (rental_sqft['COMPOUND WALL'] or 1),
+		"sqft": rental_sqft['COMPOUND WALL']['sqf'],
+		"sqft_cost":  (rental_exp_details.get('COMPOUND WALL')  or 0) / (rental_sqft['COMPOUND WALL']['sqf'] or 1),
 		"reference": json.dumps(rental_exp_reference.get("COMPOUND WALL") or [])
 	})
 
@@ -385,7 +387,8 @@ def get_rental_vehicle_sqft(filters, uom="SQF"):
 					)    
 					, 0)
 				) as qty,
-			child.item_group
+			child.item_group,
+			parent.name
 		from `tabDelivery Note Item` child
 		inner join `tabDelivery Note` parent
 		on child.parent=parent.name and child.parenttype='Delivery Note'
@@ -394,17 +397,30 @@ def get_rental_vehicle_sqft(filters, uom="SQF"):
 			parent.posting_date between '{filters.get('from_date')}' and '{filters.get("to_date")}' and
 			child.item_group in ("Pavers", "Compound Walls") and
 			ifnull(parent.transporter, '') not in ("", "Own Transporter") and
+			parent.is_rental = 1 and
 			ifnull(parent.vehicle_no, "")!=""
-		group by child.item_group
+		group by parent.name
 	"""
 
 	res = frappe.db.sql(query=query, as_dict=True)
-	sqf = {"PAVER": 0, "COMPOUND WALL": 0}
+	sqf = {
+			"PAVER": {
+				'references': {},
+				'sqf': 0
+			}, 
+			"COMPOUND WALL": {
+				'references': {},
+				'sqf': 0
+			}
+		}
 	for row in res:
 		if row.get("item_group") == "Compound Walls":
-			sqf["COMPOUND WALL"] += (row.get("qty")) or 0
-		if row.get("item_group") == "Pavers":
-			sqf["PAVER"] += (row.get("qty")) or 0
+			sqf["COMPOUND WALL"]['sqf'] += (row.get("qty")) or 0
+			sqf["COMPOUND WALL"]['references'][row.get('name')] = (row.get("qty")) or 0
+		
+		elif row.get("item_group") == "Pavers":
+			sqf["PAVER"]['sqf'] += (row.get("qty")) or 0
+			sqf["PAVER"]['references'][row.get('name')] = (row.get("qty")) or 0
 
 	return sqf
 
@@ -455,13 +471,16 @@ def get_account_balance_on(account, company, from_date, to_date):
 	gl_entries=frappe.db.sql(query, as_dict=True)
 
 	total_amout, paver, cw = 0, 0, 0
+
 	for gl in gl_entries:
 		total_amout += (gl.get("debit") or 0)
 		if gl.get("type") == "Pavers":
 			paver += (gl.get("debit") or 0)
 		if gl.get("type") == "Compound Wall":
 			cw += (gl.get("debit") or 0)
+			
 	paver_ref, cw_ref = [], []
+
 	for gl in gl_entries:
 		if gl.type == "Pavers":
 			paver_ref.append({
@@ -477,13 +496,38 @@ def get_account_balance_on(account, company, from_date, to_date):
 			'amount': gl.debit,
 			'account': gl.get('type')
 		})
+			
 	res = {
 		"reference": {
-			"PAVER":sorted(paver_ref,key = lambda x: x.get("account") or ""),
-			"COMPOUND WALL" :sorted(cw_ref,key = lambda x: x.get("account") or "")
+			"PAVER": sorted(paver_ref, key = lambda x: x.get("account") or ""),
+			"COMPOUND WALL": sorted(cw_ref, key = lambda x: x.get("account") or "")
 			},
 		"amount": total_amout,
 		"PAVER": paver,
 		"COMPOUND WALL": cw
 	}
+	
 	return res
+
+def add_delivery_reference(rental_sqft, rental_exp_reference):
+	for _type in rental_sqft:
+		frappe.errprint(_type)
+		if _type in rental_exp_reference:
+			delivery_notes_with_je = []
+			for ref in rental_exp_reference[_type]:
+				if ref.get('doctype') == 'Journal Entry' and ref.get('docname'):
+					dn = frappe.db.get_value(ref.get('doctype'), ref.get('docname'), 'delivery_note')
+					ref['other_info'] = f"""<b>{rental_sqft[_type]['references'].get(dn) or 0.0}</b> sqft {f'''<a href="/app/delivery-note/{dn}">{dn}</a>''' if dn else ''} """
+					if dn:
+						delivery_notes_with_je.append(dn)
+			
+			delivery_notes_without_je = []
+			for dn in rental_sqft[_type]['references']:
+				if dn not in delivery_notes_with_je:
+					delivery_notes_without_je.append(dn)
+			
+			for dn in delivery_notes_without_je:
+				rental_exp_reference[_type].append({
+					"account": {"PAVER": "Pavers", "COMPOUND WALL": "Compound Wall"}.get(_type) or '',
+					"other_info": f"""<b>{rental_sqft[_type]['references'].get(dn) or 0.0}</b> sqft {f'''<a href="/app/delivery-note/{dn}">{dn}</a>''' if dn else ''} """
+				})

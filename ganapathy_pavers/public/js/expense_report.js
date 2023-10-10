@@ -45,10 +45,10 @@ ganapathy_pavers.show_reference = function (title, reference, total_amount) {
 				<li>
 					<div class="expense-reference-dialog-row">
 						<div>
-							${frappe.utils.get_form_link(e.doctype, e.docname, true, e.doctype + " " + e.docname)}
+							${(e.doctype && e.docname) ? frappe.utils.get_form_link(e.doctype, e.docname, true, e.doctype + " " + e.docname) : ''}
 						</div>
 						<div>
-							${e.account || ""}
+							${e.other_info || e.account}
 						</div>
 						<div>
 							<b>${format_currency(e.amount)}</b>

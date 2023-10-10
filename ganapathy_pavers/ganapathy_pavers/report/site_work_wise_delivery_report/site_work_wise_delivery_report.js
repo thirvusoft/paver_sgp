@@ -89,6 +89,9 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 				let r = [];
 				let customer = frappe.query_report.get_filter_value("customer")
 				let site = frappe.query_report.get_filter_value("site_name")
+				let from_date = frappe.query_report.get_filter_value("from_date")
+				let to_date = frappe.query_report.get_filter_value("to_date")
+
 				let filters = {"docstatus": 1}
 				if (customer) {
 					filters["customer"] = customer
@@ -96,9 +99,20 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 				if (site) {
 					filters["site_work"] = site
 				}
+				if (from_date) {
+					filters['posting_date'] = ['>=', from_date]
+				}
+				if (to_date) {
+					filters['posting_date'] = ['<=', to_date]
+				}
+				if (from_date && to_date) {
+					filters['posting_date'] = ['between', [from_date, to_date]]
+				}
 				let vehicles = (await frappe.db.get_list("Delivery Note", { filters: filters, fields: ['own_vehicle_no', 'vehicle_no'], limit: 0 }))
 				vehicles.forEach(t => {
-					if (!r.includes(t.own_vehicle_no?t.own_vehicle_no:t.vehicle_no)) { r.push(t.own_vehicle_no?t.own_vehicle_no:t.vehicle_no) }
+					if ((t.own_vehicle_no?t.own_vehicle_no:t.vehicle_no) && !r.includes(t.own_vehicle_no?t.own_vehicle_no:t.vehicle_no)) { 
+						r.push(t.own_vehicle_no?t.own_vehicle_no:t.vehicle_no) 
+					}
 				})
 				var result=[]
 				r.forEach(t => {

@@ -82,7 +82,6 @@ def expense_tree(
         to_date, 
         company = None, 
         parent = "", 
-        doctype = 'Account', 
         vehicle = None, 
         machine = [], 
         expense_type = None, 
@@ -125,7 +124,7 @@ def expense_tree(
 
     root = get_account_balances(
                 accounts=get_children(
-                            doctype=doctype, 
+                            doctype='Account', 
                             parent=parent or company, 
                             company=company), 
                 company=company, 
@@ -143,7 +142,7 @@ def expense_tree(
             liability_acc=liability_acc[0]
             root += get_account_balances(
                         accounts=get_children(
-                                    doctype=doctype, 
+                                    doctype='Account', 
                                     parent=liability_acc or company, 
                                     company=company), 
                         company=company, 
