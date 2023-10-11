@@ -5,6 +5,10 @@ from ganapathy_pavers import uom_conversion
 from dateutil.relativedelta import relativedelta
 from frappe.utils import add_days
 
+def validate_delivery_note(self, event=None):
+    if (self.delivery_note and (je:=frappe.get_all('Journal Entry', {'name': ['!=', self.name], 'docstatus': 1, 'delivery_note': self.delivery_note}, pluck='name'))):
+        frappe.throw(f"""Delivery Note {self.delivery_note} is already used in following Journal Entries: <ul>{''.join([f'<li><a href="/app/journal-entry/{i}">{i}</a></li>' for i in je])}</ul>""")
+
 
 def journal_entry(self, event):
     for i in self.accounts:
