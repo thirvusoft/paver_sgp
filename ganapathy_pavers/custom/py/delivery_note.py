@@ -1,5 +1,6 @@
 import frappe
 import ganapathy_pavers
+from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 
 def update_qty_sitework(self,event):
     if(self.doctype=='Sales Invoice' and self.update_stock==0):
@@ -224,3 +225,9 @@ def sales_order_required(self,event):
             if not d.against_sales_order:
                 frappe.throw(("Sales Order required for Item {0}").format(d.item_code))
 
+
+
+def other_vehicle_link():
+    make_property_setter("Delivery Note", "vehicle_no", "fieldtype", "Link", "Data")
+    make_property_setter("Delivery Note", "vehicle_no", "options", "Other Vehicle", "Link")
+ 
