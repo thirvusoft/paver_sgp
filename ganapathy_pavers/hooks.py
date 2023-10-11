@@ -356,15 +356,20 @@ doc_events = {
 		]
 	},
 	"Journal Entry": {
-		"validate":"ganapathy_pavers.custom.py.journal_entry.journal_entry",
+		"validate":[
+				"ganapathy_pavers.custom.py.journal_entry.journal_entry",
+				"ganapathy_pavers.custom.py.journal_entry.validate_delivery_note"
+			],
 		"on_submit": [
-			"ganapathy_pavers.custom.py.journal_entry.site_work_additional_cost"
+			"ganapathy_pavers.custom.py.journal_entry.site_work_additional_cost",
+			"ganapathy_pavers.custom.py.journal_entry.validate_delivery_note"
 		],
 		"on_cancel": [
 			"ganapathy_pavers.custom.py.journal_entry.site_work_additional_cost"
 		],
 		"on_update_after_submit": [
-			"ganapathy_pavers.custom.py.sales_invoice.update_sales_type"
+			"ganapathy_pavers.custom.py.sales_invoice.update_sales_type",
+			"ganapathy_pavers.custom.py.journal_entry.validate_delivery_note"
 		]
 	},
 	"Attendance": {
@@ -420,7 +425,7 @@ doctype_js = {
 				"Employee":"/custom/js/employee.js",
 				"Delivery Note":"/custom/js/delivery_note.js",
 				"Sales Invoice": "/custom/js/sales_invoice.js",
-				# "Journal Entry": "/custom/js/journal_entry.js",
+				"Journal Entry": "/custom/js/journal_entry.js",
 				"Vehicle Log":[
 								"/custom/js/vehicle_log.js", 
 								"/custom/js/vehicle_log_service.js"
