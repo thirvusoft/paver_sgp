@@ -404,7 +404,7 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
 			  "ganapathy_pavers.utils.py.quotation.batch_property_setter",
 			  "ganapathy_pavers.utils.py.purchase_invoice.batch_property_setter",
 			  "ganapathy_pavers.utils.py.payment_entry.payment_entry_property_setter",
-			  "ganapathy_pavers.utils.py.salary_slip.remove_branch_read_only"
+			  "ganapathy_pavers.utils.py.salary_slip.remove_branch_read_only",
 			  "ganapathy_pavers.custom.py.delivery_note.other_vehicle_link"
 			  ]
 
