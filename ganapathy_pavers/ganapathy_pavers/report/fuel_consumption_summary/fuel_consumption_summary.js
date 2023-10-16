@@ -28,6 +28,13 @@ frappe.query_reports["Fuel Consumption Summary"] = {
 			"width": "100"
 		},
 		{
+			"fieldname": "unit",
+			"label": __("Unit"),
+			"fieldtype": "Link",
+			"options": "Location",
+			"width": "100"
+		},
+		{
 			"fieldname": "from_barrel",
 			"label": __("From Barrel"),
 			"fieldtype": "Check",
@@ -45,3 +52,6 @@ frappe.query_reports["Fuel Consumption Summary"] = {
 		return value
 	}
 };
+
+
+
