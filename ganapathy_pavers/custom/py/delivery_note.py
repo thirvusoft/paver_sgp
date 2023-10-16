@@ -45,6 +45,7 @@ def update_qty_sitework(self,event):
 
 
 
+
 def reduce_qty_sitework(self,event):
     if(self.doctype=='Sales Invoice' and self.update_stock==0):
         if self.site_work:
