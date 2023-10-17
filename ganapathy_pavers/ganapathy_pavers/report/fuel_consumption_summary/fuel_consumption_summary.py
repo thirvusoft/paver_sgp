@@ -45,7 +45,7 @@ def get_purchase_fuel_data(filters):
     group by poi.item_code, poi.warehouse
     """
     
-    data = frappe.db.sql(query, as_dict=True,debug=1)
+    data = frappe.db.sql(query, as_dict=True)
     for row in data:
         row["vehicle_unit"]=" "
         row_warehouse=frappe.get_value("Warehouse",row.get("warehouse"),"parent_warehouse")
