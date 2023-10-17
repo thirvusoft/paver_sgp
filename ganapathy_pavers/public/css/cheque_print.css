@@ -1,0 +1,6 @@
+body[data-route^="print/Cheque Print/"] .print-preview {
+    max-height: 9.2cm;
+    width: 20.1cm;
+    max-width: unset !important;
+    min-height: unset !important;
+}
