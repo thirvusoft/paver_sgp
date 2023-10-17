@@ -42,10 +42,10 @@ def get_purchase_fuel_data(filters):
         po.posting_date between '{filters.get("from_date")}' and '{filters.get("to_date")}'
         {conditions}
        
-    group by poi.item_code
+    group by poi.item_code, poi.warehouse
     """
-
-    data = frappe.db.sql(query, as_dict=True)
+    
+    data = frappe.db.sql(query, as_dict=True,debug=1)
     for row in data:
         row["vehicle_unit"]=" "
         row_warehouse=frappe.get_value("Warehouse",row.get("warehouse"),"parent_warehouse")
