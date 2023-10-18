@@ -12,6 +12,8 @@
   "column_break_3",
   "party",
   "section_break_5",
+  "cheque_no",
+  "crossing",
   "date",
   "pay",
   "rupees",
@@ -82,11 +84,25 @@
   {
    "fieldname": "section_break_5",
    "fieldtype": "Section Break"
+  },
+  {
+   "default": "No Crossing",
+   "fieldname": "crossing",
+   "fieldtype": "Select",
+   "label": "Crossing",
+   "options": "No Crossing\nCross Only\nCross A/C Payee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cheque_no",
+   "fieldtype": "Data",
+   "label": "Cheque No",
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-17 18:06:11.588107",
+ "modified": "2023-10-18 11:38:19.878175",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Cheque Print",
