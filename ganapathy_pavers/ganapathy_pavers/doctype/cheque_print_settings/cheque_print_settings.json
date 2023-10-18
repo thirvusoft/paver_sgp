@@ -41,7 +41,7 @@
    "label": "Date From Left"
   },
   {
-   "default": "0.6",
+   "default": "0.8",
    "fieldname": "date_from_top",
    "fieldtype": "Float",
    "label": "Date From Top"
@@ -97,7 +97,7 @@
    "label": "Aadhaar From Left"
   },
   {
-   "default": "5",
+   "default": "5.2",
    "fieldname": "aadhaar_from_top",
    "fieldtype": "Float",
    "label": "Aadhaar From Top"
@@ -149,7 +149,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-10-17 17:57:53.056649",
+ "modified": "2023-10-18 16:44:33.029994",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Cheque Print Settings",

@@ -1,6 +1,11 @@
 body[data-route^="print/Cheque Print/"] .print-preview {
-    max-height: 9.2cm;
-    width: 20.1cm;
+    min-height: 20.1cm;
+    width: 9.2cm;
     max-width: unset !important;
-    min-height: unset !important;
+}
+
+body[data-route^="print/Cheque Print/"] .print-format-container {
+    min-height: 20.1cm;
+    width: 9.2cm;
+    max-width: unset !important;
 }
