@@ -66,7 +66,7 @@ def _execute(filters=None, additional_table_columns=None, additional_query_colum
 			'item_name': item_record.item_name if item_record else d.item_name,
 			'item_group': item_record.item_group if item_record else d.item_group,
 			'description': d.description,
-			'type':d.type, #customized
+			'type': d.type, #customized
 			'invoice': d.parent,
 			'posting_date': d.posting_date,
 			'supplier': d.supplier,
@@ -87,6 +87,8 @@ def _execute(filters=None, additional_table_columns=None, additional_query_colum
 			'purchase_order': d.purchase_order,
 			'purchase_receipt': d.purchase_receipt,
 			'expense_account': expense_account,
+			'qty': d.qty,
+			'uom': d.uom,
 			'stock_qty': d.stock_qty,
 			'stock_uom': d.stock_uom,
 			'rate': d.base_net_amount / d.stock_qty,
@@ -262,6 +264,19 @@ def get_columns(additional_table_columns, filters):
 			'width': 100
 		},
 		{
+			'label': _('Qty'),
+			'fieldname': 'qty',
+			'fieldtype': 'Float',
+			'width': 100
+		},
+		{
+			'label': _('UOM'),
+			'fieldname': 'uom',
+			'fieldtype': 'Link',
+			'options': 'UOM',
+			'width': 100
+		},
+		{
 			'label': _('Stock Qty'),
 			'fieldname': 'stock_qty',
 			'fieldtype': 'Float',
@@ -306,7 +321,7 @@ def get_conditions(filters):
 	for opts in (("company", " and company=%(company)s"),
 		("supplier", " and `tabPurchase Invoice`.supplier = %(supplier)s"),
 		("item_code", " and `tabPurchase Invoice Item`.item_code = %(item_code)s"),
-		("type", " and `tabPurchase Invoice Item`.type = %(type)s"),#customized
+		("type", " and `tabPurchase Invoice Item`.type = %(type)s"), #customized
 		("from_date", " and `tabPurchase Invoice`.posting_date>=%(from_date)s"),
 		("to_date", " and `tabPurchase Invoice`.posting_date<=%(to_date)s"),
 		("mode_of_payment", " and ifnull(mode_of_payment, '') = %(mode_of_payment)s")):
@@ -340,6 +355,7 @@ def get_items(filters, additional_query_columns):
 			`tabPurchase Invoice Item`.`project`, `tabPurchase Invoice Item`.`purchase_order`,
 			`tabPurchase Invoice Item`.`purchase_receipt`, `tabPurchase Invoice Item`.`po_detail`,
 			`tabPurchase Invoice Item`.`expense_account`, `tabPurchase Invoice Item`.`stock_qty`,
+			`tabPurchase Invoice Item`.`qty`, `tabPurchase Invoice Item`.`uom`,
 			`tabPurchase Invoice Item`.`stock_uom`, `tabPurchase Invoice Item`.`base_net_amount`,
 			`tabPurchase Invoice`.`supplier_name`, `tabPurchase Invoice`.`mode_of_payment` {0}
 		from `tabPurchase Invoice`, `tabPurchase Invoice Item`

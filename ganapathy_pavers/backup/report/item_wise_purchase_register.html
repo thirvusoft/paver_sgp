@@ -1,0 +1,119 @@
+<!-- title -->
+{% if title %}
+<h2>{{ __(title) }}</h2>
+<hr>
+{% endif %}
+{% if subtitle %}
+{{ subtitle }}
+<hr>
+{% endif %}
+<table class="table table-bordered">
+	<!-- heading -->
+	<thead>
+		<tr>
+		<th> # </th>
+		{% for col in columns %}
+			{% if col.name && col._id !== "_check" %}
+			<th
+				{% if col.minWidth %}
+					style="min-width: {{ col.minWidth }}px"
+				{% endif %}
+				{% if col.docfield && frappe.model.is_numeric_field(col.docfield) %}
+					class="text-right"
+				{% endif %}
+			>
+				{{ __(col.name) }}</th>
+			{% endif %}
+		{% endfor %}
+		</tr>
+	</thead>
+	<!-- body -->
+	<tbody>
+        {% var totals = {} %}
+        {% var previous_type = '' %}
+		{% for row in data %}
+            {% if ((previous_type && previous_type != row.type) || (row.is_total_row)) %}
+                {% var type_total_row = totals[previous_type] %}
+                <tr style="height: 30px">
+                    <td {% if type_total_row.bold == 1 %} style="font-weight: bold" {% endif %}>
+                    </td>
+                    {% if (! Object.keys(totals).includes(type_total_row.type)) %}
+                        {% totals[type_total_row.type] = {} %}
+                    {% endif %}
+        
+                    {% for col in columns %}
+                        {% if col.name && col._id !== "_check" %}
+        
+                            {% var value = col.fieldname ? type_total_row[col.fieldname] : type_total_row[col.id]; %}
+        
+                            <td style="font-weight: bold">
+                                <span {% if col._index == 0 %} style="padding-left: {%= cint(type_total_row.indent) * 2 %}em" {% endif %}>
+                                    {% format_data = type_total_row.is_total_row && ["Currency", "Float"].includes(col.fieldtype) ? data[0] : type_total_row %}
+                                    {% if (col._index == 0) { %}
+                                        {{ __(previous_type) }}
+                                    {% } else { %}
+                                        {{
+                                            col.formatter
+                                                ? col.formatter(type_total_row._index, col._index, value, col, format_data, true)
+                                                : col.format
+                                                    ? col.format(value, type_total_row, col, format_data)
+                                                    : col.docfield
+                                                        ? frappe.format(value, col.docfield)
+                                                        : value
+                                        }}
+                                    {% } %}
+                                </span>
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endif %}
+
+			<tr style="height: 30px">
+			<td {% if row.bold == 1 %} style="font-weight: bold" {% endif %}>
+				<span> {{ row._index + 1 }} </span>
+			</td>
+            {% if (! Object.keys(totals).includes(row.type)) %}
+                {% totals[row.type] = {} %}
+            {% endif %}
+
+			{% for col in columns %}
+				{% if col.name && col._id !== "_check" %}
+
+					{% var value = col.fieldname ? row[col.fieldname] : row[col.id]; %}
+
+					<td {% if row.bold == 1 %} style="font-weight: bold" {% endif %}>
+						<span {% if col._index == 0 %} style="padding-left: {%= cint(row.indent) * 2 %}em" {% endif %}>
+							{% format_data = row.is_total_row && ["Currency", "Float"].includes(col.fieldtype) ? data[0] : row %}
+							{% if (row.is_total_row && col._index == 0) { %}
+								{{ __("Total") }}
+							{% } else { %}
+                                {% if (["Currency", "Float"].includes(col.fieldtype)) { %}
+                                    {% if (! Object.keys(totals[row.type]).includes(col.fieldname ? col.fieldname: col.id)) { %}
+                                        {% totals[row.type][col.fieldname ? col.fieldname: col.id] = value %}
+                                    {% } else { %}
+                                        {% if(parseFloat(value) == value) { %}
+                                            {% totals[row.type][col.fieldname ? col.fieldname: col.id] += value ? value : 0 %}
+                                        {% } %}
+                                    {% } %}
+                                {% } %}
+								{{
+									col.formatter
+										? col.formatter(row._index, col._index, value, col, format_data, true)
+										: col.format
+											? col.format(value, row, col, format_data)
+											: col.docfield
+												? frappe.format(value, col.docfield)
+												: value
+								}}
+							{% } %}
+						</span>
+					</td>
+				{% endif %}
+			{% endfor %}
+			</tr>
+            {% previous_type = row.type %}
+		{% endfor %}
+	</tbody>
+
+</table>
