@@ -13,7 +13,7 @@ def sales_invoice_print_format(doc, field_name="item_code"):
             uom = doc.get('running_meter_uom')
 
         if row.get(field_name):
-            _key=f"""{row.get(field_name).strip()} {row.get("rate")}  {uom}"""
+            _key=f"""{row.get(field_name)} {row.get("rate")}  {uom}"""
             if _key not in data:
                 row.update({
                 "item_name": row.get("item_name"),

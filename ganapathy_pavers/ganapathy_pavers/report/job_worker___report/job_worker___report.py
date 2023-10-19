@@ -412,7 +412,7 @@ def get_employee_salary_slip_amount(employee, from_date, to_date):
     res=frappe.db.sql(query)[0][0]
     return round((res or 0), 2) or ""
 
-def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv=None):
+def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv):
     if frappe.db.get_all('Salary Slip', {'employee': employee, 'start_date': [">=", from_date], 'end_date': ["<=", to_date], "docstatus": 1}):
         query=f"""
             SELECT SUM(ss.total_deduction)
@@ -464,7 +464,6 @@ def get_employee_salary_slip_advance_deduction(employee, from_date, to_date, adv
     if debit_note and debit_note[0] and debit_note[0].get("amount"):
         debit = debit_note[0].get("amount")
         remarks = debit_note[0].get("remarks")
-
     return {"amount": round(((planned_deduction or 0) + (debit or 0)), 2) or 0, "remarks": remarks}
 
 def get_undeducted_planned_advances(employee, from_date, to_date):
@@ -505,12 +504,12 @@ def get_undeducted_planned_advances(employee, from_date, to_date):
             e_adv.docstatus = 1 AND
             e_adv.repay_unclaimed_amount_from_salary = 1
     """)[0][0]
-    
+    frappe.errprint(f"{employee} - {res}") if res else 0
     return round((res or 0), 2)
 
 def get_employees_to_add(filters, employees):
     employees=list(set(employees))
-    emp_filters={"status": "Active", "name": ["not in", employees], "designation": "Job Worker"}
+    emp_filters={"status": ["!=", "Inactive"], "name": ["not in", employees], "designation": "Job Worker"}
     if filters.get("employee") and filters.get("employee") in employees:
         return []
     
@@ -539,6 +538,5 @@ def get_employees_to_add(filters, employees):
     return [[emp]+ [None for i in range(11)] for emp in rem if (
         get_undeducted_planned_advances(emp, filters.get("from_date"), filters.get("to_date")) or
         get_employee_salary_balance(emp, filters.get("from_date"), filters.get("to_date")).get("amount") or
-        get_employee_salary_slip_amount(emp, filters.get("from_date"), filters.get("to_date")) or
-        (get_employee_salary_slip_advance_deduction(emp, filters.get("from_date"), filters.get("to_date")) or {}).get("amount")
+        get_employee_salary_slip_amount(emp, filters.get("from_date"), filters.get("to_date"))
     )]

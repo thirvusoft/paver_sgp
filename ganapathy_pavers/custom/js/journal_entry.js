@@ -6,9 +6,6 @@ async function get_delivery_notes(name) {
 
 frappe.ui.form.on("Journal Entry", {
     refresh: function (frm, cdt, cdn) {
-        if (!cur_frm.fields_dict.delivery_note.$input) {
-            cur_frm.fields_dict.delivery_note.make_input()
-        }
         frm.fields_dict.delivery_note.$input.on("click", async function () {
             await get_delivery_notes(frm.doc.name);
         })
