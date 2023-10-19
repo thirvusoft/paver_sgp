@@ -3,22 +3,24 @@
 
 import frappe 
 from frappe import _
-
+from ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance import get_stock_qty
 
 def execute(filters=None):
     columns, data = [], [{}]
-    columns = get_columns(filters)
+    columns = get_columns()
     data = get_purchase_fuel_data(filters)
     data += get_data(filters)
     return columns, data
 
 def get_purchase_fuel_data(filters):
     conditions = ""
+    location_wise_warehouse = {}
+    for location in frappe.get_all('Location', ['name', 'warehouse']):
+        location_wise_warehouse[location.name] = get_warehouse_with_children(location.warehouse)
+
     if filters.get("unit"):
-        warehouse_name=frappe.get_value("Location",filters.get("unit"),"warehouse")
-        all_warehouse = get_warehouse_with_children(warehouse_name)
         conditions += f'''
-            and ifnull(poi.warehouse, '') in ({', '.join([f"'{i}'" for i in all_warehouse or ['']])})
+            and ifnull(poi.warehouse, '') in ({', '.join([f"'{i}'" for i in location_wise_warehouse.get(filters.get('unit')) or ['']])})
         '''
          
     query = f"""
@@ -46,17 +48,54 @@ def get_purchase_fuel_data(filters):
     """
     
     data = frappe.db.sql(query, as_dict=True)
+    res = {}
     for row in data:
-        row["vehicle_unit"]=" "
-        row_warehouse=frappe.get_value("Warehouse",row.get("warehouse"),"parent_warehouse")
-        if row_warehouse:
-            location=frappe.get_doc("Location",{"warehouse":row_warehouse})
-            if location:
-                row["vehicle_unit"]=location.name or " "
+        row["vehicle_unit"] = " "
+        for loc in location_wise_warehouse:
+            if row.get('warehouse') in location_wise_warehouse[loc]:
+                row["vehicle_unit"] = loc
+                break
+        
+        key = f"""{row['vehicle_unit']} {row['license_plate']}"""
+        if key not in res:
+            row['opening'] = get_stock_qty(
+                    item_code=row.item_code, 
+                    warehouse=location_wise_warehouse.get(row['vehicle_unit']), 
+                    date= frappe.utils.add_days(filters.get('from_date'), -1),
+                    time= "23:59:59",
+                    uom_conv=False
+                )
+            res[key] = row
+        else:
+            res[key]['fuel_qty'] += row['fuel_qty']
+            res[key]['total_fuel'] += row['total_fuel']
+    
+    fuel_items = frappe.get_all('Fuel Item Map', filters={'parent': 'Vehicle Settings', 'parenttype': 'Vehicle Settings'}, fields=['item_code', 'fuel_type'], group_by='item_code')
+    for loc in location_wise_warehouse:
+        if filters.get('unit') and filters.get('unit') != loc:
+            continue
+        
+        for item in fuel_items:
+            if filters.get('fuel_type') and filters.get('fuel_type') != item['fuel_type']:
+                continue
 
-    return ([{'license_plate': "FUEL PURCHASED", "bold": 1,"vehicle_unit":" "}] + data) if data else []
+            key = f"""{loc} {item.fuel_type}"""
+            if key not in res:
+                res[key] = {
+                    'license_plate': item.fuel_type,
+                    'vehicle_unit': loc,
+                    'opening': get_stock_qty(
+                                    item_code=item.item_code, 
+                                    warehouse=location_wise_warehouse[loc], 
+                                    date= frappe.utils.add_days(filters.get('from_date'), -1),
+                                    time= "23:59:59",
+                                    uom_conv=False
+                                )
+                }
+    
+    return ([{'license_plate': "FUEL PURCHASED", "bold": 1,"vehicle_unit":" "}] + sorted(list(res.values()), key = lambda x: ((x.get('vehicle_unit') or ''), (x.get('license_plate') or '')))) if res else []
 
-def get_columns(filters):
+def get_columns():
     columns = [
         {
             "label": _("Vehicle"),
@@ -83,6 +122,12 @@ def get_columns(filters):
             "fieldname": "vehicle_unit",
             "options":"Location",
             "default":" ",
+            "width": 100
+        },
+        {
+            "label": _("Opening Qty"),
+            "fieldtype": "Float",
+            "fieldname": "opening",
             "width": 100
         },
         {
@@ -180,16 +225,10 @@ def get_stock_entry_data(filters):
 
 
 def get_warehouse_with_children(warehouse):
-	if not isinstance(warehouse, list):
-		warehouse = [d.strip() for d in warehouse.strip().split(",") if d]
+    if frappe.db.exists("Warehouse", warehouse):
+        lft, rgt = frappe.db.get_value("Warehouse", warehouse, ["lft", "rgt"])
+        warehouses = frappe.get_all("Warehouse", filters={"lft": [">=", lft], "rgt": ["<=", rgt]}, pluck='name', group_by='name')
+        return warehouses
+    else:
+        frappe.throw(_("Warehouse: {0} does not exist").format(warehouse))
 
-	all_warehouse = []
-	for d in warehouse:
-		if frappe.db.exists("Warehouse", d):
-			lft, rgt = frappe.db.get_value("Warehouse", d, ["lft", "rgt"])
-			children = frappe.get_all("Warehouse", filters={"lft": [">=", lft], "rgt": ["<=", rgt]})
-			all_warehouse += [c.name for c in children]
-		else:
-			frappe.throw(_("Warehouse: {0} does not exist").format(d))
-
-	return list(set(all_warehouse))
