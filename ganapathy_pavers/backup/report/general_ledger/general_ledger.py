@@ -1,6 +1,7 @@
+''' file path apps/erpnext/erpnext/accounts/report/general_ledger/general_ledger.py '''
 # Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 # License: GNU General Public License v3. See license.txt
-# file path apps/erpnext/erpnext/accounts/report/general_ledger/general_ledger.py
+
 
 from collections import OrderedDict
 
@@ -292,8 +293,6 @@ def get_conditions(filters):
 		else:
 			conditions.append("type=%(type)s")
 
-		
-
 	if filters.get("finance_book"):
 		if filters.get("include_default_book_entries"):
 			conditions.append("(finance_book in (%(finance_book)s, %(company_fb)s, '') OR finance_book IS NULL)")
@@ -548,7 +547,7 @@ def get_columns(filters):
 		{
 			"label": _("Posting Date"),
 			"fieldname": "posting_date",
-			"fieldtype": "Data",
+			"fieldtype": "Date",
 			"width": 90
 		},
 		{
