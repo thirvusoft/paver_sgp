@@ -10,7 +10,6 @@
         "public/js/monthly_cw_report.js"
     ],
     "css/ganapathy_pavers.min.css": [
-        "public/css/expense_report.css",
-        "public/css/cheque_print.css"
+        "public/css/expense_report.css"
     ]
 }

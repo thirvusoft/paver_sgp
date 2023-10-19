@@ -1,6 +1,5 @@
-# ganapathy_pavers.patches.delivery_note.execute
-
 import frappe
+
 
 def execute():
     update_vehicle_name()
@@ -13,12 +12,14 @@ def update_vehicle_name():
         a =delivery_note.vehicle_no
         if a:
             trimed_string=a.strip().split()
-            camel_case=' '.join((word.capitalize() if not word.startswith('TN') else word) for word in trimed_string)
-            frappe.db.set_value("Delivery Note", i, "vehicle_no", camel_case, update_modified=False)
+            camel_case=''.join(word.capitalize() for word in trimed_string)
+            frappe.db.set_value("Delivery Note",i,"vehicle_no",camel_case,update_modified=False)
+
 
 def create_other_vehicle():
-    delivery_doc=frappe.get_all("Delivery Note", {"transporter": ["!=", "Own Transporter"]}, pluck="vehicle_no", group_by="vehicle_no")
+    delivery_doc=frappe.get_all("Delivery Note",{"transporter":["!=","Own Transporter"]},pluck="vehicle_no",group_by="vehicle_no")
     for i in delivery_doc:
+        
         if not frappe.db.exists("Other Vehicle",i) and i :
             doc = frappe.new_doc('Other Vehicle')
             doc.update({

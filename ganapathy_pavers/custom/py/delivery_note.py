@@ -229,6 +229,6 @@ def sales_order_required(self,event):
 
 
 def other_vehicle_link():
-    make_property_setter("Delivery Note", "vehicle_no", "fieldtype", "Link", "Select", validate_fields_for_doctype=False)
-    make_property_setter("Delivery Note", "vehicle_no", "options", "Other Vehicle", "Small Text")
+    make_property_setter("Delivery Note", "vehicle_no", "fieldtype", "Link", "Data")
+    make_property_setter("Delivery Note", "vehicle_no", "options", "Other Vehicle", "Link")
  
