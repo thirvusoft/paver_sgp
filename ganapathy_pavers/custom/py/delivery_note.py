@@ -1,5 +1,6 @@
 import frappe
 import ganapathy_pavers
+from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 
 def update_qty_sitework(self,event):
     if(self.doctype=='Sales Invoice' and self.update_stock==0):
@@ -224,3 +225,26 @@ def sales_order_required(self,event):
             if not d.against_sales_order:
                 frappe.throw(("Sales Order required for Item {0}").format(d.item_code))
 
+
+
+def other_vehicle_link():
+    make_property_setter("Delivery Note", "vehicle_no", "fieldtype", "Link", "Select", validate_fields_for_doctype=False)
+    make_property_setter("Delivery Note", "vehicle_no", "options", "Other Vehicle", "Small Text")
+
+@frappe.whitelist()
+def update_customer_in_delivery_note(delivery_note, customer):
+    if frappe.db.get_value('Delivery Note', delivery_note, 'per_billed'):
+        frappe.throw(f"Couldn't update customer for billed delivery note {delivery_note}")
+    
+    customer_name = frappe.db.get_value('Customer', customer, 'customer_name')
+    dn = frappe.get_doc('Delivery Note', delivery_note)
+
+    if not frappe.db.get_value('Project', dn.site_work, 'is_multi_customer'):
+        frappe.throw(f'{dn.site_work} is not a multi customer site')
+
+    dn.update({
+        'customer': customer,
+        'customer_name': customer_name
+    })
+    dn.flags.ignore_validate_update_after_submit = True
+    dn.save()
