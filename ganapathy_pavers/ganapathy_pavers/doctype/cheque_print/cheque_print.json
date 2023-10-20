@@ -1,0 +1,128 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "CHQ.-.{date}.-.###",
+ "creation": "2023-10-17 10:37:01.762180",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_1",
+  "party_type",
+  "column_break_3",
+  "party",
+  "section_break_5",
+  "cheque_no",
+  "crossing",
+  "date",
+  "pay",
+  "rupees",
+  "get_amount_in_text",
+  "rupees_in_text",
+  "aadhaar_no"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pay",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Pay",
+   "reqd": 1
+  },
+  {
+   "fieldname": "rupees",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rupees",
+   "reqd": 1
+  },
+  {
+   "fieldname": "get_amount_in_text",
+   "fieldtype": "Button",
+   "label": "Get Amount in Text"
+  },
+  {
+   "fieldname": "rupees_in_text",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Rupees in Text",
+   "reqd": 1
+  },
+  {
+   "fieldname": "aadhaar_no",
+   "fieldtype": "Data",
+   "label": "Cheque Receiver's Aadhaar number",
+   "length": 12
+  },
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "party_type",
+   "fieldtype": "Select",
+   "label": "Party Type",
+   "options": "\nCustomer\nSupplier"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "party",
+   "fieldtype": "Dynamic Link",
+   "label": "Party",
+   "options": "party_type"
+  },
+  {
+   "fieldname": "section_break_5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "No Crossing",
+   "fieldname": "crossing",
+   "fieldtype": "Select",
+   "label": "Crossing",
+   "options": "No Crossing\nCross Only\nCross A/C Payee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cheque_no",
+   "fieldtype": "Data",
+   "label": "Cheque No",
+   "unique": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-10-18 11:38:19.878175",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Cheque Print",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1,
+ "track_seen": 1
+}

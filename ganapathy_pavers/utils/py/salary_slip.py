@@ -278,6 +278,9 @@ def employee_update(doc,action):
     employee_doc.save()
 
 def validate_salaryslip(self, event=None):
+    if self.payroll_frequency == 'Weekly' and self.days != 7:
+        frappe.throw(f'Payroll frequency is set as <b>Weekly</b> but days is <b>{self.days}</b')
+        
     set_net_pay(self, event)
     validate_salary_slip(self, event)
     validate_contrator_welfare(self, event)
