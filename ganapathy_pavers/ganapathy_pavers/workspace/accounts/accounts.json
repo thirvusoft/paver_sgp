@@ -69,7 +69,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-03-24 13:01:46.504810",
+ "modified": "2023-10-18 10:43:26.526191",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Accounts",
@@ -124,6 +124,12 @@
    "doc_view": "List",
    "label": "Auto Repeat",
    "link_to": "Auto Repeat",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Cheque Print",
+   "link_to": "Cheque Print",
    "type": "DocType"
   }
  ]
