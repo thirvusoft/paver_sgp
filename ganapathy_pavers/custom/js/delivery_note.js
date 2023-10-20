@@ -250,7 +250,7 @@ frappe.ui.form.on("Delivery Note", {
     },
 });
 
-frappe.ui.form.on('Delivery Note', "refresh", function (frm) {
+frappe.ui.form.on('Delivery Note', "refresh", async function (frm) {
     frm.set_query("driver_name_2", function() {
         return {
             filters: {
@@ -291,5 +291,52 @@ frappe.ui.form.on('Delivery Note', "refresh", function (frm) {
                 ganapathy_pavers.delivery_note_save_fn.call(frm, ...args)
             }
         }
+    }
+
+    if (frm.doc.site_work && frm.doc.docstatus == 1 && !(await frappe.db.get_value('Delivery Note', frm.doc.name, 'per_billed')).message.per_billed && (await frappe.db.get_value('Project', frm.doc.site_work, 'is_multi_customer')).message.is_multi_customer) {
+        frm.add_custom_button('Update Customer', async function() {
+            await frappe.model.with_doc('Project', frm.doc.site_work)
+            let sw = frappe.get_doc('Project', frm.doc.site_work)
+            let multi_customers = [];
+
+            sw.customer_name?.forEach(r => {
+                multi_customers.push(r.customer)
+            });
+
+            let d = new frappe.ui.Dialog({
+                title: 'Update Customer',
+                fields: [
+                    {
+                        fieldname: 'customer',
+                        label: __('Customer'),
+                        fieldtype: 'Link',
+                        options: 'Customer',
+                        reqd: 1,
+                        get_query: function() {
+                            return {
+                                filters: {
+                                    name: ['in', multi_customers]
+                                }
+                            }
+                        }
+                    }
+                ],
+                primary_action: async (data) => {
+                    await frappe.call({
+                        method: 'ganapathy_pavers.custom.py.delivery_note.update_customer_in_delivery_note',
+                        args: {
+                            delivery_note: frm.doc.name,
+                            customer: data.customer
+                        },
+                        callback: function() {
+                            frm.reload_doc();
+                            d.hide();
+                        }
+                    });
+                }
+            });
+
+            d.show();
+        });
     }
 });
