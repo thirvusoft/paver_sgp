@@ -66,7 +66,7 @@ frappe.query_reports["Item-wise Purchase Register"] = {
 			"label": __("Type"),
 			"fieldname": "type",
 			"fieldtype": "Select",
-			"options": ["", "Pavers", "Compound Wall"]
+			"options": ["", "Pavers", "Compound Wall", "Vehicle", "Site", "Others"]
 		} //customized
 	],
 	"formatter": function(value, row, column, data, default_formatter) {

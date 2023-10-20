@@ -292,7 +292,12 @@ class PartyLedgerSummaryReport(object):
 				dn_names1 = frappe.get_all('Delivery Note', filters, pluck='name')
 				dn_with_si = frappe.get_all('Sales Invoice Item', filters={'delivery_note':['in', dn_names1]}, pluck='delivery_note')
 				if dn_names1:
-					sales_invoice = frappe.get_all('Sales Invoice Item', filters={'delivery_note':['in', dn_names1]}, pluck='parent')
+					si_filters={'customer': customer.get("party"), 'docstatus':1}
+					si_filters['type'] = (customer.get('type') or '')
+					si_filters['project'] = (customer.get('project') or '')
+					si_filters["posting_date"] = ["between", [self.filters.from_date, self.filters.to_date]]
+
+					sales_invoice = frappe.get_all('Sales Invoice', filters=si_filters, pluck='name')
 					sales_invoice=list(set(sales_invoice))
 					if sales_invoice:
 						paid_amount=frappe.db.sql("""
