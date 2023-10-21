@@ -50,9 +50,9 @@ def get_purchase_fuel_data(filters):
     data = frappe.db.sql(query, as_dict=True)
     res = {}
     for row in data:
-        row["vehicle_unit"] = " "
+        row["vehicle_unit"] = row.get('warehouse')
         for loc in location_wise_warehouse:
-            if row.get('warehouse') in location_wise_warehouse[loc]:
+            if row.get('warehouse') in location_wise_warehouse.get(loc) or []:
                 row["vehicle_unit"] = loc
                 break
         
@@ -60,7 +60,7 @@ def get_purchase_fuel_data(filters):
         if key not in res:
             row['opening'] = get_stock_qty(
                     item_code=row.item_code, 
-                    warehouse=location_wise_warehouse.get(row['vehicle_unit']), 
+                    warehouse=location_wise_warehouse.get(row['vehicle_unit']) or [loc], 
                     date= frappe.utils.add_days(filters.get('from_date'), -1),
                     time= "23:59:59",
                     uom_conv=False
@@ -86,7 +86,7 @@ def get_purchase_fuel_data(filters):
                     'vehicle_unit': loc,
                     'opening': get_stock_qty(
                                     item_code=item.item_code, 
-                                    warehouse=location_wise_warehouse[loc], 
+                                    warehouse=location_wise_warehouse.get(loc) or [loc], 
                                     date= frappe.utils.add_days(filters.get('from_date'), -1),
                                     time= "23:59:59",
                                     uom_conv=False
