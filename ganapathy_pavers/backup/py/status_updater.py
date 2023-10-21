@@ -1,4 +1,3 @@
-"""erpnext/erpnext/controllers/status_updater.py"""
 # Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 # License: GNU General Public License v3. See license.txt
 
@@ -59,9 +58,9 @@ status_map = {
 	],
 	"Delivery Note": [
 		["Draft", None],
-		["To Bill", "eval:round(self.total_billed_qty) != round(self.total_stock_qty) and self.docstatus == 1 or ((round(self.total_billed_qty)==0 and round(self.total_stock_qty)==0) and self.docstatus == 1) "],
+		["To Bill", "eval:round(self.total_billed_qty or 0) != round(self.total_stock_qty or 0) and self.docstatus == 1 or ((round(self.total_billed_qty or 0)==0 and round(self.total_stock_qty or 0)==0) and self.docstatus == 1) "], # TS CUSTOMIZATION
 		["Return Issued", "eval:self.per_returned == 100 and self.docstatus == 1"],
-		["Completed", "eval:round(self.total_billed_qty) == round(self.total_stock_qty) and self.docstatus == 1 and round(self.total_billed_qty)!=0 and round(self.total_stock_qty)!=0"],
+		["Completed", "eval:round(self.total_billed_qty or 0) == round(self.total_stock_qty or 0) and self.docstatus == 1 and round(self.total_billed_qty or 0)!=0 and round(self.total_stock_qty or 0)!=0"], # TS CUSTOMIZATION
 		["Cancelled", "eval:self.docstatus==2"],
 		["Closed", "eval:self.status=='Closed'"],
 	],
