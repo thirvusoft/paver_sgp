@@ -30,8 +30,10 @@ def validate_stock_qty(doc,event):
                                         WHERE
                                             docstatus = 1
                                             and dn_detail= '{dn}'
+                                            and name != '{name}'
                                         GROUP BY dn_detail""".format(
-                                            dn=i.dn_detail
+                                            dn=i.dn_detail,
+                                            name=i.name
                                         ),as_dict=1
 	                                )
             if sales_stock_qty:
@@ -41,7 +43,7 @@ def validate_stock_qty(doc,event):
                 delivery_stock_qty=math.ceil(delivery_stock_qty)
                 round_qty_difference=sales_stock_qty -delivery_stock_qty
                 if round_qty_difference > 1:
-                    frappe.throw(("Stcok Qty Differ from Delivery NOte Stock Qty {0}").format(qty_difference))
+                    frappe.throw(("Stcok Qty Differ from Delivery Note Stock Qty {0} in #row {1}").format(qty_difference, i.idx))
 
 def einvoice_validation(self,event):
     accounting=frappe.get_value("Branch",self.branch,"is_accounting")
