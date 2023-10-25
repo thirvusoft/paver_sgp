@@ -308,6 +308,7 @@ doc_events = {
 	"Sales Invoice":{
     	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer",
 		"validate":[
+			"ganapathy_pavers.custom.py.sales_invoice.validate_stock_qty",
 			"ganapathy_pavers.custom.py.sales_invoice.einvoice_validation",
 			"ganapathy_pavers.custom.py.tax_validation.tax_validation"
 			],

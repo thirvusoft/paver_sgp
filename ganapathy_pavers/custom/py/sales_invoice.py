@@ -1,5 +1,6 @@
 import frappe
 import json
+import math
 
 def update_customer(self,event):
     cus=self.customer
@@ -11,6 +12,38 @@ def update_customer(self,event):
                 frappe.db.set(doc, "customer", cus)
 
 
+def validate_stock_qty(doc,event):
+    if doc.is_return:
+        for i in doc.items:
+            if i.delivery_note:
+                delivery_stock_qty = frappe.db.get_value("Delivery Note Item", i.dn_detail, "stock_qty") or 0
+                returned_qty=delivery_stock_qty - i.stock_qty
+                frappe.db.set_value("Delivery Note Item", i.dn_detail, "billed_qty",returned_qty)
+                
+    for i in doc.items:
+        if i.delivery_note:
+            delivery_stock_qty = frappe.db.get_value("Delivery Note Item", i.dn_detail, "stock_qty") or 0
+            sales_stock_qty=frappe.db.sql(
+                                        """
+                                        SELECT
+                                            sum(stock_qty) as qty from `tabSales Invoice Item`
+                                        WHERE
+                                            docstatus = 1
+                                            and dn_detail= '{dn}'
+                                            and name != '{name}'
+                                        GROUP BY dn_detail""".format(
+                                            dn=i.dn_detail,
+                                            name=i.name
+                                        ),as_dict=1
+	                                )
+            if sales_stock_qty:
+                sales_stock_qty=sales_stock_qty[0]["qty"] + i.stock_qty
+                qty_difference=sales_stock_qty - delivery_stock_qty
+                sales_stock_qty=math.ceil(sales_stock_qty)
+                delivery_stock_qty=math.ceil(delivery_stock_qty)
+                round_qty_difference=sales_stock_qty -delivery_stock_qty
+                if round_qty_difference > 1:
+                    frappe.throw(("Stcok Qty Differ from Delivery Note Stock Qty {0} in #row {1}").format(qty_difference, i.idx))
 
 def einvoice_validation(self,event):
     accounting=frappe.get_value("Branch",self.branch,"is_accounting")
