@@ -4620,14 +4620,14 @@
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-   "creation": "2023-09-15 10:48:35.866352",
+   "creation": "2023-10-20 18:36:27.886991",
    "default_value": null,
    "doc_type": "Project",
    "docstatus": 0,
    "doctype_or_field": "DocField",
    "field_name": "status",
    "idx": 0,
-   "modified": "2023-09-15 10:48:35.866352",
+   "modified": "2023-10-20 18:36:27.886991",
    "modified_by": "Administrator",
    "name": "Project-status-options",
    "owner": "Administrator",
@@ -4637,7 +4637,7 @@
    "property": "options",
    "property_type": null,
    "row_name": null,
-   "value": "\nOpen\nCompleted\nTo Bill\nBilled\nCancelled\nStock Pending at Site\nRework"
+   "value": "\nOpen\nCompleted\nTo Bill\nBilled\nSupply Only\nCancelled\nStock Pending at Site\nRework"
   },
   {
    "_assign": null,
