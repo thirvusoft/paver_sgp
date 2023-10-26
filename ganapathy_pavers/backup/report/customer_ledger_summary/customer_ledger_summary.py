@@ -39,13 +39,6 @@ class PartyLedgerSummaryReport(object):
 			"fieldname": "party",
 			"options": self.filters.party_type,
 			"width": 200
-		},
-		{
-			"label": "Type",
-			"fieldtype": "Data",
-			"fieldname": "type",
-			"width": 150,
-			"hidden": not (self.filters.get('sales_type_order_and_group'))
 		}]
 
 		if self.party_naming_by == "Naming Series":
@@ -59,6 +52,12 @@ class PartyLedgerSummaryReport(object):
 		credit_or_debit_note = "Credit Note" if self.filters.party_type == "Customer" else "Debit Note"
 
 		columns += [
+			{
+				"label": _("Type"),
+				"fieldname": "type",
+				"fieldtype": "Data",
+				"width": 120
+			},
 			{
 				"label": _("Opening Balance"),
 				"fieldname": "opening_balance",
@@ -125,15 +124,10 @@ class PartyLedgerSummaryReport(object):
 
 		self.party_data = frappe._dict({})
 		for gle in self.gl_entries:
-			if self.filters.get('sales_type_order_and_group'):
-				key = f"{gle.party} {gle.type}"
-			else:
-				key = gle.party
-
-			self.party_data.setdefault(key, frappe._dict({
+			self.party_data.setdefault(gle.party, frappe._dict({
 				"party": gle.party,
-				"type": gle.type,
 				"party_name": gle.party_name,
+				"type":gle.type,
 				"opening_balance": 0,
 				"invoiced_amount": 0,
 				"paid_amount": 0,
@@ -143,17 +137,17 @@ class PartyLedgerSummaryReport(object):
 			}))
 
 			amount = gle.get(invoice_dr_or_cr) - gle.get(reverse_dr_or_cr)
-			self.party_data[key].closing_balance += amount
+			self.party_data[gle.party].closing_balance += amount
 
 			if gle.posting_date < self.filters.from_date or gle.is_opening == "Yes":
-				self.party_data[key].opening_balance += amount
+				self.party_data[gle.party].opening_balance += amount
 			else:
 				if amount > 0 and ((not (gle.voucher_type == 'Journal Entry' and gle.is_opening == 'No')) if self.filters.party_type == "Customer" else True):
-					self.party_data[key].invoiced_amount += amount
+					self.party_data[gle.party].invoiced_amount += amount
 				elif gle.voucher_no in self.return_invoices:
-					self.party_data[key].return_amount -= amount
+					self.party_data[gle.party].return_amount -= amount
 				else:
-					self.party_data[key].paid_amount -= amount
+					self.party_data[gle.party].paid_amount -= amount
 
 		out = []
 		for party, row in iteritems(self.party_data):
@@ -202,16 +196,8 @@ class PartyLedgerSummaryReport(object):
 
 		self.gl_entries = frappe.db.sql(("""
 			select
-				case 
-					when gle.type = 'Compound Walls'
-						then "Compound Wall"
-					when ifnull(gle.type, '') = ''
-						then 'No Type'
-					else
-						gle.type
-				end as type,
 				gle.posting_date, gle.party, gle.voucher_type, gle.voucher_no, gle.against_voucher_type,
-				gle.against_voucher, 
+				gle.against_voucher, gle.type,
 				(
 					case when ifnull(gle.debit, 0) != 0 and gle.voucher_type = 'Journal Entry' and gle.is_opening = 'No' and gle.party_type = "Customer"
 							then 0
@@ -228,16 +214,10 @@ class PartyLedgerSummaryReport(object):
 			where
 				gle.docstatus < 2 """ + sales_type_query + """ and gle.is_cancelled = 0 and gle.party_type=%(party_type)s and ifnull(gle.party, '') != ''
 				and gle.posting_date <= %(to_date)s {conditions}
-			order by 
-			case 
-				when gle.type = 'Compound Walls'
-					then "Compound Wall"
-				when ifnull(gle.type, '') = ''
-					then 'No Type'
-				else
-					gle.type
-			end,
-			gle.posting_date
+			
+			order by gle.posting_date
+			
+			
 		""").format(join=join, join_field=join_field, conditions=conditions), self.filters, as_dict=True)
 
 	def prepare_conditions(self):
@@ -315,7 +295,7 @@ class PartyLedgerSummaryReport(object):
 
 		gl_entries = frappe.db.sql(("""
 			select
-				posting_date, account, party, voucher_type, voucher_no, debit, credit
+				posting_date, account, party, voucher_type, voucher_no, debit, credit ,type
 			from
 				`tabGL Entry`
 			where
@@ -329,6 +309,7 @@ class PartyLedgerSummaryReport(object):
 					where gle.party_type=%(party_type)s and ifnull(party, '') != ''
 					and gle.posting_date between %(from_date)s and %(to_date)s and gle.docstatus < 2 {conditions}
 				)
+			
 		""").format(conditions=conditions, income_or_expense=income_or_expense), self.filters, as_dict=True)
 
 		self.party_adjustment_details = {}
