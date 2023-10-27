@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "description",
+  "is_customer_scope_expense",
   "nos",
   "amount",
   "mode_of_payment",
@@ -186,12 +187,18 @@
    "fieldname": "stock_entry",
    "fieldtype": "Data",
    "label": "Stock Entry"
+  },
+  {
+   "fieldname": "is_customer_scope_expense",
+   "fieldtype": "Select",
+   "label": "Is Customer Scope Expense",
+   "options": "\nYes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-10-04 12:49:14.172109",
+ "modified": "2023-10-27 17:02:41.494137",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Additional Costs",
