@@ -187,5 +187,6 @@ def site_work_additional_cost(self, event = None):
                 "description": frappe.get_value("Account", row.account, "account_name"),
                 "amount": row.debit,
                 "journal_entry": self.name,
+                "is_customer_scope_expense": self.is_customer_scope_expense
             })
     sw_doc.save()    

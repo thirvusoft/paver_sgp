@@ -74,8 +74,8 @@ def create_site(doc):
                     'sales_order':doc['name'],
                     'stock_qty': row['stock_qty'],
                     'stock_uom': row['stock_uom'],
-                    'customer_scope': doc.get("customer_scope"),
-                    'rate_inclusive': doc.get("rate_inclusive") if not doc.get("customer_scope") else 0
+                    'customer_scope': row.get("customer_scope"),
+                    'rate_inclusive': doc.get("rate_inclusive") if not row.get("customer_scope") else 0
                     } for row in doc['items'] if(row['item_group']=='Raw Material')]
             site_work=frappe.get_doc('Project',doc['site_work'])
             total_area=0
@@ -167,8 +167,8 @@ def update_site(doc, event):
                     'sales_order':doc.name,
                     'stock_qty': row.stock_qty,
                     'stock_uom': row.stock_uom,
-                    'customer_scope': doc.get("customer_scope"),
-                    'rate_inclusive': doc.get("rate_inclusive") if not doc.get("customer_scope") else 0
+                    'customer_scope': row.get("customer_scope"),
+                    'rate_inclusive': doc.get("rate_inclusive") if not row.get("customer_scope") else 0
                     } for row in doc.items if(row.item_group=='Raw Material')]
         site_work=frappe.get_doc('Project',doc.site_work)
         total_area=0

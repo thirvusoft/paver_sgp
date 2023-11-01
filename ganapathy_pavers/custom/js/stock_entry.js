@@ -73,8 +73,8 @@ async function bundle_calc(frm, cdt, cdn) {
     }
     let data = locals[cdt][cdn];
 
-    let pieces_qty = await ganapathy_pavers.uom_conversion(data.item_code, "Nos", data.pieces || 0, data.uom);
-    let bdl_qty = await ganapathy_pavers.uom_conversion(data.item_code, "Bdl", data.ts_qty || 0, data.uom);
+    let pieces_qty = await ganapathy_pavers.uom_conversion(data.item_code, "Nos", data.pieces || 0, data.uom, false);
+    let bdl_qty = await ganapathy_pavers.uom_conversion(data.item_code, "Bdl", data.ts_qty || 0, data.uom, false);
 
     frappe.model.set_value(cdt, cdn, "qty", (pieces_qty || 0) + (bdl_qty || 0));
 }

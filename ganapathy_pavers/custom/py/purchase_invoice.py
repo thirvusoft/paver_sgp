@@ -32,6 +32,7 @@ def site_work_details_from_pi(self, event=None):
                 "tax_rate": tax_rate,
                 "tax_amount": row.amount * tax_rate / 100,
                 "purchase_invoice": self.name,
+                "customer_scope": 1 if self.is_customer_scope_expense == 'Yes' else 0
             })
     
     if event == "on_cancel":
@@ -64,6 +65,7 @@ def site_work_details_from_pi(self, event=None):
                         "tax_rate": field_data["tax_rate"],
                         "tax_amount": field_data["tax_amount"],
                         "purchase_invoice": field_data["purchase_invoice"],
+                        "is_customer_scope_expense": self.is_customer_scope_expense,
                     })
                 elif field == "Raw Material":
                     sw_doc.append(frappe.scrub(field), field_data)
