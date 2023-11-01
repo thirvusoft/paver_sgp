@@ -44,6 +44,24 @@
   {
    "hidden": 0,
    "is_query_report": 1,
+   "label": "Sales Report",
+   "link_to": "Sales Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Payment Report",
+   "link_to": "Payment Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
    "label": "General Ledger",
    "link_to": "General Ledger",
    "link_type": "Report",
@@ -69,7 +87,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-10-18 10:43:26.526191",
+ "modified": "2023-11-01 10:01:25.027526",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Accounts",
