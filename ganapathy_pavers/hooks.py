@@ -143,6 +143,7 @@ jenv = {
 		"get_site_sales_order_item_prices:ganapathy_pavers.utils.py.sitework_printformat.get_site_sales_order_item_prices",
 		"get_site_supply_and_return_trip_details:ganapathy_pavers.utils.py.sitework_printformat.get_site_supply_and_return_trip_details",
 		"get_item_wise_so_rate:ganapathy_pavers.utils.py.sitework_printformat.get_item_wise_so_rate",
+		"get_item_wise_completion_rate:ganapathy_pavers.utils.py.sitework_printformat.get_item_wise_completion_rate",
 		"group_dn_items:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.group_dn_items"
 	]
 }
@@ -407,7 +408,8 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
 			  "ganapathy_pavers.utils.py.purchase_invoice.batch_property_setter",
 			  "ganapathy_pavers.utils.py.payment_entry.payment_entry_property_setter",
 			  "ganapathy_pavers.utils.py.salary_slip.remove_branch_read_only",
-			  "ganapathy_pavers.custom.py.delivery_note.other_vehicle_link"
+			  "ganapathy_pavers.custom.py.delivery_note.other_vehicle_link",
+			  "ganapathy_pavers.custom.py.permissions.create_permissions"
 			  ]
 
 

@@ -652,3 +652,12 @@ def get_item_wise_so_rate(sitename):
 			res[row.item_code] = row.rate
 	
 	return res
+
+def get_item_wise_completion_rate(sitename):
+	res = {}
+	rates = frappe.db.get_all("Site Completion Rate", {"parent": sitename, "parenttype": 'Project'}, ['item_code', 'rate'], group_by = 'item_code')
+	for rate in rates:
+		res[rate.item_code] = rate.rate
+	
+	return res
+
