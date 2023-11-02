@@ -39,6 +39,12 @@ frappe.query_reports["Payment Report"] = {
 			label: 'Site Work',
 			fieldtype: 'Link',
 			options: 'Project',
+		},
+		{
+			fieldname: 'type',
+			label: 'Type',
+			fieldtype: 'Select',
+			options: '\nPavers\nCompound Wall\nOthers',
 		}
 	]
 };

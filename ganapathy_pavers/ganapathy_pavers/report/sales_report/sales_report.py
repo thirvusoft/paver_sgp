@@ -18,6 +18,12 @@ def get_columns(filters):
 			"width": 350
 		},
 		{
+			"label": ("Type"),
+			"fieldtype": "Data",
+			"fieldname": "type",
+			"width": 350
+		},
+		{
 			"label": ("Invoice Amount"),
 			"fieldtype": "Currency",
 			"fieldname": "invoice_amount",
@@ -33,12 +39,15 @@ def get_data(filters):
 	
 	if filters.get('site_work'):
 		si_filters += f" and si.site_work = '{filters.get('site_work')}'"
-	
+			
+	if filters.get('type'):
+		si_filters += f" and si.type = '{filters.get('type')}'"
+
 	if filters.get('from_date') and filters.get('to_date'):
 		si_filters += f" and si.posting_date between '{filters.get('from_date')}' and '{filters.get('to_date')}' "
 
 	data = frappe.db.sql(f'''
-				select si.customer,sum(si.base_net_total) as invoice_amount from `tabSales Invoice` as si where {si_filters} group by si.customer
+				select si.customer,si.type,sum(si.base_net_total) as invoice_amount from `tabSales Invoice` as si where {si_filters} group by si.customer order by si.type
 	
 	''',as_dict=1)
 	
@@ -50,8 +59,8 @@ def get_data(filters):
 	bank_data = frappe.db.sql(f'''
 				SELECT
 					CASE
-						WHEN br.is_accounting = 1 THEN '<b>Bank Total</b>'
-						ELSE '<b>Cash Total</b>'
+						WHEN br.is_accounting = 1 THEN CONCAT('<b>Bank Total - ', si.type, '</b>')
+						ELSE CONCAT('<b>Cash Total - ', si.type, '</b>')
 					END AS customer,
 					SUM(si.base_net_total) AS invoice_amount
 				FROM
@@ -61,18 +70,32 @@ def get_data(filters):
 				WHERE
 					{si_filters}
 				GROUP BY
-					si.branch
+					si.branch,si.type
 				ORDER BY
 					si.branch DESC
 
 	
 	''',as_dict=1)
+	data += bank_data
+	type_data = frappe.db.sql(f'''
+				SELECT
+					CONCAT('<b>', si.type, '</b>') AS customer,
+					SUM(si.base_net_total) AS invoice_amount
+				FROM
+					`tabSales Invoice` AS si
+				WHERE
+					{si_filters}
+				GROUP BY
+					si.type
+
 	
+	''',as_dict=1)
+	data += type_data
+
 	data.append({
 		'customer':"<b>Total Amount</b>",
 		'invoice_amount':total_data[0]['invoice_amount'] if total_data else 0
 	})
-	data += bank_data
 	# data.append({
 	# 	'party':"<b>Bank Total</b>",
 	# 	'paid_amount':bank_data[0]['paid_amount'] if bank_data else 0
