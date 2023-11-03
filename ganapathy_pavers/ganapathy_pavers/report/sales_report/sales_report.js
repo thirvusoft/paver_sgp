@@ -31,6 +31,12 @@ frappe.query_reports["Sales Report"] = {
 			label: 'Site Work',
 			fieldtype: 'Link',
 			options: 'Project',
+		},
+		{
+			fieldname: 'type',
+			label: 'Type',
+			fieldtype: 'Select',
+			options: '\nPavers\nCompound Wall\nOthers',
 		}
 	]
 };
