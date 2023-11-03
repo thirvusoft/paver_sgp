@@ -47,7 +47,7 @@ def get_data(filters):
 		si_filters += f" and si.posting_date between '{filters.get('from_date')}' and '{filters.get('to_date')}' "
 
 	data = frappe.db.sql(f'''
-				select si.customer,si.type,sum(si.base_net_total) as invoice_amount from `tabSales Invoice` as si where {si_filters} group by si.customer order by si.type
+				select si.customer,si.type,sum(si.base_net_total) as invoice_amount from `tabSales Invoice` as si where {si_filters} group by si.customer, si.type order by si.type, si.customer
 	
 	''',as_dict=1)
 	
@@ -60,7 +60,7 @@ def get_data(filters):
 				SELECT
 					CASE
 						WHEN br.is_accounting = 1 THEN CONCAT('<b>Bank Total - ', si.type, '</b>')
-						ELSE CONCAT('<b>Cash Total - ', si.type, '</b>')
+						ELSE CONCAT('<b>Total - ', si.type, '</b>')
 					END AS customer,
 					SUM(si.base_net_total) AS invoice_amount
 				FROM

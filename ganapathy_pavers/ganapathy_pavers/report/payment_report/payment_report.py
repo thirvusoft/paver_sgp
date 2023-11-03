@@ -46,7 +46,7 @@ def get_data(filters):
 		pe_filters += f" and pe.posting_date between '{filters.get('from_date')}' and '{filters.get('to_date')}' "
 
 	data = frappe.db.sql(f'''
-				select pe.party,pe.type,sum(pe.paid_amount) as paid_amount from `tabPayment Entry` as pe where {pe_filters} group by pe.party order by pe.type
+				select pe.party,pe.type,sum(pe.paid_amount) as paid_amount from `tabPayment Entry` as pe where {pe_filters} group by pe.party, pe.type order by pe.type, pe.party
 	
 	''',as_dict=1)
 	
@@ -59,7 +59,7 @@ def get_data(filters):
 				SELECT
 					CASE
 						WHEN br.is_accounting = 1 THEN CONCAT('<b>Bank Total - ', pe.type, '</b>')
-						ELSE CONCAT('<b>Cash Total - ', pe.type, '</b>')
+						ELSE CONCAT('<b>Total - ', pe.type, '</b>')
 					END AS party,
 					SUM(pe.paid_amount) AS paid_amount
 				FROM
