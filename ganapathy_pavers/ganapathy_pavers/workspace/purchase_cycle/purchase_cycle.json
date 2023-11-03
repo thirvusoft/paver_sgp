@@ -33,6 +33,15 @@
   },
   {
    "hidden": 0,
+   "is_query_report": 1,
+   "label": "Landed Cost Voucher (Purchase Invoice)",
+   "link_to": "Landed Cost Voucher",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
    "is_query_report": 0,
    "label": "Purchase Report",
    "link_to": "",
@@ -97,7 +106,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-02-10 11:52:58.747390",
+ "modified": "2023-11-01 12:05:53.762369",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Purchase Cycle",

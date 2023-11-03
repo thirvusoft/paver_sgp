@@ -137,6 +137,7 @@ def execute(filters=None):
                 ])
     data = _data
 
+    emp_data = []
     if(len(data)):
         start = 0
         for i in range(len(data)-1):
@@ -151,7 +152,7 @@ def execute(filters=None):
                     data[i][14]=None
                 employee_id=data[i][0]
                 data[i][0]=frappe.db.get_value("Employee", data[i][0], "employee_name")
-                final_data.append(data[i]+[None, None, None])
+                emp_data.append(data[i]+[None, None, None])
                 total = [" " for i in range(15)]
                 total[0] = data[i][0]
                 total[2] = "Total"
@@ -172,8 +173,10 @@ def execute(filters=None):
                 total[13]=remarks
                 total[14] = credit_remark
                 
-                final_data[-1][8]=None
-                final_data.append(total)
+                emp_data[-1][8]=None
+                final_data.append([total[0], '', 'DETAILS']+[None]*12)
+                final_data+=emp_data+[([None]+total[1:])]+[[None]*15]
+                emp_data=[]
                 start = i+1	
                 c=0
             else:
@@ -183,7 +186,7 @@ def execute(filters=None):
                 if(c==0):data[i][10]=None
                 else:data[i][10]=None
                 c+=1
-                final_data.append(data[i]+[None, None, None])
+                emp_data.append(data[i]+[None, None, None])
         adv=get_employee_salary_slip_advance_deduction(data[-1][0], from_date, to_date, data[-1][10])
         remarks=adv.get("remarks")
         adv=adv.get("amount")
@@ -194,7 +197,7 @@ def execute(filters=None):
                     data[-1][14]=None
         employee_id=data[-1][0]
         data[-1][0]=frappe.db.get_value("Employee", data[-1][0], "employee_name")
-        final_data.append(data[-1]+[None, None, None])
+        emp_data.append(data[-1]+[None, None, None])
         total = [" " for i in range(15)]
         total[0] = data[-1][0]
         total[2] = "Total"
@@ -215,8 +218,10 @@ def execute(filters=None):
         total[12]=get_employee_salary_slip_amount(employee_id, from_date, to_date)
         total[13]=remarks
         total[14] = credit_remark
-        final_data[-1][8]=None
-        final_data.append(total)
+        emp_data[-1][8]=None
+        final_data.append([total[0], '', 'DETAILS']+[None]*12)
+        final_data+=emp_data+[([None]+total[1:])]+[[None]*15]
+        emp_data=[]
     other_work=0
     for row in final_data:
         if row[6]:

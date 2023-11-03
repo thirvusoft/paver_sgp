@@ -1,4 +1,3 @@
-# apps/erpnext/erpnext/accounts/report/item_wise_purchase_register/item_wise_purchase_register.py
 # Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 # License: GNU General Public License v3. See license.txt
 
@@ -322,6 +321,7 @@ def get_conditions(filters):
 		("supplier", " and `tabPurchase Invoice`.supplier = %(supplier)s"),
 		("item_code", " and `tabPurchase Invoice Item`.item_code = %(item_code)s"),
 		("type", " and `tabPurchase Invoice Item`.type = %(type)s"), #customized
+		("warehouse", " and `tabPurchase Invoice Item`.warehouse = %(warehouse)s"), #customized
 		("from_date", " and `tabPurchase Invoice`.posting_date>=%(from_date)s"),
 		("to_date", " and `tabPurchase Invoice`.posting_date<=%(to_date)s"),
 		("mode_of_payment", " and ifnull(mode_of_payment, '') = %(mode_of_payment)s")):
