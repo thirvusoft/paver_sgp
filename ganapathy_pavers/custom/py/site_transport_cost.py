@@ -14,21 +14,15 @@ class SiteTransportCost:
         self.operator_salary = self.get_vehicle_log_operator_cost()
         self.get_fuel_maintenance_cost()
         self.fastag_charges = {
-            'full_amount': 0,
-            'customer_scope_amount': 0
+            'full_amount': sum(frappe.db.get_all('Vehicle Log', {'docstatus': 1, 'select_purpose': 'Goods Supply', 'site_work': self.site}, pluck='fastag_charge')),
+            'customer_scope_amount': sum(frappe.db.get_all('Vehicle Log', {'docstatus': 1, 'select_purpose': 'Goods Supply', 'site_work': self.site, 'is_customer_scope_expense': 'Yes'}, pluck='fastag_charge'))
         }
-
-        for row in doc.additional_cost:
-            if 'fastag' in (row.description or '').lower():
-                self.fastag_charges['full_amount'] += (row.amount or 0)
-
-                if row.get('customer_scope_amount') == 'Yes':
-                    self.fastag_charges['customer_scope_amount'] += (row.amount or 0)
 
         self.vehicle_daily_cost = self.get_yearly_maintenance_cost()
 
         return {
             "value": (sum(self.operator_salary['full_amount'].values()) or 0) + (sum(self.driver_salary['full_amount'].values()) or 0) + (self.maintenance_cost['full_amount'] or 0) + (self.fastag_charges['full_amount'] or 0) + (self.fuel_cost['full_amount'] or 0) + (sum(self.vehicle_daily_cost['full_amount'].values()) or 0),
+            "customer_scope_value": (sum(self.operator_salary['customer_scope_amount'].values()) or 0) + (sum(self.driver_salary['customer_scope_amount'].values()) or 0) + (self.maintenance_cost['customer_scope_amount'] or 0) + (self.fastag_charges['customer_scope_amount'] or 0) + (self.fuel_cost['customer_scope_amount'] or 0) + (sum(self.vehicle_daily_cost['customer_scope_amount'].values()) or 0),
             "description": f"""<div>
                         <b>Driver Salary:</b> {", ".join([f"<b>{emp or '-'}</b>: {'%.2f'%(self.driver_salary['full_amount'].get(emp) or 0)}" for emp in self.driver_salary['full_amount']])} <br>
                         <b>Operator Salary:</b> {", ".join([f"<b>{opr or '-'}</b>: {'%.2f'%(self.operator_salary['full_amount'].get(opr) or 0)}" for opr in self.operator_salary['full_amount']])} <br>
@@ -323,6 +317,7 @@ def update_transport_cost(sitename):
     cost = SiteTransportCost(sitename)
     trans_cost = cost.get_transport_cost()
     frappe.db.set_value("Project", sitename, "transporting_cost", trans_cost.get("value", 0) or 0, update_modified=False)
+    frappe.db.set_value("Project", sitename, "customer_scope_transporting_cost", trans_cost.get("customer_scope_value", 0) or 0, update_modified=False)
     frappe.db.set_value("Project", sitename, "transport_cost_details", trans_cost.get("description", "") or "", update_modified=False)
 
     site = frappe.get_doc("Project", sitename)

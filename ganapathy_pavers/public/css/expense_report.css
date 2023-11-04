@@ -7,6 +7,19 @@
     justify-content: space-between;
 }
 
+.expense-reference-dialog-row > div {
+    flex: 1;
+    text-align: left;
+}
+
+.expense-reference-dialog-row > div:nth-child(n+2) {
+    text-align: center;
+}
+
+.expense-reference-dialog-row > div:last-child {
+    text-align: right;
+}
+
 .expense-reference-dialog-total-row {
     display: flex;
     width: 100%;

@@ -302,7 +302,22 @@ def site_completion_delivery_uom(site_work, item_group='Raw Material'):
 		if row.item_code not in f_res:
 			f_res[row.item_code] = []
 		f_res[row.item_code].append(row)
-	return f_res
+	
+	customer_scope_qty = {}
+	s_orders = frappe.get_all('Sales Order', {'docstatus': 1, 'site_work': site_work})
+	for so in s_orders:
+		so = frappe.get_doc('Sales Order', so)
+		for row in so.items:
+			if row.item_group == 'Raw Material' and row.customer_scope:
+				if row.item_code not in customer_scope_qty:
+					customer_scope_qty[row.item_code] = 0
+				
+				customer_scope_qty[row.item_code] += (row.qty or 0)
+
+	return {
+			'delivery_detail': f_res,
+			'customer_scope_qty': customer_scope_qty
+		}
 
 def get_item_price_list_rate(item, date):
 	price_list=frappe.db.get_value("Price List", {"site_work_print_format": 1, "selling": 1}, "name")
@@ -462,7 +477,6 @@ def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"], exp_group="cw_grou
 								+ (production_qty[0]['additional_cost_per_sqft']  or 0)
 								+ (production_qty[0]["labour_cost_per_sqft"] or 0) 
 								+ (production_qty[0]['operator_cost_per_sqft'] or 0))
-
 	return rm_cost, total_cost_per_sqft
 
 def get_delivery_transport_detail(sitename):
@@ -491,31 +505,50 @@ def get_delivery_transport_detail(sitename):
 	query = f"""
 		select
 			sum(
-				(case 
+				(case
 					when ifnull(dn.own_vehicle_no, '')!='' 
-						then dni.qty - dni.returned_qty
+						then dni.qty
 					else
 						0
 				end)
 				*{conv_query}
 				) as own_vehicle,
 			sum(
-				(case 
+				(case
 					when ifnull(dn.own_vehicle_no, '')='' and ifnull(dn.vehicle_no, '')!=''
-						then dni.qty - dni.returned_qty
+						then dni.qty
 					else
 						0
 				end)
 				*{conv_query}
-				) as rental_vehicle
+				) as rental_vehicle,
+
+			sum(
+				(case
+					when ifnull(dn.own_vehicle_no, '')!='' and ifnull(dn.is_customer_scope_expense, '') != 'Yes'
+						then dni.qty
+					else
+						0
+				end)
+				*{conv_query}
+				) as own_vehicle_without_cs,
+			sum(
+				(case
+					when ifnull(dn.own_vehicle_no, '')='' and ifnull(dn.vehicle_no, '')!='' and ifnull(dn.is_customer_scope_expense, '') != 'Yes'
+						then dni.qty
+					else
+						0
+				end)
+				*{conv_query}
+				) as rental_vehicle_without_cs
+				
 		from `tabDelivery Note Item` dni
 		inner join `tabDelivery Note` dn
 		on dni.parenttype='Delivery Note' and dni.parent=dn.name
 		where
 			dni.item_group in ("Pavers", "Compound Walls") and
 			dn.docstatus=1 and
-			dn.site_work='{sitename}' and
-			dn.is_return=0
+			dn.site_work='{sitename}'
 	"""
 
 	res = frappe.db.sql(query, as_dict=True)
@@ -523,43 +556,67 @@ def get_delivery_transport_detail(sitename):
 
 def get_retail_cost(doc):
 	doc=frappe.get_doc("Project",doc)
-	rental_cost = 0
-	unrelated_other_sqft=0
-	unrelated_other_per_sqft=0
-	add_cost = 0
+	rental_cost, rental_cost_without_cs = 0, 0
+	unrelated_other_sqft, unrelated_other_sqft_without_cs = 0, 0
+	unrelated_other_per_sqft, unrelated_other_sqft_without_cs =0, 0
+	add_cost, add_cost_without_cs = 0, 0
 	for i in doc.additional_cost:
 
 		if "transport" in i.description.lower():
 			rental_cost += i.amount or 0
+			if i.is_customer_scope_expense != 'Yes':
+				rental_cost_without_cs += i.amount or 0
 		elif 'fastag' in i.description.lower():
 			pass
 		else:
 			add_cost += i.amount or 0
-	other_cost = 0
-	job_work_cost = {}
-	unrelated_other_cost = 0
-	jw_amt = 0
-	jw_rate = []
+			if i.is_customer_scope_expense != 'Yes':
+				add_cost_without_cs += i.amount or 0
+			
+	other_cost, other_cost_without_cs = 0, 0
+	job_work_cost, job_work_cost_without_cs = {}, {}
+	unrelated_other_cost, unrelated_other_cost_without_cs = 0, 0
+	jw_amt, jw_amt_without_cs = 0, 0
+	jw_rate, jw_rate_without_cs = [], []
 	for m in doc.job_worker:
 		if m.other_work == 1:
 			if not m.related_work:
 				unrelated_other_sqft += (m.sqft_allocated or 0) if not m.amount_calc_by_person else 0
 				unrelated_other_cost += m.amount or 0
+
+				if m.is_customer_scope_expense != 'Yes':
+					unrelated_other_sqft_without_cs += (m.sqft_allocated or 0) if not m.amount_calc_by_person else 0
+					unrelated_other_cost_without_cs += m.amount or 0
+
 			else:
 				other_cost+= m.amount or 0
+				if m.is_customer_scope_expense != 'Yes':
+					other_cost_without_cs +=  m.amount or 0
 		else:
 			if doc.type == "Pavers":
 				if m.item not in job_work_cost:
 					job_work_cost[m.item] = {'amount': 0, 'rate': []}
 				job_work_cost[m.item]['amount'] += m.amount or 0
 				job_work_cost[m.item]['rate'].append(m.rate or 0)
+
+				if m.is_customer_scope_expense != 'Yes':
+					if m.item not in job_work_cost_without_cs:
+						job_work_cost_without_cs[m.item] = {'amount': 0, 'rate': []}
+					job_work_cost_without_cs[m.item]['amount'] += m.amount or 0
+					job_work_cost_without_cs[m.item]['rate'].append(m.rate or 0)
+
 			jw_amt += m.amount or 0
 			jw_rate.append(m.rate or 0)
+
+			if m.is_customer_scope_expense != 'Yes':
+				jw_amt_without_cs += m.amount or 0
+				jw_rate_without_cs.append(m.rate or 0)
 
 	item_cost = []
 	for item in doc.delivery_detail:
 		if doc.type != "Pavers":
 			job_work_cost[item.item] =  {'amount': jw_amt, 'rate': jw_rate}
+			job_work_cost_without_cs[item.item] =  {'amount': jw_amt_without_cs, 'rate': jw_rate_without_cs}
 		date = item.creation
 		bin_ = get_item_price_list_rate(item = item.item, date = date)
 		cost=(bin_ or 0)* (((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)))
@@ -573,20 +630,38 @@ def get_retail_cost(doc):
 	for i in job_work_cost:
 		if (isinstance(job_work_cost[i].get('rate'), list)):
 			job_work_cost[i]['rate'] = sum(job_work_cost[i]['rate'])/(len(job_work_cost[i]['rate']) or 1)
+
+	for i in job_work_cost_without_cs:
+		if (isinstance(job_work_cost_without_cs[i].get('rate'), list)):
+			job_work_cost_without_cs[i]['rate'] = sum(job_work_cost_without_cs[i]['rate'])/(len(job_work_cost_without_cs[i]['rate']) or 1)
 	
 	unrelated_other_per_sqft = unrelated_other_cost / (unrelated_other_sqft or 1)
+	unrelated_other_per_sqft_without_cs = unrelated_other_cost_without_cs / (unrelated_other_sqft_without_cs or 1)
 
-	return {
-		"additional_cost" : add_cost,
-		"rental" : rental_cost,
-		"item_cost":item_cost,
-		"own_vehicle":doc.transporting_cost,
+	res = {
+		"additional_cost": add_cost,
+		"rental": rental_cost,
+		"item_cost": item_cost,
+		"own_vehicle": doc.transporting_cost or 0,
 		"job_work_rate": job_work_cost,
 		"other_rate": other_cost,
 		"unrelated_other_cost": unrelated_other_cost,
 		"unrelated_other_sqft": unrelated_other_sqft,
 		"unrelated_other_per_sqft": unrelated_other_per_sqft,
+
+		# Expense without customer scope
+
+		"additional_cost_without_cs": add_cost_without_cs,
+		"rental_without_cs": rental_cost_without_cs,
+		"own_vehicle_without_cs": (doc.transporting_cost or 0) - (doc.customer_scope_transporting_cost or 0),
+		"job_work_rate_without_cs": job_work_cost_without_cs,
+		"other_rate_without_cs": other_cost_without_cs,
+		"unrelated_other_cost_without_cs": unrelated_other_cost_without_cs,
+		"unrelated_other_sqft_without_cs": unrelated_other_sqft_without_cs,
+		"unrelated_other_per_sqft_without_cs": unrelated_other_per_sqft_without_cs,
 	}
+
+	return res
 
 def get_site_sales_order_item_prices(site):
 	return {

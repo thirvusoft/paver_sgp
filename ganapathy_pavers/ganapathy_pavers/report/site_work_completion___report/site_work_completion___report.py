@@ -2,7 +2,7 @@
 # For license information, please see license.txt
 from locale import currency
 import frappe
-from frappe import _, errprint
+from frappe import _
 from frappe.utils import format_date
 
 def execute(filters={}):
