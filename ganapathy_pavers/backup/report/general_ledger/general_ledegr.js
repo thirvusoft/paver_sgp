@@ -198,7 +198,16 @@ frappe.query_reports["General Ledger"] = {
 			"label": __("Show Net Values in Party Account"),
 			"fieldtype": "Check"
 		}
-	]
+	],
+		"formatter": function(value, row, column, data, default_formatter) {
+		value = default_formatter(value, row, column, data);
+		if (column.fieldname == "voucher_type" && data.credit_check == 1 ) {
+			value = "Credit Note";
+		}
+		return value;
+	},
+
+}
 }
 
 erpnext.utils.add_dimensions('General Ledger', 15)
