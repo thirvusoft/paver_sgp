@@ -249,6 +249,11 @@ def get_gl_entries(filters, accounting_dimensions):
 			order_by_statement=order_by_statement
 		),
 		filters, as_dict=1)
+	
+	for entry in gl_entries:
+		if entry['voucher_type'] == "Sales Invoice":
+			if frappe.get_value("Sales Invoice",entry['voucher_no'], "is_return"):
+				entry['credit_check'] = 1
 
 	if filters.get('presentation_currency'):
 		return convert_to_presentation_currency(gl_entries, currency_map, filters.get('company'))
@@ -658,7 +663,13 @@ def get_columns(filters):
 			"label": _("Remarks"),
 			"fieldname": "remarks",
 			"width": 400
-		}
+		},
+		{
+			"label": _("Credit Note"),
+			"fieldname": "credit_check",
+			"fieldtype":"Check",
+			"hidden":1,
+			"width": 400},
 	])
 
 	return columns

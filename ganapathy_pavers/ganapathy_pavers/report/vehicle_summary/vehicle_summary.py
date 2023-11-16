@@ -511,7 +511,6 @@ def get_account_balance_on(account, company, from_date, to_date):
 
 def add_delivery_reference(rental_sqft, rental_exp_reference):
 	for _type in rental_sqft:
-		frappe.errprint(_type)
 		if _type in rental_exp_reference:
 			delivery_notes_with_je = []
 			for ref in rental_exp_reference[_type]:
