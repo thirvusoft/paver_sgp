@@ -269,7 +269,6 @@ def make_stock_entry(doc,type1):
        if doc.get("total_no_of_produced_qty") == 0:
            frappe.throw("Please Enter the Total No of Bundle")
 
-       qty = doc.get("total_no_of_bundle") 
        stock_entry.append('items', dict(
             s_warehouse = doc.get("rack_shift_source_warehouse"), 
             item_code = doc.get("item_to_manufacture"),
@@ -282,7 +281,7 @@ def make_stock_entry(doc,type1):
        stock_entry.append('items', dict(
             t_warehouse = doc.get("rack_shift_target_warehouse"), 
             item_code = doc.get("item_to_manufacture"),
-            qty = uom_conversion(doc.get("item_to_manufacture"), "Bdl",qty, default_bundle),
+            qty = uom_conversion(doc.get("item_to_manufacture"), "Nos", (doc.get("total_no_of_produced_qty")), default_bundle),
             uom = default_bundle,
             batch_no = get_shot_blast_batch(doc.get("item_to_manufacture")) if doc.get("is_shot_blasting") else "",
             basic_rate=uom_conversion_for_rate(doc.get("item_to_manufacture"),"SQF",doc.get("item_price"),default_bundle),
