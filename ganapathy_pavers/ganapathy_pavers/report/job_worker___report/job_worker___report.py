@@ -406,6 +406,11 @@ def get_employee_salary_balance(employee, from_date, to_date):
 
     elif(salary_slip1):
         return {"amount": salary_slip1[0]["total_unpaid_amount"]+amount, "remarks": remarks}
+    
+    elif (not frappe.db.exists("Salary Slip", {"docstatus": 1, "employee": employee})):
+        emp_sal_bal = frappe.db.get_value("Employee", employee, "salary_balance")
+        return {"amount": emp_sal_bal+amount, "remarks": remarks}
+    
     return {"amount": round((amount or 0), 2), "remarks": remarks}
 
 def get_employee_salary_slip_amount(employee, from_date, to_date):
