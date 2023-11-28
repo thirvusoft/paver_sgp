@@ -112,16 +112,14 @@ def get_data(filters):
         # data['pieces']=0
     data=list(data.values())
     prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=(filters.get("machine", []) or []))
-    if filters.get("new_method"):
-        expense_cost=total_expense(
-            from_date=filters.get('from_date'), 
-            prod_details="Paver",
-            to_date=filters.get('to_date'), 
-            expense_type="Manufacturing", 
-            machine=filters.get("machine")
-        )
-    else:
-        expense_cost=get_sqft_expense(filters)
+    expense_cost=total_expense(
+        from_date=filters.get('from_date'), 
+        prod_details="Paver",
+        to_date=filters.get('to_date'), 
+        expense_type="Manufacturing", 
+        machine=filters.get("machine")
+    )
+    
     for row in data:
         row["prod_cost"] = (row.get("prod_cost", 0) or 0) + (row.get("strapping", 0) or 0) + (row.get("shot_blasting", 0) or 0)
         row["strapping_cost"]=(row["strapping"] or 0)
@@ -177,25 +175,6 @@ def get_production_cost(filters, item, include_sample_rate = False):
         return (res[0].get("prod_cost") or 0), (res[0].get("labour_operator_cost") or 0), (res[0].get("strapping") or 0), (res[0].get("shot_blasting") or 0)
     return 0, 0, 0, 0
 
-
-def get_sqft_expense(filters):
-    exp=frappe.get_single("Expense Accounts")
-    machine=None
-    if ("Machine1" in (filters.get("machine", []) or []) or "Machine2" in (filters.get("machine", []) or [])) and "Machine3" in (filters.get("machine", []) or []):
-        pass
-    elif "Machine1" in (filters.get("machine", []) or []) or "Machine2" in (filters.get("machine", []) or []):
-        machine="machine_12"
-    elif (filters.get("machine", []) or []):
-        machine="machine_3"
-    paver_exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine)
-    total_sqf=0
-    for i in paver_exp_tree:
-        if i.get("child_nodes"):
-            total_sqf+=get_expense_from_child(i['child_nodes'], 0)
-        else:
-            if i["balance"]:
-                total_sqf+=i["balance"] or 0
-    return total_sqf
 
 def get_expense_from_child(account, total_sqf):
     for i in account:

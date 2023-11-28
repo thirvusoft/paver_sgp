@@ -428,25 +428,11 @@ def get_cw_production_rate(_type=[], date=None):
 	}
 
 	filters = get_cw_production_date(_type, filters)
-	exp_group="cw_group"
-	prod="cw"
-
-	if _type == ["Lego Block"]:
-		exp_group="lg_group"
-		prod="lego"
-
-	elif _type == ['Fencing Post']:
-		exp_group="fp_group" 
-		prod="fp"
-	
-	cw_cost = sum(get_cw_monthly_cost(filters=filters,
-								  _type=_type,
-								  exp_group=exp_group,
-								  prod=prod))
+	cw_cost = sum(get_cw_monthly_cost(filters=filters, _type=_type))
 
 	return cw_cost
 
-def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw"):
+def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"]):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 

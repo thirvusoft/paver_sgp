@@ -4,15 +4,16 @@
 import json
 import frappe
 from ganapathy_pavers.custom.py.expense import  expense_tree
+from ganapathy_pavers.custom.py.journal_entry import get_ITEM_TYPES
 WORKSTATIONS = {}
 
 def execute(filters=None):
-	columns, data = get_columns(filters), get_data(filters)
+	ITEM_TYPES = get_ITEM_TYPES()
+	columns, data = get_columns(filters, ITEM_TYPES), get_data(filters, ITEM_TYPES)
 	return columns, data
 
-def get_columns(filters):
+def get_columns(filters, ITEM_TYPES):
 	WORKSTATIONS = frappe.get_all("Workstation", filters={"used_in_expense_splitup": 1}, fields=["name", "location"], order_by="name",)
-
 	columns = [
 		{
 			"fieldname": "expense_group",
@@ -32,34 +33,16 @@ def get_columns(filters):
 			"label": "Total Amount",
 			"width": 150
 		},
-		{
-			"fieldname": "paver",
-			"fieldtype": "Currency",
-			"label": "Paver",
-			"width": 100,
-			"hidden": filters.get("expense_type") == "Vehicle"
-		},
-		{
-			"fieldname": "compound_wall",
-			"fieldtype": "Currency",
-			"label": "Compound Wall",
-			"width": 100,
-			"hidden": filters.get("expense_type") == "Vehicle"
-		},
-		{
-			"fieldname": "fencing_post",
-			"fieldtype": "Currency",
-			"label": "Fencing Post",
-			"width": 100,
-			"hidden": filters.get("expense_type") == "Vehicle"
-		},
-		{
-			"fieldname": "lego_block",
-			"fieldtype": "Currency",
-			"label": "Lego Block",
-			"width": 100,
-			"hidden": filters.get("expense_type") == "Vehicle"
-		},
+		*[
+			{
+				"fieldname": frappe.scrub(i_type),
+				"fieldtype": "Currency",
+				"label": i_type,
+				"width": 100,
+				"hidden": filters.get("expense_type") == "Vehicle"
+			}
+			for i_type in ITEM_TYPES
+		],
 		{
 			"fieldname": "group_total",
 			"fieldtype": "Check",
@@ -101,15 +84,15 @@ def get_columns(filters):
 			})
 	return columns
 
-def get_data(filters):
+def get_data(filters, ITEM_TYPES):
 	WORKSTATIONS = frappe.get_all("Workstation", filters={"used_in_expense_splitup": 1}, fields=["name", "location"], order_by="name")
 
 	total_amount = {
 		"total_amount": 0,
-		"paver": 0,
-		"compound_wall": 0,
-		"fencing_post": 0,
-		"lego_block": 0
+		**{
+			frappe.scrub(i_type): 0
+			for i_type in ITEM_TYPES
+		}
 	}
 	for wrk in WORKSTATIONS:
 		total_amount[frappe.scrub(wrk.name or "")] = 0
@@ -129,12 +112,12 @@ def get_data(filters):
 		dic={}
 		if i.get("expandable"):
 			dic["expense_group"]=i['value']
-			child, total_amount=get_expense_from_child(account=i['child_nodes'], WORKSTATIONS=WORKSTATIONS, total_amount=total_amount)
+			child, total_amount=get_expense_from_child(account=i['child_nodes'], WORKSTATIONS=WORKSTATIONS, total_amount=total_amount, ITEM_TYPES=ITEM_TYPES)
 			if child:
 				res.append(dic)
 				if not filters.get("expense_summary"):
 					res+=child
-				res+=group_total(child, WORKSTATIONS)
+				res+=group_total(child, WORKSTATIONS, ITEM_TYPES)
 		else:
 			if i["balance"]:
 				dic={}
@@ -142,15 +125,12 @@ def get_data(filters):
 					res.append({})
 				
 				dic['expense']=i.get('value')
-
 				dic['paver']=0
-				dic['compound_wall']=i.get('compound_wall')
-				dic['fencing_post']=i.get('fencing_post')
-				dic['lego_block']=i.get('lego_block')
-				
-				total_amount['compound_wall']+=i.get('compound_wall') or 0
-				total_amount['fencing_post']+=i.get('fencing_post') or 0
-				total_amount['lego_block']+=i.get('lego_block') or 0
+				for i_type in ITEM_TYPES:
+					if (frappe.scrub(i_type)) != "paver":
+						dic[frappe.scrub(i_type)] = i.get(frappe.scrub(i_type))
+						total_amount[frappe.scrub(i_type)]+=i.get(frappe.scrub(i_type)) or 0
+					
 				total_amount['total_amount']+=i.get('balance') or 0
 
 				for wrk in WORKSTATIONS:
@@ -177,22 +157,19 @@ def get_data(filters):
 
 	return res
 
-def get_expense_from_child(account, WORKSTATIONS, total_amount):
+def get_expense_from_child(account, WORKSTATIONS, total_amount, ITEM_TYPES):
 	res=[]
 	for i in account:
 		if i["balance"]:
 			dic={}
 
 			dic['expense']=i.get('value')
-			
 			dic['paver']=0
-			dic['compound_wall']=i.get('compound_wall')
-			dic['fencing_post']=i.get('fencing_post')
-			dic['lego_block']=i.get('lego_block')
-			
-			total_amount['compound_wall']+=i.get('compound_wall') or 0
-			total_amount['fencing_post']+=i.get('fencing_post') or 0
-			total_amount['lego_block']+=i.get('lego_block') or 0
+			for i_type in ITEM_TYPES:
+				if (frappe.scrub(i_type)) != "paver":
+					dic[frappe.scrub(i_type)] = i.get(frappe.scrub(i_type))
+					total_amount[frappe.scrub(i_type)]+=i.get(frappe.scrub(i_type)) or 0
+
 			total_amount['total_amount']+=i.get('balance') or 0
 
 			for wrk in WORKSTATIONS:
@@ -213,30 +190,25 @@ def get_expense_from_child(account, WORKSTATIONS, total_amount):
 			
 			res.append(dic)
 		if i['child_nodes']:
-			res1, total_amount=get_expense_from_child(account=i['child_nodes'], WORKSTATIONS=WORKSTATIONS, total_amount=total_amount)
+			res1, total_amount=get_expense_from_child(account=i['child_nodes'], WORKSTATIONS=WORKSTATIONS, total_amount=total_amount, ITEM_TYPES=ITEM_TYPES)
 			res+=res1
 	return res, total_amount
 
-def group_total(child, WORKSTATIONS):
+def group_total(child, WORKSTATIONS, ITEM_TYPES):
 	res=[]
 	total_amount=0
-	paver=0
-	compound_wall=0
-	fencing_post=0
-	lego_block=0
+	total = {frappe.scrub(i_type):0 for i_type in ITEM_TYPES}
 	for i in child:
-		paver+=(i.get('paver') or 0)
-		compound_wall+=(i.get('compound_wall') or 0)
-		fencing_post+=(i.get('fencing_post') or 0)
-		lego_block+=(i.get('lego_block') or 0)
+		for i_type in ITEM_TYPES:
+			total[frappe.scrub(i_type)] += (i.get(frappe.scrub(i_type)) or 0)
 		total_amount+=(i.get('total_amount') or 0)
 	group = {
 		'expense': "Group Total",
 		'total_amount': total_amount or 0,
-		'paver': paver or 0,
-		'compound_wall': compound_wall or 0,
-		'fencing_post': fencing_post or 0,
-		'lego_block': lego_block or 0,
+		**{
+			frappe.scrub(i_type): total.get(frappe.scrub(i_type)) or 0
+			for i_type in ITEM_TYPES
+		},
 		"group_total": 1
 	}
 	for wrk in WORKSTATIONS:

@@ -88,7 +88,7 @@ ganapathy_pavers.show_reference = function (title, reference, total_amount) {
 				options: opt,
 			}
 		],
-		size: "large"
+		size: "extra-large"
 	})
 	d.show()
 }

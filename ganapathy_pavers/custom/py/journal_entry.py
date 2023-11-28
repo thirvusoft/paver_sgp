@@ -19,8 +19,13 @@ def journal_entry(self, event):
             self.party_name=i.party
             break
 
+def get_ITEM_TYPES():
+    return ["Paver", *(frappe.db.get_all("Compound Wall Type", {"used_in_expense_splitup": 1}, pluck="name", order_by="name"))]
+
 @frappe.whitelist()
-def get_production_details(date=None, from_date=None, to_date=None, machines=[], item=None, paver_type=None):
+def get_production_details(date=None, from_date=None, to_date=None, machines=[], item=None, paver_type=None, ITEM_TYPES=[]):
+    if not ITEM_TYPES:
+        ITEM_TYPES = get_ITEM_TYPES()
     if not machines:
         machines = []
     res={'month': '', 'paver': 0, 'cw': 0, 'lego': 0, 'fp': 0}
@@ -35,36 +40,33 @@ def get_production_details(date=None, from_date=None, to_date=None, machines=[],
             to_date=date+relativedelta(day=1, months=+1, days=-1)
             from_date=date+relativedelta(day=1)
             res['month']=date.strftime("%B")
-        cw_filt = {'docstatus':['!=', 2], 'type': ['in', ['Post', 'Slab']]}
-        lg_filt ={'docstatus':['!=', 2], 'type': 'Lego Block'}
-        fp_filt ={'docstatus':['!=', 2], 'type': 'Fencing Post'}
+        cw_filt = {'docstatus':['!=', 2]}
         pm_filt = {'docstatus':['!=', 2], "is_sample": 0}
         if(from_date):
             pm_filt['from_time'] = ['>=', add_days(from_date,1)]
             cw_filt['molding_date'] = ['>=', from_date]
-            lg_filt['molding_date'] = ['>=', from_date]
-            fp_filt['molding_date'] = ['>=', from_date]
 
         if(to_date):
             pm_filt['to'] = ['<=', add_days(to_date,1)]
             cw_filt['molding_date'] = ['<=', to_date]
-            lg_filt['molding_date'] = ['<=', to_date]
-            fp_filt['molding_date'] = ['<=', to_date]
+        
         if(from_date and to_date):
             pm_filt['from_time'] = ['between', (from_date, to_date)]
             cw_filt['molding_date'] = ['between', (from_date, to_date)]
-            lg_filt['molding_date'] = ['between', (from_date, to_date)]
-            fp_filt['molding_date'] = ['between', (from_date, to_date)]
+
         if(machines):
             pm_filt["work_station"] = ["in", machines]
         
         if paver_type:
             pm_filt["paver_type"] = paver_type
 
-        res['paver'] = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='total_production_sqft'))
-        res['cw'] = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))
-        res['lego'] = sum(frappe.db.get_all('CW Manufacturing', filters=lg_filt, pluck='production_sqft'))
-        res['fp'] = sum(frappe.db.get_all('CW Manufacturing', filters=fp_filt, pluck='production_sqft'))
+        for i_type in ITEM_TYPES:
+            if frappe.scrub(i_type) == "paver":
+                res['paver'] = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='total_production_sqft'))
+            else:
+                filter = cw_filt
+                filter["type"] = ["in", ["Post", "Slab"]] if frappe.scrub(i_type) == 'compound_wall' else i_type
+                res[frappe.scrub(i_type)] = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))       
     except:
         pass
     return res

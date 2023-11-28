@@ -8,7 +8,13 @@ from frappe import _
 from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
 
 
-def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group="cw_group"):
+def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="compound_wall"):
+	if filters.get("compound_wall_type"):
+		_type = {
+			"compound_wall": ["Post", "Slab"]
+		}.get(frappe.scrub(filters.get("compound_wall_type"))) or [filters.get("compound_wall_type")]
+		prod_exp_sqft = frappe.scrub(filters.get("compound_wall_type"))
+		
 	columns = get_columns(filters)
 
 	from_date = filters.get("from_date")
@@ -19,16 +25,13 @@ def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="cw", exp_group=
 
 	if doc:
 		data = get_cw_cost(doc)
-	if filters.get("new_method"):
-		exp={'cw': "compound_wall", "lego": "lego_block", "fp": "fencing_post"}.get(prod_exp_sqft)
-		sqf_exp=total_expense(
-			from_date=filters.get('from_date'), 
-			prod_details=exp,
-			to_date=filters.get('to_date'), 
-			expense_type="Manufacturing", 
-		)
-	else:
-		sqf_exp=get_sqft_expense(filters, exp_group)
+	sqf_exp=total_expense(
+		from_date=filters.get('from_date'), 
+		prod_details=prod_exp_sqft,
+		to_date=filters.get('to_date'), 
+		expense_type="Manufacturing", 
+	)
+	
 	prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=filters.get("machine", []))
 	for row in  data:
 		row["prod_cost"] = (row.get("prod_cost", 0) or 0) + (row.get("strapping_cost", 0) or 0)
@@ -70,17 +73,6 @@ def get_cw_cost(doc_list):
 	res=frappe.db.sql(query, as_dict=True)
 	return res
 
-def get_sqft_expense(filters, exp_group):
-	exp=frappe.get_single("Expense Accounts")
-	paver_exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.get(exp_group))
-	total_sqf=0
-	for i in paver_exp_tree:
-		if i.get("child_nodes"):
-			total_sqf+=get_expense_from_child(i['child_nodes'], 0)
-		else:
-			if i["balance"]:
-				total_sqf+=i["balance"] or 0
-	return total_sqf
 
 def get_expense_from_child(account, total_sqf):
 	for i in account:

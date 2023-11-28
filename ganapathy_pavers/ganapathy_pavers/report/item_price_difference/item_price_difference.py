@@ -6,10 +6,9 @@ import json
 from erpnext.stock.get_item_details import get_item_price
 from frappe.desk.reportview import get_filters_cond, get_match_cond
 from frappe.utils.data import nowdate
+from ganapathy_pavers.custom.py.expense import total_expense
 from ganapathy_pavers.utils.py.sitework_printformat import get_cw_monthly_cost
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
-from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost, get_sqft_expense as paver_get_sqft_expense
-from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_cw_production_report.itemwise_monthly_cw_production_report import get_sqft_expense as cw_sqft_expense
 import frappe
 from frappe import _, scrub
 
@@ -52,7 +51,13 @@ def get_data(filters, selling_price_lists):
 	attribute_list = [row.get("attribute") for row in attributes]
 
 	# Prepare dicts
-	paver_expense_cost=paver_get_sqft_expense(filters)
+	paver_expense_cost = total_expense(
+        from_date=filters.get('from_date'), 
+        prod_details="Paver",
+        to_date=filters.get('to_date'), 
+        expense_type="Manufacturing", 
+        machine=filters.get("machine")
+    )
 	cw_expense_cost={}
 	prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=(filters.get("machine", []) or []))
 
@@ -79,23 +84,25 @@ def get_data(filters, selling_price_lists):
 			if "Post" in _type or "Slab" in _type:
 				_type = ["Post", "Slab"]
 			exp_group="cw_group"
-			prod="cw"
+			prod="compound_wall"
 
 			if _type == ["Lego Block"]:
 				exp_group="lg_group"
-				prod="lego"
+				prod="lego_block"
 
 			elif _type == ['Fencing Post']:
 				exp_group="fp_group" 
-				prod="fp"
+				prod="fencing_post"
 			
 			if exp_group not in cw_expense_cost:
-				cw_expense_cost[exp_group] = cw_sqft_expense(filters, exp_group)
+				cw_expense_cost[exp_group] = total_expense(
+					from_date=filters.get('from_date'), 
+					prod_details=prod,
+					to_date=filters.get('to_date'), 
+					expense_type="Manufacturing", 
+				)
 
-			item_dict["prod_rate"], item_dict["expense_cost"] = get_cw_monthly_cost(filters=filters,
-                                  _type=_type,
-                                  exp_group=exp_group,
-                                  prod=prod)
+			item_dict["prod_rate"], item_dict["expense_cost"] = get_cw_monthly_cost(filters=filters, _type=_type)
 			item_dict["total_production_rate"] = item_dict["prod_rate"] + item_dict["expense_cost"]
 			item_dict["expense_cost"] += ((cw_expense_cost.get(exp_group, 0) or 0) /(prod_details.get(prod, 1) or 1))
 

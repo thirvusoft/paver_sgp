@@ -2,10 +2,12 @@ import json
 import frappe
 import erpnext
 from erpnext.accounts.utils import get_children
-from ganapathy_pavers.custom.py.journal_entry import get_production_details
+from ganapathy_pavers.custom.py.journal_entry import get_ITEM_TYPES, get_production_details
 
 machine_wise_prod_info = {}
 WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
+ITEM_TYPES = get_ITEM_TYPES()
+ITEM_TYPES_FN = [frappe.scrub(i_type) for i_type in ITEM_TYPES]
 
 VEHICLE_WISE = {}
 
@@ -27,7 +29,7 @@ def filter_empty(gl_entries, vehicle_summary, workstations, group_two_wheeler):
                 _par_acc["account_name"] = _par_acc["value"] = _key
                 VEHICLE_WISE[_key] = _par_acc
             else:
-                for prod in ["paver", "compound_wall", "fencing_post", "lego_block"]:
+                for prod in ITEM_TYPES_FN:
                     if not VEHICLE_WISE[_key].get(prod):
                         VEHICLE_WISE[_key][prod] = 0
                     VEHICLE_WISE[_key][prod] += (acc.get(prod) or 0)
@@ -95,6 +97,8 @@ def expense_tree(
     ) -> list:
     
     WORKSTATIONS = frappe.get_all("Workstation", {"used_in_expense_splitup": 1}, pluck="name")
+    ITEM_TYPES = get_ITEM_TYPES()
+    ITEM_TYPES_FN = [frappe.scrub(i_type) for i_type in ITEM_TYPES]
 
     if not company:
         company=erpnext.get_default_company()
@@ -244,6 +248,7 @@ def expense_tree(
     machine_wise_prod_info.clear()
     VEHICLE_WISE.clear()
     WORKSTATIONS.clear()
+    ITEM_TYPES_FN.clear()
     return res
 
 def get_tree(root, company, from_date, to_date, vehicle=None, machine=[], expense_type=None, prod_details = "", all_expenses = False):
@@ -310,8 +315,8 @@ def get_account_balance_on(account, company, from_date, to_date, expense_name=""
 
     if prod_details:
         conditions+=f""" and (gl.{frappe.scrub(prod_details)}=1
-        or (gl.paver=0 and gl.compound_wall=0 and gl.lego_block=0 and gl.fencing_post=0) 
-        or (gl.paver=1 and gl.compound_wall=1 and gl.lego_block=1 and gl.fencing_post=1)) """
+        or ({" and ".join([f'gl.{i_type}=0' for i_type in ITEM_TYPES_FN])})
+        or ({" and ".join([f'gl.{i_type}=1' for i_type in ITEM_TYPES_FN])})) """
 
     if expense_type:
         conditions+=f" and gl.expense_type='{expense_type}'"
@@ -476,7 +481,11 @@ def get_account_balance_on(account, company, from_date, to_date, expense_name=""
 
 def calculate_exp_from_gl_entries(account, gl_entries, from_date, to_date, expense_type=None, prod_details="", machines=[], all_expenses=False):
     if all_expenses and expense_type!="Vehicle":
-        production_details = {"paver": WORKSTATIONS, "compound_wall": [], "fencing_post": [], "lego_block": []}
+        production_details = {i_type: [] for i_type in ITEM_TYPES_FN}
+        
+        if "paver" in production_details:
+            production_details["paver"] = WORKSTATIONS
+            
         for prod in production_details:
             amount = 0
             if not production_details.get(prod):
@@ -555,20 +564,13 @@ def calculate_exp_from_gl_entries(account, gl_entries, from_date, to_date, expen
 def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[], all_expenses=False):
     if not machines:
         machines=WORKSTATIONS
-    paver, cw, fp, lego = 0, 0, 0, 0
-    if (gl.get("paver") and gl.get("compound_wall") and gl.get("lego_block") and gl.get("fencing_post")):
-        paver, cw, fp, lego = 1, 1, 1 ,1
-    elif ( (not gl.get("paver")) and (not  gl.get("compound_wall")) and (not  gl.get("lego_block")) and (not  gl.get("fencing_post"))):
-        paver, cw, fp, lego = 1, 1, 1 ,1
+    item_exp = {i_type: 0 for i_type in ITEM_TYPES_FN}
+    if sum([1 for i in item_exp if gl.get(i)]) == len(item_exp):
+        item_exp = {i_type: 1 for i_type in ITEM_TYPES_FN}
+    elif sum([1 for i in item_exp if gl.get(i)]) == 0:
+        item_exp = {i_type: 1 for i_type in ITEM_TYPES_FN}
     else:
-        if gl.get("paver"):
-            paver = 1
-        if gl.get("compound_wall"):
-            cw = 1
-        if gl.get("lego_block"):
-            lego = 1
-        if gl.get("fencing_post"):
-            fp = 1
+        item_exp = {i_type: (1 if gl.get(i_type) else 0) for i_type in ITEM_TYPES_FN}
     
     gl_machines=[]
     for wrk in WORKSTATIONS:
@@ -578,7 +580,7 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[],
     gl_machines.sort()
     machines=sorted([i for i in machines if ((i in gl_machines) or not gl_machines)])
 
-    if all_expenses and ((not gl.get(prod_details) and (sum([gl.get(i) for i in ["paver", "compound_wall", "fencing_post", "lego_block"]]))) or (prod_details=="paver" and (not machines and gl_machines))):
+    if all_expenses and ((not gl.get(prod_details) and (sum([gl.get(i) for i in ITEM_TYPES_FN]))) or (prod_details=="paver" and (not machines and gl_machines))):
         return 0
     
     if gl_machines==sorted(WORKSTATIONS):  
@@ -592,7 +594,7 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[],
         res = 0
         for mach in machines:
             num_total = 1
-            den_total = sum([cw, fp, lego]) + (len(list(set([frappe.db.get_value("Workstation", mac, "location") for mac in (gl_machines or WORKSTATIONS)]))) if (paver or (sum([paver, cw, lego, fp]) == 0)) else 0)
+            den_total = sum([(item_exp.get(i) or 0) for i in item_exp if i!="paver"]) + (len(list(set([frappe.db.get_value("Workstation", mac, "location") for mac in (gl_machines or WORKSTATIONS)]))) if (item_exp.get("paver") or (sum(list(item_exp.values())) == 0)) else 0)
             if prod_details == "paver" and mach:
                 gl_m_location = [frappe.db.get_value("Workstation", mac, "location") for mac in (gl_machines or WORKSTATIONS)]
                 den_total *= gl_m_location.count(frappe.db.get_value("Workstation", mach, "location"))
@@ -603,12 +605,12 @@ def get_gl_production_rate(gl, from_date, to_date, prod_details="", machines=[],
         return res
 
     if gl_machine_key not in machine_wise_prod_info:
-        machine_wise_prod_info[gl_machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=gl_machines)
+        machine_wise_prod_info[gl_machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=gl_machines, ITEM_TYPES=ITEM_TYPES)
     if machine_key not in machine_wise_prod_info:
-        machine_wise_prod_info[machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=machines)
+        machine_wise_prod_info[machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=machines, ITEM_TYPES=ITEM_TYPES)
 
-    num_total = machine_wise_prod_info[machine_key].get({"paver": 'paver', "compound_wall": 'cw', "lego_block": "lego", "fencing_post": "fp"}.get(prod_details)) or 0
-    den_total = sum([(machine_wise_prod_info[gl_machine_key][i] or 0) for i in machine_wise_prod_info[gl_machine_key] if {'paver': paver, 'cw': cw, "lego": lego, "fp": fp}.get(i) ])
+    num_total = machine_wise_prod_info[machine_key].get(prod_details) or 0
+    den_total = sum([(machine_wise_prod_info[gl_machine_key][i] or 0) for i in machine_wise_prod_info[gl_machine_key] if item_exp.get(i) ])
     
     return (num_total or 0) / (den_total or 1)
 
@@ -718,10 +720,9 @@ def get_vehicle_expense(account, from_date, to_date, vehicle = None, machine = [
             md.maintenance as account,
             vl.today_odometer_value as distance,
             vl.today_odometer_value * ifnull(md.expense, 0) as debit,
-            vl.paver,
-            vl.compound_wall,
-            vl.fencing_post,
-            vl.lego_block,
+            {
+                "".join([f'vl.{i_type}, ' for i_type in ITEM_TYPES_FN])
+            }
             "Vehicle Log" as voucher_type,
             vl.name as voucher_no
             {f", {wrk_fields}" if wrk_fields else ""}
@@ -872,10 +873,9 @@ def get_vehicle_salary(account, from_date, to_date, vehicle = None, machine = []
             ) as debit,
             "Vehicle Log" as voucher_type,
             vl.name as voucher_no,
-            vl.paver,
-            vl.compound_wall,
-            vl.fencing_post,
-            vl.lego_block
+            {
+                ", ".join([f'vl.{i_type}' for i_type in ITEM_TYPES_FN])
+            }
             {f", {wrk_fields}" if wrk_fields else ""}
         FROM `tabVehicle Log` vl
         WHERE
@@ -952,8 +952,8 @@ def per_sqft_production_expense(from_date, to_date, machines, prod_details, all_
 
     if prod_details:
         conditions+=f""" and (exp.{frappe.scrub(prod_details)}=1
-        or (exp.paver=0 and exp.compound_wall=0 and exp.lego_block=0 and exp.fencing_post=0) 
-        or (exp.paver=1 and exp.compound_wall=1 and exp.lego_block=1 and exp.fencing_post=1)) """
+        or ({" and ".join([f'exp.{i_type}=0' for i_type in ITEM_TYPES_FN])}) 
+        or ({" and ".join([f'exp.{i_type}=1' for i_type in ITEM_TYPES_FN])})) """
 
     if machines and sorted(machines)!=sorted(WORKSTATIONS):
         conditions+=f"""  AND
@@ -994,7 +994,9 @@ def per_sqft_production_expense(from_date, to_date, machines, prod_details, all_
             "balance": 0
         }
         if all_expenses:
-            exp={"paver": WORKSTATIONS, "compound_wall": [], "lego_block": [], "fencing_post": []}
+            exp = {i_type: [] for i_type in ITEM_TYPES_FN}
+            if exp.get("paver"):
+                exp["paver"] = WORKSTATIONS
             for prod in exp:
                 if not exp[prod]:
                     expense = get_per_sqft_expense(
@@ -1046,8 +1048,8 @@ def get_per_sqft_expense(from_date, to_date, machines, prod_details, expense_nam
 
     if prod_details:
         conditions+=f""" and (exp.{frappe.scrub(prod_details)}=1
-        or (exp.paver=0 and exp.compound_wall=0 and exp.lego_block=0 and exp.fencing_post=0) 
-        or (exp.paver=1 and exp.compound_wall=1 and exp.lego_block=1 and exp.fencing_post=1)) """
+        or ({" and ".join([f'exp.{i_type}=0' for i_type in ITEM_TYPES_FN])}) 
+        or ({" and ".join([f'exp.{i_type}=1' for i_type in ITEM_TYPES_FN])})) """
 
     if expense_name:
         conditions+=f""" and exp.expense_name='{expense_name}' """
@@ -1097,9 +1099,9 @@ def get_per_sqft_expense(from_date, to_date, machines, prod_details, expense_nam
         
         exp_machine_key = json.dumps(exp_machines)
         if exp_machine_key not in machine_wise_prod_info:
-            machine_wise_prod_info[exp_machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=exp_machines)
+            machine_wise_prod_info[exp_machine_key] = get_production_details(from_date=from_date, to_date=to_date, machines=exp_machines, ITEM_TYPES=ITEM_TYPES)
         
-        sqf = machine_wise_prod_info[exp_machine_key].get({"paver": 'paver', "compound_wall": 'cw', "lego_block": "lego", "fencing_post": "fp"}.get(prod_details)) or 0
+        sqf = machine_wise_prod_info[exp_machine_key].get(prod_details) or 0
 
         expense_amount+=(sqf or 0) * (row.cost_per_sqft or 0)
 

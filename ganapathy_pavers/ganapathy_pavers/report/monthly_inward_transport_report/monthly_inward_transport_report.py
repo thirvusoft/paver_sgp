@@ -196,15 +196,12 @@ def get_expense_data(total_purchase_unit, filters):
 			vl.date between "{filters.get('from_date')}" and "{filters.get('to_date')}"
 	""")[0] or (0, 0)
 	
-	if filters.get("new_method"):
-		exp_tree=expense_tree(
-							from_date=filters.get('from_date'),
-							to_date=filters.get('to_date'),
-							expense_type="Vehicle",
-							vehicle=filters.get("vehicle_no")
-							)
-	else:
-		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.vehicle_expense, vehicle=filters.get("vehicle_no"))
+	exp_tree=expense_tree(
+						from_date=filters.get('from_date'),
+						to_date=filters.get('to_date'),
+						expense_type="Vehicle",
+						vehicle=filters.get("vehicle_no")
+						)
 	res=[]
 	for i in exp_tree:
 		if i.get("expandable"):
