@@ -1,10 +1,8 @@
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
-from ganapathy_pavers.ganapathy_pavers.doctype.compound_wall_type.compound_wall_type import cw_types
 
 @frappe.whitelist()
 def create_designation():
-    cw_types()
     if(not frappe.db.exists('Designation', 'Job Worker')):
         doc=frappe.new_doc('Designation')
         doc.update({
