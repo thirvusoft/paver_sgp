@@ -626,7 +626,9 @@ def get_vehicle_expense_based_on_km(from_date, to_date, vehicle = None, machine 
     if expense_type:
         conditions += f""" and vl.expense_type='{expense_type}' """
     if prod_details:
-        conditions += f""" and vl.{frappe.scrub(prod_details)}=1 """
+        conditions += f""" and (vl.{frappe.scrub(prod_details)}=1
+        or ({" and ".join([f'vl.{i_type}=0' for i_type in ITEM_TYPES_FN])}) 
+        or ({" and ".join([f'vl.{i_type}=1' for i_type in ITEM_TYPES_FN])})) """
     
     veh_maint = frappe.db.sql(f"""
         select
@@ -767,7 +769,10 @@ def get_vehicle_driver_operator_salary(from_date, to_date, driver_employee=None,
     if expense_type:
         conditions += f""" and vl.expense_type = "{expense_type}" """
     if prod_details:
-        conditions += f""" and vl.{prod_details} = 1 """
+        conditions += f""" and (vl.{frappe.scrub(prod_details)}=1
+        or ({" and ".join([f'vl.{i_type}=0' for i_type in ITEM_TYPES_FN])}) 
+        or ({" and ".join([f'vl.{i_type}=1' for i_type in ITEM_TYPES_FN])})) """
+        
     if purpose:
         conditions += f""" and vl.select_purpose in {f"('{purpose[0]}')" if len(purpose)==1 else tuple(purpose)} """
     if machine and sorted(machine) != sorted(WORKSTATIONS):
