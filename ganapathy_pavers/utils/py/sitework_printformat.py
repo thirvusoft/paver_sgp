@@ -682,7 +682,7 @@ def get_site_sales_order_item_prices(site):
 def get_site_supply_and_return_trip_details(sitename):
 	supply = lambda is_return = 0: frappe.db.sql(f"""
 			select 
-				sum(dni.qty) as qty,
+				sum(ifnull(dni.qty, 0)) as qty,
 				dni.uom
 			from `tabDelivery Note Item` dni
 			inner join `tabDelivery Note` dn
@@ -694,14 +694,18 @@ def get_site_supply_and_return_trip_details(sitename):
 			group by dni.uom
 			""", as_dict=True)
 	
+	supply_details = supply(0)
+	return_details = supply(1)
 	return {
 		'supply': {
 			'no_of_trips': frappe.db.count('Delivery Note', filters={'docstatus': 1, 'is_return': 0, 'site_work': sitename}),
-			'qty': ", ".join([f"""{round(i.qty, 2)} {i.uom}""" for i in supply(0)])
+			'qty': ", ".join([f"""{round(i.qty, 2)} {i.uom}""" for i in supply_details]),
+			'int_qty': sum([i.qty or 0 for i in supply_details])
 		},
 		'return': {
 			'no_of_trips': frappe.db.count('Delivery Note', filters={'docstatus': 1, 'is_return': 1, 'site_work': sitename}),
-			'qty': ", ".join([f"""{round(i.qty, 2)} {i.uom}""" for i in supply(1)])
+			'qty': ", ".join([f"""{round(i.qty, 2)} {i.uom}""" for i in return_details]),
+			'int_qty': sum([i.qty or 0 for i in return_details])
 		}
 	}
 
