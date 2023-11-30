@@ -66,7 +66,6 @@ def get_data(filters):
 	data = []
 	current_type, total = '', 0
 	for idx in range(len(_data)):
-		frappe.errprint(idx == 0 or idx == len(_data)-1)
 		if idx == 0 or idx == len(_data)-1:
 			current_type = _data[idx].type
 			total += _data[idx].invoice_amount
