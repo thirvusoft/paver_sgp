@@ -45,11 +45,50 @@ def get_data(filters):
 	if filters.get('from_date') and filters.get('to_date'):
 		pe_filters += f" and pe.posting_date between '{filters.get('from_date')}' and '{filters.get('to_date')}' "
 
-	data = frappe.db.sql(f'''
-				select pe.party,pe.type,sum(pe.paid_amount) as paid_amount from `tabPayment Entry` as pe where {pe_filters} group by pe.party, pe.type order by pe.type, pe.party
+	_data = frappe.db.sql(f'''
+				select 
+					pe.party,
+					case when ifnull(pe.type, '') = '' then 'No Type' else pe.type end as type,
+					sum(pe.paid_amount) as paid_amount 
+				from `tabPayment Entry` as pe 
+				where 
+					{pe_filters} 
+				group by
+				 	pe.party,
+					case when ifnull(pe.type, '') = '' then 'No Type' else pe.type end
+				order by 
+					pe.type,
+					pe.party
 	
 	''',as_dict=1)
 	
+	data = []
+	current_type, total = '', 0
+	for idx in range(len(_data)):
+		frappe.errprint(idx == 0 or idx == len(_data)-1)
+		if idx == 0 or idx == len(_data)-1:
+			current_type = _data[idx].type
+			total += _data[idx].paid_amount
+			data.append(_data[idx])
+			
+			if (idx == len(_data)-1):
+				data.append({
+					"party": f"{current_type}",
+					"paid_amount": total
+				})
+		else:
+			if current_type != _data[idx].type:
+				data.append({
+					"party": f"{current_type}",
+					"paid_amount": total
+				})
+				current_type = _data[idx].type
+				total = _data[idx].paid_amount
+				data.append(_data[idx])
+			else:
+				total += _data[idx].paid_amount
+				data.append(_data[idx])
+	data.append({})
 	total_data = frappe.db.sql(f'''
 				select sum(pe.paid_amount) as paid_amount from `tabPayment Entry` as pe where {pe_filters}
 	
@@ -58,8 +97,8 @@ def get_data(filters):
 	bank_data = frappe.db.sql(f'''
 				SELECT
 					CASE
-						WHEN br.is_accounting = 1 THEN CONCAT('<b>Bank Total - ', pe.type, '</b>')
-						ELSE CONCAT('<b>Total - ', pe.type, '</b>')
+						WHEN br.is_accounting = 1 THEN CONCAT('Bank Total - ',case when ifnull(pe.type, '') = '' then 'No Type' else pe.type end, '')
+						ELSE CONCAT('Total - ',case when ifnull(pe.type, '') = '' then 'No Type' else pe.type end, '')
 					END AS party,
 					SUM(pe.paid_amount) AS paid_amount
 				FROM
@@ -69,41 +108,20 @@ def get_data(filters):
 				WHERE
 					{pe_filters}
 				GROUP BY
-					pe.branch,pe.type
+					pe.branch,
+					case when ifnull(pe.type, '') = '' then 'No Type' else pe.type end
 				ORDER BY
-					pe.branch DESC
+					pe.branch DESC,
+					pe.type
 
 	
 	''',as_dict=1)
 
 	data += bank_data
-	type_data = frappe.db.sql(f'''
-				SELECT
-					CONCAT('<b>', pe.type, '</b>') AS party,
-					SUM(pe.paid_amount) AS paid_amount
-				FROM
-					`tabPayment Entry` AS pe
-
-				WHERE
-					{pe_filters}
-				GROUP BY
-					pe.type
-	
-	''',as_dict=1)
-
-	data += type_data
-
+	data.append({})
 	data.append({
-		'party':"<b>Total Amount</b>",
+		'party':"Total Amount",
 		'paid_amount':total_data[0]['paid_amount'] if total_data else 0
 	})
-	# data.append({
-	# 	'party':"<b>Bank Total</b>",
-	# 	'paid_amount':bank_data[0]['paid_amount'] if bank_data else 0
-	# })
-	# data.append({
-	# 	'party':"<b>Cash Total</b>",
-	# 	'paid_amount':bank_data[0]['paid_amount'] if bank_data else 0
-
-	# })
+	
 	return data

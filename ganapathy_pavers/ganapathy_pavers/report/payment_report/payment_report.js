@@ -46,5 +46,14 @@ frappe.query_reports["Payment Report"] = {
 			fieldtype: 'Select',
 			options: '\nPavers\nCompound Wall\nOthers',
 		}
-	]
+	],
+	formatter: function (value, row, column, data, default_formatter) {
+		value = __(default_formatter(value, row, column, data));
+		if (!data.type) {
+			value = `<div style='font-weight: bold;'>${value}</div>`
+			let $value = $(value);
+			value = $value.wrap("<p></p>").parent().html();
+		} 
+		return value
+	}
 };
