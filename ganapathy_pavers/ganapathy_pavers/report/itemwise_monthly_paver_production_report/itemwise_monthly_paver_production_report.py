@@ -112,6 +112,7 @@ def get_data(filters):
         # data['pieces']=0
     data=list(data.values())
     prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=(filters.get("machine", []) or []))
+    paver_qty = (prod_details.get('paver') or 0)
     prod_details['paver']=(prod_details.get('paver') or 0) + ((get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=(filters.get("machine", []) or []), paver_type=["like", "%KERB STONE%"])).get("paver") or 0)
     expense_cost=total_expense(
         from_date=filters.get('from_date'), 
@@ -128,7 +129,7 @@ def get_data(filters):
         row['pieces']=uom_conversion(item=row['item'], from_uom="SQF", from_qty=row['sqft'], to_uom="Nos")
         row["expense_cost"]=(expense_cost or 0) if not expense_cost else (expense_cost*(row['sqft'] or 0))/(prod_details.get("paver") or 1)/(prod_details.get("paver") or 1)
         row["expense_cost"]=(expense_cost or 0) if not expense_cost else (expense_cost)/(prod_details.get("paver") or 1)
-        row["expense_cost"] = (row.get("expense_cost", 0) or 0) + (row.get("labour_operator_cost", 0) or 0)
+        row["expense_cost"] = (row.get("expense_cost", 0) or 0) + ((row.get("labour_operator_cost", 0) or 0)*(paver_qty)/(prod_details.get("paver") or 1))
         row["total_cost"]=(row["prod_cost"] or 0) + (row["expense_cost"] or 0)
         
     return data
