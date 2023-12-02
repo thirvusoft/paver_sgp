@@ -11,7 +11,7 @@ def execute(filters=None):
     columns, data = [], [{}]
     columns = get_columns(filters)
     data = get_data(filters)
-    return columns, data
+    return columns, data, "Expense cost = (Actual Expense / (Paver production + 2*Kerb stone production)) + Labour Expense"
 def get_columns(filters):
     columns = [
         {
@@ -112,6 +112,7 @@ def get_data(filters):
         # data['pieces']=0
     data=list(data.values())
     prod_details=get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=(filters.get("machine", []) or []))
+    prod_details['paver']=(prod_details.get('paver') or 0) + ((get_production_details(from_date=filters.get('from_date'), to_date=filters.get('to_date'), machines=(filters.get("machine", []) or []), paver_type=["like", "%KERB STONE%"])).get("paver") or 0)
     expense_cost=total_expense(
         from_date=filters.get('from_date'), 
         prod_details="Paver",

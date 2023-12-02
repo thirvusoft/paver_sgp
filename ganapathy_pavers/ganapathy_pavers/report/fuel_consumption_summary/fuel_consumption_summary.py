@@ -144,7 +144,12 @@ def get_columns():
         ]
     return columns
 
-def get_data(filters, location_wise_warehouse, add_total = True):
+def get_data(filters, location_wise_warehouse = {}, add_total = True):
+    if not location_wise_warehouse:
+        location_wise_warehouse = {}
+        for location in frappe.get_all('Location', ['name', 'warehouse']):
+            location_wise_warehouse[location.name] = get_warehouse_with_children(location.warehouse)
+            
     vehicle_log = (get_stock_entry_data(filters, location_wise_warehouse) or [])
     filters_2={}
     fuel=filters.get('fuel_type')
