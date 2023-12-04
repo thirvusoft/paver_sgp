@@ -115,7 +115,7 @@ def get_supplier_data(filters):
 			) + 
 			(IFNULL(pi.ts_total_amount, 0) / pi.total_qty)
 		) as average_rate,
-		SUM(pii.amount + IFNULL(pii.tax_amount, 0)) as amount
+		SUM(pi.rounded_total) as amount
 	FROM `tabPurchase Invoice` pi
 	INNER JOIN `tabPurchase Invoice Item` pii ON pii.parenttype = 'Purchase Invoice' AND pi.name = pii.parent
 	WHERE
@@ -126,12 +126,6 @@ def get_supplier_data(filters):
 				THEN (
 					select sup.supplier_group from `tabSupplier` sup where sup.name = pi.supplier limit 1
 				) in ({', '.join(f"'{i}'" for i in (filters.get('supplier_group') or ['', '']))})
-			ELSE 1=1
-		END AND
-		pii.type in ("Pavers", "Compound Wall") AND
-		CASE
-			WHEN IFNULL({len(filters.get('item_group') or [])}, 0) != 0
-				THEN pii.item_group in ({', '.join(f"'{i}'" for i in (filters.get('item_group') or ['', '']))})
 			ELSE 1=1
 		END
 	GROUP BY
