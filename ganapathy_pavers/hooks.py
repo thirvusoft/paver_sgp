@@ -353,6 +353,10 @@ doc_events = {
     		"ganapathy_pavers.custom.py.purchase_invoice_dashboard.tags_msg",
 		    "ganapathy_pavers.custom.py.purchase_invoice.site_work_details_from_pi",
 			"ganapathy_pavers.custom.py.purchase_invoice.create_service_vehicle_log",
+			"ganapathy_pavers.custom.py.purchase_invoice.calculate_tax"
+		],
+		"on_update_after_submit": [
+			"ganapathy_pavers.custom.py.purchase_invoice.calculate_tax"
 		],
 		"on_cancel": [
 			"ganapathy_pavers.custom.py.purchase_invoice.site_work_details_from_pi",

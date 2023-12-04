@@ -42,6 +42,15 @@
   },
   {
    "hidden": 0,
+   "is_query_report": 1,
+   "label": "Purchase Report",
+   "link_to": "Purchase Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
    "is_query_report": 0,
    "label": "Purchase Report",
    "link_to": "",
@@ -106,7 +115,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-11-01 12:05:53.762369",
+ "modified": "2023-12-04 10:12:15.309880",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Purchase Cycle",
