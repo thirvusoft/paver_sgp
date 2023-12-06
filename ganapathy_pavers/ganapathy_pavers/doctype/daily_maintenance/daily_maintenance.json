@@ -50,6 +50,7 @@
   "compound_wall_stock_section",
   "compound_wall_stock",
   "compound_wall_item_stock",
+  "other_cw_items",
   "machine_details_section",
   "machine_details",
   "vehicle_details_section",
@@ -316,12 +317,18 @@
    "fieldname": "operator_absent_night",
    "fieldtype": "Int",
    "label": "Operator Absent Night"
+  },
+  {
+   "fieldname": "other_cw_items",
+   "fieldtype": "Table",
+   "label": "Other CW Items",
+   "options": "DSM Other CW Items"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-09-26 10:54:31.643263",
+ "modified": "2023-12-06 13:27:58.246890",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Daily Maintenance",
