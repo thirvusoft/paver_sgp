@@ -1,0 +1,46 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-12-06 13:27:12.066593",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "type",
+  "stock"
+ ],
+ "fields": [
+  {
+   "fieldname": "item",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Type"
+  },
+  {
+   "default": "0",
+   "fieldname": "stock",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "stock",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-12-06 13:27:17.224711",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "DSM Other CW Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
