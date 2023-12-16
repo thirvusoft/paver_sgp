@@ -94,13 +94,13 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
+permission_query_conditions = {
+	"Stock Entry Type": "ganapathy_pavers.custom.py.user_permission.stock_entry_type_permission",
+}
 #
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+has_permission = {
+	"Stock Entry Type": "ganapathy_pavers.custom.py.user_permission.has_stock_entry_type_permission",
+}
 
 # DocType Class
 # ---------------

@@ -21,6 +21,10 @@
   "panmix_operator",
   "panmix_operator_name",
   "section_break_1",
+  "old_stroke",
+  "column_break_16",
+  "current_stroke",
+  "section_break_20",
   "no_of_item_in_process",
   "total_working_hrs",
   "cb_1",
@@ -227,7 +231,8 @@
   },
   {
    "fieldname": "section_break_1",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Stroke Count"
   },
   {
    "collapsible": 1,
@@ -1028,12 +1033,30 @@
    "label": "Paver Type",
    "options": "Paver Type",
    "read_only": 1
+  },
+  {
+   "fieldname": "old_stroke",
+   "fieldtype": "Int",
+   "label": "Old Stroke"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "current_stroke",
+   "fieldtype": "Int",
+   "label": "Current Stroke"
+  },
+  {
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-21 10:03:24.270893",
+ "modified": "2023-12-12 16:26:09.493843",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

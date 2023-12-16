@@ -1,0 +1,32 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Stock Reconciliation Item",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2023-07-08 11:04:11.843853",
+   "default_value": null,
+   "doc_type": "Stock Reconciliation Item",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "barcode",
+   "idx": 0,
+   "modified": "2023-07-08 11:04:11.843853",
+   "modified_by": "krishnaveni@gpy.com",
+   "name": "Stock Reconciliation Item-barcode-hidden",
+   "owner": "krishnaveni@gpy.com",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "hidden",
+   "property_type": "Check",
+   "row_name": null,
+   "value": "1"
+  }
+ ],
+ "sync_on_migrate": 1
+}
