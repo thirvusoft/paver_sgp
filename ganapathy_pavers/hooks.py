@@ -323,7 +323,9 @@ doc_events = {
 					"ganapathy_pavers.custom.py.delivery_note.reduce_return_qty_sitework"
 					],
 		"on_update_after_submit": [
-			"ganapathy_pavers.custom.py.sales_invoice.update_sales_type"
+			"ganapathy_pavers.custom.py.sales_invoice.update_sales_type",
+			"ganapathy_pavers.custom.py.sales_invoice.repost_ledger_after_change_project"
+
 		]		
   	},
 	"Vehicle":{

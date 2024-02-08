@@ -62,3 +62,20 @@ def get_einvoice_no(name="", irn=""):
 def update_sales_type(doc, event=None):
     for gl in frappe.get_all("GL Entry", {"voucher_type": doc.doctype, "voucher_no": doc.name}):
         frappe.db.set_value("GL Entry", gl.name, "type", doc.type)
+
+
+def repost_ledger_after_change_project(doc,event):
+    doc.docstatus=2
+    doc.make_gl_entries()
+    doc.docstatus=1
+    doc.make_gl_entries()
+    if doc.status == "Paid":
+        if frappe.get_all("Payment Entry Reference",filters={"reference_name": doc.name, "docstatus": ["<", 2]},fields=["parent"],limit=1):
+            for i in frappe.get_all("Payment Entry Reference",filters={"reference_name": doc.name, "docstatus": ["<", 2]},fields=["parent"],limit=1):
+                pay_doc=frappe.get_doc("Payment Entry",i)
+                pay_doc.docstatus=2
+                pay_doc.make_gl_entries()
+                pay_doc.docstatus=1
+                pay_doc.make_gl_entries()
+
+
