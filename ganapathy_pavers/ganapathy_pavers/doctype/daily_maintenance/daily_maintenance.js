@@ -57,6 +57,7 @@ frappe.ui.form.on('Daily Maintenance', {
 				cur_frm.set_value("compound_wall_item_stock", r.message[8])
 				cur_frm.set_value("size_details", r.message[9])
 				cur_frm.set_value("raw_material_details", r.message[10])
+				cur_frm.set_value("other_cw_items", r.message[11])
 			}
 		})
 	},

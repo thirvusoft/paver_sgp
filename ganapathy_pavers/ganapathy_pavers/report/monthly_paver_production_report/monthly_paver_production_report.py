@@ -199,24 +199,19 @@ def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, labour_exp=
 		machine="machine_12"
 	elif filters.get("machine", []):
 		machine="machine_3"
-	if filters.get("new_method"):
-		paver_type = filters.get('paver_type')
-		if paver_type and not frappe.db.get_value("Paver Type", paver_type, "used_in_expense_splitup"):
-			paver_type = ""
-			
-		exp_tree=expense_tree(
-							from_date=filters.get('from_date'),
-							to_date=filters.get('to_date'),
-							prod_details=paver_type or "Paver",
-							expense_type="Manufacturing",
-							machine = filters.get("machine", []) or [],
-							vehicle_summary = filters.get("vehicle_summary")
-							)
-	else:
-		exp=frappe.get_single("Expense Accounts")
-		if not exp.paver_group:
-			return [], 0, 0
-		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.paver_group, machine=machine )
+
+	paver_type = filters.get('paver_type')
+	if paver_type and not frappe.db.get_value("Paver Type", paver_type, "used_in_expense_splitup"):
+		paver_type = ""
+		
+	exp_tree=expense_tree(
+						from_date=filters.get('from_date'),
+						to_date=filters.get('to_date'),
+						prod_details=paver_type or "Paver",
+						expense_type="Manufacturing",
+						machine = filters.get("machine", []) or [],
+						vehicle_summary = filters.get("vehicle_summary")
+						)
 	
 	exp_tree.append(labour_exp)
 	res=[]

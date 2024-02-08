@@ -87,6 +87,9 @@ frappe.query_reports["Job Worker - Report"] = {
 		if (data && (data.status == "Total" || data.job_worker == "Total" || data.bold)) {
 			value = `<b style="font-size: 117%;${(column.fieldname=="job_worker" && data.job_worker!="Total")?'font-weight:bold;font-size: 20px;text-align: center; color:green':''}">${value}</b>`;
 		}
+		if (data.status == 'DETAILS') {
+			value = `<b style="font-size: 117%;${(column.fieldname=="job_worker")?'font-weight:bold;font-size: 20px;text-align: center; color:green':'display:none'}">${value}</b>`;
+		}
 		return value;
 	},
 };

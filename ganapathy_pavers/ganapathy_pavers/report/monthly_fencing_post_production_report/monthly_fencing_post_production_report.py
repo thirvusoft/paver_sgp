@@ -5,4 +5,4 @@ from frappe import _
 from ganapathy_pavers.ganapathy_pavers.report.monthly_compound_wall_production_report.monthly_compound_wall_production_report import execute as compound_wall_report
 
 def execute(filters=None):
-	return compound_wall_report(filters, ["Fencing Post"], "fp_group", "fp")
+	return compound_wall_report(filters, ["Fencing Post"], "fencing_post")

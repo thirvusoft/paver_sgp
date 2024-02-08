@@ -7,17 +7,18 @@ from ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenan
 
 def execute(filters=None):
     columns, data = [], [{}]
-    columns = get_columns()
-    data = get_purchase_fuel_data(filters)
-    data += get_data(filters)
-    return columns, data
 
-def get_purchase_fuel_data(filters):
-    conditions = ""
     location_wise_warehouse = {}
     for location in frappe.get_all('Location', ['name', 'warehouse']):
         location_wise_warehouse[location.name] = get_warehouse_with_children(location.warehouse)
 
+    columns = get_columns()
+    data = get_purchase_fuel_data(filters, location_wise_warehouse)
+    data += get_data(filters, location_wise_warehouse)
+    return columns, data
+
+def get_purchase_fuel_data(filters, location_wise_warehouse):
+    conditions = ""
     if filters.get("unit"):
         conditions += f'''
             and ifnull(poi.warehouse, '') in ({', '.join([f"'{i}'" for i in location_wise_warehouse.get(filters.get('unit')) or ['']])})
@@ -50,9 +51,9 @@ def get_purchase_fuel_data(filters):
     data = frappe.db.sql(query, as_dict=True)
     res = {}
     for row in data:
-        row["vehicle_unit"] = " "
+        row["vehicle_unit"] = row.get('warehouse')
         for loc in location_wise_warehouse:
-            if row.get('warehouse') in location_wise_warehouse[loc]:
+            if row.get('warehouse') in location_wise_warehouse.get(loc) or []:
                 row["vehicle_unit"] = loc
                 break
         
@@ -60,7 +61,7 @@ def get_purchase_fuel_data(filters):
         if key not in res:
             row['opening'] = get_stock_qty(
                     item_code=row.item_code, 
-                    warehouse=location_wise_warehouse.get(row['vehicle_unit']), 
+                    warehouse=location_wise_warehouse.get(row['vehicle_unit']) or [loc], 
                     date= frappe.utils.add_days(filters.get('from_date'), -1),
                     time= "23:59:59",
                     uom_conv=False
@@ -86,7 +87,7 @@ def get_purchase_fuel_data(filters):
                     'vehicle_unit': loc,
                     'opening': get_stock_qty(
                                     item_code=item.item_code, 
-                                    warehouse=location_wise_warehouse[loc], 
+                                    warehouse=location_wise_warehouse.get(loc) or [loc], 
                                     date= frappe.utils.add_days(filters.get('from_date'), -1),
                                     time= "23:59:59",
                                     uom_conv=False
@@ -143,8 +144,13 @@ def get_columns():
         ]
     return columns
 
-def get_data(filters, add_total = True):
-    vehicle_log = (get_stock_entry_data(filters) or [])
+def get_data(filters, location_wise_warehouse = {}, add_total = True):
+    if not location_wise_warehouse:
+        location_wise_warehouse = {}
+        for location in frappe.get_all('Location', ['name', 'warehouse']):
+            location_wise_warehouse[location.name] = get_warehouse_with_children(location.warehouse)
+            
+    vehicle_log = (get_stock_entry_data(filters, location_wise_warehouse) or [])
     filters_2={}
     fuel=filters.get('fuel_type')
 
@@ -185,9 +191,10 @@ def get_data(filters, add_total = True):
 
     return ([{'license_plate': "FUEL USED", "bold": 1,"vehicle_unit":" "}] + vehicle_log) if vehicle_log else []
 
-def get_stock_entry_data(filters):
+def get_stock_entry_data(filters, location_wise_warehouse):
     if not filters.get("from_barrel", 0):
         return []
+    
     conditions = ""
     if (filters.get("fuel_type")):
         conditions += f'''and
@@ -197,11 +204,17 @@ def get_stock_entry_data(filters):
         FROM `tabFuel Item Map` f
         WHERE f.fuel_type='{filters.get("fuel_type")}'
         )'''
+
     if filters.get('from_date') and filters.get("to_date"):
         conditions += f'''
             and se.posting_date between '{filters.get("from_date")}' and '{filters.get("to_date")}'
         '''
-   
+
+    if filters.get("unit"):
+        conditions += f'''
+            and ifnull(sed.s_warehouse, '') in ({', '.join([f"'{i}'" for i in location_wise_warehouse.get(filters.get('unit')) or ['']])})
+        '''
+
     res=[]
     query=f"""
     SELECT 

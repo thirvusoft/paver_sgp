@@ -32,6 +32,7 @@ def site_work_details_from_pi(self, event=None):
                 "tax_rate": tax_rate,
                 "tax_amount": row.amount * tax_rate / 100,
                 "purchase_invoice": self.name,
+                "customer_scope": 1 if self.is_customer_scope_expense == 'Yes' else 0
             })
     
     if event == "on_cancel":
@@ -64,6 +65,7 @@ def site_work_details_from_pi(self, event=None):
                         "tax_rate": field_data["tax_rate"],
                         "tax_amount": field_data["tax_amount"],
                         "purchase_invoice": field_data["purchase_invoice"],
+                        "is_customer_scope_expense": self.is_customer_scope_expense,
                     })
                 elif field == "Raw Material":
                     sw_doc.append(frappe.scrub(field), field_data)
@@ -123,5 +125,28 @@ def create_service_logs(docnames=[]):
             create_service_vehicle_log(frappe.get_doc("Purchase Invoice", pi_doc["name"]))
             success+=1
     
-    print(success)
     return success
+
+def calculate_tax(doc, event=None):
+    tax_amount = {}
+    for row in doc.taxes:
+        if row.item_wise_tax_detail:
+            try:
+                data = json.loads(row.item_wise_tax_detail)
+                for item in data:
+                    try:
+                        if data[item][0]:
+                            tax_amount[item] = (tax_amount.get(item) or 0) + (data[item][1] or 0)
+                    except:
+                        frappe.log_error(title = f"{doc.name} ITEM WISE TAX", message=frappe.get_traceback())
+            except:
+                frappe.log_error(title = f"{doc.name} ITEM WISE TAX", message=frappe.get_traceback())
+    
+    item_wise_amount = {}
+    for row in doc.items:
+        item_wise_amount[row.item_code] = (item_wise_amount.get(row.item_code) or 0) + (row.amount or 0)
+
+    for row in doc.items:
+        tax_rate = (tax_amount.get(row.item_code) or 0)*100/(item_wise_amount.get(row.item_code) or 0) if (item_wise_amount.get(row.item_code) or 0) else 0
+        frappe.db.set_value(row.doctype, row.name, "tax_rate", tax_rate, update_modified=False)
+        frappe.db.set_value(row.doctype, row.name, "tax_amount", tax_rate * (row.amount or 0) / 100, update_modified=False)

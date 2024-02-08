@@ -94,13 +94,13 @@ after_install = ["ganapathy_pavers.custom.py.item_group.item_group",
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
+permission_query_conditions = {
+	"Stock Entry Type": "ganapathy_pavers.custom.py.user_permission.stock_entry_type_permission",
+}
 #
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+has_permission = {
+	"Stock Entry Type": "ganapathy_pavers.custom.py.user_permission.has_stock_entry_type_permission",
+}
 
 # DocType Class
 # ---------------
@@ -133,6 +133,7 @@ jenv = {
 		"color_table1:ganapathy_pavers.utils.py.daily_maintenance.colour_details",
 		"color_table2:ganapathy_pavers.utils.py.daily_maintenance.colour_details_sb",
 		"bundle_sum:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.print_format",
+		"delivery_slip_print_format:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.delivery_slip_print_format",
 		"get_daily_maintenance_html:ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.daily_maintenance_print_format",
 		"get_raw_materials_for_print:ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.get_raw_materials_for_print",
 		"check_only_rm:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.check_only_rm",
@@ -142,7 +143,9 @@ jenv = {
 		"get_site_sales_order_item_prices:ganapathy_pavers.utils.py.sitework_printformat.get_site_sales_order_item_prices",
 		"get_site_supply_and_return_trip_details:ganapathy_pavers.utils.py.sitework_printformat.get_site_supply_and_return_trip_details",
 		"get_item_wise_so_rate:ganapathy_pavers.utils.py.sitework_printformat.get_item_wise_so_rate",
-		"group_dn_items:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.group_dn_items"
+		"get_item_wise_completion_rate:ganapathy_pavers.utils.py.sitework_printformat.get_item_wise_completion_rate",
+		"group_dn_items:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.group_dn_items",
+		"group_other_cw_items:ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.group_other_cw_items",
 	]
 }
 
@@ -307,6 +310,7 @@ doc_events = {
 	"Sales Invoice":{
     	"before_validate":"ganapathy_pavers.custom.py.sales_invoice.update_customer",
 		"validate":[
+			"ganapathy_pavers.custom.py.sales_invoice.validate_stock_qty",
 			"ganapathy_pavers.custom.py.sales_invoice.einvoice_validation",
 			"ganapathy_pavers.custom.py.tax_validation.tax_validation"
 			],
@@ -350,6 +354,10 @@ doc_events = {
     		"ganapathy_pavers.custom.py.purchase_invoice_dashboard.tags_msg",
 		    "ganapathy_pavers.custom.py.purchase_invoice.site_work_details_from_pi",
 			"ganapathy_pavers.custom.py.purchase_invoice.create_service_vehicle_log",
+			"ganapathy_pavers.custom.py.purchase_invoice.calculate_tax"
+		],
+		"on_update_after_submit": [
+			"ganapathy_pavers.custom.py.purchase_invoice.calculate_tax"
 		],
 		"on_cancel": [
 			"ganapathy_pavers.custom.py.purchase_invoice.site_work_details_from_pi",
@@ -405,7 +413,9 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
 			  "ganapathy_pavers.utils.py.purchase_invoice.batch_property_setter",
 			  "ganapathy_pavers.utils.py.payment_entry.payment_entry_property_setter",
 			  "ganapathy_pavers.utils.py.salary_slip.remove_branch_read_only",
-			  "ganapathy_pavers.custom.py.delivery_note.other_vehicle_link"
+			  "ganapathy_pavers.custom.py.delivery_note.other_vehicle_link",
+			  "ganapathy_pavers.custom.py.permissions.create_permissions",
+			  "ganapathy_pavers.ganapathy_pavers.doctype.compound_wall_type.compound_wall_type.cw_types",
 			  ]
 
 

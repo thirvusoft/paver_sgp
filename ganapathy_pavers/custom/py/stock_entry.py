@@ -397,7 +397,7 @@ def add_additional_cost(self,event):
             "qty": total_qty,
             "nos":total_qty,
             "amount": self.total_outgoing_value,
-            "stock_entry":self.name
-            
+            "stock_entry":self.name,
+            "is_customer_scope_expense": self.is_customer_scope_expense
         })
         sw_doc.save()

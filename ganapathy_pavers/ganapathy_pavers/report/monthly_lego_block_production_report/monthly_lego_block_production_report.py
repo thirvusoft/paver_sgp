@@ -5,5 +5,5 @@ from frappe import _
 from ganapathy_pavers.ganapathy_pavers.report.monthly_compound_wall_production_report.monthly_compound_wall_production_report import execute as compound_wall_report
 
 def execute(filters=None):
-	return compound_wall_report(filters, ["Lego Block"], "lg_group", "lego")
+	return compound_wall_report(filters, ["Lego Block"], "lego_block")
 	

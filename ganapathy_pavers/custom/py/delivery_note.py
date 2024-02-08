@@ -230,4 +230,21 @@ def sales_order_required(self,event):
 def other_vehicle_link():
     make_property_setter("Delivery Note", "vehicle_no", "fieldtype", "Link", "Select", validate_fields_for_doctype=False)
     make_property_setter("Delivery Note", "vehicle_no", "options", "Other Vehicle", "Small Text")
- 
+
+@frappe.whitelist()
+def update_customer_in_delivery_note(delivery_note, customer):
+    if frappe.db.get_value('Delivery Note', delivery_note, 'per_billed'):
+        frappe.throw(f"Couldn't update customer for billed delivery note {delivery_note}")
+    
+    customer_name = frappe.db.get_value('Customer', customer, 'customer_name')
+    dn = frappe.get_doc('Delivery Note', delivery_note)
+
+    if not frappe.db.get_value('Project', dn.site_work, 'is_multi_customer'):
+        frappe.throw(f'{dn.site_work} is not a multi customer site')
+
+    dn.update({
+        'customer': customer,
+        'customer_name': customer_name
+    })
+    dn.flags.ignore_validate_update_after_submit = True
+    dn.save()

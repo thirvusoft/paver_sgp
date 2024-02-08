@@ -8,7 +8,12 @@ from ganapathy_pavers import uom_conversion
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
 from ganapathy_pavers.custom.py.expense import  expense_tree
 
-def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw"):
+def execute(filters=None, _type=["Post", "Slab"], prod="compound_wall"):
+	if filters.get("compound_wall_type"):
+		_type = {
+			"compound_wall": ["Post", "Slab"]
+		}.get(frappe.scrub(filters.get("compound_wall_type"))) or [filters.get("compound_wall_type")]
+		prod = frappe.scrub(filters.get("compound_wall_type"))
 	rm_uoms = frappe.db.get_all("Item Group UOM", {'parenttype': 'Item Group', 'parent': 'Raw Material'}, pluck='uom')
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
@@ -134,7 +139,7 @@ def execute(filters=None, _type=["Post", "Slab"], exp_group="cw_group", prod="cw
 					}
 				]
 			}
-			exp, total_sqf, total_amt=get_expense_data(prod_details.get(prod),filters, (production_qty[0]['production_sqft']), total_sqf, total_amt, exp_group, prod, labour_exp)
+			exp, total_sqf, total_amt=get_expense_data(prod_details.get(prod),filters, (production_qty[0]['production_sqft']), total_sqf, total_amt, prod, labour_exp)
 			if exp:
 				data.append({
 					"material":"<b style='background: rgb(242 140 140 / 81%)'>Expense Details</b>"
@@ -213,22 +218,15 @@ def get_columns(rm_uoms):
 	return columns
 
 
-def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, exp_group, prod='cw', labour_exp=[]):
-	if filters.get("new_method"):
-		exp={'cw': "compound_wall", "lego": "lego_block", "fp": "fencing_post"}.get(prod)
-		exp_tree=exp_tree=expense_tree(
-							from_date=filters.get('from_date'),
-							to_date=filters.get('to_date'),
-							prod_details=exp,
-							expense_type="Manufacturing",
-							vehicle_summary = filters.get("vehicle_summary")
-							)
-	else:
-		exp=frappe.get_single("Expense Accounts")
-		if not exp.get(exp_group):
-			return [], 0, 0
-		exp_tree=exp.tree_node(from_date=filters.get('from_date'), to_date=filters.get('to_date'), parent=exp.get(exp_group))
-
+def get_expense_data(prod_sqft, filters, sqft, total_sqf, total_amt, prod='compound_wall', labour_exp=[]):
+	exp_tree=exp_tree=expense_tree(
+						from_date=filters.get('from_date'),
+						to_date=filters.get('to_date'),
+						prod_details=prod,
+						expense_type="Manufacturing",
+						vehicle_summary = filters.get("vehicle_summary")
+						)
+	
 	exp_tree.append(labour_exp)
 	res=[]
 	for i in exp_tree:

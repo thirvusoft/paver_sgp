@@ -189,11 +189,14 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	
 
 	#compound_wall_items
+	compound_wall_items = []
+	
 	compound_item=frappe.db.get_all("Item", filters={'disabled': 0, 'item_group':"Compound Walls","compound_wall_type":["!=", "Slab"],'item_name':['like',"%FEET%"]},pluck='name',order_by='name')
 	post_item={}
 	if compound_item:
 		# for i in compound_item:
 			ci_wo= frappe.db.get_all("Item", filters=[['disabled', '=', 0],['item_name','like','%WITHOUT%'],['item_name','not like','%CORNER%'],['item_name','not like','%FENCING%'],['name','in',compound_item],['disabled','=',0]])
+			compound_wall_items+=ci_wo
 			if ci_wo:
 				for j in ci_wo:
 					post=j['name'].split('FEET')[0]+ 'FEET'
@@ -207,7 +210,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 					else:
 						post_item[post + "Normal"]={'wo_bolt':get_stock_qty(j.name, warehouse, date, time) or 0, 'post_length':post, 'type':'Normal'}
 			ci_w= frappe.db.get_all("Item", filters=[['item_name','not like','%WITHOUT%'], ['item_name','not like','%CORNER%'],['item_name','not like','%FENCING%'], ['name','in',compound_item],['disabled', '=', 0]],order_by='item_name')
-			
+			compound_wall_items+=ci_w
 			if ci_w:
 				for j in ci_w:
 					post=j['name'].split('FEET')[0]+ 'FEET'
@@ -223,6 +226,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 						post_item[post + "Normal"]={'with_bolt':get_stock_qty(j.name, warehouse, date, time) or 0, 'post_length':post, 'type':'Normal'}
 			
 			ci_wo_cp= frappe.db.get_all("Item", filters=[['item_name','like','%CORNER%'],['item_name','like','%WITHOUT%'],['item_name','not like','%FENCING%'], ['name', 'in',compound_item],['disabled', '=',0]])
+			compound_wall_items+=ci_wo_cp
 			if ci_wo_cp:
 				for j in ci_wo_cp:
 					post=j['name'].split('FEET')[0]+ 'FEET'
@@ -237,6 +241,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 			
    
 			ci_w_cp= frappe.db.get_all("Item", filters=[['item_name','not like','%FENCING%'],['item_name','like','%CORNER%'],['item_name','not like','%WITHOUT%'], ['name', 'in',compound_item],['disabled', '=',0]])
+			compound_wall_items+=ci_w_cp
 			if ci_w_cp:
 				template={'post_length':ci_w_cp,'type':'Normal'}
 				for j in ci_w_cp:
@@ -251,6 +256,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 						post_item[post + "Normal"]={'pc_with_bolt':get_stock_qty(j.name, warehouse, date, time) or 0, 'post_length':post, 'type': 'Normal'}
       
 			ci_fencing_wo= frappe.db.get_all("Item", filters=[['item_name','like','%FENCING%'],['item_name','like','%WITHOUT%'], ['name', 'in',compound_item],['disabled', '=',0]])
+			compound_wall_items+=ci_fencing_wo
 			if ci_fencing_wo:
 				for j in ci_fencing_wo:
 					post=j['name'].split('FEET')[0]+ 'FEET'
@@ -264,6 +270,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 						post_item[post + "FENCING"]={'wo_bolt':get_stock_qty(j.name, warehouse, date, time) or 0, 'post_length':post, 'type':"Fencing"}
    
 			ci_fencing_with= frappe.db.get_all("Item", filters=[['item_name','like','%FENCING%'],['item_name','not like','%WITHOUT%'], ['name', 'in',compound_item],['disabled', '=',0]])
+			compound_wall_items+=ci_fencing_with
 			if ci_fencing_with:
 				for j in ci_fencing_with:
 					post=j['name'].split('FEET')[0]+ 'FEET'
@@ -311,21 +318,30 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 		elif 'dolamite' in frappe.scrub(item['colour']):
 			item['sqft']=round(uom_conversion(item = item["colour"], from_qty=item['stock'], to_uom="SQF"))
 			item['no_of_days']=round(item["sqft"]/3000)
+	
 	# slab type item
 	slab_item=frappe.db.get_all("Item", filters={'item_group':'Compound Walls', 'compound_wall_type':'Slab', 'disabled':0}, pluck='name')
 	
 	slab_details=[]
-	
+	compound_wall_items+=slab_item
 	for i in slab_item:
 		slab_stock=get_stock_qty(i, warehouse, date, time)
 		slab={'item':i,'stock':slab_stock}
 		slab_details.append(slab)
 	if frappe.db.exists("Item", "POST CAP"):
+		compound_wall_items.append("POST CAP")
 		post_cap=frappe.db.get_value("Item", 'POST CAP', 'name')
 		post_=get_stock_qty('POST CAP', warehouse, date, time)
 		post={'item':post_cap, 'stock':post_}
 		slab_details.append(post)
- 
+
+	# other cw items
+	compound_wall_items = list(set([i['name'] if isinstance(i, dict) else i for i in compound_wall_items]))
+	
+	other_cw_items = frappe.get_all("Item", {"item_group": "Compound Walls", 'disabled': 0, 'name': ["not in", compound_wall_items], 'is_stock_item': 1}, ["name as item", "compound_wall_type as type"])
+	for i in other_cw_items:
+		i.stock=get_stock_qty(i.item, warehouse, date, time)
+
 	#pavers size details 
 	paver_item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1, 'disabled': 0},pluck='name',order_by="name")
 
@@ -343,7 +359,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	raw_material_stock=raw_material_stock_details(date= date, time=time)
 	total_stock_shot= sorted(list(total_stock_shot.values()), key=lambda x: x.get("colour", ""))
 	total_stock=sorted(list(total_stock.values()), key=lambda x: x.get("colour", ""))
-	return items_stock, total_stock, items_stock_shot, total_stock_shot, list(sqf.values()), production,  sorted(list(post_item.values()), key=lambda x: x.get("post_length", "") or ""), colour_details, sorted(slab_details, key=lambda x: x.get("item", "") or ""), normal_total_stock, raw_material_stock
+	return items_stock, total_stock, items_stock_shot, total_stock_shot, list(sqf.values()), production,  sorted(list(post_item.values()), key=lambda x: x.get("post_length", "") or ""), colour_details, sorted(slab_details, key=lambda x: x.get("item", "") or ""), normal_total_stock, raw_material_stock, sorted(other_cw_items, key=lambda x: ((x.get('type') or ''), (x.get('name'))))
 
 def size_details(items, _type):
 	fields=[]
@@ -410,3 +426,13 @@ def get_stock_details_from_warehosue(warehouse, machine="", prefix="", date= "",
 			})
 
 	return stock
+
+def group_other_cw_items(items):
+	res = {}
+	for row in items:
+		if (row.type or '') not in res:
+			res[(row.type or '')] = []
+		
+		res[(row.type or '')].append(row)
+	
+	return res

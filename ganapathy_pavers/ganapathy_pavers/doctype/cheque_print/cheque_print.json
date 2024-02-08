@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "CHQ.-.{date}.-.###",
+ "autoname": "CHQ-.###",
  "creation": "2023-10-17 10:37:01.762180",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -102,7 +102,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-18 11:38:19.878175",
+ "modified": "2023-10-20 11:24:31.013350",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Cheque Print",

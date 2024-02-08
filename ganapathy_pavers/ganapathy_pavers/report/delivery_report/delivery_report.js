@@ -72,16 +72,26 @@ frappe.query_reports["Delivery Report"] = {
 			"fieldtype": "MultiSelectList",
 			"options": "\nOpen\nCompleted\nTo Bill\nBilled\nCancelled\nStock Pending at Site\nRework",
 			"default": "Billed",
-			"get_data": function () {
-				return [
-					{value: "Open", description: ''},
-					{value: "Completed", description: ''},
-					{value: "To Bill", description: ''},
-					{value: "Billed", description: ''},
-					{value: "Cancelled", description: ''},
-					{value: "Stock Pending at Site", description: ''},
-					{value: "Rework", description: ''},
-				]
+			get_data: async function() {
+				let res = [];
+				await frappe.model.with_doctype('Project', () => {
+					frappe.get_meta('Project').fields.every(row => {
+						if (row.fieldname == 'status') {
+							row.options.split('\n').forEach(opt => {
+								if (opt) {
+									res.push({
+										value: opt,
+										description: opt
+									});
+								}
+							});
+							return false
+						}
+						return true
+					});
+				});
+
+				return res
 			}
 		},
 		{
