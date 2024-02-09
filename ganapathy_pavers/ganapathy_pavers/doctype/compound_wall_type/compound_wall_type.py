@@ -46,3 +46,10 @@ def cw_types():
 		"value": cw_options
 	})
 	doc.save()
+
+def get_paver_and_compound_wall_types():
+	cw = [frappe.scrub(i) for i in frappe.db.get_all("Compound Wall Type", {'used_in_expense_splitup': 1}, pluck="name")]
+	paver = [frappe.scrub(i) for i in frappe.db.get_all("Paver Type", {'used_in_expense_splitup': 1}, pluck="name")]
+	fields = list(set(paver + cw + ["paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block"]))
+	return fields
+

@@ -179,7 +179,10 @@ doc_events = {
         "validate" : [
     			"ganapathy_pavers.custom.py.stock_entry.basic_rate_validation",
 				"ganapathy_pavers.custom.py.stock_entry.expense_account",
-			]
+			],
+		"on_update_after_submit": [
+			"ganapathy_pavers.custom.py.stock_entry.repost_stock_entry"
+		]
 		
 	},
 	"Payment Entry":{
@@ -276,7 +279,10 @@ doc_events = {
 		"before_cancel": "ganapathy_pavers.custom.py.purchase_order.update_drop_ship_items_in_sw",
 	},
 	"Vehicle Log":{
-		"on_update_after_submit": "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
+		"on_update_after_submit": [
+            "ganapathy_pavers.custom.py.vehicle_log.onsubmit",
+			"ganapathy_pavers.custom.py.vehicle_log.update_expense_details"
+		],
 		"on_submit": [
 						"ganapathy_pavers.custom.py.site_transport_cost.update_transport_cost_of_all_sites",
 						"ganapathy_pavers.custom.py.vehicle_log.onsubmit",
@@ -377,7 +383,8 @@ doc_events = {
 		],
 		"on_update_after_submit": [
 			"ganapathy_pavers.custom.py.sales_invoice.update_sales_type",
-			"ganapathy_pavers.custom.py.journal_entry.validate_delivery_note"
+			"ganapathy_pavers.custom.py.journal_entry.validate_delivery_note",
+			"ganapathy_pavers.custom.py.journal_entry.repost_journal_entry"
 		]
 	},
 	"Attendance": {

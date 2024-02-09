@@ -12,6 +12,7 @@ from frappe import _
 from frappe.utils.data import cint, flt
 from six import iteritems
 from ganapathy_pavers import uom_conversion
+from ganapathy_pavers.ganapathy_pavers.doctype.compound_wall_type.compound_wall_type import get_paver_and_compound_wall_types
 
 def update_asset(self, event):
     fg_completed_qty=0
@@ -77,6 +78,7 @@ class _StockController(StockController):
         gl_list = []
         warehouse_with_no_account = []
         precision = self.get_debit_field_precision()
+        paver_cw_fields = get_paver_and_compound_wall_types()
         for item_row in voucher_details:
 
             sle_list = sle_map.get(item_row.name)
@@ -98,14 +100,13 @@ class _StockController(StockController):
                             "internal_fuel_consumption": self.get("internal_fuel_consumption"), # Customization
                             "vehicle": item_row.get("vehicle"), # Customization
                             "expense_type": item_row.get("expense_type"), # Customization
-                            "paver": item_row.get("paver"), # Customization
-                            "is_shot_blast": item_row.get("is_shot_blast"), # Customization
-                            "compound_wall": item_row.get("compound_wall"), # Customization
-                            "fencing_post": item_row.get("fencing_post"), # Customization
-                            "lego_block": item_row.get("lego_block"), # Customization
                             "from_date": item_row.get("from_date"), # Customization
                             "to_date": item_row.get("to_date"), # Customization
                             "split_equally": item_row.get("split_equally"), # Customization
+                            **{
+                                f: item_row.get(f)
+                                for f in paver_cw_fields
+                            }, # Customization
                             "account": warehouse_account[sle.warehouse]["account"],
                             "against": expense_account,
                             "cost_center": item_row.cost_center,
@@ -119,14 +120,13 @@ class _StockController(StockController):
                             "internal_fuel_consumption": self.get("internal_fuel_consumption"), # Customization
                             "vehicle": item_row.get("vehicle"), # Customization
                             "expense_type": item_row.get("expense_type"), # Customization
-                            "paver": item_row.get("paver"), # Customization
-                            "is_shot_blast": item_row.get("is_shot_blast"), # Customization
-                            "compound_wall": item_row.get("compound_wall"), # Customization
-                            "fencing_post": item_row.get("fencing_post"), # Customization
-                            "lego_block": item_row.get("lego_block"), # Customization
                             "from_date": item_row.get("from_date"), # Customization
                             "to_date": item_row.get("to_date"), # Customization
                             "split_equally": item_row.get("split_equally"), # Customization
+                            **{
+                                f: item_row.get(f)
+                                for f in paver_cw_fields
+                            }, # Customization
                             "account": expense_account,
                             "against": warehouse_account[sle.warehouse]["account"],
                             "cost_center": item_row.cost_center,
@@ -182,10 +182,11 @@ def process_gl_map(gl_map, merge_entries=True, precision=None):
 def merge_similar_entries(gl_map, precision=None):
     merged_gl_map = []
     accounting_dimensions = get_accounting_dimensions()
+    paver_cw_fields = get_paver_and_compound_wall_types()
     for entry in gl_map:
         # if there is already an entry in this account then just add it
         # to that entry
-        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block", "from_date", "to_date", "split_equally"] + get_workstations())
+        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + paver_cw_fields + ["vehicle", "expense_type", "from_date", "to_date", "split_equally"] + get_workstations())
         if same_head:
             same_head.debit	= flt(same_head.debit) + flt(entry.debit)
             same_head.debit_in_account_currency	= \
@@ -401,3 +402,11 @@ def add_additional_cost(self,event):
             "is_customer_scope_expense": self.is_customer_scope_expense
         })
         sw_doc.save()
+
+def repost_stock_entry(doc, event=None):
+    if doc.docstatus == 1:
+        doc.docstatus = 2
+        doc.make_gl_entries()
+
+        doc.docstatus = 1
+        doc.make_gl_entries()

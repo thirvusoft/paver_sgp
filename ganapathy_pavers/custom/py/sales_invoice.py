@@ -60,5 +60,10 @@ def get_einvoice_no(name="", irn=""):
     return res.get("result", {}).get("EwbNo")
 
 def update_sales_type(doc, event=None):
+    if doc.doctype == 'Sales Invoice':
+        doc.db_set("project", doc.site_work)
+    doc.reload()
     for gl in frappe.get_all("GL Entry", {"voucher_type": doc.doctype, "voucher_no": doc.name}):
         frappe.db.set_value("GL Entry", gl.name, "type", doc.type)
+        if doc.doctype == 'Sales Invoice':
+            frappe.db.set_value("GL Entry", gl.name, "project", doc.project)

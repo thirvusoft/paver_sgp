@@ -5,10 +5,12 @@ from frappe import _
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import get_accounting_dimensions
 from erpnext.accounts.doctype.journal_entry.journal_entry import JournalEntry
 from erpnext.accounts.general_ledger import check_if_in_list, make_reverse_gl_entries, save_entries, update_net_values, validate_accounting_period
+from ganapathy_pavers.ganapathy_pavers.doctype.compound_wall_type.compound_wall_type import get_paver_and_compound_wall_types
 
 class _JournalEntry(JournalEntry):
     def make_gl_entries(self, cancel=0, adv_adj=0):
         gl_map = []
+        paver_cw_fields = get_paver_and_compound_wall_types()
         for d in self.get("accounts"):
             if d.debit or d.credit:
                 r = [d.user_remark, self.remark]
@@ -18,14 +20,13 @@ class _JournalEntry(JournalEntry):
                         "account": d.account,
                         "vehicle": d.vehicle, # Customization
                         "expense_type": d.expense_type, # Customization
-                        "paver": d.paver, # Customization
-                        "is_shot_blast": d.is_shot_blast, # Customization
-                        "compound_wall": d.compound_wall, # Customization
-                        "fencing_post": d.fencing_post, # Customization
-                        "lego_block": d.lego_block, # Customization
                         "from_date": d.from_date, # Customization
                         "to_date": d.to_date, # Customization
                         "split_equally": d.split_equally, # Customization
+                        **{
+                            f: d.get(f)
+                            for f in paver_cw_fields
+                        }, # Customization
                         "party_type": d.party_type,
                         "due_date": self.due_date,
                         "party": d.party,
@@ -110,10 +111,11 @@ def get_workstations():
 def merge_similar_entries(gl_map, precision=None):
     merged_gl_map = []
     accounting_dimensions = get_accounting_dimensions()
+    paver_cw_fields = get_paver_and_compound_wall_types()
     for entry in gl_map:
         # if there is already an entry in this account then just add it
         # to that entry
-        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block", "from_date", "to_date", "split_equally"] + get_workstations()) # Customization
+        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + paver_cw_fields + ["vehicle", "expense_type", "from_date", "to_date", "split_equally"] + get_workstations()) # Customization
         if same_head:
             same_head.debit	= flt(same_head.debit) + flt(entry.debit)
             same_head.debit_in_account_currency	= \

@@ -192,3 +192,11 @@ def site_work_additional_cost(self, event = None):
                 "is_customer_scope_expense": self.is_customer_scope_expense
             })
     sw_doc.save()    
+
+def repost_journal_entry(doc, event=None):
+    if doc.docstatus == 1:
+        doc.docstatus = 2
+        doc.make_gl_entries(1)
+
+        doc.docstatus = 1
+        doc.make_gl_entries()

@@ -2,6 +2,7 @@ from ganapathy_pavers.custom.py.journal_entry_override import get_workstations
 import frappe
 import erpnext
 from frappe.utils import date_diff
+from ganapathy_pavers.ganapathy_pavers.doctype.compound_wall_type.compound_wall_type import get_paver_and_compound_wall_types
 
 def onsubmit(doc, event):
     updateservice(doc)
@@ -309,14 +310,14 @@ def get_supplier_credit_acc(supplier, company):
 
 def update_vehicle_jea_exp(self, exp):
     for row in exp:
+        paver_cw_fields = get_paver_and_compound_wall_types()
         row.update({
             "expense_type": self.expense_type,
-            "paver": self.paver,
             "split_equally": self.split_equally,
-            "is_shot_blast": self.is_shot_blast,
-            "compound_wall": self.compound_wall,
-            "lego_block": self.lego_block,
-            "fencing_post": self.fencing_post,
+            **{
+                f: self.get(f)
+                for f in paver_cw_fields
+            }
         })
         if self.get("license_plate"):
             row.update({
@@ -547,3 +548,16 @@ def adblue_stock_entry(self, event=None):
     doc.save()
     doc.submit()
     frappe.msgprint(f"""Adblue <b>Stock Entry <a href="/app/stock-entry/{doc.name}">{doc.name}</a></b> Created for <a href="/app/vehicle-log/{self.name}"><b>{self.name}</b></a>""")
+
+def update_expense_details(doc, event):
+    je = frappe.db.get_all("Journal Entry", {"docstatus": 1, "vehicle_log": doc.name})
+    se = frappe.db.get_all("Stock Entry", {"docstatus": 1, "vehicle_log": doc.name})
+    for j in je:
+        journal_entry = frappe.get_doc("Journal Entry", j.name)
+        update_vehicle_jea_exp(doc, journal_entry.accounts)
+        journal_entry.save()
+    
+    for s in se:
+        stock_entry = frappe.get_doc("Stock Entry", s.name)
+        update_vehicle_jea_exp(doc, stock_entry.items)
+        stock_entry.save()
