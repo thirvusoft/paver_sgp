@@ -84,3 +84,39 @@ def selling_settings():
         ]
     }
     create_custom_fields(custom_fields)
+
+def create_types():
+    from frappe.model.delete_doc import delete_doc
+    __types = frappe.db.get_all("Paver Type", pluck="name") + frappe.db.get_all("Compound Wall Type", pluck="name")
+    types = ['Internal']
+
+    name = {'Paver': 'Pavers'}
+
+    for i in __types:
+        types.append((name.get(i) or i))
+    
+    for _type in types:
+        if not frappe.db.exists("Types", _type):
+            d = frappe.new_doc("Types")
+            d.update({
+                "type": _type
+            })
+            d.save()
+    
+    _types = frappe.db.get_all("Types", pluck="name")
+    not_deletable = []
+    deleted = []
+
+    for _type in _types:
+        if _type not in types:
+            try:
+                delete_doc("Types", _type, ignore_permissions=True)
+                deleted.append(_type)
+            except:
+                not_deletable.append(_type)
+
+    if deleted:
+        print("Deleted unused type", ", ".join(deleted))
+
+    if not_deletable:
+        print("Types to be deleted manually", ", ".join(not_deletable))

@@ -46,6 +46,7 @@ def make_custom_field(self, event=None, oldname=None, wrk_dt=wrk_doctypes, inser
                                 fieldtype="Check",
                                 insert_after=insert_after,
                                 depends_on="""eval:doc.expense_type=="Manufacturing" """,
+                                allow_on_submit=1,
                             ),]
                     }
                 create_custom_fields(custom_fields)

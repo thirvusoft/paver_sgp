@@ -9,7 +9,7 @@ frappe.ui.form.on("CW Manufacturing", {
     refresh: async function (frm) {
         if (frm.is_new()) {
             default_value(frm, "labour_cost_per_hrs", "labour_salary_per_hrs");
-            default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
+            // default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
             default_value(frm, "labour_cost_per_sqft", "labour_cost_per_sqft_curing");
             frm.trigger("get_bin_items");
         }
@@ -21,7 +21,7 @@ frappe.ui.form.on("CW Manufacturing", {
                 },
             };
         });
-        frm.set_query("bom", "item_details", function (frm, cdt, cdn) {
+        frm.set_query("bom", "item_details", function (frm1, cdt, cdn) {
             let data = locals[cdt][cdn];
             return {
                 filters: {
@@ -33,6 +33,7 @@ frappe.ui.form.on("CW Manufacturing", {
             return {
                 filters: {
                     compound_wall_type: frm.doc.type,
+                    compound_wall_sub_type: frm.doc.sub_type,
                     item_group: "Compound Walls",
                 },
             };
@@ -87,7 +88,7 @@ frappe.ui.form.on("CW Manufacturing", {
     },
     onload: function (frm) { },
     type: function (frm) {
-        default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
+        // default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
     },
     ts_before_save: function (frm) {
         frm.trigger("calculate_bin_qty")
@@ -606,18 +607,18 @@ function default_value(frm, usb_field, set_field) {
     frm.refresh_field(set_field);
 }
 
-async function default_value_from_table(frm, usb_field, type, set_field, default_value_to_set = 0) {
-    let table = (await frappe.db.get_doc("CW Settings"))[usb_field]
-    frm.set_value(set_field, default_value_to_set);
-    if (table) {
-        (table || []).forEach(row => {
-            if (row.type == type) {
-                frm.set_value(set_field, row.cost)
-            }
-        });
-    }
-    frm.refresh_field(set_field);
-}
+// async function default_value_from_table(frm, usb_field, type, set_field, default_value_to_set = 0) {
+//     let table = (await frappe.db.get_doc("CW Settings"))[usb_field]
+//     frm.set_value(set_field, default_value_to_set);
+//     if (table) {
+//         (table || []).forEach(row => {
+//             if (row.type == type) {
+//                 frm.set_value(set_field, row.cost)
+//             }
+//         });
+//     }
+//     frm.refresh_field(set_field);
+// }
 function total_amount(frm, cdt, cdn) {
     var d = locals[cdt][cdn];
     frappe.model.set_value(cdt, cdn, "amount", d.qty * d.rate);

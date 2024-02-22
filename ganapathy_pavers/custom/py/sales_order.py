@@ -55,6 +55,7 @@ def create_site(doc):
             compoun_walls=[{
                     'item':row['item_code'],
                     'compound_wall_type':row['compound_wall_type'],
+                    'compound_wall_sub_type':row['compound_wall_sub_type'],
                     'allocated_ft':row['qty'],
                     'uom': row['uom'],
                     'rate':row['rate'],
@@ -148,6 +149,7 @@ def update_site(doc, event):
             compoun_walls=[{
                     'item':row.item_code,
                     'compound_wall_type':row.compound_wall_type,
+                    'compound_wall_sub_type':row.compound_wall_sub_type,
                     'allocated_ft':row.qty,
                     'uom': row.uom,
                     'rate':row.rate,

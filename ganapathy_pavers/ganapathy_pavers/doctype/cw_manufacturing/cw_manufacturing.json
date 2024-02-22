@@ -10,6 +10,7 @@
   "amended_from",
   "molding_date",
   "type",
+  "sub_type",
   "column_break_3",
   "company",
   "status1",
@@ -528,11 +529,11 @@
   },
   {
    "fieldname": "type",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Type",
-   "options": "Post\nSlab\nFencing Post\nLego Block"
+   "options": "Compound Wall Type"
   },
   {
    "fieldname": "bin_items",
@@ -550,12 +551,20 @@
    "fieldname": "get_total_no_of_batches",
    "fieldtype": "Button",
    "label": "Get Total Batches"
+  },
+  {
+   "fieldname": "sub_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Sub Type",
+   "options": "Compound Wall Sub Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-05-10 17:13:41.905347",
+ "modified": "2024-02-22 17:50:46.237312",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",

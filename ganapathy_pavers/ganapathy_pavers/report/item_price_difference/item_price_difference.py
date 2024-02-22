@@ -9,6 +9,7 @@ from frappe.utils.data import nowdate
 from ganapathy_pavers.custom.py.expense import total_expense
 from ganapathy_pavers.utils.py.sitework_printformat import get_cw_monthly_cost
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
+from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost
 import frappe
 from frappe import _, scrub
 

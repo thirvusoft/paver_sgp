@@ -20,23 +20,21 @@ class CWManufacturing(Document):
             frappe.throw(f"Please change the status to {frappe.bold('Completed')} before submitting.")
 
     def validate(doc):
-        items={}
-        type1=[]
+        type1, type2 = [], []
         if(len(doc.item_details)>0):
             for row in doc.item_details:
                 if(row.get('item')):
                     cw_type = frappe.get_value("Item", row.get('item'), 'compound_wall_type')
+                    cw_sub_type = frappe.get_value("Item", row.get('item'), 'compound_wall_sub_type')
                     if(cw_type):
                         type1.append(cw_type)
-            if(len(list(set(type1))) != 1 or type1[0] != doc.type):
+                    if cw_sub_type:
+                        type2.append(cw_sub_type)
+            if type1 and (len(list(set(type1))) != 1 or type1[0] != doc.type):
                 frappe.throw(f'Please enter Item with Compound Wall Type as {frappe.bold(doc.type)}')
             
-
-            # for row in doc.item_details:
-            #     if(row.get('item')):
-            #         cw_type = frappe.get_value("Item", row.get('item'), 'compound_wall_type')
-            #         if(cw_type and cw_type=="Post" and not row.get("no_of_batches")):
-            #             frappe.throw(f"""Please enter <b>No of Batches</b> for an Item <b>{row.get('item')}</b>""")
+            if type2 and (len(list(set(type2))) != 1 or type2[0] != doc.sub_type):
+                frappe.throw(f'Please enter Item with Compound Wall Type as {frappe.bold(doc.type)}')
 
         doc.abstractcalc()
     
@@ -478,7 +476,7 @@ def get_working_hrs(attendance_date, machine):
 @frappe.whitelist()
 def add_item(doc, batches = 1):
     items={}
-    type1=[]
+    type1, type2 = [], []
     doc=json.loads(doc)
     item_table_len = 0
     if(len(doc)>0):
@@ -487,12 +485,19 @@ def add_item(doc, batches = 1):
                 item_table_len += 1
             if(row.get('item')):
                 cw_type = frappe.get_value("Item", row.get('item'), 'compound_wall_type')
+                cw_sub_type = frappe.get_value("Item", row.get('item'), 'compound_wall_sub_type')
                 if(cw_type):
                     type1.append(cw_type)
+                if cw_sub_type:
+                    type2.append(cw_sub_type)
         if(len(list(set(type1))) != 1):
             frappe.throw('Please enter Single Compound Wall Type Items.')
         else:
             type1 = type1[0]
+        
+        if type2:
+            type2 = type2[0]
+
         for k in doc:
             no_of_batches = float(batches)/item_table_len
             if(k.get('bom')):

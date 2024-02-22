@@ -422,7 +422,7 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
 			  "ganapathy_pavers.utils.py.salary_slip.remove_branch_read_only",
 			  "ganapathy_pavers.custom.py.delivery_note.other_vehicle_link",
 			  "ganapathy_pavers.custom.py.permissions.create_permissions",
-			  "ganapathy_pavers.ganapathy_pavers.doctype.compound_wall_type.compound_wall_type.cw_types",
+			  "ganapathy_pavers.custom.py.defaults.create_types"
 			  ]
 
 
