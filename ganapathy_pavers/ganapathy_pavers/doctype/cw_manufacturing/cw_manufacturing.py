@@ -34,7 +34,7 @@ class CWManufacturing(Document):
                 frappe.throw(f'Please enter Item with Compound Wall Type as {frappe.bold(doc.type)}')
             
             if type2 and (len(list(set(type2))) != 1 or type2[0] != doc.sub_type):
-                frappe.throw(f'Please enter Item with Compound Wall Type as {frappe.bold(doc.type)}')
+                frappe.throw(f'Please enter Item with Compound Wall Sub Type as {frappe.bold(doc.type)}')
 
         doc.abstractcalc()
     

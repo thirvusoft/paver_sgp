@@ -126,12 +126,16 @@ async function fetch_expense_details(frm) {
                 d.workstation = row.workstation || ""
             })
             refresh_field("workstations")
-            frm.set_value("paver", vehicle.paver)
+            await frappe.call({
+                method: "ganapathy_pavers.ganapathy_pavers.doctype.compound_wall_type.compound_wall_type.get_paver_and_compound_wall_types",
+                callback: function(r) {
+                    (r.message || []).forEach(f => {
+                        frm.set_value(f, vehicle[f])
+                    })
+                }
+            });
             frm.set_value("split_equally", vehicle.split_equally)
-            frm.set_value("is_shot_blast", vehicle.is_shot_blast)
-            frm.set_value("compound_wall", vehicle.compound_wall)
-            frm.set_value("fencing_post", vehicle.fencing_post)
-            frm.set_value("lego_block", vehicle.lego_block)
+            
         });
     }
 }

@@ -17,6 +17,8 @@ from frappe.model.meta import get_field_precision
 from frappe.utils.data import cint, flt
 from six import iteritems
 
+from ganapathy_pavers.ganapathy_pavers.doctype.compound_wall_type.compound_wall_type import get_paver_and_compound_wall_types
+
 
 class _PurchaseInvoice(PurchaseInvoice):
     def get_gl_entries(self, warehouse_account=None):
@@ -66,16 +68,16 @@ def add_expense_to_gl_entries(self, gl_entries):
         elif len(self.items) == 1:
              expense_name=self.items[0].get("item_code")
 
+        paver_cw_fields = get_paver_and_compound_wall_types()
         for gl_dict in gl_entries:
             gl_dict.update({
                 "expense_name": expense_name, # Customization
                 "vehicle": self.get("vehicle") if self.get("expense_type") else "", # Customization
                 "expense_type": self.get("expense_type"), # Customization
-                "paver": self.get("paver"), # Customization
-                "is_shot_blast": self.get("is_shot_blast"), # Customization
-                "compound_wall": self.get("compound_wall"), # Customization
-                "fencing_post": self.get("fencing_post"), # Customization
-                "lego_block": self.get("lego_block"), # Customization
+               **{
+                    f: self.get(f)
+                    for f in paver_cw_fields
+                }, # Customization
                 "from_date": self.get("from_date"), # Customization
                 "to_date": self.get("to_date"), # Customization
                 "split_equally": self.get("split_equally"), # Customization
@@ -91,30 +93,31 @@ def add_expense_to_gl_entries(self, gl_entries):
         return gl_entries
 
 def merge_similar_entries(gl_map, precision=None):
-	merged_gl_map = []
-	accounting_dimensions = get_accounting_dimensions()
-	for entry in gl_map:
-		# if there is already an entry in this account then just add it
-		# to that entry
-		same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + ["vehicle", "expense_type", "paver", "is_shot_blast", "compound_wall", "fencing_post", "lego_block", "from_date", "to_date", "split_equally"] + get_workstations()) # Customization
-		if same_head:
-			same_head.debit	= flt(same_head.debit) + flt(entry.debit)
-			same_head.debit_in_account_currency	= \
-				flt(same_head.debit_in_account_currency) + flt(entry.debit_in_account_currency)
-			same_head.credit = flt(same_head.credit) + flt(entry.credit)
-			same_head.credit_in_account_currency = \
-				flt(same_head.credit_in_account_currency) + flt(entry.credit_in_account_currency)
-		else:
-			merged_gl_map.append(entry)
+    merged_gl_map = []
+    accounting_dimensions = get_accounting_dimensions()
+    paver_cw_fields = get_paver_and_compound_wall_types()
+    for entry in gl_map:
+        # if there is already an entry in this account then just add it
+        # to that entry
+        same_head = check_if_in_list(entry, merged_gl_map, accounting_dimensions + paver_cw_fields + ["vehicle", "expense_type", "from_date", "to_date", "split_equally"] + get_workstations()) # Customization
+        if same_head:
+            same_head.debit	= flt(same_head.debit) + flt(entry.debit)
+            same_head.debit_in_account_currency	= \
+                flt(same_head.debit_in_account_currency) + flt(entry.debit_in_account_currency)
+            same_head.credit = flt(same_head.credit) + flt(entry.credit)
+            same_head.credit_in_account_currency = \
+                flt(same_head.credit_in_account_currency) + flt(entry.credit_in_account_currency)
+        else:
+            merged_gl_map.append(entry)
 
-	company = gl_map[0].company if gl_map else erpnext.get_default_company()
-	company_currency = erpnext.get_company_currency(company)
+    company = gl_map[0].company if gl_map else erpnext.get_default_company()
+    company_currency = erpnext.get_company_currency(company)
 
-	if not precision:
-		precision = get_field_precision(frappe.get_meta("GL Entry").get_field("debit"), company_currency)
+    if not precision:
+        precision = get_field_precision(frappe.get_meta("GL Entry").get_field("debit"), company_currency)
 
-	# filter zero debit and credit entries
-	merged_gl_map = filter(lambda x: flt(x.debit, precision)!=0 or flt(x.credit, precision)!=0, merged_gl_map)
-	merged_gl_map = list(merged_gl_map)
+    # filter zero debit and credit entries
+    merged_gl_map = filter(lambda x: flt(x.debit, precision)!=0 or flt(x.credit, precision)!=0, merged_gl_map)
+    merged_gl_map = list(merged_gl_map)
 
-	return merged_gl_map
+    return merged_gl_map

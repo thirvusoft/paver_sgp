@@ -19,6 +19,15 @@ frappe.query_reports["Daily Compound Wall Production Register"] = {
 			"default": frappe.datetime.get_today(),
 			"width": "80",
 			"reqd":1
+		},
+		{
+			"fieldname": "compound_wall_type",
+			"label": __("Compound Wall Type"),
+			"fieldtype": "Link",
+			"options": "Compound Wall Type",
+			"default": "Compound Wall",
+			"width": "80",
+			"reqd": 1
 		}
 	]
  };

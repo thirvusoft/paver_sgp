@@ -65,7 +65,7 @@ def get_production_details(date=None, from_date=None, to_date=None, machines=[],
                 res['paver'] = sum(frappe.db.get_all('Material Manufacturing', filters=pm_filt, pluck='total_production_sqft'))
             else:
                 filter = cw_filt
-                filter["type"] = ["in", ["Post", "Slab"]] if frappe.scrub(i_type) == 'compound_wall' else i_type
+                filter["type"] = i_type
                 res[frappe.scrub(i_type)] = sum(frappe.db.get_all('CW Manufacturing', filters=cw_filt, pluck='production_sqft'))       
     except:
         pass
@@ -115,47 +115,47 @@ def get_production_details(date=None, from_date=None, to_date=None, machines=[],
 #         pass
 #     return res
 
-@frappe.whitelist()
-def split_expenses(common_exp):
-    common_exp=json.loads(common_exp)
-    com_acc=[]
-    for row in common_exp:
-        add=True
-        if row.get("paver", 0) and row.get("paver_account", 0) and float(row.get("paver_amount", 0) or 0):
-            com_acc.append({
-                "account": row.get("paver_account"),
-                "debit": row.get("paver_amount") or 0,
-                "vehicle": row.get("vehicle", ""),
-            })
-            add=False
-        if row.get("compound_wall", 0) and row.get("cw_account", 0) and float(row.get("cw_amount", 0) or 0):
-            com_acc.append({
-                "account": row.get("cw_account"),
-                "debit": row.get("cw_amount") or 0,
-                "vehicle": row.get("vehicle", ""),
-            })
-            add=False
-        if row.get("lego_block") and row.get("lg_account") and float(row.get("lg_amount", 0) or 0):
-            com_acc.append({
-                "account": row.get("lg_account"),
-                "debit": row.get("lg_amount") or 0,
-                "vehicle": row.get("vehicle", ""),
-            })
-            add=False
-        if row.get("fencing_post") and row.get("fp_account") and float(row.get("fp_amount", 0) or 0):
-            com_acc.append({
-                "account": row.get("fp_account"),
-                "debit": row.get("fp_amount") or 0,
-                "vehicle": row.get("vehicle", ""),
-            })
-            add=False
-        if add:
-            com_acc.append({
-                "account": row.get("account"),
-                "debit": row.get("debit") or 0,
-                "vehicle": row.get("vehicle", ""),
-            })
-    return com_acc
+# @frappe.whitelist()
+# def split_expenses(common_exp):
+#     common_exp=json.loads(common_exp)
+#     com_acc=[]
+#     for row in common_exp:
+#         add=True
+#         if row.get("paver", 0) and row.get("paver_account", 0) and float(row.get("paver_amount", 0) or 0):
+#             com_acc.append({
+#                 "account": row.get("paver_account"),
+#                 "debit": row.get("paver_amount") or 0,
+#                 "vehicle": row.get("vehicle", ""),
+#             })
+#             add=False
+#         if row.get("compound_wall", 0) and row.get("cw_account", 0) and float(row.get("cw_amount", 0) or 0):
+#             com_acc.append({
+#                 "account": row.get("cw_account"),
+#                 "debit": row.get("cw_amount") or 0,
+#                 "vehicle": row.get("vehicle", ""),
+#             })
+#             add=False
+#         if row.get("lego_block") and row.get("lg_account") and float(row.get("lg_amount", 0) or 0):
+#             com_acc.append({
+#                 "account": row.get("lg_account"),
+#                 "debit": row.get("lg_amount") or 0,
+#                 "vehicle": row.get("vehicle", ""),
+#             })
+#             add=False
+#         if row.get("fencing_post") and row.get("fp_account") and float(row.get("fp_amount", 0) or 0):
+#             com_acc.append({
+#                 "account": row.get("fp_account"),
+#                 "debit": row.get("fp_amount") or 0,
+#                 "vehicle": row.get("vehicle", ""),
+#             })
+#             add=False
+#         if add:
+#             com_acc.append({
+#                 "account": row.get("account"),
+#                 "debit": row.get("debit") or 0,
+#                 "vehicle": row.get("vehicle", ""),
+#             })
+#     return com_acc
 
 def site_work_additional_cost(self, event = None):
     if not self.is_site_expense:
