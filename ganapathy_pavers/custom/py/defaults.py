@@ -88,7 +88,7 @@ def selling_settings():
 def create_types():
     from frappe.model.delete_doc import delete_doc
     __types = frappe.db.get_all("Paver Type", pluck="name") + frappe.db.get_all("Compound Wall Type", pluck="name")
-    types = ['Internal']
+    types = ['Internal', 'Others', 'Site', 'Vehicle']
 
     name = {'Paver': 'Pavers'}
 

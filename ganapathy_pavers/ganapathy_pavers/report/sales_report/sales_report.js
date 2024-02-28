@@ -35,8 +35,8 @@ frappe.query_reports["Sales Report"] = {
 		{
 			fieldname: 'type',
 			label: 'Type',
-			fieldtype: 'Select',
-			options: '\nPavers\nCompound Wall\nOthers',
+			fieldtype: 'Link',
+			options: 'Types',
 		}
 	],
 	formatter: function (value, row, column, data, default_formatter) {

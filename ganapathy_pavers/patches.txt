@@ -1,2 +1,0 @@
-ganapathy_pavers.patches.sales_order_cw_type
-ganapathy_pavers.patches.item_cw_type

@@ -265,12 +265,19 @@ class PartyLedgerSummaryReport(object):
 		if self.filters.get("project"):
 			dn_filters["project"] = self.filters.get("project")
 		else:
-			projects = tuple(frappe.get_all("Project", {"dont_show_in_delivery_report": 1}, pluck="name"))
+			project_filters = {"dont_show_in_delivery_report": 1}
+			if self.filters.get("type"):
+				project_filters["type"] = self.filters.get("type")
+			
+			projects = tuple(frappe.get_all("Project", project_filters, pluck="name"))
 			if len(projects) == 1:
 				dn_filters["project"] = ["!=", projects[0]]
 			elif len(projects) > 1:
 				dn_filters["project"] = ["not in", projects]
 
+		if self.filters.get("type"):
+			dn_filters["type"] = self.filters.get("type")
+		
 		if self.filters.get("company"):
 			dn_filters["company"] = self.filters.get("company")
 		customer_list=frappe.get_all("Delivery Note", dn_filters, ["customer", "customer_name", "project", "type"])

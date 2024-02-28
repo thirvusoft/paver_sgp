@@ -109,8 +109,8 @@ frappe.query_reports["Customer Ledger Summary"] = {
 		{
 			"fieldname":"sales_type",
 			"label": __("Type"),
-			"fieldtype": "Select",
-			"options": "\nPavers\nCompound Wall\nInternal\nOthers\n--Nothing--"
+			"fieldtype": "Link",
+			"options": "Types"
 		},
 		{
 			"fieldname": "sales_type_order_and_group",

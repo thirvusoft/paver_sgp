@@ -541,7 +541,7 @@ def get_employees_to_add(filters, employees):
         """)
         for row in emp:
             emp_list.append(row[0])
-            emp_filters.append(["name", "in", emp_list])
+        emp_filters.append(["name", "in", emp_list])
 
     elif filters.get("type"):
         emp_filters.append(["Employee Production Type", "type", "=", filters.get("type")])
