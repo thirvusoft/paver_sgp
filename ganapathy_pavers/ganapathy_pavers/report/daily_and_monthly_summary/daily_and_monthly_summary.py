@@ -50,7 +50,9 @@ def get_data(filters= {}):
 	cw_sqft = frappe.db.get_all('CW Manufacturing', filters=cw_filt, fields=['sum(production_sqft) as production_sqft', 'type'], group_by="type")
 	delivery_notes = frappe.db.get_all('Delivery Note', filters=dl_filt, pluck='name')
 
-	final_data.append({'type':'Paver Production', 'sqft':pm_sqft})
+	if pm_sqft:
+		final_data.append({'type':'Paver Production', 'sqft': pm_sqft})
+	
 	for cw in cw_sqft:
 		final_data.append({'type': f'{cw.type} Production', 'sqft': cw.production_sqft or 0})
 
@@ -89,15 +91,33 @@ def get_data(filters= {}):
 		else:
 			cw_dl_qty = i.stock_qty
 		
-		if item_wise_type[i.item_code] not in cw
+		if item_wise_type[i.item_code] not in cw_type_wise_delivery_qty:
+			cw_type_wise_delivery_qty[item_wise_type[i.item_code]] = 0
+		
+		cw_type_wise_delivery_qty[item_wise_type[i.item_code]] += cw_dl_qty
 
 	for i in cw_si_items:
+		if i.item_code not in item_wise_type:
+			item_wise_type[i.item_code] = frappe.db.get_value('Item', i.item_code, 'compound_wall_type')
+
 		if(i.stock_uom != 'SQF'):
 			cw_dl_qty = ganapathy_pavers.uom_conversion(i.item_code, from_uom=i.stock_uom, from_qty=i.stock_qty, to_uom='SQF')
 		else:
 			cw_dl_qty = i.stock_qty
+		
+		if item_wise_type[i.item_code] not in cw_type_wise_delivery_qty:
+			cw_type_wise_delivery_qty[item_wise_type[i.item_code]] = 0
+		
+		cw_type_wise_delivery_qty[item_wise_type[i.item_code]] += cw_dl_qty
 
-	final_data.append({'type':'Paver Delivery Note', 'sqft':pv_dl_qty})
-	final_data.append({'type':'Compound Wall Delivery Note', 'sqft':cw_dl_qty})
+	if final_data:
+		final_data.append({})
+	
+	if pv_dl_qty:
+		final_data.append({'type':'Paver Delivery', 'sqft':pv_dl_qty})
+
+	for cw in cw_type_wise_delivery_qty:
+		if cw_type_wise_delivery_qty[cw]:
+			final_data.append({'type': f'{cw} Delivery', 'sqft': cw_type_wise_delivery_qty[cw]})
 
 	return final_data

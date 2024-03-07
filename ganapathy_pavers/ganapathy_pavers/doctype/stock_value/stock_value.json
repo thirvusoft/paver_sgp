@@ -15,11 +15,10 @@
   "get_warehouses",
   "get_items",
   "filters_section",
-  "item_group",
+  "type",
   "warehouse_paver_cw",
   "column_break_3",
   "ignore_empty_item_size",
-  "cw_type",
   "warehouse_rm",
   "section_break_10",
   "paver_stock",
@@ -69,6 +68,8 @@
   "compound_wall_stock_value",
   "compound_wall_stock_value_administrative",
   "section_break_46",
+  "other_item_detail",
+  "section_break_m3ti3",
   "raw_material_stock",
   "raw_material_stock_qty",
   "raw_material_stock_nos",
@@ -111,14 +112,6 @@
    "label": "Filters"
   },
   {
-   "fieldname": "item_group",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Item Group",
-   "options": "Item Group"
-  },
-  {
    "depends_on": "eval: !['Raw Material'].includes(doc.item_group)",
    "fieldname": "warehouse_paver_cw",
    "fieldtype": "Table",
@@ -128,15 +121,6 @@
   {
    "fieldname": "column_break_3",
    "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "eval: doc.item_group == 'Compound Walls'",
-   "fieldname": "cw_type",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "CW Type",
-   "options": "\nSlab\nPost\nCorner Post\nFencing Post\nU Drain\nLego Block"
   },
   {
    "depends_on": "eval: !['Pavers', 'Compound Walls'].includes(doc.item_group)",
@@ -573,12 +557,30 @@
    "fieldtype": "Currency",
    "label": "Total Stock Value With Administrative Cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Type",
+   "options": "Types"
+  },
+  {
+   "fieldname": "other_item_detail",
+   "fieldtype": "Table",
+   "label": "Other Item Detail",
+   "options": "Stock Value Other Item Detail"
+  },
+  {
+   "fieldname": "section_break_m3ti3",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-27 15:30:40.582946",
+ "modified": "2024-03-05 12:33:22.559427",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Stock Value",

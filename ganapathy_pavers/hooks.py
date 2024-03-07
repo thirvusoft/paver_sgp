@@ -146,6 +146,8 @@ jenv = {
 		"get_item_wise_completion_rate:ganapathy_pavers.utils.py.sitework_printformat.get_item_wise_completion_rate",
 		"group_dn_items:ganapathy_pavers.utils.py.thirvu_deliveryslip_printformat.group_dn_items",
 		"group_other_cw_items:ganapathy_pavers.ganapathy_pavers.doctype.daily_maintenance.daily_maintenance.group_other_cw_items",
+		"get_stock_value_other_items:ganapathy_pavers.ganapathy_pavers.doctype.stock_value.stock_value.get_stock_value_other_items",
+		"get_total_stock_value:ganapathy_pavers.ganapathy_pavers.doctype.stock_value.stock_value.get_total_stock_value"
 	]
 }
 
