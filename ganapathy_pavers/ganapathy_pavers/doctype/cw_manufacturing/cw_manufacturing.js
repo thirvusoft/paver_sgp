@@ -9,8 +9,6 @@ frappe.ui.form.on("CW Manufacturing", {
     refresh: async function (frm) {
         if (frm.is_new()) {
             default_value(frm, "labour_cost_per_hrs", "labour_salary_per_hrs");
-            // default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
-            default_value(frm, "labour_cost_per_sqft", "labour_cost_per_sqft_curing");
             frm.trigger("get_bin_items");
         }
 
@@ -87,10 +85,17 @@ frappe.ui.form.on("CW Manufacturing", {
         frm.fields_dict.bin_items.refresh()
     },
     onload: function (frm) { },
-    type: function (frm) {
-        // default_value_from_table(frm, "strapping_cost", frm.doc.type, "strapping_cost_per_sqft_unmold", 0);
+    calc_strapping_cost: function(frm) {
+        let strapping_cost = 0, curing_cost = 0;;
+        (frm.doc.item_details || []).forEach(row => {
+            strapping_cost += (row.strapping_cost || 0);
+            curing_cost += (row.curing_cost || 0);
+        });
+        frm.set_value("strapping_cost_per_sqft_unmold", frm.doc.item_details ? (strapping_cost / frm.doc.item_details.length) : 0);
+        frm.set_value("labour_cost_per_sqft_curing", frm.doc.item_details ? (curing_cost / frm.doc.item_details.length) : 0);
     },
     ts_before_save: function (frm) {
+        frm.trigger("calc_strapping_cost")
         frm.trigger("calculate_bin_qty")
 
         item_details_total(frm);
@@ -118,10 +123,10 @@ frappe.ui.form.on("CW Manufacturing", {
         });
     },
     labour_salary_per_hrs: function (frm) {
-        frm.set_value("total_labour_wages", frm.doc.labour_salary_per_hrs * frm.doc.manually_total_working_hrs);
+        frm.set_value("total_labour_wages", frm.doc.labour_salary_per_hrs * frm.doc.manually_total_working_hrs * (frm.doc.total_batches ? frm.doc.total_no_of_batche / frm.doc.total_batches : 1));
     },
     manually_total_working_hrs: function (frm) {
-        frm.set_value("total_labour_wages", frm.doc.labour_salary_per_hrs * frm.doc.manually_total_working_hrs);
+        frm.set_value("total_labour_wages", frm.doc.labour_salary_per_hrs * frm.doc.manually_total_working_hrs * (frm.doc.total_batches ? frm.doc.total_no_of_batche / frm.doc.total_batches : 1));
     },
     total_labour_wages: function (frm) {
         frm.set_value("total_expence", frm.doc.total_labour_wages + frm.doc.total_operator_wages + frm.doc.additional_cost_in_wages + frm.doc.raw_material_cost);
@@ -159,6 +164,12 @@ frappe.ui.form.on("CW Manufacturing", {
             },
         });
     },
+    total_no_of_batche: function (frm) {
+        frm.trigger("item_count");
+    },
+    total_batches: function (frm) {
+        frm.trigger("item_count");
+    },
     item_count: function (frm) {
         let operator_details = frm.doc.operator_details ? frm.doc.operator_details : [],
             total_operator_wages = 0;
@@ -166,7 +177,8 @@ frappe.ui.form.on("CW Manufacturing", {
             let cdt = operator_details[row].doctype,
                 cdn = operator_details[row].name;
             let data = locals[cdt][cdn];
-            let wages = (data.salary ? data.salary : 0) / (frm.doc.item_count ? frm.doc.item_count : 1);
+            let wages = ((data.salary ? data.salary : 0) / (frm.doc.item_count ? frm.doc.item_count : 1)) * (frm.doc.total_batches ? frm.doc.total_no_of_batche / frm.doc.total_batches : 1);
+
             frappe.model.set_value(cdt, cdn, "division_salary", wages);
             total_operator_wages += wages;
         }

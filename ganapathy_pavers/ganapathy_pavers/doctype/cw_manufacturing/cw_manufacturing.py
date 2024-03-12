@@ -33,7 +33,7 @@ class CWManufacturing(Document):
             if type1 and (len(list(set(type1))) != 1 or type1[0] != doc.type):
                 frappe.throw(f'Please enter Item with Compound Wall Type as {frappe.bold(doc.type)}')
             
-            if type2 and (len(list(set(type2))) != 1 or type2[0] != doc.sub_type):
+            if doc.sub_type and type2 and (len(list(set(type2))) != 1 or type2[0] != doc.sub_type):
                 frappe.throw(f'Please enter Item with Compound Wall Sub Type as {frappe.bold(doc.type)}')
 
         doc.abstractcalc()
@@ -98,14 +98,13 @@ def make_stock_entry_for_molding(doc):
         "CW Settings", "default_molding_target_warehouse") or throw_error('Molding Target Warehouse')
     
     
-    
-    default_nos = frappe.db.get_singles_value(
-        "CW Settings", "default_molding_uom") or throw_error('Molding UOM')
-   
-    list_item = frappe.db.sql(f"""select *,sum(produced_qty) as produced_qty,sum(ts_production_sqft) as ts_production_sqft,sum(damaged_qty) as damaged_qty from `tabCW Items` as items where items.parent = '{doc.get("name")}'  group by items.item""",as_dict=1)
+    list_item = frappe.db.sql(f"""select *,sum(produced_qty) as produced_qty,sum(ts_production_sqft) as ts_production_sqft,sum(damaged_qty) as damaged_qty from `tabCW Items` as items where items.parent = '{doc.get("name")}'  group by items.item, items.workstation""",as_dict=1)
    
     for item in list_item or []:
-        
+        default_nos = frappe.db.get_value(
+            "Workstation", item.workstation, "default_molding_uom") or throw_error(f"Workstation {item.workstation}")
+   
+
         stock_entry = frappe.new_doc("Stock Entry")
         stock_entry.company = doc.get("company")
         stock_entry.from_bom = 1
@@ -128,8 +127,8 @@ def make_stock_entry_for_molding(doc):
                 stock_entry.append('items', dict(
                     s_warehouse=(i.get("source_warehouse") or source_warehouse), item_code=i.get("item_code"), qty=i.get("qty")*(item.get("ts_production_sqft")/doc.get("ts_production_sqft")), uom=i.get("uom"),
                     basic_rate=i.get('rate'),
-                        basic_rate_hidden=i.get('rate'),
-                    
+                    basic_rate_hidden=i.get('rate'),
+                    cw_workstation = item.get("workstation"),
                 ))
         else:
             frappe.throw("Kindly Enter Raw Materials")
@@ -139,12 +138,13 @@ def make_stock_entry_for_molding(doc):
             t_warehouse = target_warehouse, item_code=item.get("item"), qty= manufactue_qty, uom=default_nos, is_finished_item=1,
                 basic_rate=uom_conversion_for_rate(item.get("item"),"SQF",doc.get('total_cost_per_sqft'),default_nos),
                 basic_rate_hidden=uom_conversion_for_rate(item.get("item"),"SQF",doc.get('total_cost_per_sqft'),default_nos),
-
+                cw_workstation = item.get("workstation"),
         ))
         if item.get("damaged_qty") > 0:
             scrap_qty = uom_conversion(item.get("item"), 'Nos', item.get("damaged_qty"), default_nos)
             stock_entry.append('items', dict(
                 t_warehouse=default_scrap_warehouse, item_code=item.get("item"), qty=scrap_qty, uom=default_nos, is_process_loss=1,
+                cw_workstation = item.get("workstation"),
 
             ))
         stock_entry.append('additional_costs', dict(
@@ -190,12 +190,11 @@ def make_stock_entry_for_bundling(doc):
         "CW Settings", "default_unmolding_source_warehouse") or throw_error('Unmolding Source Warehouse')
     target_warehouse = frappe.db.get_singles_value(
         "CW Settings", "default_unmolding_target_warehouse") or throw_error('Unmolding Target Warehouse')
-    default_nos = frappe.db.get_singles_value(
-            "CW Settings", "default_unmolding_and_bundling_uom") or throw_error('Default Unmolding and Bundling UOM')
-
-
 
     for item in doc.get("cw_manufacturing_batch_details") or []:
+        default_nos = frappe.db.get_value(
+            "Workstation", item.workstation, "default_unmolding_and_bundling_uom") or throw_error(f"Workstation {item.workstation}")
+
         if (item.get("item_code")):
             if (not frappe.get_value('Item', item.get("item_code"), 'has_batch_no')):
                 frappe.throw(
@@ -217,12 +216,14 @@ def make_stock_entry_for_bundling(doc):
 
         stock_entry.append('items', dict(
             s_warehouse = source_warehouse, item_code = item.get('item_code'), qty = item.get('qty') ,uom = item.get('uom') ,batch_no = item.get("batch"),
+            cw_workstation = item.get("workstation"),
              basic_rate=uom_conversion_for_rate(item.get("item_code"),"SQF",doc.get('total_cost_per_sqft'), item.get('uom')),
                   basic_rate_hidden=uom_conversion_for_rate(item.get("item_code"),"SQF",doc.get('total_cost_per_sqft'), item.get('uom')),
             )) 
         stock_entry.append('items', dict(
             t_warehouse = target_warehouse, item_code = item.get('item_code'), qty = converted_qty,uom = default_nos,
                   basic_rate=uom_conversion_for_rate(item.get("item_code"),"SQF",doc.get('total_cost_per_sqft'),default_nos),
+                  cw_workstation = item.get("workstation"),
                   basic_rate_hidden=uom_conversion_for_rate(item.get("item_code"),"SQF",doc.get('total_cost_per_sqft'),default_nos),
             ))
         stock_entry.append('additional_costs', dict(
@@ -287,6 +288,7 @@ def make_stock_entry_for_curing(doc):
         sqft_qty = uom_conversion(item.get('item_code'), item.get("uom"),  item.get('qty') , "SQF")
         stock_entry.append('items', dict(
             s_warehouse = source_warehouse, item_code = item.get("item_code"),qty = item.get('qty') ,uom = item.get('uom') ,batch_no = item.get("batch"),
+            cw_workstation = item.get("workstation"),
             t_warehouse = target_warehouse,
                    basic_rate=uom_conversion_for_rate(item.get("item_code"),"SQF",doc.get('total_cost_per_sqft'),item.get("uom")),
                     basic_rate_hidden=uom_conversion_for_rate(item.get("item_code"),"SQF",doc.get('total_cost_per_sqft'),item.get("uom")),
@@ -347,9 +349,21 @@ def std_item(doc):
     for row in doc.get('item_details') or  []:
         if(row.get('bom') and row.get('bom') not in bom_list):
             bom_list.append(row.get('bom'))
+
+    no_of_batches = float(doc.get("total_no_of_batche") or 1)/(len((doc.get("item_details") or [])) or 1)
+
     for bom in bom_list:
         bom_doc = frappe.get_doc("BOM", bom)
         for item in bom_doc.items:
+            if not bin_items and item.is_usb_item:
+                row={}
+                row['item_code'], row['stock_uom'], row['uom'], row['rate'], row['validation_rate'] = frappe.get_value(
+                    "Item", item.get('item_code'), ['item_code', 'stock_uom', 'stock_uom', 'last_purchase_rate', 'valuation_rate'])        
+                row["qty"] = item.qty * no_of_batches
+                row['validation_rate'] = get_valuation_rate(row.get('item_code'))
+                row['amount'] = (row.get('qty') or 0) * (row.get('rate') or row.get('validation_rate'))
+                items[row.get('item_code')] = row
+
             if(item.is_usb_item and item.item_code in items):
                 if item.qty:
                     items[item.item_code]['ts_qty'] = item.qty
@@ -381,18 +395,18 @@ def find_batch(self):
                 batch = frappe.get_doc("Stock Entry",i.name)
                 for j in batch.items:
                     if j.t_warehouse and j.is_finished_item and not j.is_process_loss:
-                        manufacture_batch_list.append({'item_code': j.item_code, 'batch': j.batch_no, 'qty': j.qty, 'uom': j.uom})
+                        manufacture_batch_list.append({'item_code': j.item_code, 'batch': j.batch_no, 'qty': j.qty, 'uom': j.uom, 'workstation': j.cw_workstation})
                         
             elif i.stock_entry_type == "Repack":
                 batch = frappe.get_doc("Stock Entry",i.name)
                 for j in batch.items:
                     if j.t_warehouse and j.is_finished_item and not j.is_process_loss:
-                        unmolding_batch_list.append({'item_code': j.item_code, 'batch': j.batch_no, 'qty': j.qty, 'uom': j.uom})
+                        unmolding_batch_list.append({'item_code': j.item_code, 'batch': j.batch_no, 'qty': j.qty, 'uom': j.uom, 'workstation': j.cw_workstation})
             elif i.stock_entry_type == "Material Transfer":
                 batch = frappe.get_doc("Stock Entry",i.name)
                 for j in batch.items:
                     if j.t_warehouse and j.s_warehouse:
-                        curing_batch_list.append({'item_code': j.item_code, 'batch': j.batch_no, 'qty': j.qty, 'uom': j.uom})
+                        curing_batch_list.append({'item_code': j.item_code, 'batch': j.batch_no, 'qty': j.qty, 'uom': j.uom, 'workstation': j.cw_workstation})
     self.update({
     "cw_manufacturing_batch_details": manufacture_batch_list,
     "cw_unmolding_batch_details": unmolding_batch_list,
