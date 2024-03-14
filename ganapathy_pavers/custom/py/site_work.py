@@ -352,8 +352,11 @@ def update_status(doc, events):
     doc.reload()
 
 def validate_status(self,event):
-    if (self.previous_state in ("Billed",) and self.status != "Rework"):
+    if (self.previous_state in ("Billed",) and self.status not in ("Rework", "Completed")):
         frappe.throw("Billed Site Work cannot be updated.")
+    
+    if (self.previous_state in ("Completed",) and self.status not in ("Rework",)):
+        frappe.throw("Completed Site Work cannot be updated.")
 
 def rework_count(self,event):
     a = frappe.get_value("Project", self.name, 'status')

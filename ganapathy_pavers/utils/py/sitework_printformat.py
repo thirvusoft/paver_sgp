@@ -625,6 +625,7 @@ def get_retail_cost(doc):
 		item_cost.append({
 		 "item" : item.item,
 		 "qty" : ((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)),
+		 "uom": frappe.db.get_value("Item", item.item, "stock_uom"),
 		 "rate" : bin_,
 		 "amount": cost
 		})

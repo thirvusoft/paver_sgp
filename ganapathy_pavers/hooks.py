@@ -115,7 +115,8 @@ override_doctype_class = {
 	"Vehicle Log" : "ganapathy_pavers.custom.py.vehicle_overwrite.odometer",
 	"Journal Entry": "ganapathy_pavers.custom.py.journal_entry_override._JournalEntry",
 	"Purchase Invoice": "ganapathy_pavers.custom.py.purchase_invoice_expense._PurchaseInvoice",
-	"Lead":"ganapathy_pavers.custom.py.lead.lead_status"
+	"Lead":"ganapathy_pavers.custom.py.lead.lead_status",
+	"Delivery Note": "ganapathy_pavers.custom.py.delivery_note._DeliveryNote",
 }
 
 # Document Events
@@ -424,7 +425,8 @@ after_migrate=["ganapathy_pavers.custom.py.site_work.create_status",
 			  "ganapathy_pavers.utils.py.salary_slip.remove_branch_read_only",
 			  "ganapathy_pavers.custom.py.delivery_note.other_vehicle_link",
 			  "ganapathy_pavers.custom.py.permissions.create_permissions",
-			  "ganapathy_pavers.custom.py.defaults.create_types"
+			  "ganapathy_pavers.custom.py.defaults.create_types",
+			  "ganapathy_pavers.custom.py.defaults.print_settings",
 			  ]
 
 

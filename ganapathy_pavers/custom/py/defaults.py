@@ -120,3 +120,17 @@ def create_types():
 
     if not_deletable:
         print("Types to be deleted manually", ", ".join(not_deletable))
+
+def print_settings():
+    custom_fields = {
+        'Print Settings': [
+            {
+                "label": "Delivery Slip - Show Bundle UOM",
+                "fieldname": "print_as_bundle",
+                "fieldtype": "Check",
+                "default": 1,
+                "insert_after" : "print_taxes_with_zero_amount"
+            },
+        ]
+    }
+    create_custom_fields(custom_fields)

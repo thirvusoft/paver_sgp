@@ -193,3 +193,26 @@ ganapathy_pavers.loading_svg = `
   }
   </style>
 `
+
+ganapathy_pavers.scroll_to_element = function(element) {
+	let $el = $(element);
+
+	// uncollapse section
+	if (field.section.is_collapsed()) {
+		field.section.collapse(false);
+	}
+
+	// scroll to input
+	frappe.utils.scroll_to($el, true, 15);
+
+	// highlight input
+	$el.addClass('has-error');
+	setTimeout(() => {
+		$el.removeClass('has-error');
+		$el.find('input, select, textarea').focus();
+	}, 1000);
+}
+
+ganapathy_pavers.delivery_slip_scroll = function() {
+	ganapathy_pavers.scroll_to_element(document.querySelector(`.dynamic-settings div[data-fieldtype="Check"][data-fieldname="print_as_bundle"]`))
+}
