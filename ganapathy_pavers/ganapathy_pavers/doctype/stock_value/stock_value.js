@@ -98,8 +98,7 @@ frappe.ui.form.on('Stock Value', {
 			args: {
 				unit: frm.doc.unit,
 				administrative_cost: frm.doc.administrative_cost || 0,
-				item_group: frm.doc.item_group,
-				cw_type: frm.doc.cw_type,
+				_type: frm.doc.type,
 				date: frm.doc.date,
 				time: frm.doc.time,
 				paver_cw_warehouse: paver_cw_warehouse,

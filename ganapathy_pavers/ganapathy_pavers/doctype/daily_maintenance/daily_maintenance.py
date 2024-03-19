@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import json
+import re
 from erpnext.stock.stock_ledger import get_previous_sle
 import frappe
 from frappe.model.document import Document
@@ -86,6 +87,10 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	item=frappe.db.get_all("Item", filters={'item_group':"Pavers",'has_variants':1, 'disabled': 0},pluck='name',order_by='name')
 	items_stock=[]
 	total_stock={}
+
+	grass_paver_pattern = re.compile(r'grass\s*paver', re.IGNORECASE)
+	kerb_stone_pattern = re.compile(r'kerb\s*stone', re.IGNORECASE)
+
 	#paver_item_normal
 	for i in item:
 		item_1=frappe.db.get_all("Item", filters=[
@@ -94,7 +99,14 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 										["Item Variant Attribute","attribute_value",'=','Normal'],
 																			])
 		if item_1:
-			template={'short_name':i, 'type': 'Normal'}
+			item_size = frappe.db.get_value('Item', i, 'item_size') or ""
+			template={'short_name':i, 'type': ''}
+
+			if re.search(grass_paver_pattern, item_size) or re.search(grass_paver_pattern, i):
+				template['type'] = 'Grass Paver'
+			elif re.search(kerb_stone_pattern, item_size) or re.search(kerb_stone_pattern, i):
+				template['type'] = 'Kerb Stone'
+
 			for j in item_1:
 				stock_qty=get_stock_qty(j.name, warehouse, date, time)
 
@@ -124,7 +136,14 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 										["Item Variant Attribute","attribute_value",'=','Shot Blast']
 																			])
 		if item_2:
-			template_1={'short_name':i, 'type': 'Shot Blast'}
+			item_size = frappe.db.get_value('Item', i, 'item_size') or ""
+			template_1={'short_name':i, 'type': ''}
+
+			if re.search(grass_paver_pattern, item_size) or re.search(grass_paver_pattern, i):
+				template_1['type'] = 'Grass Paver'
+			elif re.search(kerb_stone_pattern, item_size) or re.search(kerb_stone_pattern, i):
+				template_1['type'] = 'Kerb Stone'
+
 			for sb in item_2:
 				stock_qty_sb=get_stock_qty(sb.name, warehouse, date, time)
 
@@ -338,7 +357,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	# other cw items
 	compound_wall_items = list(set([i['name'] if isinstance(i, dict) else i for i in compound_wall_items]))
 	
-	other_cw_items = frappe.get_all("Item", {"item_group": "Compound Walls", 'disabled': 0, 'name': ["not in", compound_wall_items], 'is_stock_item': 1}, ["name as item", "compound_wall_type as type"])
+	other_cw_items = frappe.get_all("Item", {"item_group": "Compound Walls", 'disabled': 0, 'name': ["not in", compound_wall_items], 'is_stock_item': 1}, ["name as item", "compound_wall_type as type", "compound_wall_sub_type as sub_type"])
 	for i in other_cw_items:
 		i.stock=get_stock_qty(i.item, warehouse, date, time)
 
@@ -359,7 +378,7 @@ def paver_item(warehouse,production_date, date, time, warehouse_colour):
 	raw_material_stock=raw_material_stock_details(date= date, time=time)
 	total_stock_shot= sorted(list(total_stock_shot.values()), key=lambda x: x.get("colour", ""))
 	total_stock=sorted(list(total_stock.values()), key=lambda x: x.get("colour", ""))
-	return items_stock, total_stock, items_stock_shot, total_stock_shot, list(sqf.values()), production,  sorted(list(post_item.values()), key=lambda x: x.get("post_length", "") or ""), colour_details, sorted(slab_details, key=lambda x: x.get("item", "") or ""), normal_total_stock, raw_material_stock, sorted(other_cw_items, key=lambda x: ((x.get('type') or ''), (x.get('name'))))
+	return sorted(items_stock, key=lambda x: x.get("type") or ''), total_stock, sorted(items_stock_shot, key=lambda x: x.get("type") or ''), total_stock_shot, list(sqf.values()), production,  sorted(list(post_item.values()), key=lambda x: x.get("post_length", "") or ""), colour_details, sorted(slab_details, key=lambda x: x.get("item", "") or ""), normal_total_stock, raw_material_stock, sorted(other_cw_items, key=lambda x: ((x.get('type') or ''), (x.get('name'))))
 
 def size_details(items, _type):
 	fields=[]
@@ -379,13 +398,13 @@ def size_details(items, _type):
 				break
 		num_size=int(size[::-1]) if size[::-1].isnumeric() else 0
 		size=size[::-1]+'MM'
-		if 'kerb' in shortname:
-			size+=' KERB STONE'
+		if row.get("type"):
+			size+=f' {row.get("type").upper()}'
 		if size not in total_size:
-			total_size[size]={'type': _type, 'size': size, "num_size": num_size, 'total_stock': 0}
+			total_size[size]={'item_type': row.get("type"), 'type': _type, 'size': size, "num_size": num_size, 'total_stock': 0}
 		for field in fields:
 			total_size[size]['total_stock']+=row.get(field, 0)
-	return sorted(list(total_size.values()), key=lambda x: x.get("num_size", 0) or 0)
+	return sorted(list(total_size.values()), key=lambda x: ((x.get("item_type") or ''), (x.get("num_size", 0) or 0)))
 
 def raw_material_stock_details(date= "", time= ""):
 	dsm=frappe.get_single("DSM Defaults")
@@ -430,9 +449,13 @@ def get_stock_details_from_warehosue(warehouse, machine="", prefix="", date= "",
 def group_other_cw_items(items):
 	res = {}
 	for row in items:
-		if (row.type or '') not in res:
-			res[(row.type or '')] = []
+		_key = (row.type or '')
+		if row.sub_type:
+			_key += f" - {(row.sub_type or '')}"
+
+		if _key not in res:
+			res[_key] = []
 		
-		res[(row.type or '')].append(row)
+		res[_key].append(row)
 	
 	return res

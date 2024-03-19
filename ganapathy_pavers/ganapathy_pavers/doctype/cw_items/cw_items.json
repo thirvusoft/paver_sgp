@@ -10,6 +10,8 @@
   "item",
   "bom",
   "no_of_batches",
+  "strapping_cost",
+  "curing_cost",
   "column_break_5",
   "production_qty",
   "damaged_qty",
@@ -76,7 +78,7 @@
    "columns": 2,
    "fieldname": "no_of_batches",
    "fieldtype": "Float",
-   "label": "No. Of Batches",
+   "label": "No. Of M Cube",
    "mandatory_depends_on": "eval: parent.type==\"Post\"",
    "non_negative": 1,
    "read_only": 1
@@ -102,12 +104,28 @@
    "hidden": 1,
    "label": "TS Production Sqft",
    "read_only": 1
+  },
+  {
+   "fetch_from": "item.strapping_cost",
+   "fetch_if_empty": 1,
+   "fieldname": "strapping_cost",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Strapping Cost"
+  },
+  {
+   "fetch_from": "item.curing_cost",
+   "fetch_if_empty": 1,
+   "fieldname": "curing_cost",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Curing Cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-02-27 12:03:35.693426",
+ "modified": "2024-03-12 16:13:00.438486",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Items",

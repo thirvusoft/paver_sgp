@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "field:paver_type",
  "creation": "2023-07-15 12:10:44.293468",
  "doctype": "DocType",
@@ -25,30 +24,24 @@
    "default": "0",
    "fieldname": "used_in_expense_splitup",
    "fieldtype": "Check",
+   "hidden": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Used In Expense Splitup"
+   "label": "Used In Expense Splitup",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-15 16:58:48.053392",
+ "modified": "2024-03-19 12:07:10.095877",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Paver Type",
  "owner": "Administrator",
  "permissions": [
   {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
    "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
+   "role": "System Manager"
   }
  ],
  "quick_entry": 1,

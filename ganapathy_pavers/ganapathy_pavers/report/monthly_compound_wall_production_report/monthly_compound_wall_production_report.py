@@ -8,18 +8,22 @@ from ganapathy_pavers import uom_conversion
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
 from ganapathy_pavers.custom.py.expense import  expense_tree
 
-def execute(filters=None, _type=["Post", "Slab"], prod="compound_wall"):
+def execute(filters=None, _type="Compound Wall"):
+	prod = frappe.scrub(_type or '')
+
 	if filters.get("compound_wall_type"):
-		_type = {
-			"compound_wall": ["Post", "Slab"]
-		}.get(frappe.scrub(filters.get("compound_wall_type"))) or [filters.get("compound_wall_type")]
+		_type = filters.get("compound_wall_type")
 		prod = frappe.scrub(filters.get("compound_wall_type"))
+	
+	if not frappe.db.get_value("Compound Wall Type", _type, 'used_in_expense_splitup'):
+		prod = 'compound_wall'
+
 	rm_uoms = frappe.db.get_all("Item Group UOM", {'parenttype': 'Item Group', 'parent': 'Raw Material'}, pluck='uom')
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 	data = []
 
-	cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]],'type':["in",_type]},pluck="name")
+	cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]],'type': _type},pluck="name")
 	cw_data = []
 
 	if cw_list:

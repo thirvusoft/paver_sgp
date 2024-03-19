@@ -15,12 +15,12 @@ def execute(filters=None):
 	return columns, data, None, chart_data
 
 def get_data(filters):
-	compound_wall_type = []
-	for i in (filters.get('compound_wall_type') or []):
-		if (i == "Compound Wall"):
-			compound_wall_type += ['Post', 'Slab']
-		else:
-			compound_wall_type.append(i)
+	cw_wise_sub_type = {}
+	if filters.get('compound_wall_type') and filters.get('compound_wall_sub_type'):
+		cw_wise_sub_type = {
+			cw: frappe.db.get_all('Compound Wall Sub Type', {'compound_wall_type': cw, 'name': ["in", filters.get('compound_wall_sub_type')]}, pluck="name")
+			for cw in (filters.get('compound_wall_type') or [])
+		}
 
 	return frappe.db.sql(f"""
 				SELECT
@@ -42,8 +42,27 @@ def get_data(filters):
 						ELSE 1=1
 					END AND
 					CASE
-		      			WHEN IFNULL('{len(compound_wall_type)}', 0) != 0
-					    	THEN cw.type in ({', '.join([f"'{i}'" for i in compound_wall_type or ['']])})
+		      			WHEN IFNULL('{len(filters.get('compound_wall_type') or [])}', 0) != 0
+					    	THEN cw.type in ({', '.join([f"'{i}'" for i in filters.get('compound_wall_type') or ['']])})
+						ELSE 1=1
+					END AND
+					CASE
+		      			WHEN IFNULL('{len(filters.get('compound_wall_sub_type') or [])}', 0) != 0
+					    	THEN (
+								CASE 
+									{
+										" ".join([
+											f'''
+												WHEN cw.type = "{cw}"
+													THEN cw.sub_type in ({', '.join([f"'{i}'" for i in cw_wise_sub_type[cw] or ['']])})
+											'''
+											for cw in cw_wise_sub_type
+											if cw_wise_sub_type[cw]
+										]) or " WHEN 1=1 THEN 1=1 "
+									}
+									ELSE 1=1
+								END
+							)
 						ELSE 1=1
 					END
 				GROUP BY

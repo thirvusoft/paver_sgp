@@ -7,8 +7,8 @@ frappe.query_reports["Site Work - Excess and Remaining Delivery"] = {
 		{
 			fieldname: "type",
 			label: __("Type"),
-			fieldtype: "Select",
-			options: "\nPavers\nCompound Wall"
+			fieldtype: "Link",
+			options: "Types"
 		},
 		{
 			fieldname: "from_date",

@@ -1,6 +1,13 @@
+from erpnext.stock.doctype.delivery_note.delivery_note import DeliveryNote
 import frappe
 import ganapathy_pavers
 from frappe.custom.doctype.property_setter.property_setter import make_property_setter
+
+class _DeliveryNote(DeliveryNote):
+    def get_print_settings(self):
+        print_setting_fields = ["print_as_bundle"]
+
+        return print_setting_fields
 
 def update_qty_sitework(self,event):
     if(self.doctype=='Sales Invoice' and self.update_stock==0):

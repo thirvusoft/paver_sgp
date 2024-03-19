@@ -39,9 +39,9 @@ frappe.query_reports["Site Work Wise Delivery Report"] = {
 		},
 		{
 			"fieldname": "sales_type",
-			"label": __("Sales Type"),
-			"fieldtype": "Select",
-			"options": "\nPavers\nCompound Walls",
+			"label": __("Type"),
+			"fieldtype": "Link",
+			"options": "Types",
 			"width": "100"
 		},
 		{

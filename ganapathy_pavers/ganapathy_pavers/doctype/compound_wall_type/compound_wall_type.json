@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "field:compound_wall_type",
  "creation": "2023-07-17 11:46:54.739988",
  "doctype": "DocType",
@@ -32,7 +31,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-17 11:46:54.739988",
+ "modified": "2024-02-21 17:02:22.042038",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Compound Wall Type",

@@ -10,6 +10,7 @@
   "amended_from",
   "molding_date",
   "type",
+  "sub_type",
   "column_break_3",
   "company",
   "status1",
@@ -23,6 +24,7 @@
   "section_break_21",
   "get_total_no_of_batches",
   "total_no_of_batche",
+  "total_batches",
   "production_qty",
   "produced_qty",
   "column_break_34",
@@ -309,7 +311,7 @@
   {
    "fieldname": "total_no_of_batche",
    "fieldtype": "Float",
-   "label": "Total No. Of Batches"
+   "label": "No of M Cube"
   },
   {
    "fieldname": "working_hrs_section",
@@ -528,11 +530,11 @@
   },
   {
    "fieldname": "type",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Type",
-   "options": "Post\nSlab\nFencing Post\nLego Block"
+   "options": "Compound Wall Type"
   },
   {
    "fieldname": "bin_items",
@@ -549,13 +551,26 @@
   {
    "fieldname": "get_total_no_of_batches",
    "fieldtype": "Button",
-   "label": "Get Total Batches"
+   "label": "Get Total M Cubes"
+  },
+  {
+   "fieldname": "sub_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Sub Type",
+   "options": "Compound Wall Sub Type"
+  },
+  {
+   "fieldname": "total_batches",
+   "fieldtype": "Float",
+   "label": "Total M Cube"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-05-10 17:13:41.905347",
+ "modified": "2024-03-12 16:12:47.988465",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "CW Manufacturing",
