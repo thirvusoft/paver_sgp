@@ -1,7 +1,9 @@
 import copy
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
+from frappe.desk.utils import slug
 from frappe.model.utils.rename_field import rename_field
+from frappe.utils.data import quoted
          
 wrk_doctypes = ["Journal Entry Account", "Stock Entry Detail", "GL Entry", "Purchase Invoice","Production Expense Table"]
 
@@ -46,6 +48,7 @@ def make_custom_field(self, event=None, oldname=None, wrk_dt=wrk_doctypes, inser
                                 fieldtype="Check",
                                 insert_after=insert_after,
                                 depends_on="""eval:doc.expense_type=="Manufacturing" """,
+                                allow_on_submit=1,
                             ),]
                     }
                 create_custom_fields(custom_fields)
@@ -88,12 +91,12 @@ def remove_custom_field(self, event=None, wrk_dt=wrk_doctypes):
         return 
     
     # if field exists
-    gl_links = frappe.get_all("GL Entry", filters = {frappe.scrub(self.name): 1}, fields = ["voucher_type", "voucher_no"], group_by="voucher_no, voucher_type")
+    gl_links = frappe.get_all("GL Entry", filters = {frappe.scrub(self.name): 1, 'is_cancelled': 0}, fields = ["voucher_type", "voucher_no"], group_by="voucher_no, voucher_type")
 
     if gl_links and not event == "after_rename":
         messgae = "This document is used in Expense entries <ul>"
         for i in gl_links:
-            messgae += f"<li><a href='/app/{i.voucher_type}/{i.voucher_no}'>{i.voucher_no}</a></li>"
+            messgae += f"<li><a href='/app/{quoted(slug(i.voucher_type))}/{i.voucher_no}'>{i.voucher_no}</a></li>"
         
         messgae += "</ul>"
 

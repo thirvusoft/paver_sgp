@@ -432,11 +432,27 @@ def get_cw_production_rate(_type=[], date=None):
 
 	return cw_cost
 
-def get_cw_monthly_cost(filters=None, _type=["Post", "Slab"]):
+def get_cw_monthly_cost(filters=None, _type=[], sub_type=[]):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 
-	cw_list = frappe.db.get_list("CW Manufacturing",filters={'molding_date':["between",[from_date,to_date]],'type':["in",_type]},pluck="name")
+	type_wise_subtype = {
+		cw: frappe.db.get_all("Compound Wall Sub Type", {'compound_wall_type': cw, 'name': ['in', sub_type]}, pluck="name")
+		for cw in (_type if isinstance(_type, (list, tuple)) else [_type])
+	}
+
+	cw_list = []
+	if type_wise_subtype:
+		for _type in type_wise_subtype:
+			filters = {'molding_date':["between",[from_date,to_date]],'type': _type}
+			if type_wise_subtype[_type]:
+				filters['sub_type'] = ["in", type_wise_subtype[_type]]
+
+			cw_list += frappe.db.get_list("CW Manufacturing",filters=filters,pluck="name")
+	else:
+		filters = {'molding_date':["between",[from_date,to_date]]}
+		cw_list = frappe.db.get_list("CW Manufacturing",filters=filters,pluck="name")
+
 	total_cost_per_sqft = 0
 	rm_cost = 0
 
@@ -609,6 +625,7 @@ def get_retail_cost(doc):
 		item_cost.append({
 		 "item" : item.item,
 		 "qty" : ((item.delivered_stock_qty or 0) + (item.returned_stock_qty or 0)),
+		 "uom": frappe.db.get_value("Item", item.item, "stock_uom"),
 		 "rate" : bin_,
 		 "amount": cost
 		})

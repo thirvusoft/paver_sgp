@@ -8,19 +8,22 @@ from frappe import _
 from ganapathy_pavers.ganapathy_pavers.doctype.cw_manufacturing.cw_manufacturing import uom_conversion
 
 
-def execute(filters=None, _type=["Post", "Slab"], prod_exp_sqft="compound_wall"):
+def execute(filters=None, _type='Compound Wall'):
+	prod_exp_sqft = frappe.scrub(_type or '')
+
 	if filters.get("compound_wall_type"):
-		_type = {
-			"compound_wall": ["Post", "Slab"]
-		}.get(frappe.scrub(filters.get("compound_wall_type"))) or [filters.get("compound_wall_type")]
+		_type = filters.get("compound_wall_type")
 		prod_exp_sqft = frappe.scrub(filters.get("compound_wall_type"))
-		
+	
+	if not frappe.db.get_value("Compound Wall Type", _type, 'used_in_expense_splitup'):
+		prod_exp_sqft = 'compound_wall'
+	
 	columns = get_columns(filters)
 
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 
-	doc = frappe.get_all("CW Manufacturing", {"molding_date":["between", (from_date, to_date)],"type":["in",_type],"production_sqft":["!=",0],"docstatus":["!=",2]}, order_by = 'molding_date')
+	doc = frappe.get_all("CW Manufacturing", {"molding_date":["between", (from_date, to_date)],"type": _type,"production_sqft":["!=",0],"docstatus":["!=",2]}, order_by = 'molding_date')
 	data = []
 
 	if doc:

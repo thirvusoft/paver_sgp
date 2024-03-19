@@ -1,0 +1,127 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-03-05 12:32:30.322464",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "size",
+  "item_code",
+  "type",
+  "sub_type",
+  "qty",
+  "uom",
+  "column_break_6",
+  "nos",
+  "sqft",
+  "bundle",
+  "section_break_10",
+  "rate",
+  "amount",
+  "administrative_cost"
+ ],
+ "fields": [
+  {
+   "columns": 2,
+   "fieldname": "size",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Size",
+   "options": "Item Size"
+  },
+  {
+   "columns": 2,
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "columns": 1,
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Type"
+  },
+  {
+   "columns": 1,
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qty"
+  },
+  {
+   "columns": 1,
+   "fieldname": "uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "UOM",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nos",
+   "fieldtype": "Float",
+   "label": "Nos"
+  },
+  {
+   "fieldname": "sqft",
+   "fieldtype": "Float",
+   "label": "Sqft"
+  },
+  {
+   "fieldname": "bundle",
+   "fieldtype": "Float",
+   "label": "Bundle"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "columns": 1,
+   "fieldname": "rate",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rate",
+   "precision": "2"
+  },
+  {
+   "columns": 1,
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "precision": "2"
+  },
+  {
+   "columns": 1,
+   "fieldname": "administrative_cost",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Administrative Cost"
+  },
+  {
+   "fieldname": "sub_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Sub Type"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-03-07 13:29:56.788567",
+ "modified_by": "Administrator",
+ "module": "Ganapathy Pavers",
+ "name": "Stock Value Other Item Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

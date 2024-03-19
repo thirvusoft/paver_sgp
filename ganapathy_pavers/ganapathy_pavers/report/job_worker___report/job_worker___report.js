@@ -44,8 +44,8 @@ frappe.query_reports["Job Worker - Report"] = {
 		{
 			"fieldname": "type",
 			"label": __("Type"),
-			"fieldtype": "Select",
-			"options": "\nPavers\nCompound Wall"
+			"fieldtype": "Link",
+			"options": "Types"
 		},
 		{
 			"fieldname": "payment_date",

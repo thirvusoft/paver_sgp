@@ -46,40 +46,17 @@ def execute(filters=None):
 	
 	cw_manufacturing=frappe.db.sql("""
 	select 
-		CASE 
-			WHEN type not in ("Post", "Slab") 
-			THEN type 
-			ELSE "Compound Wall" 
-		END as type,
+		type,
 		SUM(total_labour_wages + labour_expense_for_curing) as total_labour_cost,
 		SUM(total_operator_wages) as total_operator_cost,
 		AVG(total_labour_wages + labour_expense_for_curing)/AVG(production_sqft) as labour_cost,
 		AVG(total_operator_wages)/AVG(production_sqft) as operator_cost,
 		SUM(production_sqft) as production_sqft
 		from `tabCW Manufacturing` {0}
-		GROUP BY CASE
-            WHEN type not in ('Post', 'Slab') 
-			THEN type
-        END
+		GROUP BY type
 		""".format(cw_filt), as_dict=1)
 	
-	post_slab={}
-	for row in cw_manufacturing:
-		if row.get("type") in []:
-			if not post_slab:
-				post_slab=row
-				post_slab["type"]="Compound Wall"
-			else:
-				post_slab["total_labour_cost"] += row.get("total_labour_cost", 0)
-				post_slab["labour_cost"] = (post_slab.get("labour_cost", 0)+row.get("labour_cost", 0))/2
-				post_slab["total_operator_cost"] += row.get("total_operator_cost", 0)
-				post_slab["operator_cost"] = (post_slab.get("operator_cost", 0)+row.get("operator_cost", 0))/2
-				post_slab["production_sqft"] = post_slab.get("production_sqft", 0)+row.get("production_sqft", 0)
-			continue
-		data.append(row)
-	
-	if post_slab:
-		data.append(post_slab)
+	data += cw_manufacturing
 	
 	if pw_manufacturing and pw_manufacturing[0]:
 		data.append(pw_manufacturing[0])

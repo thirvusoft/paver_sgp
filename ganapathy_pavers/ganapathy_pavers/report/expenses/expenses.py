@@ -239,35 +239,21 @@ def get_labour_operator_expense(filters):
 				"""
 	cw_labour_query=f"""
 				SELECT 
-					case
-						when type in ('Post', 'Slab') then 'Compound Wall'
-						else type
-					end as fieldname,
+					type as fieldname,
 					SUM(total_labour_wages + labour_expense_for_curing) as value
 				from `tabCW Manufacturing`
 				WHERE 
 					molding_date between '{filters.get("from_date")}' and '{filters.get("to_date")}'
-				group by 
-					case
-						when type in ('Post', 'Slab') then 'Compound Wall'
-						else type
-					end
+				group by type
 				"""
 	cw_operator_query=f"""
 				SELECT 
-					case
-						when type in ('Post', 'Slab') then 'Compound Wall'
-						else type
-					end as fieldname,
+					type as fieldname,
 					SUM(total_operator_wages) as value
 				from `tabCW Manufacturing`
 				WHERE 
 					molding_date between '{filters.get("from_date")}' and '{filters.get("to_date")}'
-				group by 
-					case
-						when type in ('Post', 'Slab') then 'Compound Wall'
-						else type
-					end
+				group by type
 				"""
 	paver_labour_cost = frappe.db.sql(paver_labour_query, as_dict=True)
 	paver_operator_cost = frappe.db.sql(paver_operator_query, as_dict=True)

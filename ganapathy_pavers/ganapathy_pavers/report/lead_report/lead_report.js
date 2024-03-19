@@ -8,7 +8,7 @@ frappe.query_reports["Lead Report"] = {
 			"fieldname":"from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",
-			"default": frappe.datetime.get_today(),
+			"default": frappe.datetime.month_start(),
 			"width": "80",
 			"reqd":1
 		},
@@ -16,15 +16,15 @@ frappe.query_reports["Lead Report"] = {
 			"fieldname":"to_date",
 			"label": __("To Date"),
 			"fieldtype": "Date",
-			"default": frappe.datetime.get_today(),
+			"default": frappe.datetime.month_end(),
 			"width": "80",
 			"reqd":1
 		},
 		{
 			"fieldname":"lead_type",
 			"label": __("Lead Type"),
-			"fieldtype": "Select",
-			"options":"\nPavers\nCompound Wall",
+			"fieldtype": "Link",
+			"options":"Types",
 			"width":"100"
 		},
 		{

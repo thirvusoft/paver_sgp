@@ -168,8 +168,8 @@ frappe.query_reports["General Ledger"] = {
 		{
 			"fieldname":"type",
 			"label": __("Type"),
-			"fieldtype": "Select",
-			"options":"\nPavers\nCompound Wall\nInternal\nOthers"
+			"fieldtype": "Link",
+			"options":"Types"
 			
 		},
 		{
@@ -207,7 +207,6 @@ frappe.query_reports["General Ledger"] = {
 		return value;
 	},
 
-}
 }
 
 erpnext.utils.add_dimensions('General Ledger', 15)

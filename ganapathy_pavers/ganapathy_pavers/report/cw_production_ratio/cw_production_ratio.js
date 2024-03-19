@@ -20,27 +20,18 @@ frappe.query_reports["CW Production Ratio"] = {
 			fieldname: 'compound_wall_type',
 			label: 'Compound Wall Type',
 			fieldtype: 'MultiSelectList',
-			get_data: async () => {
-				await frappe.model.with_doctype('CW Manufacturing')
-				let res = [{
-					'value': 'Compound Wall',
-					'description': ''
-				}]
-				frappe.get_meta("CW Manufacturing").fields.every(row => {
-					if (row.fieldname == 'type') {
-						(row.options || '').split('\n').forEach(opt => {
-							if (!['Post', 'Slab'].includes(opt)) {
-								res.push({
-									'value': opt,
-									'description': ''
-								})
-							}
-						});
-						return false
-					}
-					return true
-				})
-				return res
+			get_data: async (txt) => {
+				return frappe.db.get_link_options('Compound Wall Type', txt);
+			}
+		},
+		{
+			fieldname: 'compound_wall_sub_type',
+			label: 'Compound Wall Sub Type',
+			fieldtype: 'MultiSelectList',
+			get_data: async (txt) => {
+				return frappe.db.get_link_options('Compound Wall Sub Type', txt, {
+					'compound_wall_type': ['in', frappe.query_report.get_filter_value('compound_wall_type')]
+				});
 			}
 		},
 	]

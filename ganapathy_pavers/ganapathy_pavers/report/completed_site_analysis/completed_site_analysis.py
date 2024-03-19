@@ -4,11 +4,12 @@
 import frappe
 
 def execute(filters=None):
-	columns, data = get_columns(filters), get_data(filters)
-	fields = ['Paver', 'Compound Wall'] if not bool(filters.get('type')) else []
+	data, types_with_data = get_data(filters)
+	columns = get_columns(filters, types_with_data) 
+	fields = types_with_data if not bool(filters.get('type')) else []
 	dataset = [
-				{"name": 'Paver', "values": [(i.get('paver') or 0) for i in data]},
-				{"name": 'Compound Wall', "values": [(i.get('cw') or 0) for i in data]}
+				{"name": type, "values": [(i.get(frappe.scrub(type)) or 0) for i in data]}
+				for type in types_with_data
 			]  if not bool(filters.get('type')) else []
 	
 	chart_data = {
@@ -24,7 +25,8 @@ def execute(filters=None):
 	return columns, data, None, chart_data
 
 def get_data(filters):
-	return frappe.db.sql(f"""
+	types = frappe.db.get_all('Types', pluck="name")
+	data = frappe.db.sql(f"""
 		SELECT
 			CONCAT(
 				MONTHNAME(sw.completion_date),
@@ -32,20 +34,17 @@ def get_data(filters):
 				YEAR(sw.completion_date)
 			) as month,
 			COUNT(sw.name) as count,
-		    SUM(
-				CASE
-		      		WHEN sw.type = 'Pavers'
-		      			THEN 1
-		    		ELSE 0
-		    	END
-			) as paver,
-			SUM(
-				CASE
-		      		WHEN sw.type = 'Compound Wall'
-		      			THEN 1
-		    		ELSE 0
-		    	END
-			) as cw
+			{
+				', '.join([f'''
+					SUM(
+						CASE
+							WHEN sw.type = '{type}'
+								THEN 1
+							ELSE 0
+						END
+					) as {frappe.scrub(type)}
+				''' for type in types])
+			}
 		FROM `tabProject` sw
 		WHERE
 		    sw.status = "Completed" AND
@@ -88,7 +87,18 @@ def get_data(filters):
 		ORDER BY YEAR(sw.completion_date), MONTH(sw.completion_date)
 	""", as_dict=True)
 
-def get_columns(filters):
+	types_with_data = []
+	for i in data:
+		for type in types:
+			if (type in types_with_data):
+				continue
+
+			if i.get(frappe.scrub(type)) and type not in types_with_data:
+				types_with_data.append(type)
+
+	return data, types_with_data
+
+def get_columns(filters, types_with_data):
 	return [
 		{
 			'fieldname': 'month',
@@ -96,20 +106,16 @@ def get_columns(filters):
 			'fieldtype': 'Data',
 			'width': 200
 		},
-		{
-			'fieldname': 'paver',
-			'label': 'Paver',
-			'fieldtype': 'Int',
-			'width': 200,
-			'hidden': bool(filters.get('type'))
-		},
-		{
-			'fieldname': 'cw',
-			'label': 'Compound Wall',
-			'fieldtype': 'Int',
-			'width': 200,
-			'hidden': bool(filters.get('type'))
-		},
+		*[
+			{
+				'fieldname': frappe.scrub(type),
+				'label': type,
+				'fieldtype': 'Int',
+				'width': 200,
+				'hidden': bool(filters.get('type'))
+			}
+			for type in types_with_data
+		],
 		{
 			'fieldname': 'count',
 			'label': 'Count',

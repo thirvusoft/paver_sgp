@@ -134,7 +134,7 @@ class StockValue(Document):
 		self.total_stock_bundle = self.paver_stock_bundle + self.kerb_stone_stock_bundle + self.grass_paver_stock_bundle + self.compound_wall_stock_bundle + self.raw_material_stock_bundle
 
 @frappe.whitelist()
-def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', paver_cw_warehouse=[], rm_warehouse=[], ignore_empty_item_size=False, administrative_cost=0):
+def get_items(unit='', _type='', date='', time = '23:59:59', paver_cw_warehouse=[], rm_warehouse=[], ignore_empty_item_size=False, administrative_cost=0):
 	if not administrative_cost:
 		administrative_cost = 0
 
@@ -161,7 +161,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 			ignore_empty_item_size = int(ignore_empty_item_size)
 	except:
 		frappe.log_error(title='STOCK VALUE', message=f"""
-		   item_group: {item_group}\ncw_type: {cw_type }\ndate: {date}\npaver_cw_warehouse: {paver_cw_warehouse}\nrm_warehouse: {rm_warehouse}\nignore_empty_item_size: {ignore_empty_item_size}\n
+		   _type: {_type}\ndate: {date}\npaver_cw_warehouse: {paver_cw_warehouse}\nrm_warehouse: {rm_warehouse}\nignore_empty_item_size: {ignore_empty_item_size}\n
 		   \n
 		   {frappe.get_traceback()}
 		   """)
@@ -171,6 +171,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		'raw_material_stock': [],
 		'kerb_stone_stock': [],
 		'grass_paver_stock': [],
+		'other_item_detail': [],
 	}
 	if isinstance(paver_cw_warehouse, str):
 		paver_cw_warehouse = json.loads(paver_cw_warehouse)
@@ -185,11 +186,11 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 			ELSE 1=1
 		END
 		"""
-	if item_group:
-		item_filters += f" and item.item_group = '{item_group}' "
-	
-		if item_group == 'Compound Walls' and cw_type:
-			item_filters += f" and item.compound_wall_type = '{cw_type}' "
+	if _type:
+		if _type == "Pavers":
+			item_filters += f" and item.item_group = '{_type}' "
+		else:
+			item_filters += f" and (item.paver_type = '{_type}' or item.compound_wall_type = '{_type}') "
 	
 	item_filters += f""" and 
 		CASE 
@@ -218,6 +219,7 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		       	ELSE item.item_group
 		    END as item_group,
 			item.compound_wall_type,
+			item.compound_wall_sub_type,
 			IFNULL(item.dsm_uom, item.stock_uom) as uom,
 			(
 				CASE
@@ -322,7 +324,10 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		if item.get('item_group') == 'Pavers':
 			res['paver_stock'].append(item)
 		elif item.get('item_group') == "Compound Walls":
-			res['cw_stock'].append(item)
+			if item.get("compound_wall_type") == "Compound Wall":
+				res['cw_stock'].append(item)
+			else:
+				res['other_item_detail'].append(item)
 		elif item.get('item_group') == "Raw Material":
 			res["raw_material_stock"].append(item)
 		elif item.get('item_group') == 'Kerb Stone':
@@ -476,6 +481,43 @@ def get_items(unit='', item_group='', cw_type = '', date='', time = '23:59:59', 
 		if rate and rate[0] and len(rate[0])>1:
 			item['rate'] = rate[0][1]
 	
+	for item in res['other_item_detail']:
+		item['qty'] = get_stock_qty(
+			item_code=item.get('name'),
+			warehouse=paver_cw_warehouse,
+			date=date,
+			time = time,
+			to_uom=item.get('uom'),
+			uom_conv=False
+		)
+		item['nos'] = uom_conversion(item=item.get('name'), from_uom=item.get('uom'), from_qty=item.get("qty"), to_uom="Nos", throw_err=False)
+		item['sqft'] = uom_conversion(item=item.get('name'), from_uom=item.get('uom'), from_qty=item.get("qty"), to_uom="SQF", throw_err=False)
+		item['bundle'] = uom_conversion(item=item.get('name'), from_uom=item.get('uom'), from_qty=item.get("qty"), to_uom="Bdl", throw_err=False)
+
+		rate = ()
+		if item.get('item_size'):
+			filters = {}
+			filters['item_group'] = item.get('item_group')
+
+			if item.get('item_group') == 'Pavers':
+				filters['finish'] = item.get('finish')
+				filters['colour'] = item.get('colour')
+			elif item.get('item_group') == 'Compound Walls' and item.get('compound_wall_type') in ['Post', 'Corner Post', 'Fencing Post']:
+				filters['post_type'] = item.get('compound_wall_type')
+
+			rate = get_item_size_price(item_size=item.get('item_size'), item_code=item.get('name'), posting_date=date, to_uom=item.get('uom'), filters=filters)
+		else:
+			rate = get_item_price(args={
+					'batch_no': '',
+					'posting_date': date, 
+					'price_list': get_default_price_list()
+				}, 
+				item_code=item.get('name'), 
+				to_uom = item.get('uom'))
+		
+		if rate and rate[0] and len(rate[0])>1:
+			item['rate'] = rate[0][1]
+
 	for item in res['raw_material_stock']:
 		item['qty'] = get_stock_qty(
 			item_code=item.get('name'),
@@ -521,12 +563,14 @@ def group_item_sizes(res, stock_default, administrative_cost):
 	kerb_stone = res['kerb_stone_stock']
 	grass_paver = res['grass_paver_stock']
 	cw = res['cw_stock']
+	other = res["other_item_detail"]
 	raw_material = res['raw_material_stock']
 
 	paver_res = {}
 	kerb_stone_res = {}
 	grass_paver_res = {}
 	cw_res = {}
+	other_res = {}
 	raw_material_res = {}
 
 	for row in paver:
@@ -613,7 +657,7 @@ def group_item_sizes(res, stock_default, administrative_cost):
 			cw_res[key or ''] = {
 				'size': row.get('item_size') or '',
 				'item_code': (row.get('name') or '') if not row.get('item_size') else '',
-				'type': row.get('compound_wall_type'),
+				'type': row.get('compound_wall_sub_type'),
 				'qty': row.get('qty') or 0,
 				'nos': row.get('nos') or 0,
 				'sqft': row.get('sqft') or 0,
@@ -630,6 +674,31 @@ def group_item_sizes(res, stock_default, administrative_cost):
 			cw_res[key or '']['nos'] += row.get('nos') or 0
 			cw_res[key or '']['sqft'] += row.get('sqft') or 0
 			cw_res[key or '']['bundle'] += row.get('bundle') or 0
+	
+	for row in other:
+		key = f"{row.get('item_size') or row.get('name')}---------{row.get('uom')}--------------{row.get('rate')}"
+		if key not in other_res:
+			other_res[key or ''] = {
+				'size': row.get('item_size') or '',
+				'item_code': (row.get('name') or '') if not row.get('item_size') else '',
+				'type': row.get('compound_wall_type'),
+				'sub_type': row.get('compound_wall_sub_type'),
+				'qty': row.get('qty') or 0,
+				'nos': row.get('nos') or 0,
+				'sqft': row.get('sqft') or 0,
+				'bundle': row.get('bundle') or 0,
+				'uom': row.get('uom') or '',
+				'rate': row.get('rate') or 0,
+				'administrative_cost': ((row.get('qty') or 0) * (administrative_cost or 0)),
+				'amount': (row.get('qty') or 0) * (row.get('rate') or 0),
+			}
+		else:
+			other_res[key or '']['qty'] += row.get('qty') or 0
+			other_res[key or '']['amount'] += ((row.get('qty') or 0) * (row.get('rate') or 0))
+			other_res[key or '']['administrative_cost'] += ((row.get('qty') or 0) * (administrative_cost or 0))
+			other_res[key or '']['nos'] += row.get('nos') or 0
+			other_res[key or '']['sqft'] += row.get('sqft') or 0
+			other_res[key or '']['bundle'] += row.get('bundle') or 0
 	
 	for row in raw_material:
 		key = f"{row.get('item_size') or row.get('name')}---------{row.get('uom')}--------------{row.get('rate')}"
@@ -656,6 +725,7 @@ def group_item_sizes(res, stock_default, administrative_cost):
 		'kerb_stone_stock': sorted(list(kerb_stone_res.values()), key=lambda x: x.get('finish') or ''),
 		'grass_paver_stock': sorted(list(grass_paver_res.values()), key=lambda x: x.get('finish') or ''),
 		'cw_stock': list(cw_res.values()),
+		'other_item_detail': list(other_res.values()),
 		'raw_material_stock': list(raw_material_res.values())
 	})
 
@@ -799,5 +869,49 @@ def group_item_sizes(res, stock_default, administrative_cost):
 
 		default=len(res['raw_material_stock']) + 1
 		res['raw_material_stock'].sort(key = lambda row: (get_item_order(item=row.get("item_code") or row.get("size") or "", default=default) or 0))
+
+	res['cw_stock'].sort(key = lambda row: ((row.get("type") or ""), (row.get("size") or "")))
+	res['other_item_detail'].sort(key = lambda row: ((row.get("type") or ""), (row.get("sub_type") or ""), (row.get("size") or "")))
+
+	return res
+
+def get_stock_value_other_items(doc):
+	res = {}
+	for row in doc.other_item_detail:
+		if (row.get("qty") or 0):
+			if row.type not in res:
+				res[row.type] = {
+					"items": [],
+					"total_nos": 0,
+					"total_sqft": 0,
+					"total_stock_qty": 0,
+					"total_stock_value": 0,
+					"total_administrative_cost": 0
+				}
+				
+			res[row.type]["items"].append(row)
+			res[row.type]["total_nos"] += (row.get("nos") or 0)
+			res[row.type]["total_sqft"] += (row.get("sqft") or 0)
+			res[row.type]["total_stock_qty"] += (row.get("qty") or 0)
+			res[row.type]["total_stock_value"] += (row.get("amount") or 0)
+			res[row.type]["total_administrative_cost"] += (row.get("administrative_cost") or 0)
+	
+	return res
+
+def get_total_stock_value(doc):
+	other_stock = {}
+	for os in (doc.get("other_item_detail") or []):
+		if os.type not in other_stock:
+			other_stock[os.type] = 0
+		other_stock[os.type] += (os.amount + os.administrative_cost)
+
+	res = {
+		"Paver": (doc.get("paver_stock_value") or 0) + (doc.get('paver_stock_value_administrative') or 0),
+		"Kerb Stone": (doc.get("kerb_stone_stock_value") or 0) + (doc.get('kerb_stone_stock_value_administrative') or 0),
+		"Grass Paver": (doc.get("grass_paver_stock_value") or 0) + (doc.get('grass_paver_stock_value_administrative') or 0),
+		"Compound Wall": (doc.get("compound_wall_stock_value") or 0) + (doc.get('compound_wall_stock_value_administrative') or 0),
+		**other_stock,
+		"Raw Material": (doc.get("raw_material_stock_value") or 0) + (doc.get('raw_material_stock_value_administrative') or 0),
+	}
 
 	return res

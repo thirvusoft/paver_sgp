@@ -18,7 +18,7 @@ def execute(filters=None):
         adv_conditions = "where empadv.repay_unclaimed_amount_from_salary=1"
         if site_type:
             conditions += " and site.type='{0}'".format(site_type)
-            conditions += " and emp.paver=1" if site_type=="Pavers" else " and emp.compound_wall=1"
+            conditions += f""" and "{site_type}" in (select _t.type from `tabEmployee Production Type` _t where _t.parent=emp.name and _t.parenttype='Employee' and _t.parentfield='production') """
         if from_date and to_date:
             conditions += "  and jwd.start_date >= '{0}' and jwd.end_date <= '{1}'".format(from_date, to_date)
             adv_conditions += " and empadv.posting_date between '{0}' and '{1}' ".format(from_date, to_date)
@@ -520,12 +520,16 @@ def get_undeducted_planned_advances(employee, from_date, to_date):
 
 def get_employees_to_add(filters, employees):
     employees=list(set(employees))
-    emp_filters={"status": "Active", "name": ["not in", employees], "designation": "Job Worker"}
+    emp_filters = [
+        ["status", "=", "Active"],
+        ["name", "not in", employees],
+        ["designation", '=', "Job Worker"]
+    ]
     if filters.get("employee") and filters.get("employee") in employees:
         return []
     
     elif filters.get("employee"):
-        emp_filters["name"] = filters.get("employee")
+        emp_filters.append(["name", "=", filters.get("employee")])
 
     elif filters.get("site_name"):
         emp_list=[]
@@ -537,13 +541,10 @@ def get_employees_to_add(filters, employees):
         """)
         for row in emp:
             emp_list.append(row[0])
-        emp_filters["name"] = ["in", emp_list]
+        emp_filters.append(["name", "in", emp_list])
 
     elif filters.get("type"):
-        if filters.get("type")=="Pavers":
-            emp_filters["paver"] = 1
-        else:
-            emp_filters["compound_wall"] = 1
+        emp_filters.append(["Employee Production Type", "type", "=", filters.get("type")])
 
     rem = frappe.get_all("Employee", emp_filters, pluck='name')
     return [[emp]+ [None for i in range(11)] for emp in rem if (

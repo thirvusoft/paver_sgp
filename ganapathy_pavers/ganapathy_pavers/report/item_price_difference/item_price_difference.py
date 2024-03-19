@@ -9,6 +9,7 @@ from frappe.utils.data import nowdate
 from ganapathy_pavers.custom.py.expense import total_expense
 from ganapathy_pavers.utils.py.sitework_printformat import get_cw_monthly_cost
 from ganapathy_pavers.custom.py.journal_entry import get_production_details
+from ganapathy_pavers.ganapathy_pavers.report.itemwise_monthly_paver_production_report.itemwise_monthly_paver_production_report import get_production_cost
 import frappe
 from frappe import _, scrub
 
@@ -80,34 +81,23 @@ def get_data(filters, selling_price_lists):
 		
 		if frappe.db.get_value("Item", item_dict.get("variant_name"), "item_group") == "Compound Walls":
 			
-			_type = [frappe.db.get_value("Item", item_dict.get("variant_name"), "compound_wall_type")]
-			if "Post" in _type or "Slab" in _type:
-				_type = ["Post", "Slab"]
-			exp_group="cw_group"
-			prod="compound_wall"
-
-			if _type == ["Lego Block"]:
-				exp_group="lg_group"
-				prod="lego_block"
-
-			elif _type == ['Fencing Post']:
-				exp_group="fp_group" 
-				prod="fencing_post"
+			_type = frappe.db.get_value("Item", item_dict.get("variant_name"), "compound_wall_type")
+			prod = frappe.scrub(_type or '')
 			
-			if exp_group not in cw_expense_cost:
-				cw_expense_cost[exp_group] = total_expense(
+			if prod not in cw_expense_cost:
+				cw_expense_cost[prod] = total_expense(
 					from_date=filters.get('from_date'), 
 					prod_details=prod,
 					to_date=filters.get('to_date'), 
 					expense_type="Manufacturing", 
 				)
-
+			
 			item_dict["prod_rate"], item_dict["expense_cost"] = get_cw_monthly_cost(filters=filters, _type=_type)
 			item_dict["total_production_rate"] = item_dict["prod_rate"] + item_dict["expense_cost"]
-			item_dict["expense_cost"] += ((cw_expense_cost.get(exp_group, 0) or 0) /(prod_details.get(prod, 1) or 1))
+			item_dict["expense_cost"] += ((cw_expense_cost.get(prod, 0) or 0) /(prod_details.get(prod, 1) or 1))
 
 			if item_dict["total_production_rate"]:
-				item_dict["total_production_rate"] += ((cw_expense_cost.get(exp_group, 0) or 0) /(prod_details.get(prod, 1) or 1))
+				item_dict["total_production_rate"] += ((cw_expense_cost.get(prod, 0) or 0) /(prod_details.get(prod, 1) or 1))
 
 		for price_list in selling_price_lists:
 			selling_price_map = get_selling_price_map(filters, item_dict.get("variant_name"), price_list)

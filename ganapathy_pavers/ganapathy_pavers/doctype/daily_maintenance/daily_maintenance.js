@@ -18,6 +18,27 @@ frappe.ui.form.on('Daily Maintenance', {
 			})
 			refresh_field('warehouse_colour')
 		}
+
+		document.querySelector(`button[data-fieldtype="Button"][data-fieldname="load_item_details"]`).classList.add('btn-primary')
+		let btn = frm.add_custom_button("Load Item Details", () => {
+			frm.trigger('load_item_details');
+		}).addClass('btn-primary');
+
+		function btnVisible() {
+			window.requestAnimationFrame(btnVisible);
+			if (ganapathy_pavers.isVisible(document.querySelector(`button[data-fieldtype="Button"][data-fieldname="load_item_details"]`))) {
+				btn[0].style.display = "none"
+			} else {
+				btn[0].style.display = ""
+			}
+		}
+
+		try {
+			btnVisible();;
+		} catch (error) {
+			console.log('Error caught:', error);
+		}
+
 	},
 	get_attendance_details: function (frm) {
 		frappe.call({

@@ -343,17 +343,17 @@ async function compoun_walls_calc(frm, cdt, cdtn) {
         }
         let Post = 0, Slab = 0;
         for (let i = 0; i < frm.doc.items.length; i++) {
-            if (cur_frm.doc.items[i].compound_wall_type == 'Slab' && cur_frm.doc.items[i].item_group == 'Compound Walls') {
+            if (cur_frm.doc.items[i].compound_wall_type == 'Compound Wall' && cur_frm.doc.items[i].compound_wall_sub_type == 'Slab' && cur_frm.doc.items[i].item_group == 'Compound Walls') {
                 Slab += 1;
             }
-            else if (cur_frm.doc.items[i].compound_wall_type == 'Post' && cur_frm.doc.items[i].item_group == 'Compound Walls') {
+            else if (ccur_frm.doc.items[i].compound_wall_type == 'Compound Wall' && ur_frm.doc.items[i].compound_wall_sub_type == 'Post' && cur_frm.doc.items[i].item_group == 'Compound Walls') {
                 Post += 1;
             }
         }
-        if (row.compound_wall_type == 'Slab' && Slab == 1 && cur_frm.doc.total_slab) {
+        if (cur_frm.doc.items[i].compound_wall_type == 'Compound Wall' && row.compound_wall_sub_type == 'Slab' && Slab == 1 && cur_frm.doc.total_slab) {
             frappe.model.set_value(cdt, cdtn, 'pieces', cur_frm.doc.total_slab);
         }
-        else if (row.compound_wall_type == 'Post' && Post == 1 && cur_frm.doc.total_post) {
+        else if (cur_frm.doc.items[i].compound_wall_type == 'Compound Wall' && row.compound_wall_sub_type == 'Post' && Post == 1 && cur_frm.doc.total_post) {
             frappe.model.set_value(cdt, cdtn, 'pieces', cur_frm.doc.total_post);
         }
         else {

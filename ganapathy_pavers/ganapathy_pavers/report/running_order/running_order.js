@@ -36,9 +36,9 @@ frappe.query_reports["Running Order"] = {
         {
             "fieldname": "type",
             "label": __("Type"),
-            "fieldtype": "Select",
+            "fieldtype": "Link",
             "default": "Pavers",
-            "options": "Pavers\nCompound Wall"
+            "options": "Types"
         },
         {
             "fieldname": "status",
