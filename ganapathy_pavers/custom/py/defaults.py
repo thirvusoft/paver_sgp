@@ -128,7 +128,7 @@ def print_settings():
                 "label": "Delivery Slip - Show Bundle UOM",
                 "fieldname": "print_as_bundle",
                 "fieldtype": "Check",
-                "default": 1,
+                "default": "1",
                 "insert_after" : "print_taxes_with_zero_amount"
             },
         ]

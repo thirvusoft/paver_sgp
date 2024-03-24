@@ -28,15 +28,18 @@
   "avg_damage_sqft",
   "section_break_7",
   "from_time",
+  "opening_eb_reading",
   "additional_cost",
   "total_cost_per_sqft",
   "column_break_12",
   "to_time",
+  "closing_eb_reading",
   "labour_cost",
   "labour_cost_in_workstation",
   "create_stock_entry",
   "column_break_14",
   "total_hrs",
+  "rate_per_unit",
   "total_cost",
   "total_damage_cost",
   "section_break_16",
@@ -138,7 +141,7 @@
   {
    "fieldname": "additional_cost",
    "fieldtype": "Float",
-   "label": "Additional Cost"
+   "label": "EB Cost"
   },
   {
    "fieldname": "labour_cost",
@@ -252,12 +255,30 @@
    "fieldname": "total_operator_wages",
    "fieldtype": "Currency",
    "label": "Total Operator Wages"
+  },
+  {
+   "fieldname": "opening_eb_reading",
+   "fieldtype": "Float",
+   "label": "Opening EB Reading",
+   "precision": "4"
+  },
+  {
+   "fieldname": "closing_eb_reading",
+   "fieldtype": "Float",
+   "label": "Closing EB Reading",
+   "precision": "4"
+  },
+  {
+   "fieldname": "rate_per_unit",
+   "fieldtype": "Currency",
+   "label": "Rate per Unit",
+   "precision": "4"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-12 19:10:32.082055",
+ "modified": "2024-03-24 12:55:17.434190",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Shot Blast Costing",

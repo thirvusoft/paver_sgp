@@ -6,10 +6,10 @@ frappe.ui.form.on('Material Manufacturing', {
 	refresh: async function (frm) {
 		if (cur_frm.is_new() == 1) {
 			if (frm.doc.is_shot_blasting) {
-				default_value("shot_blast_per_sqft", "shot_blast_per_sqft")
+				// default_value("shot_blast_per_sqft", "shot_blast_per_sqft")
 			}
 			// default_value("labour_cost_per_sqft", "labour_cost_per_sqft")
-			default_value("strapping_cost_per_sqft", "strapping_cost_per_sqft")
+			// default_value("strapping_cost_per_sqft", "strapping_cost_per_sqft")
 			default_value("default_manufacture_operation", "operation")
 			default_value("default_rack_shift_workstation", "workstation")
 			default_value("default_manufacture_workstation", "work_station")
@@ -70,7 +70,7 @@ frappe.ui.form.on('Material Manufacturing', {
 	},
 	is_shot_blasting: function (frm) {
 		if (frm.doc.is_shot_blasting == 1) {
-			default_value("shot_blast_per_sqft", "shot_blast_per_sqft")
+			// default_value("shot_blast_per_sqft", "shot_blast_per_sqft")
 			value_from_workstation("default_curing_target_warehouse_for_setting", "curing_target_warehouse")
 		}
 		else {

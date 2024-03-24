@@ -697,12 +697,15 @@
    "label": "Total Expense per Sqft"
   },
   {
-   "fetch_from": "work_station.curing_labour_cost_per_sqft",
+   "fetch_from": "item_to_manufacture.curing_cost",
+   "fetch_if_empty": 1,
    "fieldname": "labour_cost_per_sqft",
    "fieldtype": "Currency",
    "label": "Labour Cost per Sqft"
   },
   {
+   "fetch_from": "item_to_manufacture.shot_blast_cost",
+   "fetch_if_empty": 1,
    "fieldname": "shot_blast_per_sqft",
    "fieldtype": "Float",
    "label": "Shot Blast per Sqft",
@@ -720,6 +723,8 @@
    "read_only": 1
   },
   {
+   "fetch_from": "item_to_manufacture.strapping_cost",
+   "fetch_if_empty": 1,
    "fieldname": "strapping_cost_per_sqft",
    "fieldtype": "Float",
    "label": "Strapping Cost Per Sqft"
@@ -1056,7 +1061,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-12-12 16:26:09.493843",
+ "modified": "2024-03-24 11:30:32.079672",
  "modified_by": "Administrator",
  "module": "Ganapathy Pavers",
  "name": "Material Manufacturing",

@@ -16,6 +16,7 @@ class StockValue(Document):
 		self.kerb_stone_stock_value = 0
 		self.grass_paver_stock_value = 0
 		self.compound_wall_stock_value = 0
+		self.other_stock_value = 0
 		self.raw_material_stock_value = 0
 
 		self.paver_stock_value_administrative = 0
@@ -24,6 +25,7 @@ class StockValue(Document):
 		self.kerb_stone_stock_value_administrative = 0
 		self.grass_paver_stock_value_administrative = 0
 		self.compound_wall_stock_value_administrative = 0
+		self.other_stock_value_administrative = 0
 
 		self.paver_stock_qty = 0
 		self.normal_paver_stock_qty = 0
@@ -31,6 +33,7 @@ class StockValue(Document):
 		self.kerb_stone_stock_qty = 0
 		self.grass_paver_stock_qty = 0
 		self.compound_wall_stock_qty = 0
+		self.other_stock_qty = 0
 		self.raw_material_stock_qty = 0
 
 		self.paver_stock_nos = 0
@@ -39,6 +42,7 @@ class StockValue(Document):
 		self.kerb_stone_stock_nos = 0
 		self.grass_paver_stock_nos = 0
 		self.compound_wall_stock_nos = 0
+		self.other_stock_nos = 0
 		self.raw_material_stock_nos = 0
 
 		self.paver_stock_sqft = 0
@@ -47,6 +51,7 @@ class StockValue(Document):
 		self.kerb_stone_stock_sqft = 0
 		self.grass_paver_stock_sqft = 0
 		self.compound_wall_stock_sqft = 0
+		self.other_stock_sqft = 0
 		self.raw_material_stock_sqft = 0
 
 		self.paver_stock_bundle = 0
@@ -55,6 +60,7 @@ class StockValue(Document):
 		self.kerb_stone_stock_bundle = 0
 		self.grass_paver_stock_bundle = 0
 		self.compound_wall_stock_bundle = 0
+		self.other_stock_bundle = 0
 		self.raw_material_stock_bundle = 0
 
 		for row in self.paver_stock:
@@ -117,6 +123,17 @@ class StockValue(Document):
 			self.compound_wall_stock_sqft += row.sqft or 0
 			self.compound_wall_stock_bundle += row.bundle or 0
 		
+		for row in self.other_item_detail:
+			row.amount = (row.qty or 0) * (row.rate or 0)
+			row.administrative_cost = (row.qty or 0) * (self.administrative_cost or 0)
+
+			self.other_stock_value += row.amount or 0
+			self.other_stock_value_administrative += row.administrative_cost or 0
+			self.other_stock_qty += row.qty or 0
+			self.other_stock_nos += row.nos or 0
+			self.other_stock_sqft += row.sqft or 0
+			self.other_stock_bundle += row.bundle or 0
+		
 		for row in self.raw_material_stock:
 			row.amount = (row.qty or 0) * (row.rate or 0)
 			self.raw_material_stock_value += row.amount or 0
@@ -125,13 +142,13 @@ class StockValue(Document):
 			self.raw_material_stock_sqft += row.sqft or 0
 			self.raw_material_stock_bundle += row.bundle or 0
 		
-		self.total_stock_qty = self.paver_stock_qty + self.kerb_stone_stock_qty + self.grass_paver_stock_qty + self.compound_wall_stock_qty + self.raw_material_stock_qty
-		self.total_stock_value = self.paver_stock_value + self.kerb_stone_stock_value + self.grass_paver_stock_value + self.compound_wall_stock_value + self.raw_material_stock_value
-		self.total_stock_value_administrative = self.paver_stock_value_administrative + self.kerb_stone_stock_value_administrative + self.grass_paver_stock_value_administrative + self.compound_wall_stock_value_administrative
+		self.total_stock_qty = self.paver_stock_qty + self.kerb_stone_stock_qty + self.grass_paver_stock_qty + self.compound_wall_stock_qty + self.other_stock_qty + self.raw_material_stock_qty
+		self.total_stock_value = self.paver_stock_value + self.kerb_stone_stock_value + self.grass_paver_stock_value + self.compound_wall_stock_value + self.other_stock_value + self.raw_material_stock_value
+		self.total_stock_value_administrative = self.paver_stock_value_administrative + self.kerb_stone_stock_value_administrative + self.grass_paver_stock_value_administrative + self.compound_wall_stock_value_administrative + self.other_stock_value_administrative
 		self.total_stock_value_with_administrative = (self.total_stock_value or 0) + (self.total_stock_value_administrative or 0)
-		self.total_stock_nos = self.paver_stock_nos + self.kerb_stone_stock_nos + self.grass_paver_stock_nos + self.compound_wall_stock_nos + self.raw_material_stock_nos
-		self.total_stock_sqft = self.paver_stock_sqft + self.kerb_stone_stock_sqft + self.grass_paver_stock_sqft + self.compound_wall_stock_sqft + self.raw_material_stock_sqft
-		self.total_stock_bundle = self.paver_stock_bundle + self.kerb_stone_stock_bundle + self.grass_paver_stock_bundle + self.compound_wall_stock_bundle + self.raw_material_stock_bundle
+		self.total_stock_nos = self.paver_stock_nos + self.kerb_stone_stock_nos + self.grass_paver_stock_nos + self.compound_wall_stock_nos + self.other_stock_nos + self.raw_material_stock_nos
+		self.total_stock_sqft = self.paver_stock_sqft + self.kerb_stone_stock_sqft + self.grass_paver_stock_sqft + self.compound_wall_stock_sqft + self.other_stock_sqft + self.raw_material_stock_sqft
+		self.total_stock_bundle = self.paver_stock_bundle + self.kerb_stone_stock_bundle + self.grass_paver_stock_bundle + self.compound_wall_stock_bundle + self.other_stock_bundle + self.raw_material_stock_bundle
 
 @frappe.whitelist()
 def get_items(unit='', _type='', date='', time = '23:59:59', paver_cw_warehouse=[], rm_warehouse=[], ignore_empty_item_size=False, administrative_cost=0):
@@ -902,16 +919,35 @@ def get_total_stock_value(doc):
 	other_stock = {}
 	for os in (doc.get("other_item_detail") or []):
 		if os.type not in other_stock:
-			other_stock[os.type] = 0
-		other_stock[os.type] += (os.amount + os.administrative_cost)
+			other_stock[os.type] = {
+				"qty": 0,
+				"amount": 0
+			}
+		other_stock[os.type]["amount"] += (os.amount + os.administrative_cost)
+		other_stock[os.type]["qty"] += (os.qty or 0)
 
 	res = {
-		"Paver": (doc.get("paver_stock_value") or 0) + (doc.get('paver_stock_value_administrative') or 0),
-		"Kerb Stone": (doc.get("kerb_stone_stock_value") or 0) + (doc.get('kerb_stone_stock_value_administrative') or 0),
-		"Grass Paver": (doc.get("grass_paver_stock_value") or 0) + (doc.get('grass_paver_stock_value_administrative') or 0),
-		"Compound Wall": (doc.get("compound_wall_stock_value") or 0) + (doc.get('compound_wall_stock_value_administrative') or 0),
+		"Paver": {
+			"qty": (doc.get("paver_stock_qty") or 0),
+			"amount": (doc.get("paver_stock_value") or 0) + (doc.get('paver_stock_value_administrative') or 0),
+			},
+		"Kerb Stone": {
+			"qty": (doc.get("kerb_stone_stock_qty") or 0),
+			"amount": (doc.get("kerb_stone_stock_value") or 0) + (doc.get('kerb_stone_stock_value_administrative') or 0),
+			},
+		"Grass Paver": {
+			"qty": (doc.get("grass_paver_stock_qty") or 0),
+			"amount": (doc.get("grass_paver_stock_value") or 0) + (doc.get('grass_paver_stock_value_administrative') or 0),
+			},
+		"Compound Wall": {
+			"qty": (doc.get("compound_wall_stock_qty") or 0),
+			"amount": (doc.get("compound_wall_stock_value") or 0) + (doc.get('compound_wall_stock_value_administrative') or 0),
+			},
 		**other_stock,
-		"Raw Material": (doc.get("raw_material_stock_value") or 0) + (doc.get('raw_material_stock_value_administrative') or 0),
+		"Raw Material": {
+			"qty": (doc.get("raw_material_stock_qty") or 0),
+			"amount": (doc.get("raw_material_stock_value") or 0) + (doc.get('raw_material_stock_value_administrative') or 0),
+			},
 	}
 
 	return res

@@ -182,6 +182,18 @@ frappe.ui.form.on('Shot Blast Costing', {
 		}
 		frm.set_value("total_operator_wages", total_operator_wages);
 	},
+	opening_eb_reading: function (frm) {
+		frm.trigger("calculate_eb");
+	},
+	closing_eb_reading: function (frm) {
+		frm.trigger("calculate_eb");
+	},
+	rate_per_unit: function (frm) {
+		frm.trigger("calculate_eb");
+	},
+	calculate_eb: function (frm) {
+		frm.set_value('additional_cost', ((frm.doc.closing_eb_reading || 0) - (frm.doc.opening_eb_reading || 0)) * (frm.doc.rate_per_unit || 0));
+	}
 });
 frappe.ui.form.on('Shot Blast Items', {
 	material_manufacturing: async function (frm, cdt, cdn) {
